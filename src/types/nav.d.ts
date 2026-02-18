@@ -12,4 +12,5 @@ export interface NavItemConfig {
   // If you need to match multiple paths,
   // can extend it to accept multiple matchers.
   matcher?: { type: 'startsWith' | 'equals'; href: string };
+  blockedUsers?: string[];
 }

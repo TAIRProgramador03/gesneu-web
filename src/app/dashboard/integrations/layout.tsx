@@ -1,10 +1,14 @@
-// filepath: c:\PROYECTOS\material-kit-react\src\app\dashboard\integrations\layout.tsx
-import { config } from '@/config';
+import React from 'react';
+import { PermissionGuard } from '@/components/auth/permission-guard';
 
 export const metadata = {
   title: `Gestion de Neumaticos`,
 };
 
-export default function Layout({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+export const Layout = ({ children }: { children: React.ReactNode }): React.JSX.Element => {
+  return (
+    <PermissionGuard blockedUsers={['GESNEU']}>
+      {children}
+    </PermissionGuard>
+  );
 }

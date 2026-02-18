@@ -15,6 +15,8 @@ import type { NavItemConfig } from '@/types/nav';
 import { paths } from '@/paths';
 import { isNavItemActive } from '@/lib/is-nav-item-active';
 
+import { useUser } from '@/hooks/use-user';
+
 import { navItems } from './config';
 import { navIcons } from './nav-icons';
 
@@ -26,6 +28,12 @@ interface SideNavProps {
 export function SideNav({ collapsed, setCollapsed }: SideNavProps): React.JSX.Element {
   const pathname = usePathname();
   const navRef = React.useRef<HTMLDivElement>(null);
+  const { user } = useUser();
+
+  let userName = user?.usuario?.trim() ?? ''
+  const visibleNavItems = navItems.filter(
+    (item) => !item.blockedUsers?.includes(userName ?? '')
+  );
 
   React.useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -95,7 +103,7 @@ export function SideNav({ collapsed, setCollapsed }: SideNavProps): React.JSX.El
       {/* Menú */}
       <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', pt: 2 }}>
         <Box component="nav" sx={{ width: '100%' }}>
-          {renderNavItems({ pathname, items: navItems, collapsed })}
+          {renderNavItems({ pathname, items: visibleNavItems, collapsed })}
         </Box>
       </Box>
       <Divider />
