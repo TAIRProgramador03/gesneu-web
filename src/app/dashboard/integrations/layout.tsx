@@ -5,7 +5,7 @@ export const metadata = {
   title: `Gestion de Neumaticos`,
 };
 
-export const Layout = ({ children }: { children: React.ReactNode }): React.JSX.Element => {
+export default function Layout({ children }: { children: React.ReactNode }): React.JSX.Element {
   return (
     <PermissionGuard blockedUsers={['GESNEU']}>
       {children}
