@@ -1,11 +1,11 @@
 import { Customer } from "@/components/dashboard/customer/customers-table"
 import { ListPadronMapped } from "@/types/padron"
 
-interface Props {
+interface MappedPadronNeumaticosParams {
   filteredCustomers: Customer[]
 }
 
-export const mappedPadronNeumaticos = ({ filteredCustomers }: Props): ListPadronMapped => {
+export const mappedPadronNeumaticos = ({ filteredCustomers }: MappedPadronNeumaticosParams): ListPadronMapped => {
 
   return filteredCustomers.map((c: Customer) => ({
     'Código': c.CODIGO,

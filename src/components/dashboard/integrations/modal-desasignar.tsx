@@ -950,9 +950,9 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = ({
 
                         {/* Botón Asignar Neumáticos */}
                         <Button
-                          color="primary"
-                          variant="outlined"
-                          sx={{}}
+                          color="success"
+                          variant="contained"
+                          sx={{ ml: 1 }}
                           disabled={!tienePosicionesVacias || !tieneAccionYObservacion}
                           onClick={() => {
                             // Agrupar por posición y quedarse con el más reciente (mayor ID_MOVIMIENTO)

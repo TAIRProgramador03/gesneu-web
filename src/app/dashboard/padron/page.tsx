@@ -20,7 +20,7 @@ import ModalInsertExcel from '@/components/dashboard/customer/modal-insert-excel
 import { useQuery } from '@tanstack/react-query';
 import { useNeuStats } from '@/hooks/use-neu-stats';
 import * as XLSX from 'xlsx';
-import { exportToExcel } from '@/utils/exportToExcel';
+import { exportToExcel } from '@/utils/export-to-excel';
 import { mappedPadronNeumaticos } from '@/mapped/padron-neumaticos.mapped';
 
 export default function Page(): React.JSX.Element {
