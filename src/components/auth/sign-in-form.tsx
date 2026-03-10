@@ -20,7 +20,7 @@ import { z as zod } from 'zod';
 import IconButton from '@mui/material/IconButton';
 
 import { paths } from '@/paths';
-import { loginApi } from '@/lib/auth/authApi';
+import { loginApi } from '@/lib/auth/auth-api';
 import { useUser } from '@/hooks/use-user';
 
 const schema = zod.object({

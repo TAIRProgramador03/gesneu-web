@@ -6,7 +6,7 @@ import ModalInpeccionNeu from '../../../components/dashboard/integrations/modal-
 import { useEffect, useState } from 'react';
 import { obtenerUltimosMovimientosPorCodigo } from '../../../api/Neumaticos';
 import { calcularKmRecorrido, MovimientoNeumatico } from './calculo-km-recorrido';
-import { obtenerInfoDesgaste } from '../../../utils/tireUtils';
+import { obtenerInfoDesgaste } from '../../../utils/tire-utils';
 import axios from 'axios';
 import { Customer } from '@/components/dashboard/customer/customers-table';
 

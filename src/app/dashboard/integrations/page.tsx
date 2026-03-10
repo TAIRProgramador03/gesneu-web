@@ -6,7 +6,7 @@ import { Neumaticos, obtenerNeumaticosAsignadosPorPlaca, buscarVehiculoPorPlaca,
 import Alert from '@mui/material/Alert';
 import ModalAdvertenciaReubicacion from '@/components/core/theme-provider/modal-reubicar/modal-advertencia-reubicacion';
 import ModalAdvertenciaDesasignacion from '@/components/core/theme-provider/modal-desasignar/modal-advertencia-desasignar';
-import ModalInspDesasignacionObligatoria from '@/components/core/theme-provider/modal-desasignar/modal-inspDesasignacion-obligatoria';
+import ModalInspDesasignacionObligatoria from '@/components/core/theme-provider/modal-desasignar/modal-insp-desasignacion-obligatoria';
 import ModalInspeccionObligatoria from '@/components/core/theme-provider/modal-reubicar/modal-inspeccion-obligatoria';
 import ModalConfirmarInspeccion from '@/components/core/theme-provider/modal-reubicar/modal-confirmar-inspeccion';
 import Box from '@mui/material/Box';
@@ -43,8 +43,8 @@ import ModalDesasignar from '@/components/dashboard/integrations/modal-desasigna
 import DiagramaVehiculo from '@/styles/theme/components/DiagramaVehiculo';
 import { Neumatico } from '@/types/types';
 import { useUser } from '@/hooks/use-user';
-import ModalConfirmarInspDesasignar from '@/components/core/theme-provider/modal-desasignar/modal-confirmar-inspDesasignar';
-import { obtenerInfoDesgaste, calcularPorcentajeDesgaste } from '@/utils/tireUtils';
+import ModalConfirmarInspDesasignar from '@/components/core/theme-provider/modal-desasignar/modal-confirmar-insp-desasignar';
+import { obtenerInfoDesgaste, calcularPorcentajeDesgaste } from '@/utils/tire-utils';
 import { Customer } from '@/components/dashboard/customer/customers-table';
 import { CompaniesFilters } from '@/components/dashboard/integrations/integrations-filters';
 import { useQuery } from '@tanstack/react-query';

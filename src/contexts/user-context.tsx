@@ -5,7 +5,7 @@ import * as React from 'react';
 import type { User } from '@/types/user';
 import { authClient } from '@/lib/auth/client';
 import { logger } from '@/lib/default-logger';
-import { checkSessionApi } from '@/lib/auth/authApi';
+import { checkSessionApi } from '@/lib/auth/auth-api';
 
 export interface UserContextValue {
   user: User | null;
