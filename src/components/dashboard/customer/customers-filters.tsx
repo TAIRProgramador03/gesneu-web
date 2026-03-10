@@ -61,7 +61,7 @@ export const CustomersFilters = memo(({ projectCount, disponiblesCount, asignado
           }
         } else {
           if (ref.current) {
-            ref.current.textContent = target.toString();
+            ref.current.textContent = target?.toString();
           }
         }
       });

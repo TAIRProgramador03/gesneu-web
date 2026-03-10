@@ -693,7 +693,7 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
                                             : `Kilometraje actual: ${Number(Odometro).toLocaleString()} km`}
                                 </Typography>
                                 <img
-                                    src="/assets/car-diagram-new.png"
+                                    src="/assets/car-diagram.png"
                                     alt="Diagrama del Vehículo"
                                     style={{
                                         width: '256px',

@@ -138,8 +138,8 @@ const DiagramaVehiculo: React.FC<DiagramaVehiculoProps & {
                 <img
                     src={
                         tipoModal === 'mantenimiento'
-                            ? '/assets/car-diagram-new.png'
-                            : '/assets/car-diagram-new.png'
+                            ? '/assets/car-diagram.png'
+                            : '/assets/car-diagram.png'
                     }
                     alt="Base"
                     style={
@@ -416,7 +416,7 @@ const PosicionNeumatico: React.FC<{
                             top: `calc(${top} + 30px)`,
                             left: `calc(${left} + -13px)`,
                             zIndex: 3,
-                            background: '#e7e7e7',
+                            background: '#f5f5f5',
                             borderRadius: '6px',
                             padding: '2px 10px',
                             fontSize: '13px',
@@ -441,7 +441,7 @@ const PosicionNeumatico: React.FC<{
                                     ? `calc(${left} + 30px)` // Derecha para POS01 y POS03
                                     : `calc(${left} - 90px)`, // Izquierda para POS02 y POS04
                             zIndex: 3,
-                            background: '#e7e7e7',
+                            background: '#f5f5f5',
                             borderRadius: '6px',
                             padding: '2px 10px',
                             fontSize: '13px',
@@ -474,7 +474,7 @@ const PosicionNeumatico: React.FC<{
                                 minHeight: '90px',
                                 border: '1px solid #3030302e',
                                 borderRadius: '20px',
-                                background: '#ededed',
+                                background: '#fdfdfd',
                                 color: '#d32f2f',
                                 fontWeight: 500,
                                 fontSize: '14px',
@@ -506,7 +506,7 @@ const PosicionNeumatico: React.FC<{
                                 minHeight: '90px',
                                 border: '1px solid #3030302e',
                                 borderRadius: '20px',
-                                background: '#ededed',
+                                background: '#fdfdfd',
                                 color: '#d32f2f',
                                 fontWeight: 500,
                                 fontSize: '14px',
