@@ -3,18 +3,15 @@
 import * as React from 'react';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
-import { cargarPadronNeumatico } from "@/api/Neumaticos";
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import Stack from '@mui/material/Stack';
 import Box from '@mui/material/Box';
 import { Download as DownloadIcon } from '@phosphor-icons/react/dist/ssr/Download';
-import { Plus as PlusIcon } from '@phosphor-icons/react/dist/ssr/Plus';
 import { Upload as UploadIcon } from '@phosphor-icons/react/dist/ssr/Upload';
 import { ArrowClockwise as RefreshIcon } from '@phosphor-icons/react/dist/ssr/ArrowClockwise';
 import styled from '@emotion/styled';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
-
 import { CustomersFilters } from '@/components/dashboard/customer/customers-filters';
 import { CustomersTable, Customer } from '@/components/dashboard/customer/customers-table';
 import { Neumaticos } from '@/api/Neumaticos';
@@ -22,6 +19,9 @@ import { useUser } from '@/hooks/use-user';
 import ModalInsertExcel from '@/components/dashboard/customer/modal-insert-excel';
 import { useQuery } from '@tanstack/react-query';
 import { useNeuStats } from '@/hooks/use-neu-stats';
+import * as XLSX from 'xlsx';
+import { exportToExcel } from '@/utils/exportToExcel';
+import { mappedPadronNeumaticos } from '@/mapped/padron-neumaticos.mapped';
 
 export default function Page(): React.JSX.Element {
 
@@ -171,35 +171,12 @@ export default function Page(): React.JSX.Element {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  // Determinar si el usuario tiene el perfil 002 (JEFE DE TALLER)
   const esJefeTaller = Array.isArray(user?.perfiles) && user.perfiles.some((p: any) => p.codigo === '002');
 
-  // Nueva función para importar desde el modal
-  // const handleImportarArchivo = async (file: File) => {
-  //   setLoading(true);
-  //   setResultadoCarga(null);
-  //   try {
-  //     const response = await cargarPadronNeumatico(file);
-  //     setResultadoCarga(response);
-  //     setModalCargaVisible(true);
-  //     setModalImportarVisible(false);
-  //     if (response.insertados > 0) {
-  //       const data = await Neumaticos();
-  //       setCustomers(data);
-  //     }
-  //   } catch (error: any) {
-  //     setResultadoCarga({
-  //       mensaje: error.message || 'Error desconocido al cargar el archivo',
-  //       total: 0,
-  //       insertados: 0,
-  //       errores: []
-  //     });
-  //     setModalCargaVisible(true);
-  //     setModalImportarVisible(false);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
+  const handleExportExcel = () => {
+    const data = mappedPadronNeumaticos({ filteredCustomers })
+    exportToExcel({ data })
+  }
 
   return (
     <>
@@ -249,7 +226,7 @@ export default function Page(): React.JSX.Element {
               color="secondary"
               variant="contained"
               startIcon={<UploadIcon />}
-              disabled
+              onClick={handleExportExcel}
             >
               {isMobile ? null : "Exportar"}
             </Button>
