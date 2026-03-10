@@ -27,7 +27,7 @@ const ModalInsDesasignacionObligatoria: React.FC<ModalInspeccionObligatoriaDesas
                     <Typography variant="h5" fontWeight="bold" color="primary" sx={{ mb: 1 }}>
                         INSPECCION OBLIGATORIA
                     </Typography>
-                    <Typography sx={{ fontWeight: 'bold', fontSize: 16, color: '#222', mb: 2 }}>
+                    <Typography sx={{ fontSize: 16, color: '#222', mb: 2 }}>
                         Este vehículo nunca ha sido inspeccionado. Debe realizar una inspección antes de Desasignar.
                     </Typography>
                     <Typography sx={{ fontSize: 15, color: '#1976d2', mb: 1 }}>
@@ -35,7 +35,7 @@ const ModalInsDesasignacionObligatoria: React.FC<ModalInspeccionObligatoriaDesas
                     </Typography>
                 </Box>
                 <img
-                    src="/images/inspeccion-obligatoria.png"
+                    src="/assets/inspeccionVehiculo.png"
                     alt="Inspección Obligatoria"
                     style={{ width: 70, height: 70, marginLeft: 16, marginTop: 4, borderRadius: 8 }}
                 />

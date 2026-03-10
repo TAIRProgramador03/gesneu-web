@@ -51,7 +51,7 @@ export function SideNav({ collapsed, setCollapsed }: SideNavProps): React.JSX.El
         width: collapsed ? 72 : 280,
         minWidth: collapsed ? 72 : 260,
         transition: 'width 0.2s',
-        bgcolor: '#f4f6f8',
+        bgcolor: '#002141',
         color: 'var(--SideNav-color)',
         height: '100vh',
         position: 'fixed',
@@ -74,10 +74,10 @@ export function SideNav({ collapsed, setCollapsed }: SideNavProps): React.JSX.El
           py: 1,
         }}
       >
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '20px' }}>
           {/* <img src="/logo-tair.png" alt="Logo" style={{ width: 40, height: 40 }} /> */}
           {!collapsed && (
-            <Typography variant="h6" sx={{ ml: 1 }}>
+            <Typography variant="h6" sx={{ ml: 1, color: '#fff', fontSize: '1.6em' }}>
               Gestión de Neumáticos
             </Typography>
           )}
@@ -91,6 +91,7 @@ export function SideNav({ collapsed, setCollapsed }: SideNavProps): React.JSX.El
             ml: collapsed ? 0 : 1,
             borderRadius: '50%',
             p: 0,
+            color: "#fff",
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -99,10 +100,10 @@ export function SideNav({ collapsed, setCollapsed }: SideNavProps): React.JSX.El
           {collapsed ? <CaretRight size={20} /> : <CaretLeft size={20} />}
         </Button>
       </Box>
-      <Divider />
+      {/* <Divider /> */}
       {/* Menú */}
-      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', pt: 2 }}>
-        <Box component="nav" sx={{ width: '100%' }}>
+      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', pt: 2, marginTop: '25px' }}>
+        <Box component="nav" sx={{ width: '100%', padding: '10px' }}>
           {renderNavItems({ pathname, items: visibleNavItems, collapsed })}
         </Box>
       </Box>
@@ -167,7 +168,7 @@ function NavItem({
         sx={{
           alignItems: 'center',
           borderRadius: 1,
-          color: 'var(--NavItem-color)',
+          color: '#fff',
           cursor: 'pointer',
           display: 'flex',
           flex: '0 0 auto',
@@ -182,15 +183,15 @@ function NavItem({
             color: 'var(--NavItem-disabled-color)',
             cursor: 'not-allowed',
           }),
-          ...(active && { bgcolor: 'var(--NavItem-active-background)', color: 'var(--NavItem-active-color)' }),
+          ...(active && { bgcolor: '#167bd9', color: '#fff' }),
         }}
       >
         <Box sx={{ alignItems: 'center', display: 'flex', justifyContent: 'center', flex: '0 0 auto' }}>
           {Icon ? (
             <Icon
-              fill={active ? 'var(--NavItem-icon-active-color)' : 'var(--NavItem-icon-color)'}
+              fill={active ? '#fff' : '#fff'}
               fontSize="var(--icon-fontSize-md)"
-              weight={active ? 'fill' : undefined}
+              weight={'fill'}
             />
           ) : null}
         </Box>
@@ -199,13 +200,15 @@ function NavItem({
           <Box sx={{ flex: '1 1 auto' }}>
             <Typography
               component="span"
-              sx={{ color: 'inherit', fontSize: '0.875rem', fontWeight: 500, lineHeight: '28px' }}
+              sx={{
+                color: 'inherit', fontSize: '16px', fontWeight: 500, lineHeight: '28px'
+              }}
             >
               {title}
             </Typography>
           </Box>
         )}
       </Box>
-    </li>
+    </li >
   );
 }

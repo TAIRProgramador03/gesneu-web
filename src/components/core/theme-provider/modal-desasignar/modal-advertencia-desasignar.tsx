@@ -49,7 +49,7 @@ const ModalAdvertenciaDesasignacion: React.FC<ModalAdvertenciaDesasignacionProps
                         <Typography variant="h5" fontWeight="bold" color={color} sx={{ mb: 1 }}>
                             {titulo}
                         </Typography>
-                        <Typography sx={{ fontWeight: 'bold', fontSize: 16, color: '#222' }}>
+                        <Typography sx={{ fontSize: 16, color: '#222' }}>
                             {mensaje.split('\n').map((line, idx) => (
                                 <span key={idx}>
                                     {line}

@@ -31,6 +31,8 @@ export interface Neumatico {
   PROVEEDOR?: string; // Proveedor (opcional)
   FECHA_COMPRA?: string; // Fecha de compra (opcional)
   KILOMETRO?: string | number; // Kilometraje (opcional)
+  ID_OPERACION: number
+  COD_SUPERVISOR: string
 }
 
 export interface Vehiculo {
@@ -42,6 +44,8 @@ export interface Vehiculo {
   proyecto?: string;
   operacion?: string;
   kilometro?: number;
+  cod_supervisor?: string,
+  id_operacion?: number
 }
 
 export interface User {

@@ -41,7 +41,7 @@ export interface SalesProps {
 export function Sales({ chartSeries: _chartSeries, sx }: SalesProps): React.JSX.Element {
   const chartOptions = useChartOptions();
   const { user } = useUser();
-  const [startDate, setStartDate] = React.useState<dayjs.Dayjs | null>(dayjs().subtract(3, 'month'));
+  const [startDate, setStartDate] = React.useState<dayjs.Dayjs | null>(dayjs().subtract(4, 'day'));
   const [endDate, setEndDate] = React.useState<dayjs.Dayjs | null>(dayjs());
   const [chartSeries, setChartSeries] = React.useState<{ name: string; data: number[] }[]>([]);
   const [categories, setCategories] = React.useState<string[]>([]);
@@ -49,6 +49,7 @@ export function Sales({ chartSeries: _chartSeries, sx }: SalesProps): React.JSX.
   const [allSeriesOptions, setAllSeriesOptions] = React.useState<string[]>([]);
   const [selectedSeries, setSelectedSeries] = React.useState<string[]>([]);
   const [fullChartSeries, setFullChartSeries] = React.useState<{ name: string; data: number[] }[]>([]);
+  const [fullXCategories, setFullXCategories] = React.useState<string[]>([]);
 
   React.useEffect(() => {
     if (startDate && endDate && user?.usuario) {
@@ -59,34 +60,36 @@ export function Sales({ chartSeries: _chartSeries, sx }: SalesProps): React.JSX.
             fechaInicio: startDate.format('YYYY-MM-DD'),
             fechaFin: endDate.format('YYYY-MM-DD'),
           });
-          // console.log('Datos inspecciones backend (crudo):', JSON.stringify(data, null, 2));
+
           // Agrupar por FECHA_REGISTRO
           const groupByFecha: Record<string, any[]> = {};
           data.forEach((item: any) => {
             if (!groupByFecha[item.FECHA_REGISTRO]) groupByFecha[item.FECHA_REGISTRO] = [];
             groupByFecha[item.FECHA_REGISTRO].push(item);
           });
+
           // Ordenar fechas
           const fechas = Object.keys(groupByFecha).sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
-          // Obtener todas las placas únicas por fecha (manteniendo el orden)
+
+          // Placas únicas por fecha
           const placasPorFecha: Record<string, string[]> = {};
           fechas.forEach(fecha => {
             placasPorFecha[fecha] = Array.from(new Set(groupByFecha[fecha].map((item: any) => item.PLACA.trim())));
           });
-          // Construir categorías: para cada fecha, una barra por cada placa
+
+          // Una barra por cada (fecha, placa)
           const xCategories: string[] = [];
           fechas.forEach(fecha => {
             placasPorFecha[fecha].forEach(placa => {
               xCategories.push(`${fecha}|${placa}`);
             });
           });
-          // Todas las combinaciones de POSICION_NEU + CODIGO
+
+          // Series = POSICION_NEU - CODIGO (5 posiciones apiladas)
           const allSeriesKeys = Array.from(
-            new Set(
-              data.map((item: any) => `${item.POSICION_NEU} - ${item.CODIGO}`)
-            )
+            new Set(data.map((item: any) => `${item.POSICION_NEU} - ${item.CODIGO}`))
           ) as string[];
-          // Construir series: para cada serie, un valor por cada (fecha, placa)
+
           const series = allSeriesKeys.map((serieKey) => ({
             name: serieKey,
             data: xCategories.map((cat) => {
@@ -97,70 +100,62 @@ export function Sales({ chartSeries: _chartSeries, sx }: SalesProps): React.JSX.
               return found ? found.REMANENTE : 0;
             }),
           }));
-          // Las categorías serán solo la fecha (sin placa)
-          const displayCategories = xCategories.map(cat => {
-            const [fecha] = cat.split('|');
-            return fecha;
-          });
-          // Guardar también las placas en el mismo orden de las barras
-          const placasPorBarra = xCategories.map(cat => {
-            const [, placa] = cat.split('|');
-            return placa;
-          });
-          // Guardar también los kilometrajes en el mismo orden de las barras
-          const kilometrosPorBarra = xCategories.map(cat => {
-            const [fecha, placa] = cat.split('|');
-            // Busca el primer registro de esa placa en esa fecha
-            const all = groupByFecha[fecha]?.filter((item: any) => item.PLACA.trim() === placa && item.KILOMETRO !== undefined && item.KILOMETRO !== null);
-            if (!all || all.length === 0) return '';
-            // Si todos los kilometros son 0, mostrar vacío
-            const maxKm = Math.max(...all.map((item: any) => Number(item.KILOMETRO) || 0));
-            return maxKm > 0 ? maxKm.toLocaleString() : all[0].KILOMETRO.toString();
-          });
-          // Guardar también las posiciones en el mismo orden de las barras
-          const posicionesPorBarra = xCategories.map(cat => {
-            const [fecha, placa] = cat.split('|');
-            // Busca el primer registro de esa placa en esa fecha
-            const found = groupByFecha[fecha]?.find((item: any) => item.PLACA.trim() === placa);
-            return found ? found.POSICION_NEU : '';
-          });
-          setCategories(displayCategories);
-          setAllSeriesOptions(allSeriesKeys);
+
+          // Placas únicas para el Autocomplete
+          const allPlacas = Array.from(new Set(data.map((item: any) => item.PLACA.trim()))) as string[];
+
+          if (xCategories.length === 0) {
+            setFullXCategories([]);
+            setFullChartSeries([]);
+            setCategories([]);
+            setChartSeries([]);
+            setAllSeriesOptions([]);
+            setSelectedSeries([]);
+            return;
+          }
+          setFullXCategories(xCategories);
           setFullChartSeries(series);
-          setSelectedSeries(allSeriesKeys);
-          // Guardar placas y kilometrajes para usarlas en el overlay
-          (window as any).placasPorBarra = placasPorBarra;
-          (window as any).kilometrosPorBarra = kilometrosPorBarra;
-          (window as any).posicionesPorBarra = posicionesPorBarra;
-          // Preparar datos para Chart3D (opcional)
-          const plotlyData = data.map((item: any) => ({
-            placa: item.PLACA.trim(),
-            fecha: item.FECHA_REGISTRO,
-            posicion: item.POSICION_NEU,
-            codigo: item.CODIGO,
-            remanente: item.REMANENTE,
-          }));
-          setPlotlyData(plotlyData);
-          // Exponer los datos originales para el tooltip
+          setAllSeriesOptions(allPlacas);
+          setSelectedSeries(allPlacas);
           (window as any).rawInspeccionData = data;
         } catch (e) {
+          setFullXCategories([]);
+          setFullChartSeries([]);
           setCategories([]);
           setChartSeries([]);
-          setPlotlyData([]);
         }
       };
       fetchData();
     }
   }, [startDate, endDate, user]);
 
+  // Filtrar barras por placas seleccionadas
   React.useEffect(() => {
-    if (selectedSeries.length > 0) {
-      const filtered = fullChartSeries.filter(s => selectedSeries.includes(s.name));
-      setChartSeries(filtered);
-    } else {
+    if (fullXCategories.length === 0 || fullChartSeries.length === 0) {
+      setCategories([]);
       setChartSeries([]);
+      return;
     }
-  }, [selectedSeries, fullChartSeries]);
+
+    const filteredIndices = fullXCategories
+      .map((cat, i) => ({ cat, i }))
+      .filter(({ cat }) => selectedSeries.includes(cat.split('|')[1]))
+      .map(({ i }) => i);
+
+    const filteredCategories = filteredIndices.map(i => {
+      const [fecha, placa] = fullXCategories[i].split('|');
+      return `${fecha} | ${placa}`;
+    });
+    const filteredPlacas = filteredIndices.map(i => fullXCategories[i].split('|')[1]);
+
+    const filteredSeries = fullChartSeries
+      .map(s => ({ ...s, data: filteredIndices.map(i => s.data[i]) }))
+      .filter(s => s.data.some(v => v > 0));
+
+    setCategories(filteredCategories);
+    setChartSeries(filteredSeries);
+    (window as any).placasPorBarra = filteredPlacas;
+  }, [selectedSeries, fullChartSeries, fullXCategories]);
 
   return (
     <Card sx={sx}>
@@ -185,16 +180,16 @@ export function Sales({ chartSeries: _chartSeries, sx }: SalesProps): React.JSX.
             </div>
           </LocalizationProvider>
         }
-        title="Inspecciones por Neumático"
+        title="Inspecciones por Vehiculo"
       />
       <CardContent sx={{ display: 'flex', flexDirection: 'row', gap: 2 }}>
         <div style={{ flexGrow: 1, position: 'relative' }}>
-            {/* Gráfico 2D actual */}
-            <div style={{ position: 'relative', width: '100%' }}>
+          {/* Gráfico 2D actual */}
+          <div style={{ position: 'relative', width: '100%' }}>
             {/* Overlay de placas arriba de cada barra */}
-            <BarPlatesOverlay categories={categories} />
+            {/* <BarPlatesOverlay categories={categories} /> */}
             <Chart height={350} options={{ ...chartOptions, xaxis: { ...chartOptions.xaxis, categories } }} series={chartSeries} type="bar" width="100%" />
-            </div>
+          </div>
         </div>
         <Autocomplete
           multiple
@@ -208,8 +203,8 @@ export function Sales({ chartSeries: _chartSeries, sx }: SalesProps): React.JSX.
             <TextField
               {...params}
               variant="outlined"
-              label="Seleccionar Neumáticos"
-              placeholder="Neumáticos"
+              label="Seleccionar Placas"
+              placeholder="Placa"
             />
           )}
           sx={{ width: 300 }}
@@ -240,9 +235,9 @@ function useChartOptions(): ApexOptions {
         color: '#222',
         opacity: 0.5
       },
-      formatter: function(val, opts) {
+      formatter: function (val, opts) {
         if (typeof val === 'number' && val > 0) {
-          return val % 1 === 0 ? val.toString() : val.toFixed(2).replace('.00','');
+          return val % 1 === 0 ? val.toString() : val.toFixed(2).replace('.00', '');
         }
         return '';
       },
@@ -251,10 +246,12 @@ function useChartOptions(): ApexOptions {
     fill: {
       opacity: 1,
       type: 'solid',
-      colors: [function({ value, seriesIndex, dataPointIndex, w }: { value: number; seriesIndex: number; dataPointIndex: number; w: any; }) {
+      colors: [function ({ value, seriesIndex, dataPointIndex, w }: { value: number; seriesIndex: number; dataPointIndex: number; w: any; }) {
+        if (value === 0) return 'transparent';
         const rawData = (window && (window).rawInspeccionData) || [];
         const placasPorBarra = (window && (window).placasPorBarra) || [];
-        const fecha = w.globals.labels[dataPointIndex];
+        const label = w.globals.labels[dataPointIndex];
+        const fecha = String(label).split(' | ')[0];
         const serieKey = w.globals.seriesNames[seriesIndex];
         const [posicion, codigo] = serieKey.split(' - ');
         const placa = placasPorBarra[dataPointIndex] || '';
@@ -320,20 +317,22 @@ function useChartOptions(): ApexOptions {
     },
     tooltip: {
       y: {
-        formatter: function(val, opts) {
+        formatter: function (val, opts) {
           const placasPorBarra = (window && (window).placasPorBarra) || [];
-          const kilometrosPorBarra = (window && (window).kilometrosPorBarra) || [];
+          // const kilometrosPorBarra = (window && (window).kilometrosPorBarra) || [];
           const rawData = (window && (window).rawInspeccionData) || [];
           const placa = placasPorBarra[opts.dataPointIndex] || '';
-          const km = kilometrosPorBarra[opts.dataPointIndex] || '';
+          // const km = kilometrosPorBarra[opts.dataPointIndex] || '';
+          let km = 0;
           let pos = '';
           let estado = '';
+          let codigoNeu = '';
           let estadoNum: number | null = null;
           if (rawData && rawData.length) {
-            const fecha = opts.w.globals.labels[opts.dataPointIndex];
+            const label = opts.w.globals.labels[opts.dataPointIndex];
+            const fecha = String(label).split(' | ')[0];
             const serieKey = opts.w.globals.seriesNames[opts.seriesIndex];
             const [posicion, codigo] = serieKey.split(' - ');
-            const placa = placasPorBarra[opts.dataPointIndex] || '';
             const found = rawData.find(
               (item: any) => item.PLACA.trim() === placa && item.FECHA_REGISTRO === fecha && item.POSICION_NEU === posicion && String(item.CODIGO) === codigo
             );
@@ -341,12 +340,15 @@ function useChartOptions(): ApexOptions {
               pos = found.POSICION_NEU;
               estado = found.ESTADO;
               estadoNum = Number(found.ESTADO);
+              km = Number(found.KILOMETRO);
+              codigoNeu = found.CODIGO;
             }
           }
           let result = placa;
-          if (km) result += ` |${km}km`;
+          result += ` | ${km}km`;
           if (pos) result += ` | ${pos}`;
-          if (estado !== '') result += ` | Estado: ${estado}`;
+          if (estado !== '') result += ` | Estado: ${estado}%`;
+          result += ` | ${codigoNeu}`;
 
           return result;
         },
@@ -370,7 +372,7 @@ function useChartOptions(): ApexOptions {
 function BarPlatesOverlay({ categories }: { categories: string[] }) {
   // Obtener placas y kilometrajes en el mismo orden que las barras
   const placasPorBarra = (typeof window !== 'undefined' && window.placasPorBarra) || [];
-  const kilometrosPorBarra = (typeof window !== 'undefined' && window.kilometrosPorBarra) || [];
+  // const kilometrosPorBarra = (typeof window !== 'undefined' && window.kilometrosPorBarra) || [];
   // console.log('Overlay placasPorBarra:', placasPorBarra);
   // console.log('Overlay kilometrosPorBarra:', kilometrosPorBarra);
   // Renderizar un label por cada barra
@@ -391,7 +393,8 @@ function BarPlatesOverlay({ categories }: { categories: string[] }) {
       color: '#223A57',
       textShadow: '0 1px 2px #fff, 0 0 2px #fff',
     }}>
-      {kilometrosPorBarra.map((km, idx) => (
+      <h1>hi</h1>
+      {/* {kilometrosPorBarra.map((km, idx) => (
         <span key={idx} style={{
           minWidth: 0,
           maxWidth: 80,
@@ -406,7 +409,7 @@ function BarPlatesOverlay({ categories }: { categories: string[] }) {
         }}>
           <span style={{ fontWeight: 700 }}>{`Km: ${km}`}</span>
         </span>
-      ))}
+      ))} */}
     </div>
   );
 }

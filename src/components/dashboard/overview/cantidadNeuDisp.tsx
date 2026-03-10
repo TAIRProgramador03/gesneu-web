@@ -61,22 +61,22 @@ export function TotalCustomers({ diff, trend, sx, value }: TotalCustomersProps):
               </Typography>
               <Typography variant="h4">{value}</Typography>
             </Stack>
-            
+
             <Stack sx={{ position: 'relative', width: 75, height: 75 }}>
               <img src="/assets/disponibles.ico" alt="Neumático Disponible" style={{ width: 115, height: 115, position: 'absolute', top: -13, left: -25, zIndex: 1, opacity: 1 }} />
             </Stack>
           </Stack>
-          <div style={{ width: '100%', height: 60 }}>
+          {/* <div style={{ width: '100%', height: 60 }}>
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={data}>
-                {/* <CartesianGrid strokeDasharray="3 3" /> */}
-                <XAxis dataKey="fecha" hide />
+              <LineChart data={data}> */}
+          {/* <CartesianGrid strokeDasharray="3 3" /> */}
+          {/* <XAxis dataKey="fecha" hide />
                 <YAxis hide />
                 <Tooltip />
                 <Line type="monotone" dataKey="cantidad" stroke="#8884d8" strokeWidth={2} dot />
               </LineChart>
             </ResponsiveContainer>
-          </div>
+          </div> */}
           {/* {diff ? (
             <Stack sx={{ alignItems: 'center' }} direction="row" spacing={2}>
               <Stack sx={{ alignItems: 'center' }} direction="row" spacing={0.5}>

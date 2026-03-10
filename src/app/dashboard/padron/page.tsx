@@ -3,12 +3,10 @@
 import * as React from 'react';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
-import tirePng from "@/public/assets/tire.png";
 import { cargarPadronNeumatico } from "@/api/Neumaticos";
 import { useState, useRef, useEffect } from "react";
 import Stack from '@mui/material/Stack';
 import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
 import { Download as DownloadIcon } from '@phosphor-icons/react/dist/ssr/Download';
 import { Plus as PlusIcon } from '@phosphor-icons/react/dist/ssr/Plus';
 import { Upload as UploadIcon } from '@phosphor-icons/react/dist/ssr/Upload';
@@ -20,14 +18,14 @@ import { useTheme } from '@mui/material/styles';
 import { CustomersFilters } from '@/components/dashboard/customer/customers-filters';
 import { CustomersTable, Customer } from '@/components/dashboard/customer/customers-table';
 import { Neumaticos } from '@/api/Neumaticos';
-import { MainNav } from '@/components/dashboard/layout/main-nav';
 import { useUser } from '@/hooks/use-user';
-import { obtenerCantidadNeumaticos, obtenerCantidadNeumaticosDisponibles, obtenerCantidadNeumaticosAsignados, obtenerCantidadAutosDisponibles, obtenerCantidadNeumaticosBajaDefinitiva, obtenerCantidadNeumaticosRecuperados } from '@/api/Neumaticos';
-import ModalInsertExcel from '@/components/dashboard/customer/modal-insertExcel';
+import ModalInsertExcel from '@/components/dashboard/customer/modal-insert-excel';
+import { useQuery } from '@tanstack/react-query';
+import { useNeuStats } from '@/hooks/use-neu-stats';
 
 export default function Page(): React.JSX.Element {
+
   const { user } = useUser();
-  const [customers, setCustomers] = React.useState<Customer[]>([]);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [loading, setLoading] = useState(false);
@@ -37,69 +35,12 @@ export default function Page(): React.JSX.Element {
   const [searchText, setSearchText] = useState('');
   const [modalImportarVisible, setModalImportarVisible] = useState(false);
 
-  const [projectCount, setProjectCount] = useState<number>(0);
-  const [disponiblesCount, setDisponiblesCount] = useState<number>(0);
-  const [asignadosCount, setAsignadosCount] = useState<number>(0);
-  const [autosDisponiblesCount, setAutosDisponiblesCount] = useState<number>(0);
-  const [bajaDefinitivaCount, setBajaDefinitivaCount] = useState<number>(0);
-  const [recuperadosCount, setRecuperadosCount] = useState<number>(0);
+  const { data: customers = [], refetch: customersRefetch } = useQuery({
+    queryKey: ['customers'],
+    queryFn: Neumaticos
+  })
 
-  React.useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = await Neumaticos();
-        setCustomers(data);
-      } catch (error) {
-        console.error('Error al cargar los datos de la API:', error);
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  useEffect(() => {
-    obtenerCantidadNeumaticos()
-      .then(setProjectCount)
-      .catch(console.error);
-  }, []);
-
-  useEffect(() => {
-    obtenerCantidadNeumaticosDisponibles()
-      .then(setDisponiblesCount)
-      .catch(console.error);
-  }, []);
-
-  useEffect(() => {
-    obtenerCantidadNeumaticosAsignados()
-      .then(setAsignadosCount)
-      .catch(console.error);
-  }, []);
-
-  useEffect(() => {
-    obtenerCantidadAutosDisponibles()
-      .then(setAutosDisponiblesCount)
-      .catch(console.error);
-      obtenerCantidadNeumaticosBajaDefinitiva()
-        .then(setBajaDefinitivaCount)
-        .catch(console.error);
-      obtenerCantidadNeumaticosRecuperados()
-        .then(setRecuperadosCount)
-        .catch(console.error);
-  }, []);
-
-  useEffect(() => {
-    obtenerCantidadNeumaticosBajaDefinitiva()
-      .then(setBajaDefinitivaCount)
-      .catch(console.error);
-  }, []);
-
-  useEffect(() => {
-    obtenerCantidadNeumaticosRecuperados()
-      .then(setRecuperadosCount)
-      .catch(console.error);
-  }, []);
-
-
+  const { allQtyNeu, avaibleQtyNeu, assignedQtyNeu, dropQtyNeu, recoverQtyNeu, avaibleQtyAuto } = useNeuStats();
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchText(e.target.value.toLowerCase());
@@ -111,7 +52,9 @@ export default function Page(): React.JSX.Element {
     setPage(0);
   };
 
-  const filteredCustomers = customers.filter((c) =>
+  let filteredCustomers = []
+
+  filteredCustomers = customers?.length >= 1 ? (customers?.filter((c: Customer) =>
     c.CODIGO.toString().toLowerCase().includes(searchText) ||
     c.MARCA.toLowerCase().includes(searchText) ||
     c.MEDIDA.toLowerCase().includes(searchText) ||
@@ -125,7 +68,7 @@ export default function Page(): React.JSX.Element {
     c.PROVEEDOR.toLowerCase().includes(searchText) ||
     c.FECHA_FABRICACION_COD.toLowerCase().includes(searchText) ||
     c.TIPO_MOVIMIENTO.toLowerCase().includes(searchText)
-  );
+  )) : [];
 
   const paginatedCustomers = applyPagination(filteredCustomers, page, rowsPerPage);
 
@@ -209,34 +152,19 @@ export default function Page(): React.JSX.Element {
       100% { transform: rotate(360deg); }
     }
   }
-`;
+  `;
 
-  const handleRefresh = async () => {
-    setCustomers([]); // Limpia la tabla para ver el efecto
+  const handleRefresh = () => {
     try {
-      const data = await Neumaticos();
-      setCustomers(data);
-      // Actualiza los contadores usando funciones reutilizables:
-      obtenerCantidadNeumaticos()
-        .then(setProjectCount)
-        .catch(console.error);
-      obtenerCantidadNeumaticosDisponibles()
-        .then(setDisponiblesCount)
-        .catch(console.error);
-      obtenerCantidadNeumaticosAsignados()
-        .then(setAsignadosCount)
-        .catch(console.error);
-      obtenerCantidadAutosDisponibles()
-        .then(setAutosDisponiblesCount)
-        .catch(console.error);
-      obtenerCantidadNeumaticosBajaDefinitiva()
-        .then(setBajaDefinitivaCount)
-        .catch(console.error);
-      obtenerCantidadNeumaticosRecuperados()
-        .then(setRecuperadosCount)
-        .catch(console.error);
+      customersRefetch()
+      allQtyNeu.refetch()
+      avaibleQtyNeu.refetch()
+      assignedQtyNeu.refetch()
+      dropQtyNeu.refetch()
+      recoverQtyNeu.refetch()
+      avaibleQtyAuto.refetch()
     } catch (error) {
-      alert('Error al refrescar los datos');
+      console.error('Error al refrescar los datos');
     }
   };
 
@@ -247,31 +175,31 @@ export default function Page(): React.JSX.Element {
   const esJefeTaller = Array.isArray(user?.perfiles) && user.perfiles.some((p: any) => p.codigo === '002');
 
   // Nueva función para importar desde el modal
-  const handleImportarArchivo = async (file: File) => {
-    setLoading(true);
-    setResultadoCarga(null);
-    try {
-      const response = await cargarPadronNeumatico(file);
-      setResultadoCarga(response);
-      setModalCargaVisible(true);
-      setModalImportarVisible(false);
-      if (response.insertados > 0) {
-        const data = await Neumaticos();
-        setCustomers(data);
-      }
-    } catch (error: any) {
-      setResultadoCarga({
-        mensaje: error.message || 'Error desconocido al cargar el archivo',
-        total: 0,
-        insertados: 0,
-        errores: []
-      });
-      setModalCargaVisible(true);
-      setModalImportarVisible(false);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // const handleImportarArchivo = async (file: File) => {
+  //   setLoading(true);
+  //   setResultadoCarga(null);
+  //   try {
+  //     const response = await cargarPadronNeumatico(file);
+  //     setResultadoCarga(response);
+  //     setModalCargaVisible(true);
+  //     setModalImportarVisible(false);
+  //     if (response.insertados > 0) {
+  //       const data = await Neumaticos();
+  //       setCustomers(data);
+  //     }
+  //   } catch (error: any) {
+  //     setResultadoCarga({
+  //       mensaje: error.message || 'Error desconocido al cargar el archivo',
+  //       total: 0,
+  //       insertados: 0,
+  //       errores: []
+  //     });
+  //     setModalCargaVisible(true);
+  //     setModalImportarVisible(false);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   return (
     <>
@@ -296,64 +224,65 @@ export default function Page(): React.JSX.Element {
             <TextField
               size="small"
               value={searchText}
-              onChange={e => {
-                setSearchText(e.target.value.toLowerCase());
-                setPage(0);
-              }}
+              onChange={handleSearchChange}
               placeholder="Buscar neumático..."
               sx={{
                 width: {
-                  xs: '100%',   
-                  sm: 300       
-                }
+                  xs: '100%',
+                  sm: 300
+                },
+                backgroundColor: "#fff"
               }}
             />
           </Box>
           <Box sx={{ display: 'flex', gap: 2, mt: { xs: 2, md: 0 } }}>
             <Button
-              color="inherit"
-              startIcon={<UploadIcon />}
+              color="success"
+              variant="contained"
+              startIcon={<DownloadIcon fontSize="var(--icon-fontSize-md)" />}
               onClick={() => setModalImportarVisible(true)}
               disabled={loading || esJefeTaller}
             >
               {isMobile ? null : (loading ? "Cargando..." : "Importar")}
             </Button>
             <Button
-              color="inherit"
-              startIcon={<DownloadIcon fontSize="var(--icon-fontSize-md)" />}
+              color="secondary"
+              variant="contained"
+              startIcon={<UploadIcon />}
+              disabled
             >
               {isMobile ? null : "Exportar"}
             </Button>
             <Button
-              color="inherit"
+              color="info"
+              variant="contained"
               startIcon={<RefreshIcon fontSize="var(--icon-fontSize-md)" />}
               onClick={handleRefresh}
               disabled={loading}
             >
               {isMobile ? null : "Refrescar"}
             </Button>
-            <Button
+            {/* <Button
               startIcon={<PlusIcon fontSize="var(--icon-fontSize-md)" />}
               variant="contained"
               disabled={esJefeTaller}
             >
               Agregar
-            </Button>
+            </Button> */}
           </Box>
         </Stack>
+
         <CustomersFilters
-          key={projectCount + '-' + disponiblesCount + '-' + asignadosCount + '-' + autosDisponiblesCount + '-' + bajaDefinitivaCount + '-' + recuperadosCount + '-' + Date.now()}
-          projectCount={projectCount}
-          disponiblesCount={disponiblesCount}
-          asignadosCount={asignadosCount}
-          autosDisponiblesCount={autosDisponiblesCount}
-          bajaDefinitivaCount={bajaDefinitivaCount}
-          recuperadosCount={recuperadosCount}
+          projectCount={allQtyNeu.data}
+          disponiblesCount={avaibleQtyNeu.data}
+          asignadosCount={assignedQtyNeu.data}
+          autosDisponiblesCount={avaibleQtyAuto.data}
+          bajaDefinitivaCount={dropQtyNeu.data}
+          recuperadosCount={recoverQtyNeu.data}
         />
 
-
         <CustomersTable
-          count={filteredCustomers.length}
+          count={filteredCustomers?.length ?? 0}
           page={page}
           rows={paginatedCustomers}
           rowsPerPage={rowsPerPage}
@@ -363,6 +292,7 @@ export default function Page(): React.JSX.Element {
             setPage(0);
           }}
         />
+
       </Stack >
 
       {modalCargaVisible && resultadoCarga && (
@@ -393,13 +323,13 @@ export default function Page(): React.JSX.Element {
             )}
             {resultadoCarga.errores && resultadoCarga.errores.length > 0 && (
               <>
-                <p style={{marginTop: 18, fontWeight: 600, color: '#c62828'}}>Errores detectados:</p>
+                <p style={{ marginTop: 18, fontWeight: 600, color: '#c62828' }}>Errores detectados:</p>
                 <div style={{ maxHeight: '300px', overflowY: 'auto', margin: '0 auto', marginBottom: 10, minWidth: 'min(90vw, 400px)' }}>
                   <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.98rem' }}>
                     <thead>
                       <tr>
-                        <th style={{background:'#f5f5f5', padding:'6px'}}>Fila/Código</th>
-                        <th style={{background:'#f5f5f5', padding:'6px'}}>Mensaje</th>
+                        <th style={{ background: '#f5f5f5', padding: '6px' }}>Fila/Código</th>
+                        <th style={{ background: '#f5f5f5', padding: '6px' }}>Mensaje</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -457,22 +387,10 @@ export default function Page(): React.JSX.Element {
           </ModalOverlay>
         )
       }
-
       <ModalInsertExcel
         open={modalImportarVisible}
         onClose={() => setModalImportarVisible(false)}
-        onSuccess={async () => {
-          // Refresca la tabla solo si hubo éxito en la carga
-          const data = await Neumaticos();
-          setCustomers(data);
-          // También refresca los contadores
-          obtenerCantidadNeumaticos().then(setProjectCount).catch(console.error);
-          obtenerCantidadNeumaticosDisponibles().then(setDisponiblesCount).catch(console.error);
-          obtenerCantidadNeumaticosAsignados().then(setAsignadosCount).catch(console.error);
-          obtenerCantidadAutosDisponibles().then(setAutosDisponiblesCount).catch(console.error);
-          obtenerCantidadNeumaticosBajaDefinitiva().then(setBajaDefinitivaCount).catch(console.error);
-          obtenerCantidadNeumaticosRecuperados().then(setRecuperadosCount).catch(console.error);
-        }}
+        onSuccess={() => handleRefresh}
       />
     </>
   );

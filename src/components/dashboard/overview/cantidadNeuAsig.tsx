@@ -54,17 +54,17 @@ export function TasksProgress({ value, sx }: TasksProgressProps): React.JSX.Elem
               <img src="/assets/asignados.png" alt="Neumático Asignado" style={{ width: 115, height: 115, position: 'absolute', top: -28, left: -25, zIndex: 1, opacity: 1 }} />
             </Stack>
           </Stack>
-          <div style={{ width: '100%', height: 60 }}>
+          {/* <div style={{ width: '100%', height: 60 }}>
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={data}>
-                {/* <CartesianGrid strokeDasharray="3 3" /> */}
-                <XAxis dataKey="fecha" hide />
+              <LineChart data={data}> */}
+          {/* <CartesianGrid strokeDasharray="3 3" /> */}
+          {/* <XAxis dataKey="fecha" hide />
                 <YAxis hide />
                 <Tooltip />
                 <Line type="monotone" dataKey="cantidad" stroke="#8884d8" strokeWidth={2} dot />
               </LineChart>
             </ResponsiveContainer>
-          </div>
+          </div> */}
         </Stack>
       </CardContent>
     </Card>

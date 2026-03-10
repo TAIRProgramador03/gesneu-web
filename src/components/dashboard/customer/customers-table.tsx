@@ -1,13 +1,14 @@
 'use client';
 
 import * as React from 'react';
+import { memo } from 'react';
 import {
   Card, Table, TableBody, TableCell, TableHead, TablePagination,
   TableRow, Box, Divider, Typography, Checkbox, Stack, LinearProgress
 } from '@mui/material';
-
 import { useSelection } from '@/hooks/use-selection';
 import { obtenerUltimosMovimientosPorPlaca, obtenerUltimosMovimientosPorCodigo } from '@/api/Neumaticos';
+import { Neumatico } from '@/types/types';
 
 export interface Customer {
   CODIGO: number;
@@ -39,53 +40,52 @@ interface CustomersTableProps {
   onRowsPerPageChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-export function CustomersTable({
-  count = 0,
-  rows = [],
-  page = 0,
-  rowsPerPage = 0,
-  onPageChange = () => {},
-  onRowsPerPageChange,
-}: CustomersTableProps): React.JSX.Element {
-  const rowIds = React.useMemo(() => {
-    return rows.map((customer) => customer.CODIGO.toString());
-  }, [rows]);
+export const CustomersTable = memo(({ count = 0, rows = [], page = 0, rowsPerPage = 0, onPageChange = () => { }, onRowsPerPageChange }: CustomersTableProps) => {
 
-  const { selectAll, deselectAll, selectOne, deselectOne, selected } = useSelection(rowIds);
+  // const rowIds = useMemo(() => {
+  //   return rows.map((customer) => customer.CODIGO.toString());
+  // }, [rows]);
 
-  const selectedSome = (selected?.size ?? 0) > 0 && (selected?.size ?? 0) < rows.length;
-  const selectedAll = rows.length > 0 && selected?.size === rows.length;
+  // const { selectAll, deselectAll, selectOne, deselectOne, selected } = useSelection(rowIds);
 
-  const [estadoPorCodigo, setEstadoPorCodigo] = React.useState<{ [codigo: number]: string | number }>({});
+  // const selectedSome = (selected?.size ?? 0) > 0 && (selected?.size ?? 0) < rows.length;
+  // const selectedAll = rows.length > 0 && selected?.size === rows.length;
 
-  React.useEffect(() => {
-    async function fetchEstados() {
-      const codigos = rows.map(r => r.CODIGO);
-      const estados: { [codigo: number]: string | number } = {};
-      await Promise.all(codigos.map(async (codigo) => {
-        try {
-          const movimientos = await obtenerUltimosMovimientosPorCodigo(codigo);
-          // Log para depuración: ver movimientos retornados
-          if (window && window.console) {
-           // console.log('Movimientos para código', codigo, movimientos);
-          }
-          if (Array.isArray(movimientos) && movimientos.length > 0) {
-            movimientos.sort((a, b) => new Date(b.FECHA_MOVIMIENTO).getTime() - new Date(a.FECHA_MOVIMIENTO).getTime());
-            const mov = movimientos[0];
-            if (mov && mov.ESTADO !== undefined) {
-              estados[codigo] = mov.ESTADO;
-            }
-          }
-        } catch (e) {
-          if (window && window.console) {
-            console.error('Error obteniendo movimientos para código', codigo, e);
-          }
-        }
-      }));
-      setEstadoPorCodigo(estados);
-    }
-    if (rows.length > 0) fetchEstados();
-  }, [rows]);
+  // const [estadoPorCodigo, setEstadoPorCodigo] = useState<Customer[]>([]);
+
+  // useEffect(() => {
+  //   async function fetchEstados() {
+  //     const codigos = rows.map(r => r.CODIGO);
+  //     const estados: { [codigo: number]: string | number } = {};
+
+  //     await Promise.all(codigos.map(async (codigo) => {
+
+  //       console.log("Codigo para la tabla: " + codigo);
+
+  //       try {
+  // const movimientos = await obtenerUltimosMovimientosPorCodigo(codigo);
+
+  //         // Log para depuración: ver movimientos retornados
+  //         if (window && window.console) {
+  //           console.log('Movimientos para código', codigo, movimientos);
+  //         }
+  //         if (Array.isArray(movimientos) && movimientos.length > 0) {
+  //           movimientos.sort((a, b) => new Date(b.FECHA_MOVIMIENTO).getTime() - new Date(a.FECHA_MOVIMIENTO).getTime());
+  //           const mov = movimientos[0];
+  //           if (mov && mov.ESTADO !== undefined) {
+  //             estados[codigo] = mov.ESTADO;
+  //           }
+  //         }
+  //       } catch (e) {
+  //         if (window && window.console) {
+  //           console.error('Error obteniendo movimientos para código', codigo, e);
+  //         }
+  //       }
+  //     }));
+  //     setEstadoPorCodigo(estados);
+  //   }
+  //   if (rows.length > 0) fetchEstados();
+  // }, [rows]);
 
   return (
     <Card sx={{ width: '100%' }}>
@@ -93,7 +93,7 @@ export function CustomersTable({
         <Table sx={{ width: '100%' }}>
           <TableHead>
             <TableRow>
-              <TableCell padding="checkbox">
+              {/* <TableCell padding="checkbox">
                 <Checkbox
                   checked={selectedAll}
                   indeterminate={selectedSome}
@@ -104,8 +104,8 @@ export function CustomersTable({
                       deselectAll();
                     }
                   }}
-                />
-              </TableCell>
+                /> */}
+              {/* </TableCell> */}
               <TableCell><Typography fontWeight="bold">Código</Typography></TableCell>
               <TableCell><Typography fontWeight="bold">Marca</Typography></TableCell>
               <TableCell><Typography fontWeight="bold">Medida</Typography></TableCell>
@@ -124,12 +124,12 @@ export function CustomersTable({
           </TableHead>
           <TableBody>
             {rows.map((row) => {
-              const isSelected = selected?.has(row.CODIGO.toString());
-              const estado = estadoPorCodigo[row.CODIGO] !== undefined ? estadoPorCodigo[row.CODIGO] : row.ESTADO;
-
+              // const isSelected = selected?.has(row.CODIGO.toString());
               return (
-                <TableRow hover key={row.CODIGO} selected={isSelected}>
-                  <TableCell padding="checkbox">
+                <TableRow hover key={row.CODIGO}
+                // selected={isSelected}
+                >
+                  {/* <TableCell padding="checkbox">
                     <Checkbox
                       checked={isSelected}
                       onChange={(event) => {
@@ -140,7 +140,7 @@ export function CustomersTable({
                         }
                       }}
                     />
-                  </TableCell>
+                  </TableCell> */}
                   <TableCell>{row.CODIGO}</TableCell>
                   <TableCell>{row.MARCA}</TableCell>
                   <TableCell>{row.MEDIDA}</TableCell>
@@ -155,19 +155,21 @@ export function CustomersTable({
                   <TableCell>{row.FECHA_FABRICACION_COD}</TableCell>
                   <TableCell>{row.TIPO_MOVIMIENTO}</TableCell>
                   <TableCell align="center">
-                    {typeof estado === 'number' ? (
+                    {typeof row.ESTADO === 'number' ? (
                       <Box sx={{ width: '120px', position: 'relative' }}>
                         <LinearProgress
                           variant="determinate"
-                          value={estado}
+                          value={row.ESTADO}
                           sx={{
                             height: 20,
+                            color: "#ffffff",
                             borderRadius: 5,
+                            border: `.5px solid #2a2a2a`,
+                            padding: "10px",
                             backgroundColor: '#eee',
-                            boxShadow: '0 0 0 1.5px #222', // Borde oscuro
                             '& .MuiLinearProgress-bar': {
                               backgroundColor:
-                                estado < 39 ? '#d32f2f' : estado < 79 ? '#FFEB3B' : '#2e7d32',
+                                row.ESTADO < 39 ? '#d32f2f' : row.ESTADO < 79 ? '#FFEB3B' : '#2e7d32',
                               borderRadius: 5,
                             },
                           }}
@@ -184,14 +186,14 @@ export function CustomersTable({
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            color: '#000',
+                            color: `${row.ESTADO < 79 && row.ESTADO > 39 ? '#000' : (row.ESTADO <= 39) ? '#000' : '#fff'}`,
                             fontWeight: 'bold',
                             fontSize: 13,
                             letterSpacing: 0.5,
                             textShadow: '0 1px 2px rgba(255,255,255,0.15)'
                           }}
                         >
-                          {estado}%
+                          {row.ESTADO}%
                         </Typography>
                       </Box>
                     ) : (
@@ -220,4 +222,4 @@ export function CustomersTable({
       </Box>
     </Card>
   );
-}
+})

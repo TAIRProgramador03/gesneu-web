@@ -38,6 +38,9 @@ const ModalConfirmarInspeccion: React.FC<ModalConfirmarInspeccionProps> = ({
     const esReciente = diasDiferencia >= 1 && diasDiferencia <= 4;
     const esHoy = diasDiferencia === 0;
 
+    console.log({ gaaaHoytaiiue: esHoy })
+
+
     // Título
     let titulo = 'CONFIRMAR INSPECCIÓN';
     if (esMuyAntigua) titulo = 'INSPECCIÓN REQUERIDA';
@@ -75,7 +78,7 @@ const ModalConfirmarInspeccion: React.FC<ModalConfirmarInspeccionProps> = ({
                         <Typography variant="h5" fontWeight="bold" color={colorTitulo} sx={{ mb: 1 }}>
                             {titulo}
                         </Typography>
-                        <Typography sx={{ fontWeight: 'bold', fontSize: 16, color: '#222', mb: 1 }}>
+                        <Typography sx={{ fontSize: 16, color: '#222', mb: 1 }}>
                             {mensaje}
                         </Typography>
                         <Typography sx={{ fontSize: 15, color: '#1976d2', mb: 1 }}>

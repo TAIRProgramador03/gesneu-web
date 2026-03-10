@@ -61,15 +61,15 @@ export function AccountDetailsForm(): React.JSX.Element {
             </Grid>
             <Grid md={6} xs={12}>
               <FormControl fullWidth>
-                <InputLabel>Perfil</InputLabel>
+                <InputLabel>Cuenta</InputLabel>
                 <OutlinedInput
                   defaultValue={
                     Array.isArray(user?.perfiles) && user.perfiles.length > 0
                       ? (user.perfiles[0] as { descripcion?: string }).descripcion || ''
                       : ''
                   }
-                  label="Perfil"
-                  name="perfil"
+                  label="Cuenta"
+                  name="cuenta"
                   readOnly
                 />
               </FormControl>

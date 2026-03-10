@@ -27,7 +27,7 @@ const ModalInspeccionObligatoria: React.FC<ModalInspeccionObligatoriaProps> = ({
                     <Typography variant="h5" fontWeight="bold" color="primary" sx={{ mb: 1 }}>
                         INSPECCIÓN OBLIGATORIA
                     </Typography>
-                    <Typography sx={{ fontWeight: 'bold', fontSize: 16, color: '#222', mb: 1 }}>
+                    <Typography sx={{ fontSize: 16, color: '#222', mb: 1 }}>
                         Este vehículo nunca ha sido inspeccionado. Debe realizar una inspección antes de reubicar.
                     </Typography>
                     <Typography sx={{ fontSize: 15, color: '#1976d2', mb: 1 }}>

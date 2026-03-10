@@ -9,7 +9,7 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 
 const user = {
-  name: 'SISTEMA DE GESTION DE NEUMATICOS',
+  name: 'SISTEMA DE GESTIÓN DE NEUMÁTICOS',
   avatar: '/assets/avatar.png',
 } as const;
 
@@ -19,9 +19,9 @@ export function AccountInfo(): React.JSX.Element {
       <CardContent>
         <Stack spacing={2} sx={{ alignItems: 'center' }}>
           <div>
-            <Avatar 
-              src={user.avatar} 
-              sx={{ height: '140px', width: '140px', borderRadius: '20px' }} 
+            <Avatar
+              src={user.avatar}
+              sx={{ height: '140px', width: '140px', borderRadius: '20px' }}
               variant="square"
             />
           </div>

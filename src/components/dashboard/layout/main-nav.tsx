@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { useState } from 'react';
 import Avatar from '@mui/material/Avatar';
 import Badge from '@mui/material/Badge';
 import Box from '@mui/material/Box';
@@ -18,7 +19,7 @@ import { MobileNav } from './mobile-nav';
 import { UserPopover } from './user-popover';
 
 export function MainNav(): React.JSX.Element {
-  const [openNav, setOpenNav] = React.useState<boolean>(false);
+  const [openNav, setOpenNav] = useState<boolean>(false);
   const userPopover = usePopover<HTMLDivElement>();
 
   return (
@@ -50,16 +51,18 @@ export function MainNav(): React.JSX.Element {
           </Stack>
           <Stack sx={{ alignItems: 'center' }} direction="row" spacing={2}>
             <Tooltip title="Contactos">
-              <IconButton>
-                <UsersIcon />
-              </IconButton>
+              <span>
+                <IconButton disabled={true}>
+                  <UsersIcon />
+                </IconButton>
+              </span>
             </Tooltip>
             <Tooltip title="Notificaciones">
-              <Badge badgeContent={4} color="success" variant="dot">
-                <IconButton>
+              <span>
+                <IconButton disabled={true}>
                   <BellIcon />
                 </IconButton>
-              </Badge>
+              </span>
             </Tooltip>
             <Avatar
               onClick={userPopover.handleOpen}

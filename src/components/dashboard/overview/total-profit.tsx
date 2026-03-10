@@ -19,13 +19,13 @@ export function TotalProfit({ value, sx }: TotalProfitProps): React.JSX.Element 
         <Stack direction="row" sx={{ alignItems: 'flex-start', justifyContent: 'space-between' }} spacing={3}>
           <Stack spacing={1}>
             <Typography color="text.secondary" variant="overline">
-              Total Profit
+              Costo neumáticos asignados
             </Typography>
             <Typography variant="h4">{value}</Typography>
           </Stack>
-          <Avatar sx={{ backgroundColor: 'var(--mui-palette-primary-main)', height: '56px', width: '56px' }}>
-            <ReceiptIcon fontSize="var(--icon-fontSize-lg)" />
-          </Avatar>
+          <Stack sx={{ position: 'relative', width: 75, height: 75 }}>
+            <img src="/assets/hand-tyre.png" alt="Neumático Asignado" style={{ width: 130, height: 130, position: 'absolute', top: -28, left: -25, zIndex: 1, opacity: 1, objectFit: 'contain' }} />
+          </Stack>
         </Stack>
       </CardContent>
     </Card>

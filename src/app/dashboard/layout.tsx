@@ -35,9 +35,10 @@ export default function Layout({ children }: LayoutProps): React.JSX.Element {
           },
         }}
       />
+      {/* #FFF8E1  */}
       <Box
         sx={{
-          bgcolor: '#FFF8E1',
+          bgcolor: '#e7e7e7',
           display: 'flex',
           flexDirection: 'column',
           position: 'relative',
@@ -80,7 +81,7 @@ export default function Layout({ children }: LayoutProps): React.JSX.Element {
         >
           <MainNav />
           <main>
-            <Container maxWidth={false} sx={{ py: '32px', px: { xs: 1, md: 3 } }}>
+            <Container maxWidth={false} sx={{ py: '32px', px: { xs: 1, md: 3 }, marginTop: '17px' }}>
               {children}
             </Container>
           </main>

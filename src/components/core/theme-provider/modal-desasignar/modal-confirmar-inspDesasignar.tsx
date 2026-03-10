@@ -66,7 +66,7 @@ const ModalConfirmarInspDesasignar: React.FC<ModalConfirmarInspDesasignarProps> 
                         <Typography variant="h5" fontWeight="bold" color={colorTitulo} sx={{ mb: 1 }}>
                             {titulo}
                         </Typography>
-                        <Typography sx={{ fontWeight: 'bold', fontSize: 16, color: '#222', mb: 1 }}>
+                        <Typography sx={{ fontSize: 16, color: '#222', mb: 1 }}>
                             {mensaje}
                         </Typography>
                         <Typography sx={{ fontSize: 15, color: '#1976d2', mb: 1 }}>

@@ -4,9 +4,9 @@ const config = {
   allowedDevOrigins: [
     '192.168.100.63',
     '192.168.100.182',
+    '192.168.4.51',
     'localhost',
     '127.0.0.1',
-    // Agrega más IPs si es necesario
   ],
   
   // Configuración para solucionar el error de ActionQueueContext
@@ -14,14 +14,14 @@ const config = {
   experimental: {
     esmExternals: 'loose'
   },
-  webpack: (config, { isServer }) => {
+  webpack: (webpackConfig, { isServer }) => {
     if (!isServer) {
-      config.resolve.fallback = {
-        ...config.resolve.fallback,
+      webpackConfig.resolve.fallback = {
+        ...webpackConfig.resolve.fallback,
         fs: false,
       };
     }
-    return config;
+    return webpackConfig;
   },
 };
 

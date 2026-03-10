@@ -2,12 +2,13 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import { useDroppable, useDraggable } from '@dnd-kit/core';
 // import ModalMantenimientoNeu from '../../../components/dashboard/integrations/modal-mantenimientoNeu'; // Eliminado
-import ModalInpeccionNeu from '../../../components/dashboard/integrations/modal-inspeccionNeu';
+import ModalInpeccionNeu from '../../../components/dashboard/integrations/modal-inspeccion-neu';
 import { useEffect, useState } from 'react';
 import { obtenerUltimosMovimientosPorCodigo } from '../../../api/Neumaticos';
-import { calcularKmRecorrido, MovimientoNeumatico } from './calculoKmRecorrido';
+import { calcularKmRecorrido, MovimientoNeumatico } from './calculo-km-recorrido';
 import { obtenerInfoDesgaste } from '../../../utils/tireUtils';
 import axios from 'axios';
+import { Customer } from '@/components/dashboard/customer/customers-table';
 
 interface Neumatico {
     POSICION: string;
@@ -25,7 +26,7 @@ interface Neumatico {
 }
 
 interface DiagramaVehiculoProps {
-    neumaticosAsignados: Neumatico[];
+    neumaticosAsignados: any;
     layout?: 'dashboard' | 'modal';
     tipoModal?: 'inspeccion' | 'mantenimiento'; // NUEVO: para distinguir el modal
     editable?: boolean; // <-- Agregado para permitir la prop editable
@@ -59,10 +60,7 @@ const posiciones = {
 };
 
 const DiagramaVehiculo: React.FC<DiagramaVehiculoProps & {
-    onPosicionClick?: (neumatico: Neumatico | undefined) => void;
-    onMantenimientoClick?: () => void;
-    fromMantenimientoModal?: boolean;
-    placa?: string;
+    onPosicionClick?: (neumatico: Neumatico | undefined) => void; onMantenimientoClick?: () => void; fromMantenimientoModal?: boolean; placa?: string;
 }> = ({ neumaticosAsignados = [], layout = 'dashboard', tipoModal, onPosicionClick, fromMantenimientoModal, placa, posicionResaltada, ...props }) => {
     // Selección de layout según tipoModal
     let pos;
@@ -81,7 +79,7 @@ const DiagramaVehiculo: React.FC<DiagramaVehiculoProps & {
         if (tipoModal === 'mantenimiento') {
 
             // PROCESAMIENTO DIRECTO - datos ya están sincronizados
-            const result = neumaticosAsignados.filter(n => n.TIPO_MOVIMIENTO !== 'BAJA DEFINITIVA');
+            const result = neumaticosAsignados.filter((n: any) => n.TIPO_MOVIMIENTO !== 'BAJA DEFINITIVA');
             return result;
         }
 
@@ -89,10 +87,10 @@ const DiagramaVehiculo: React.FC<DiagramaVehiculoProps & {
         const porPosicion = new Map<string, Neumatico>();
         for (const n of neumaticosAsignados) {
             if (n.TIPO_MOVIMIENTO === 'BAJA DEFINITIVA') continue;
-            const pos = n.POSICION_NEU || n.POSICION;
-            if (!pos) continue;
-            if (!porPosicion.has(pos) || ((n.ID_MOVIMIENTO || 0) > (porPosicion.get(pos)?.ID_MOVIMIENTO || 0))) {
-                porPosicion.set(pos, n);
+            const posX = n.POSICION_NEU || n.POSICION;
+            if (!posX) continue;
+            if (!porPosicion.has(posX) || ((n.ID_MOVIMIENTO || 0) > (porPosicion.get(posX)?.ID_MOVIMIENTO || 0))) {
+                porPosicion.set(posX, n);
             }
         }
 
@@ -117,7 +115,7 @@ const DiagramaVehiculo: React.FC<DiagramaVehiculoProps & {
     // Usar solo la prop 'placa' (no buscar en los neumáticos)
     const placaModal = placa || '';
     // Usar el array original de neumáticos asignados, asegurando que CODIGO nunca sea undefined
-    const neumaticosAsignadosModal = neumaticosAsignados.map(n => ({
+    const neumaticosAsignadosModal = neumaticosAsignados.map((n: any) => ({
         ...n,
         CODIGO: n.CODIGO ?? '', // Forzar string
     }));
@@ -140,8 +138,8 @@ const DiagramaVehiculo: React.FC<DiagramaVehiculoProps & {
                 <img
                     src={
                         tipoModal === 'mantenimiento'
-                            ? '/assets/car-diagram.png'
-                            : '/assets/car-diagram.png'
+                            ? '/assets/car-diagram-new.png'
+                            : '/assets/car-diagram-new.png'
                     }
                     alt="Base"
                     style={
@@ -181,7 +179,7 @@ const DiagramaVehiculo: React.FC<DiagramaVehiculoProps & {
                 />
 
                 {pos.map(({ key, top, left }) => {
-                    const neumatico = neumaticosFiltrados.find(n => (n.POSICION_NEU || n.POSICION) === key);
+                    const neumatico = neumaticosFiltrados.find((n: any) => (n.POSICION_NEU || n.POSICION) === key);
                     if (neumatico) {
                         console.log(`[DiagramaVehiculo] 🎯 Renderizando ${key}:`, neumatico.CODIGO_NEU || neumatico.CODIGO);
                     } else {
@@ -199,6 +197,7 @@ const DiagramaVehiculo: React.FC<DiagramaVehiculoProps & {
                             tipoModal={tipoModal}
                             onPosicionClick={onPosicionClick}
                             posicionResaltada={posicionResaltada}
+                            placa={placa}
                         />
                     );
                 })}
@@ -221,12 +220,13 @@ const PosicionNeumatico: React.FC<{
     keyPos: string;
     top: string;
     left: string;
-    neumatico: Neumatico | undefined;
+    neumatico: any | undefined;
     layout: 'dashboard' | 'modal';
     tipoModal?: 'inspeccion' | 'mantenimiento';
     onPosicionClick?: (neumatico: Neumatico | undefined) => void;
     posicionResaltada?: string;
-}> = ({ keyPos, top, left, neumatico, layout, tipoModal, onPosicionClick, posicionResaltada }) => {
+    placa?: string | undefined
+}> = ({ keyPos, top, left, neumatico, layout, tipoModal, onPosicionClick, posicionResaltada, placa = '' }) => {
     // Drop target para cada posición
     const { setNodeRef: setDropRef, isOver } = useDroppable({ id: keyPos });
     // Siempre ejecuta el hook, pero solo activa el draggable si hay neumático
@@ -254,8 +254,9 @@ const PosicionNeumatico: React.FC<{
 
     let bgColor = 'transparent';
     if (esResaltada) {
-        // Estilo de resaltado con animación pulsante
         bgColor = '#ffeb3b'; // Amarillo brillante para resaltar
+    } else if ((neumatico as any)?.TIPO_MOVIMIENTO === 'TEMPORAL') {
+        bgColor = '#00ACC1'; // Turquesa: neumático recién asignado, sin inspección aún
     } else {
         bgColor = infoDesgaste.bgColor;
     }
@@ -269,11 +270,11 @@ const PosicionNeumatico: React.FC<{
     // Refrescar kmRecorrido cuando cambien los datos del neumático (props)
     useEffect(() => {
         fetchKm();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+
     }, [neumatico?.CODIGO, neumatico?.CODIGO_NEU]);
     useEffect(() => {
         fetchKm();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+
     }, [JSON.stringify(neumatico)]);
     useEffect(() => {
         const refrescarKm = () => {
@@ -308,24 +309,24 @@ const PosicionNeumatico: React.FC<{
             setKmRecorrido('—');
             return;
         }
-        try {
-            // Usar el endpoint correcto para historial completo
-            const { obtenerHistorialMovimientosPorCodigo } = await import('../../../api/Neumaticos');
-            const historial = await obtenerHistorialMovimientosPorCodigo(codigo);
-            if (!Array.isArray(historial) || historial.length === 0) {
-                setKmRecorrido('—');
-                return;
-            }
-            // Log de depuración para ver los datos reales
-            //console.log('[DEBUG calculoKmRecorrido] keyPos:', keyPos);
-            //console.log('[DEBUG calculoKmRecorrido] historial:', historial);
-            // Usar la función centralizada para calcular el km recorrido acumulado
-            const kmTotal = calcularKmRecorrido(historial as MovimientoNeumatico[], keyPos);
-            //console.log('[DEBUG calculoKmRecorrido] resultado kmTotal:', kmTotal);
-            setKmRecorrido(kmTotal > 0 ? kmTotal.toLocaleString() + ' km' : '0 km');
-        } catch (e: any) {
-            setKmRecorrido('—');
-        }
+        // try {
+        //     // Usar el endpoint correcto para historial completo
+        //     const { obtenerHistorialMovimientosPorCodigo } = await import('../../../api/Neumaticos');
+        //     const historial = await obtenerHistorialMovimientosPorCodigo(codigo);
+        //     if (!Array.isArray(historial) || historial.length === 0) {
+        //         setKmRecorrido('—');
+        //         return;
+        //     }
+        //     // Log de depuración para ver los datos reales
+        //     //console.log('[DEBUG calculoKmRecorrido] keyPos:', keyPos);
+        //     //console.log('[DEBUG calculoKmRecorrido] historial:', historial);
+        //     // Usar la función centralizada para calcular el km recorrido acumulado
+        //     const kmTotal = calcularKmRecorrido(historial as MovimientoNeumatico[], keyPos);
+        //     //console.log('[DEBUG calculoKmRecorrido] resultado kmTotal:', kmTotal);
+        //     setKmRecorrido(kmTotal > 0 ? kmTotal.toLocaleString() + ' km' : '0 km');
+        // } catch (e: any) {
+        //     setKmRecorrido('—');
+        // }
     }, [neumatico]);
     // Estilos personalizados para REPUESTO
     const isReserva = keyPos === 'RES01';
@@ -339,7 +340,7 @@ const PosicionNeumatico: React.FC<{
             height: '29px',
             borderRadius: '6px',
             backgroundColor: isOver ? '#e0f7fa' : bgColor,
-            border: isOver ? '2px solid #388e3c' : esResaltada ? '3px solid #ff5722' : '2px solid #888',
+            border: isOver ? '2px solid #388e3c' : esResaltada ? '3px solid #ff5722' : '2px solid transparent',
             animation: esResaltada ? 'pulso 1s infinite' : 'none',
             '@keyframes pulso': {
                 '0%': { transform: 'scale(1)', boxShadow: '0 0 0 0 rgba(255, 87, 34, 0.7)' },
@@ -355,7 +356,7 @@ const PosicionNeumatico: React.FC<{
             fontSize: 18,
             cursor: neumatico ? 'grab' : 'pointer',
             transition: 'box-shadow 0.2s, background 0.2s, border 0.2s',
-            boxShadow: neumatico && isDragging ? '0 0 16px 4px #388e3c' : neumatico ? '0 0 8px 2px #4caf50' : 'none',
+            boxShadow: neumatico && isDragging ? `0 0 8px 2px ${bgColor}` : neumatico ? `0 0 8px 2px ${bgColor}` : 'none',
             opacity: neumatico && isDragging ? 0.5 : 1,
             userSelect: 'none',
             outline: neumatico && isDragging ? '2px solid #388e3c' : 'none',
@@ -369,7 +370,7 @@ const PosicionNeumatico: React.FC<{
             height: layout === 'modal' ? '58px' : '61px',
             borderRadius: '15px',
             backgroundColor: isOver ? '#e0f7fa' : bgColor,
-            border: isOver ? '2px solid #388e3c' : esResaltada ? '3px solid #ff5722' : '2px solid #888',
+            border: isOver ? '2px solid #388e3c' : esResaltada ? '3px solid #ff5722' : '2px solid transparent',
             animation: esResaltada ? 'pulso 1s infinite' : 'none',
             '@keyframes pulso': {
                 '0%': { transform: 'scale(1)', boxShadow: '0 0 0 0 rgba(255, 87, 34, 0.7)' },
@@ -385,7 +386,7 @@ const PosicionNeumatico: React.FC<{
             fontSize: 18,
             cursor: neumatico ? 'grab' : 'pointer',
             transition: 'box-shadow 0.2s, background 0.2s, border 0.2s',
-            boxShadow: neumatico && isDragging ? '0 0 16px 4px #388e3c' : neumatico ? '0 0 8px 2px #4caf50' : 'none',
+            boxShadow: neumatico && isDragging ? `0 0 8px 2px ${bgColor}` : neumatico ? `0 0 8px 2px ${bgColor}` : 'none',
             opacity: neumatico && isDragging ? 0.5 : 1,
             userSelect: 'none',
             outline: neumatico && isDragging ? '2px solid #388e3c' : 'none',
@@ -402,7 +403,7 @@ const PosicionNeumatico: React.FC<{
                 onClick={() => onPosicionClick && onPosicionClick(neumatico ? { ...neumatico, POSICION: keyPos } : undefined)}
                 title={keyPos + (neumatico ? ` - ${neumatico.CODIGO_NEU || neumatico.CODIGO || ''}` : '')}
             >
-                <span style={{ fontWeight: 'bold', fontSize: isReserva ? '15px' : '13px', color: '#333', pointerEvents: 'none' }}>
+                <span style={{ fontWeight: 'bold', fontSize: isReserva ? '15px' : '13px', color: `#fff`, pointerEvents: 'none' }}>
                     {isReserva ? 'RES' : keyPos.replace('POS', '')}
                 </span>
             </Box>
@@ -415,7 +416,7 @@ const PosicionNeumatico: React.FC<{
                             top: `calc(${top} + 30px)`,
                             left: `calc(${left} + -13px)`,
                             zIndex: 3,
-                            background: 'rgba(255,255,255,0.95)',
+                            background: '#e7e7e7',
                             borderRadius: '6px',
                             padding: '2px 10px',
                             fontSize: '13px',
@@ -425,7 +426,7 @@ const PosicionNeumatico: React.FC<{
                             pointerEvents: 'none',
                             minWidth: '85px',
                             textAlign: 'center',
-                            border: '1px solid #e0e0e0',
+                            border: '1px solid #b9b9b9',
                         }}
                     >
                         {` ${neumatico.PRESION_AIRE} psi`}
@@ -440,7 +441,7 @@ const PosicionNeumatico: React.FC<{
                                     ? `calc(${left} + 30px)` // Derecha para POS01 y POS03
                                     : `calc(${left} - 90px)`, // Izquierda para POS02 y POS04
                             zIndex: 3,
-                            background: 'rgba(255,255,255,0.95)',
+                            background: '#e7e7e7',
                             borderRadius: '6px',
                             padding: '2px 10px',
                             fontSize: '13px',
@@ -450,7 +451,7 @@ const PosicionNeumatico: React.FC<{
                             pointerEvents: 'none',
                             minWidth: '85px',
                             textAlign: 'center',
-                            border: '1px solid #e0e0e0',
+                            border: '1px solid #b9b9b9',
                         }}
                     >
                         {` ${neumatico.PRESION_AIRE} psi`}
@@ -471,9 +472,9 @@ const PosicionNeumatico: React.FC<{
                                 left: keyPos === 'POS01' || keyPos === 'POS03' ? '385px' : '1px',
                                 width: '200px',
                                 minHeight: '90px',
-                                border: '1px solid #8888882e',
+                                border: '1px solid #3030302e',
                                 borderRadius: '20px',
-                                background: '#fff',
+                                background: '#ededed',
                                 color: '#d32f2f',
                                 fontWeight: 500,
                                 fontSize: '14px',
@@ -503,9 +504,9 @@ const PosicionNeumatico: React.FC<{
                                 left: '195px',
                                 width: '190px',
                                 minHeight: '90px',
-                                border: '1px solid #8888882e',
+                                border: '1px solid #3030302e',
                                 borderRadius: '20px',
-                                background: '#fff',
+                                background: '#ededed',
                                 color: '#d32f2f',
                                 fontWeight: 500,
                                 fontSize: '14px',
