@@ -10,7 +10,7 @@ const config = {
   ],
   
   // Configuración para solucionar el error de ActionQueueContext
-  reactStrictMode: false,
+  reactStrictMode: true,
   experimental: {
     esmExternals: 'loose'
   },

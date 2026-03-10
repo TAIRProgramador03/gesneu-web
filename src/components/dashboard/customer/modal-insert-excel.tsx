@@ -9,7 +9,9 @@ import { cargarPadronNeumatico } from '@/api/Neumaticos';
 interface ModalInsertExcelProps {
   open: boolean;
   onClose: () => void;
-  onSuccess?: () => void; // Notifica al padre si hubo éxito para refrescar
+  onSuccess?: () => void;
+  onHandleSetLoading: (value: boolean) => void
+  isLoading: boolean
 }
 
 const Overlay = styled.div`
@@ -119,11 +121,11 @@ const CancelButton = styled(Button)`
   }
 `;
 
-const ModalInsertExcel: React.FC<ModalInsertExcelProps> = ({ open, onClose, onSuccess }) => {
+const ModalInsertExcel: React.FC<ModalInsertExcelProps> = ({ open, onClose, onSuccess, onHandleSetLoading, isLoading }) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [dragActive, setDragActive] = useState(false);
-  const [loading, setLoading] = useState(false);
+  // const [loading, setLoading] = useState(false);
   const [resultadoCarga, setResultadoCarga] = useState<any>(null);
   const [showResumen, setShowResumen] = useState(false);
 
@@ -153,7 +155,7 @@ const ModalInsertExcel: React.FC<ModalInsertExcelProps> = ({ open, onClose, onSu
 
   const handleImport = async () => {
     if (!selectedFile) return;
-    setLoading(true);
+    onHandleSetLoading(true);
     setResultadoCarga(null);
     try {
       const response = await cargarPadronNeumatico(selectedFile);
@@ -171,7 +173,7 @@ const ModalInsertExcel: React.FC<ModalInsertExcelProps> = ({ open, onClose, onSu
       });
       setShowResumen(true);
     } finally {
-      setLoading(false);
+      onHandleSetLoading(false);
     }
   };
 
@@ -204,7 +206,7 @@ const ModalInsertExcel: React.FC<ModalInsertExcelProps> = ({ open, onClose, onSu
                 ref={inputRef}
                 style={{ display: 'none' }}
                 onChange={handleFileChange}
-                disabled={loading}
+                disabled={isLoading}
               />
               <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1, padding: "15px" }}>
                 <svg width="44" height="44" fill="#1976d2" viewBox="0 0 24 24" style={{ marginBottom: 2 }}><path d="M19 15v4a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>
@@ -234,9 +236,9 @@ const ModalInsertExcel: React.FC<ModalInsertExcelProps> = ({ open, onClose, onSu
               <Button
                 color="info"
                 variant="contained"
-                startIcon={loading ? <CircularProgress size={18} color="inherit" /> : undefined}
+                startIcon={isLoading ? <CircularProgress size={18} color="inherit" /> : undefined}
                 onClick={handleImport}
-                disabled={!selectedFile || loading}
+                disabled={!selectedFile || isLoading}
               >
                 Importar
               </Button>
@@ -244,7 +246,7 @@ const ModalInsertExcel: React.FC<ModalInsertExcelProps> = ({ open, onClose, onSu
                 color="error"
                 variant="outlined"
                 onClick={onClose}
-                disabled={loading}
+                disabled={isLoading}
               >
                 Cancelar
               </Button>

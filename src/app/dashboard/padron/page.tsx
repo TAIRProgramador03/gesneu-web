@@ -19,13 +19,14 @@ import { useUser } from '@/hooks/use-user';
 import ModalInsertExcel from '@/components/dashboard/customer/modal-insert-excel';
 import { useQuery } from '@tanstack/react-query';
 import { useNeuStats } from '@/hooks/use-neu-stats';
-import * as XLSX from 'xlsx';
 import { exportToExcel } from '@/utils/export-to-excel';
 import { mappedPadronNeumaticos } from '@/mapped/padron-neumaticos.mapped';
+import Image from 'next/image';
 
 export default function Page(): React.JSX.Element {
 
   const { user } = useUser();
+
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [loading, setLoading] = useState(false);
@@ -44,11 +45,6 @@ export default function Page(): React.JSX.Element {
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchText(e.target.value.toLowerCase());
-    setPage(0);
-  };
-
-  const handleMainNavSearch = (text: string) => {
-    setSearchText(text.toLowerCase());
     setPage(0);
   };
 
@@ -175,7 +171,7 @@ export default function Page(): React.JSX.Element {
 
   const handleExportExcel = () => {
     const data = mappedPadronNeumaticos({ filteredCustomers })
-    exportToExcel({ data })
+    exportToExcel({ data, username: user?.usuario as string, title: 'GESNEU: PADRÓN DE NEUMÁTICOS' })
   }
 
   return (
@@ -183,7 +179,7 @@ export default function Page(): React.JSX.Element {
       {loading && (
         <LoaderOverlay>
           <div className="loader-tire">
-            <img src="/assets/tire.png" alt="Cargando..." />
+            <Image src={`/assets/tire.png`} alt='Cargando...' width={100} height={100} />
             <p style={{ marginTop: "10px", fontWeight: "bold" }}>Procesando Excel...</p>
           </div>
         </LoaderOverlay>
@@ -368,6 +364,8 @@ export default function Page(): React.JSX.Element {
         open={modalImportarVisible}
         onClose={() => setModalImportarVisible(false)}
         onSuccess={() => handleRefresh}
+        isLoading={loading}
+        onHandleSetLoading={(value: boolean) => setLoading(value)}
       />
     </>
   );

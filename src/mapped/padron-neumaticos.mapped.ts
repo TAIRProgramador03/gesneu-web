@@ -25,7 +25,7 @@ export const mappedPadronNeumaticos = ({ filteredCustomers }: MappedPadronNeumat
     'Estado': c.TIPO_MOVIMIENTO,
     'Recuperado': c.RECUPERADO ? 'SI' : 'NO',
     'Placa': c.PLACA ?? '',
-    'Porcentaje de Vida': c.ESTADO + '%'
+    'Porcentaje de Vida (%)': Number(c.ESTADO)
   }))
 
 

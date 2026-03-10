@@ -16,7 +16,7 @@ interface PadronMapped {
   'Estado': string
   'Recuperado': string
   'Placa': string
-  'Porcentaje de Vida': string
+  'Porcentaje de Vida (%)': number
 }
 
 export type ListPadronMapped = PadronMapped[]
