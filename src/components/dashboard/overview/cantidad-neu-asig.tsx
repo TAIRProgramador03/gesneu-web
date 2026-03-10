@@ -50,8 +50,8 @@ export function TasksProgress({ value, sx }: TasksProgressProps): React.JSX.Elem
               </Typography>
               <Typography variant="h4">{value}</Typography>
             </Stack>
-            <Stack sx={{ position: 'relative', width: 75, height: 75 }}>
-              <img src="/assets/asignados.png" alt="Neumático Asignado" style={{ width: 115, height: 115, position: 'absolute', top: -28, left: -25, zIndex: 1, opacity: 1 }} />
+            <Stack sx={{ width: 115, objectFit: 'cover' }}>
+              <img src="/assets/asignados.png" alt="Neumático Asignado" style={{ width: 115, height: 115, zIndex: 1, opacity: 1 }} />
             </Stack>
           </Stack>
           {/* <div style={{ width: '100%', height: 60 }}>

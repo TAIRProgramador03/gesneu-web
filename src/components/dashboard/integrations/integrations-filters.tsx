@@ -12,8 +12,6 @@ import { Car } from '@phosphor-icons/react/dist/ssr/Car';
 import Stack from '@mui/material/Stack';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import Checkbox from '@mui/material/Checkbox';
-import FormControlLabel from '@mui/material/FormControlLabel';
 import ModalTodasPlacas from './modal-todas-placas';
 
 interface CompaniesFiltersProps {
@@ -146,10 +144,11 @@ export const CompaniesFilters = memo(({ onSearchChange, operationName, autosDisp
           disabled={checkboxChecked}
           sx={{ maxWidth: '450px', flex: '1 1 auto', minWidth: '300px' }}
         />
-        <FormControlLabel
+        {/* TODO: Desabilitado para transito */}
+        {/* <FormControlLabel
           control={<Checkbox onChange={handleCheckboxChange} checked={checkboxChecked} disabled={inputValue.trim() !== ''} />}
           label="Transito"
-        />
+        /> */}
         {/* Información agrupada - Ubicación, Operación y Vehículos */}
         <Box
           sx={{

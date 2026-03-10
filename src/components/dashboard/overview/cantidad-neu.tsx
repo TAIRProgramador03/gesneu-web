@@ -31,8 +31,8 @@ export function Budget({ diff, trend, sx, value }: BudgetProps): React.JSX.Eleme
               </Typography>
               <Typography variant="h4">{value}</Typography>
             </Stack>
-            <Stack sx={{ position: 'relative', width: 75, height: 75 }}>
-              <img src="/assets/cantidad.png" alt="Neumático" style={{ width: 115, height: 115, position: 'absolute', top: -13, left: -25, zIndex: 1, opacity: 1 }} />
+            <Stack sx={{ width: 115, objectFit: 'cover' }}>
+              <img src="/assets/cantidad.png" alt="Neumático" style={{ width: 115, height: 115, position: 'absolute', zIndex: 1, opacity: 1 }} />
             </Stack>
           </Stack>
           {/* {diff ? (
@@ -50,6 +50,6 @@ export function Budget({ diff, trend, sx, value }: BudgetProps): React.JSX.Eleme
           ) : null} */}
         </Stack>
       </CardContent>
-    </Card>
+    </Card >
   );
 }

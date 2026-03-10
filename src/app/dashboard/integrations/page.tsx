@@ -1302,8 +1302,8 @@ export default function Page(): React.JSX.Element {
             onClose={handleMenuMantenimientoClose}
           >
             {/* TODO: Mantenimientoga */}
-            <MenuItem onClick={handleAbrirMantenimientoReubicar}>REUBICAR</MenuItem>
-            <MenuItem onClick={handleAbrirMantenimientoDesasignar}>DESASIGNAR</MenuItem>
+            <MenuItem onClick={handleAbrirMantenimientoReubicar}>Reubicar</MenuItem>
+            <MenuItem onClick={handleAbrirMantenimientoDesasignar}>Desasignar</MenuItem>
           </Menu>
           <Box sx={{ mt: 6 }}>
             <TableContainer component={Paper}>
@@ -1364,7 +1364,7 @@ export default function Page(): React.JSX.Element {
           overflow: 'auto'
         }}>
           <Typography variant="h6" sx={{ mb: 2 }}>
-            Neumáticos instalados en esta unidad :
+            Neumáticos instalados en esta unidad:
           </Typography>
           <TableContainer component={Paper} sx={{ mb: 4 }}>
             <Table>
@@ -1483,7 +1483,12 @@ export default function Page(): React.JSX.Element {
                   boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
                 }}
               >
-                {`Disponibles: ${neumaticosDisponiblesUseQuery.length.toLocaleString()} Neumáticos`}
+                <span>
+                  Disponibles:
+                  <span className='font-normal'> &nbsp;
+                    {`${neumaticosDisponiblesUseQuery.length.toLocaleString()} Neumáticos`}
+                  </span>
+                </span>
               </Box>
             </Stack>
 

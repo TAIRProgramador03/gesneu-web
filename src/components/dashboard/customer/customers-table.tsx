@@ -6,9 +6,8 @@ import {
   Card, Table, TableBody, TableCell, TableHead, TablePagination,
   TableRow, Box, Divider, Typography, Checkbox, Stack, LinearProgress
 } from '@mui/material';
-import { useSelection } from '@/hooks/use-selection';
-import { obtenerUltimosMovimientosPorPlaca, obtenerUltimosMovimientosPorCodigo } from '@/api/Neumaticos';
-import { Neumatico } from '@/types/types';
+import { TipoMovimientoBadge } from '@/components/ui/TipoMovimientoBadge';
+import { EsRecuperadoBadge } from '@/components/ui/EsRecuperadoBadge';
 
 export interface Customer {
   CODIGO: number;
@@ -29,6 +28,7 @@ export interface Customer {
   TIPO_MOVIMIENTO: string;
   ESTADO: string;
   PLACA?: string; // Añadido para poder agrupar por placa
+  RECUPERADO?: boolean
 }
 
 interface CustomersTableProps {
@@ -41,51 +41,6 @@ interface CustomersTableProps {
 }
 
 export const CustomersTable = memo(({ count = 0, rows = [], page = 0, rowsPerPage = 0, onPageChange = () => { }, onRowsPerPageChange }: CustomersTableProps) => {
-
-  // const rowIds = useMemo(() => {
-  //   return rows.map((customer) => customer.CODIGO.toString());
-  // }, [rows]);
-
-  // const { selectAll, deselectAll, selectOne, deselectOne, selected } = useSelection(rowIds);
-
-  // const selectedSome = (selected?.size ?? 0) > 0 && (selected?.size ?? 0) < rows.length;
-  // const selectedAll = rows.length > 0 && selected?.size === rows.length;
-
-  // const [estadoPorCodigo, setEstadoPorCodigo] = useState<Customer[]>([]);
-
-  // useEffect(() => {
-  //   async function fetchEstados() {
-  //     const codigos = rows.map(r => r.CODIGO);
-  //     const estados: { [codigo: number]: string | number } = {};
-
-  //     await Promise.all(codigos.map(async (codigo) => {
-
-  //       console.log("Codigo para la tabla: " + codigo);
-
-  //       try {
-  // const movimientos = await obtenerUltimosMovimientosPorCodigo(codigo);
-
-  //         // Log para depuración: ver movimientos retornados
-  //         if (window && window.console) {
-  //           console.log('Movimientos para código', codigo, movimientos);
-  //         }
-  //         if (Array.isArray(movimientos) && movimientos.length > 0) {
-  //           movimientos.sort((a, b) => new Date(b.FECHA_MOVIMIENTO).getTime() - new Date(a.FECHA_MOVIMIENTO).getTime());
-  //           const mov = movimientos[0];
-  //           if (mov && mov.ESTADO !== undefined) {
-  //             estados[codigo] = mov.ESTADO;
-  //           }
-  //         }
-  //       } catch (e) {
-  //         if (window && window.console) {
-  //           console.error('Error obteniendo movimientos para código', codigo, e);
-  //         }
-  //       }
-  //     }));
-  //     setEstadoPorCodigo(estados);
-  //   }
-  //   if (rows.length > 0) fetchEstados();
-  // }, [rows]);
 
   return (
     <Card sx={{ width: '100%' }}>
@@ -119,6 +74,7 @@ export const CustomersTable = memo(({ count = 0, rows = [], page = 0, rowsPerPag
               <TableCell><Typography fontWeight="bold">Proveedor</Typography></TableCell>
               <TableCell><Typography fontWeight="bold">Fecha Fabricación</Typography></TableCell>
               <TableCell><Typography fontWeight="bold">Situación</Typography></TableCell>
+              <TableCell><Typography fontWeight="bold">Recuperado</Typography></TableCell>
               <TableCell><Typography fontWeight="bold">Estado</Typography></TableCell>
             </TableRow>
           </TableHead>
@@ -153,7 +109,12 @@ export const CustomersTable = memo(({ count = 0, rows = [], page = 0, rowsPerPag
                   <TableCell>{row.PROYECTO}</TableCell>
                   <TableCell>{row.PROVEEDOR}</TableCell>
                   <TableCell>{row.FECHA_FABRICACION_COD}</TableCell>
-                  <TableCell>{row.TIPO_MOVIMIENTO}</TableCell>
+                  <TableCell align='center'>
+                    <TipoMovimientoBadge tipoMovimiento={row.TIPO_MOVIMIENTO} />
+                  </TableCell>
+                  <TableCell align='center'>
+                    <EsRecuperadoBadge esRecuperado={row.RECUPERADO ?? false} />
+                  </TableCell>
                   <TableCell align="center">
                     {typeof row.ESTADO === 'number' ? (
                       <Box sx={{ width: '120px', position: 'relative' }}>

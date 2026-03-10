@@ -70,6 +70,7 @@ const DraggableNeumatico: React.FC<{
             style={{
                 cursor: disabled ? 'not-allowed' : 'grab',
                 opacity: disabled ? 0.5 : 1,
+                margin: '0px',
             }}
         >
             <img
@@ -79,7 +80,7 @@ const DraggableNeumatico: React.FC<{
                     width: '30px',
                     height: '60px',
                     display: 'block',
-                    margin: '0 auto',
+                    margin: '0px auto',
                     objectFit: 'contain',
                 }}
             />
@@ -978,7 +979,7 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
                                                                         : {},
                                                                 }}
                                                             >
-                                                                <TableCell sx={{ fontSize: '0.78rem' }}>
+                                                                <TableCell sx={{ fontSize: '0.78rem', padding: '5px 5px', textAlign: 'center' }}>
                                                                     <DraggableNeumatico
                                                                         neumatico={neumatico}
                                                                         disabled={isDisabled}

@@ -1046,7 +1046,7 @@ const ModalAsignacionNeuDesdeDesasignacion: React.FC<ModalAsignacionNeuDesdeDesa
                                                                         : {},
                                                                 }}
                                                             >
-                                                                <TableCell sx={{ fontSize: '0.78rem' }}>
+                                                                <TableCell sx={{ fontSize: '0.78rem', padding: '5px 5px', textAlign: 'center' }}>
                                                                     <DraggableNeumatico
                                                                         neumatico={neumatico}
                                                                         disabled={isDisabled}

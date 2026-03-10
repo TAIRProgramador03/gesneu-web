@@ -6,7 +6,6 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import FactCheckIcon from '@mui/icons-material/FactCheck';
-import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 
 interface ModalInspeccionObligatoriaProps {
   open: boolean;
@@ -33,9 +32,6 @@ const ModalInspeccionAnterior: React.FC<ModalInspeccionObligatoriaProps> = ({ op
           <Typography sx={{ fontSize: 16, color: '#222', mb: 1 }}>
             La última inspección ({fechaInspeccion}) de este vehiculo esta dentro de los 4 dias. ¿Deseas usar la misma o realizar una nueva inspección?.
           </Typography>
-          {/* <Typography sx={{ fontSize: 15, color: '#1976d2', mb: 1 }}>
-            Acción: Reubicar neumático
-          </Typography> */}
         </Box>
         <img
           src="/assets/inspeccionVehiculo.png"

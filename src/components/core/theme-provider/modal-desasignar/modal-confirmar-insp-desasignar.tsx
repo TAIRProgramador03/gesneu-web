@@ -57,7 +57,7 @@ const ModalConfirmarInspDesasignar: React.FC<ModalConfirmarInspDesasignarProps> 
         <Dialog
             open={open}
             onClose={onClose}
-            PaperProps={{ sx: { borderRadius: 3, minWidth: 600, maxWidth: 700, border: '3px solid red', zIndex: 9999 } }}
+            PaperProps={{ sx: { borderRadius: 3, minWidth: 600, maxWidth: 700, zIndex: 9999 } }}
         >
             <DialogContent sx={{ bgcolor: fondo, borderRadius: 2, p: 0 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', p: 3, pb: 2 }}>

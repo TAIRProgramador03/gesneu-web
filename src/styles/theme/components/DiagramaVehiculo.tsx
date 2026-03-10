@@ -150,7 +150,7 @@ const DiagramaVehiculo: React.FC<DiagramaVehiculoProps & {
                                 objectFit: 'contain',
                                 position: 'absolute',
                                 top: '-30px',
-                                left: '60px',
+                                left: '162px',
                                 zIndex: 1,
                                 pointerEvents: 'none',
                             }

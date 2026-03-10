@@ -62,8 +62,8 @@ export function TotalCustomers({ diff, trend, sx, value }: TotalCustomersProps):
               <Typography variant="h4">{value}</Typography>
             </Stack>
 
-            <Stack sx={{ position: 'relative', width: 75, height: 75 }}>
-              <img src="/assets/disponibles.ico" alt="Neumático Disponible" style={{ width: 115, height: 115, position: 'absolute', top: -13, left: -25, zIndex: 1, opacity: 1 }} />
+            <Stack sx={{ width: 115, objectFit: 'cover' }}>
+              <img src="/assets/disponibles.ico" alt="Neumático Disponible" style={{ width: 115, height: 115, zIndex: 1, opacity: 1 }} />
             </Stack>
           </Stack>
           {/* <div style={{ width: '100%', height: 60 }}>

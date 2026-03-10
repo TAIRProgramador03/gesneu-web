@@ -4,6 +4,8 @@ import Card from '@mui/material/Card';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import RecyclingIcon from '@mui/icons-material/Recycling';
 
 export interface CustomersFiltersProps {
   projectCount: number;
@@ -189,7 +191,9 @@ export const CustomersFilters = memo(({ projectCount, disponiblesCount, asignado
               position: 'relative',
             }}
           >
-            <span style={{ marginRight: 4, fontSize: 20 }}>❌</span>
+            <span style={{ marginRight: 4, fontSize: 20 }}>
+              <WarningAmberIcon />
+            </span>
             <div ref={bajaRef}>0</div>
           </Box>
           <Typography align="center" variant="body2" color="text.secondary">
@@ -214,7 +218,9 @@ export const CustomersFilters = memo(({ projectCount, disponiblesCount, asignado
               position: 'relative',
             }}
           >
-            <span style={{ marginRight: 4, fontSize: 20 }}>♻️</span>
+            <span style={{ marginRight: 4, fontSize: 20 }}>
+              <RecyclingIcon />
+            </span>
             <div ref={recuperadosRef}>0</div>
           </Box>
           <Typography align="center" variant="body2" color="text.secondary">

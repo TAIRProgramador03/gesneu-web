@@ -7,6 +7,7 @@ import type { SxProps } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import { ArrowDown as ArrowDownIcon } from '@phosphor-icons/react/dist/ssr/ArrowDown';
 import { ArrowUp as ArrowUpIcon } from '@phosphor-icons/react/dist/ssr/ArrowUp';
+import RecyclingIcon from '@mui/icons-material/Recycling';
 
 export interface RecuperadosProps {
   diff?: number;
@@ -38,7 +39,7 @@ export function Recuperados({ diff, trend, sx, value }: RecuperadosProps): React
                   width: '56px',
                 }}
               >
-                ♻️
+                <RecyclingIcon />
               </Avatar>
             </Stack>
           </Stack>

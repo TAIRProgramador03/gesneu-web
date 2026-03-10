@@ -23,8 +23,8 @@ export function TotalProfit({ value, sx }: TotalProfitProps): React.JSX.Element 
             </Typography>
             <Typography variant="h4">{value}</Typography>
           </Stack>
-          <Stack sx={{ position: 'relative', width: 75, height: 75 }}>
-            <img src="/assets/hand-tyre.png" alt="Neumático Asignado" style={{ width: 130, height: 130, position: 'absolute', top: -28, left: -25, zIndex: 1, opacity: 1, objectFit: 'contain' }} />
+          <Stack sx={{ width: 115, objectFit: 'contain' }}>
+            <img src="/assets/hand-tyre.png" alt="Neumático Asignado" style={{ width: 115, height: 115, zIndex: 1, opacity: 1, objectFit: 'contain' }} />
           </Stack>
         </Stack>
       </CardContent>

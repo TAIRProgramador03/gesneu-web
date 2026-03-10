@@ -7,6 +7,7 @@ import type { SxProps } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import { ArrowDown as ArrowDownIcon } from '@phosphor-icons/react/dist/ssr/ArrowDown';
 import { ArrowUp as ArrowUpIcon } from '@phosphor-icons/react/dist/ssr/ArrowUp';
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 
 export interface BajaDefinitivaProps {
   diff?: number;
@@ -38,7 +39,7 @@ export function BajaDefinitiva({ diff, trend, sx, value }: BajaDefinitivaProps):
                   width: '56px',
                 }}
               >
-                ❌
+                <WarningAmberIcon />
               </Avatar>
             </Stack>
           </Stack>
