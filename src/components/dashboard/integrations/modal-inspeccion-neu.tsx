@@ -9,16 +9,13 @@ import Stack from '@mui/material/Stack';
 import Card from '@mui/material/Card';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
-import MenuItem from '@mui/material/MenuItem';
 import DiagramaVehiculo from '../../../styles/theme/components/DiagramaVehiculo';
 import { useState, useContext, useEffect } from 'react';
 import ModalInspeccionAver from '../../core/modal-inspeccion-aver';
 import { consultarInspeccionHoy, listarNeumaticosAsignados, guardarInspeccion, Neumaticos, obtenerUltimosMovimientosPorCodigo, getUltimaFechaInspeccionPorPlaca, obtenerUltimosMovimientosPorPosicion } from '../../../api/Neumaticos';
-import Snackbar from '@mui/material/Snackbar';
-import Alert from '@mui/material/Alert';
-import axios from 'axios';
 import { UserContext } from '../../../contexts/user-context';
 import ModalAsignacionNeu from './modal-asignacion-neu';
+import { toast } from 'sonner';
 
 // --- Declaraciones de tipos fuera del componente ---
 interface FormValues {
@@ -37,7 +34,6 @@ interface FormValues {
   torque: string;
   fecha_inspeccion: string;
 }
-type SnackbarSeverity = 'success' | 'error' | 'info';
 
 interface Neumatico {
   POSICION: string;
@@ -96,7 +92,6 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = ({ open, onClose, pl
   }, [open, neumaticosAsignados]);
   const { user } = useContext(UserContext) || {};
   const [neumaticoSeleccionado, setNeumaticoSeleccionado] = useState<any | null>(null);
-  const [snackbar, setSnackbar] = React.useState<{ open: boolean; message: string; severity: SnackbarSeverity }>({ open: false, message: '', severity: 'success' });
   const [formValues, setFormValues] = React.useState<FormValues>({
     kilometro: '',
     marca: '',
@@ -559,35 +554,35 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = ({ open, onClose, pl
 
   const handleGuardarInspeccionLocal = () => {
     if (kmError) {
-      setSnackbar({ open: true, message: `El kilometro no puede ser menor a ${initialOdometro.toLocaleString()} km`, severity: 'error' });
+      toast.error(`El kilometro no puede ser menor a ${initialOdometro.toLocaleString()} km`)
       return;
     }
     if (!neumaticoSeleccionado) {
-      setSnackbar({ open: true, message: 'Debe seleccionar un neumático.', severity: 'error' });
+      toast.error('Debe seleccionar un neumático.')
       return;
     }
     // Eliminada la restricción de RES01: ahora se guarda igual, pero los campos ya están bloqueados en el formulario
     if (!hayCambiosFormulario && neumaticoSeleccionado.POSICION !== 'RES01') {
-      setSnackbar({ open: true, message: 'No hay cambios para guardar.', severity: 'info' });
+      toast.info('No hay cambios para guardar.')
       return;
     }
     // Validaciones mínimas
     if (Odometro < Number(formValues.kilometro)) {
-      setSnackbar({ open: true, message: `El número de kilometro no puede ser menor al actual (${formValues.kilometro} km).`, severity: 'error' });
+      toast.error(`El número de kilometro no puede ser menor al actual (${formValues.kilometro} km).`)
       return;
     }
     if (remanenteError) {
-      setSnackbar({ open: true, message: `El valor de remanente no puede ser mayor a ${valorReferenciaRemanente}`, severity: 'error' });
+      toast.error(`El valor de remanente no puede ser igual o mayor a ${valorReferenciaRemanente}`)
       return;
     }
 
     if (presionError) {
-      setSnackbar({ open: true, message: `El valor de la presión no puede ser menor a 25 o mayor que 50.`, severity: 'error' });
+      toast.error(`El valor de la presión no puede ser menor a 25 o mayor que 50.`)
       return;
     }
 
     if (torqueError) {
-      setSnackbar({ open: true, message: `El valor de la torque no puede ser menor a 110 o mayor que 150.`, severity: 'error' });
+      toast.error(`El valor de la torque no puede ser menor a 110 o mayor que 150.`)
       return;
     }
 
@@ -615,7 +610,10 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = ({ open, onClose, pl
       return nuevoArray;
     });
     setFormValuesInicial({ ...formValues, kilometro: Odometro.toString() });
-    setSnackbar({ open: true, message: 'Inspección guardada localmente.', severity: 'success' });
+
+    toast.success('Inspección guardada localmente.', {
+      position: 'top-center'
+    })
 
     // --- NAVEGACIÓN AUTOMÁTICA ACTUALIZADA ---
     const posicionesPrincipales = ['POS01', 'POS02', 'POS03', 'POS04'];
@@ -670,7 +668,7 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = ({ open, onClose, pl
     const fechaSeleccionada = formValues.fecha_inspeccion.trim();
 
     if (!fechaSeleccionada || fechaSeleccionada.length === 0) {
-      setSnackbar({ open: true, message: 'Debe seleccionar una fecha de inspección.', severity: 'error' });
+      toast.error('Debe seleccionar una fecha de inspección.')
       return;
     }
 
@@ -678,7 +676,7 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = ({ open, onClose, pl
     const errorFecha = validarFechaInspeccion(fechaSeleccionada);
     if (errorFecha) {
       setFechaInspeccionError(errorFecha);
-      setSnackbar({ open: true, message: errorFecha, severity: 'error' });
+      toast.error(errorFecha)
       return;
     }
 
@@ -691,16 +689,11 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = ({ open, onClose, pl
       //   neumaticosAsignados.map(n => consultarInspeccionHoy({ codigo: n.CODIGO, placa, fecha: fechaSeleccionada }))
       // );
 
-      // if (results.some(r => r && r.existe)) {
-      //   setSnackbar({ open: true, message: `Ya se registró una inspección para este vehículo en la fecha ${fechaSeleccionada}. No puede realizar otra.`, severity: 'error' });
-      //   return;
-      // }
-
       let placaTrim = placa.trim()
       const responseInspeccion = await consultarInspeccionHoy({ placa: placaTrim, fecha: fechaSeleccionada })
 
       if (responseInspeccion.existe) {
-        setSnackbar({ open: true, message: `Ya se registró una inspección para este vehículo en la fecha ${fechaSeleccionada}. No puede realizar otra.`, severity: 'error' });
+        toast.error(`Ya se registró una inspección para este vehículo en la fecha ${fechaSeleccionada}. No puede realizar otra.`)
         return;
       }
 
@@ -709,18 +702,18 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = ({ open, onClose, pl
     }
 
     if (kmError) {
-      setSnackbar({ open: true, message: `El kilometro no puede ser menor a ${initialOdometro.toLocaleString()} km`, severity: 'error' });
+      toast.error(`El kilometro no puede ser menor a ${initialOdometro.toLocaleString()} km`)
       return;
     }
 
     if (Odometro <= minKilometro) {
-      setSnackbar({ open: true, message: `El kilometro debe ser mayor al actual (${minKilometro.toLocaleString()} km).`, severity: 'error' });
+      toast.error(`El kilometro debe ser mayor al actual (${minKilometro.toLocaleString()} km).`)
       return;
     }
 
     // Ahora requerimos 5 inspecciones (incluyendo RES01)
     if (inspeccionesPendientes.length !== 5) {
-      setSnackbar({ open: true, message: 'Debe inspeccionar los 5 neumáticos (incluyendo el de repuesto) antes de enviar.', severity: 'error' });
+      toast.error('Debe inspeccionar los 5 neumáticos (incluyendo el de repuesto) antes de enviar.')
       return;
     }
 
@@ -794,7 +787,10 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = ({ open, onClose, pl
     console.log('Payload FINAL a enviar al backend:', payloads);
     try {
       await guardarInspeccion(payloads); // El backend acepta array
-      setSnackbar({ open: true, message: 'Inspecciones enviadas correctamente.', severity: 'success' });
+      toast.success('Inspecciones guardadas correctamente.', {
+        duration: 6000,
+        position: 'top-right'
+      })
       setInspeccionesPendientes([]);
       if (onUpdateAsignados) {
         await onUpdateAsignados(); // <--- Forzar refresh de tabla
@@ -805,7 +801,9 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = ({ open, onClose, pl
       marcarInspeccionHoy(); // Marcar inspección realizada hoy
       onClose();
     } catch (error: any) {
-      setSnackbar({ open: true, message: error?.message || 'Error al enviar inspecciones.', severity: 'error' });
+
+      const messageErrorCatch = error?.message || 'Error al enviar inspecciones.'
+      toast.error(messageErrorCatch)
       // Intentar actualizar el diagrama aunque haya error en el guardado
       if (onUpdateAsignados) {
         await onUpdateAsignados();
@@ -1361,11 +1359,6 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = ({ open, onClose, pl
       </Dialog>
       {/* Modal de asignación de neumáticos (debes reemplazarlo por tu modal real) */}
       {/* <ModalAsignacionNeumatico open={openAsignacion} onClose={() => setOpenAsignacion(false)} placa={placa} /> */}
-      <Snackbar open={snackbar.open} autoHideDuration={999000} onClose={() => setSnackbar(s => ({ ...s, open: false }))} anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
-        <Alert onClose={() => setSnackbar(s => ({ ...s, open: false }))} severity={snackbar.severity} sx={{ width: '100%' }}>
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
     </>
   );
 };

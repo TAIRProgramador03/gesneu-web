@@ -9,6 +9,7 @@ import {
     Box,
 } from '@mui/material';
 import { asignarNeumatico } from "@/api/Neumaticos";
+import Image from 'next/image';
 
 
 interface ModalAvertAsigNeuProps {
@@ -24,10 +25,10 @@ const ModalAvertAsigNeu: React.FC<ModalAvertAsigNeuProps> = ({ open, onClose, on
     const handleClose = () => {
         onClose();
         setTimeout(() => {
-            document.body.focus(); 
+            document.body.focus();
         }, 0);
     };
-    
+
     React.useEffect(() => {
         if (open) {
             setTimeout(() => {
@@ -44,10 +45,14 @@ const ModalAvertAsigNeu: React.FC<ModalAvertAsigNeuProps> = ({ open, onClose, on
         >
             <DialogTitle id="alert-dialog-title" sx={{ textAlign: 'center' }}>
                 {/* Imagen personalizada */}
-                <img
+                <Image
                     src="/assets/quitarNeumatico.png"
                     alt="Quitar Neumático"
-                    style={{ width: 100, height: 100 }}
+                    width={100}
+                    height={100}
+                    style={{
+                        margin: '0 auto'
+                    }}
                 />
 
                 <Box sx={{ mt: 1, fontWeight: 'bold', fontSize: '1.2rem' }}>Confirmación</Box>
@@ -55,7 +60,7 @@ const ModalAvertAsigNeu: React.FC<ModalAvertAsigNeuProps> = ({ open, onClose, on
             <DialogContent>
                 <DialogContentText
                     id="alert-dialog-description"
-                    sx={{ textAlign: 'center', color: 'black', fontWeight: 'bold', fontSize: '1rem' }}
+                    sx={{ textAlign: 'center', color: 'black', fontSize: '1rem' }}
                 >
                     {message}
                 </DialogContentText>

@@ -12,6 +12,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { UserProvider } from '@/contexts/user-context';
 import { LocalizationProvider } from '@/components/core/localization-provider';
 import { ThemeProvider } from '@/components/core/theme-provider/theme-provider';
+import { Toaster } from '@/components/ui/sonner';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -38,6 +39,7 @@ export default function Layout({ children }: LayoutProps): React.JSX.Element {
             </UserProvider>
           </LocalizationProvider>
           <ReactQueryDevtools initialIsOpen={false} />
+          <Toaster position="bottom-right" richColors />
         </QueryClientProvider>
       </body>
     </html>

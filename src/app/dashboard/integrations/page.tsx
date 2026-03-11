@@ -18,7 +18,6 @@ import Menu from '@mui/material/Menu';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import Paper from '@mui/material/Paper';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
-import Snackbar from '@mui/material/Snackbar';
 import Stack from '@mui/material/Stack';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -50,6 +49,8 @@ import { CompaniesFilters } from '@/components/dashboard/integrations/integratio
 import { useQuery } from '@tanstack/react-query';
 import ModalInspeccionAntigua from '@/components/core/theme-provider/modal-reubicar/modal-inspeccion-antigua';
 import ModalInspeccionAnterior from '@/components/core/theme-provider/modal-reubicar/modal-inspeccion-anterior';
+import { EsRecuperadoBadge } from '@/components/ui/EsRecuperadoBadge';
+import { toast } from 'sonner';
 
 function NeumaticosDisponiblesTable({ neumaticos }: { neumaticos: any[] }) {
   const [page, setPage] = React.useState(0);
@@ -65,6 +66,7 @@ function NeumaticosDisponiblesTable({ neumaticos }: { neumaticos: any[] }) {
               <TableCell sx={{ backgroundColor: '#e0f7fa', fontWeight: 'bold', fontSize: '0.78rem' }}>Remanente</TableCell>
               <TableCell sx={{ backgroundColor: '#e0f7fa', fontWeight: 'bold', fontSize: '0.78rem' }}>Medida</TableCell>
               <TableCell sx={{ backgroundColor: '#e0f7fa', fontWeight: 'bold', fontSize: '0.78rem' }}>Fecha</TableCell>
+              <TableCell sx={{ backgroundColor: '#e0f7fa', fontWeight: 'bold', fontSize: '0.78rem' }}>Recuperado</TableCell>
               <TableCell sx={{ backgroundColor: '#e0f7fa', fontWeight: 'bold', fontSize: '0.78rem' }}>Estado</TableCell>
             </TableRow>
           </TableHead>
@@ -77,6 +79,9 @@ function NeumaticosDisponiblesTable({ neumaticos }: { neumaticos: any[] }) {
                 <TableCell align="center">{neumatico.REMANENTE}</TableCell>
                 <TableCell align="center">{neumatico.MEDIDA}</TableCell>
                 <TableCell align="center">{neumatico.FECHA_FABRICACION_COD}</TableCell>
+                <TableCell align="center">
+                  <EsRecuperadoBadge esRecuperado={neumatico.RECUPERADO} />
+                </TableCell>
                 <TableCell align="center">
                   {typeof neumatico.ESTADO === 'number' || (typeof neumatico.ESTADO === 'string' && neumatico.ESTADO !== '') ? (
                     <Box sx={{ position: 'relative', width: '180px' }}>
@@ -147,9 +152,7 @@ export default function Page(): React.JSX.Element {
   const [filterCol2, setFilterCol2] = React.useState('');
   const [vehiculo, setVehiculo] = React.useState<Vehiculo | null>(null);
   const [error, setError] = React.useState<string | null>(null);
-  const [snackbarOpen, setSnackbarOpen] = React.useState(false);
-  const [snackbarMessage, setSnackbarMessage] = React.useState('');
-  const [snackbarSeverity, setSnackbarSeverity] = React.useState<'success' | 'error' | 'info' | 'warning'>('success');
+
   const [animatedKilometraje, setAnimatedKilometraje] = useState(0);
   const [animatedTotalNeumaticos, setAnimatedTotalNeumaticos] = useState(0);
   const [openModalDesasignar, setOpenModalDesasignar] = useState(false);
@@ -197,9 +200,6 @@ export default function Page(): React.JSX.Element {
     ID_SUPERVISOR: string;
   }
 
-  const handleSnackbarClose = () => {
-    setSnackbarOpen(false);
-  };
 
   const handleFilterChangeCol1 = (event: SelectChangeEvent<string>) => {
     const value = event.target.value;
@@ -229,19 +229,16 @@ export default function Page(): React.JSX.Element {
         const vehiculoData = await buscarVehiculoPorPlaca(placa);
 
         if (!vehiculoData || vehiculoData?.mensaje === "Vehículo no encontrado") {
-          setSnackbarMessage('Vehículo no encontrado o la unidad no le pertenece.');
-          setSnackbarSeverity('error');
-          setSnackbarOpen(true);
+          toast.error('Vehículo no encontrado o la unidad no le pertenece.');
           setVehiculo(null);
           setNeumaticosFiltrados([]);
           setNeumaticosAsignados([]);
           // setLoading(false);
           return;
         }
+
         setVehiculo(vehiculoData);
-        setSnackbarMessage('Vehículo encontrado exitosamente.');
-        setSnackbarSeverity('success');
-        setSnackbarOpen(true);
+        toast.success('Vehículo encontrado exitosamente.');
 
         // Obtener neumáticos asignados desde la API
         const asignados = await obtenerNeumaticosAsignadosPorPlaca(placa);
@@ -329,9 +326,7 @@ export default function Page(): React.JSX.Element {
       } catch (err) {
         console.error('Error al buscar el vehículo:', err);
         setVehiculo(null);
-        setSnackbarMessage('Error al conectar con el servidor.');
-        setSnackbarSeverity('error');
-        setSnackbarOpen(true);
+        toast.error('Error al conectar con el servidor.');
         setNeumaticosFiltrados([]);
         setNeumaticosAsignados([]);
       } finally {
@@ -399,9 +394,7 @@ export default function Page(): React.JSX.Element {
           n => n.TIPO_MOVIMIENTO !== 'BAJA DEFINITIVA'
         );
         if (asignadosValidos.length >= 5) {
-          setSnackbarMessage('Este vehículo ya tiene todos sus neumáticos asignados. El modal de asignación solo es para vehículos nuevos sin neumáticos.');
-          setSnackbarSeverity('warning');
-          setSnackbarOpen(true);
+          toast.warning('Este vehículo ya tiene todos sus neumáticos asignados. El modal de asignación solo es para vehículos nuevos sin neumáticos.');
           return;
         }
 
@@ -465,9 +458,7 @@ export default function Page(): React.JSX.Element {
     try {
       // Usar directamente el vehículo seleccionado (ya viene completo del modal)
       setVehiculo(vehiculoSeleccionado);
-      setSnackbarMessage('Vehículo de tránsito seleccionado.');
-      setSnackbarSeverity('success');
-      setSnackbarOpen(true);
+      toast.success('Vehículo de tránsito seleccionado.');
 
       // Obtener neumáticos asignados desde la API
       const asignados = await obtenerNeumaticosAsignadosPorPlaca(vehiculoSeleccionado.PLACA.trim());
@@ -545,9 +536,7 @@ export default function Page(): React.JSX.Element {
     } catch (err) {
       console.error('Error al cargar vehículo de tránsito:', err);
       setVehiculo(null);
-      setSnackbarMessage('Error al cargar el vehículo.');
-      setSnackbarSeverity('error');
-      setSnackbarOpen(true);
+      toast.error('Error al cargar el vehículo.');
       setNeumaticosFiltrados([]);
       setNeumaticosAsignados([]);
     } finally {
@@ -892,14 +881,16 @@ export default function Page(): React.JSX.Element {
 
   // Handler centralizado para abrir el modal de asignación SIEMPRE refrescando datos
   // Estado para mostrar advertencia si ya hay 4 neumáticos asignados
-  const [showAsignadosWarning, setShowAsignadosWarning] = useState(false);
 
   const handleOpenModalConRefresh = async () => {
     // Si ya hay 5 neumáticos asignados (excluyendo solo baja definitiva), mostrar advertencia y no abrir modal
     const asignadosValidos = neumaticosAsignadosUnicos.filter(
       n => n.TIPO_MOVIMIENTO !== 'BAJA DEFINITIVA');
     if (asignadosValidos.length === 5) {
-      setShowAsignadosWarning(true);
+      toast.warning('Ya hay 5 neumáticos asignados a este vehículo. Si desea reasignar, primero debe desasignar alguno.', {
+        duration: 7000,
+        position: 'top-center'
+      })
       return;
     }
     await Promise.all([refreshAsignados(), refreshVehiculo()]);
@@ -1099,9 +1090,7 @@ export default function Page(): React.JSX.Element {
 
       } catch (err) {
         console.error('Error verificando inspección:', err);
-        setSnackbarMessage('Error verificando inspección.');
-        setSnackbarSeverity('error');
-        setSnackbarOpen(true);
+        toast.error('Error verificando inspección.');
       }
     }
   };
@@ -1178,9 +1167,7 @@ export default function Page(): React.JSX.Element {
         }
       } catch (err) {
         console.error('Error verificando inspección para desasignar:', err);
-        setSnackbarMessage('Error verificando inspección.');
-        setSnackbarSeverity('error');
-        setSnackbarOpen(true);
+        toast.error('Error verificando inspección.');
       }
     }
   };
@@ -1511,16 +1498,6 @@ export default function Page(): React.JSX.Element {
           <NeumaticosDisponiblesTable neumaticos={neumaticosDisponiblesUseQuery} />
         </Card>
       </Stack>
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={6000}
-        onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-      >
-        <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
       <ModalAdvertenciaReubicacion
         open={openModalAdvertenciaReubicacion}
         onClose={() => setOpenModalAdvertenciaReubicacion(false)}
@@ -1620,17 +1597,6 @@ export default function Page(): React.JSX.Element {
           setOpenMantenimientoModal(true);
         }}
       />
-      {/* Snackbar para advertencia de 4 neumáticos asignados  */}
-      <Snackbar
-        open={showAsignadosWarning}
-        autoHideDuration={4000}
-        onClose={() => setShowAsignadosWarning(false)}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-      >
-        <Alert onClose={() => setShowAsignadosWarning(false)} severity="info" sx={{ width: '100%' }}>
-          Ya hay 5 neumáticos asignados a este vehículo. Si desea reasignar, primero debe desasignar alguno.
-        </Alert>
-      </Snackbar>
       {/* ...existing code... */}
       <ModalAsignacionNeu
         open={openModal}
@@ -1643,7 +1609,7 @@ export default function Page(): React.JSX.Element {
               DISEÑO: neumatico.DISEÑO ?? '',
               FECHA_FABRICACION_COD: neumatico.FECHA_FABRICACION_COD ?? '',
               COD_SUPERVISOR: vehiculo?.ID_SUPERVISOR,
-              ID_OPERACION: vehiculo?.ID_OPERACION
+              ID_OPERACION: vehiculo?.ID_OPERACION,
             }))
         }
         assignedNeumaticos={(() => {

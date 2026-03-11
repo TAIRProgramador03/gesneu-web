@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
-  Dialog, DialogContent, Typography, Button, Stack, Box, Card, TextField, MenuItem,
-  Snackbar, Alert as MuiAlert, AlertTitle, Divider
+  Dialog, DialogContent, Typography, Button, Stack, Box, Card, TextField, MenuItem
 } from '@mui/material';
 import { DndContext, DragEndEvent, useDraggable, useDroppable } from '@dnd-kit/core';
 import DiagramaVehiculo from '../../../styles/theme/components/DiagramaVehiculo';
@@ -16,6 +15,8 @@ import {
   getUltimaFechaInspeccionPorPlaca,
   desasignarConReemplazo
 } from '../../../api/Neumaticos';
+import { CheckCircle, TriangleAlertIcon } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface ModalDesasignarProps {
   open: boolean;
@@ -63,11 +64,6 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = ({
 
   // Estado para asignaciones temporales (NO guardadas en BD)
   const [asignacionesTemporales, setAsignacionesTemporales] = useState<any[]>([]);
-
-  // Estados para notificaciones
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMsg, setSnackbarMsg] = useState('');
-  const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error' | 'info' | 'warning'>('info');
 
   // Ref para rastrear si ya se inicializó y evitar loops
   const prevOpenRef = React.useRef(false);
@@ -244,9 +240,7 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = ({
 
       // Bloquear nuevas desasignaciones cuando ya hay asignaciones temporales pendientes
       if (asignacionesTemporales.length > 0) {
-        setSnackbarMsg('Ya hay neumáticos pendientes de asignación. Usa "Restaurar" para empezar de nuevo.');
-        setSnackbarSeverity('warning');
-        setSnackbarOpen(true);
+        toast.info('Ya hay neumáticos pendientes de asignación. Usa "Restaurar" para empezar de nuevo.')
         return;
       }
 
@@ -348,17 +342,13 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = ({
 
       // Bloquear neumáticos temporales (recién asignados desde modal de asignación)
       if ((neumatico as any).TIPO_MOVIMIENTO === 'TEMPORAL') {
-        setSnackbarMsg('Este neumático está pendiente de asignación y no puede ser desasignado.');
-        setSnackbarSeverity('warning');
-        setSnackbarOpen(true);
+        toast.warning('Este neumático está pendiente de asignación y no puede ser desasignado.')
         return;
       }
 
       // Bloquear nuevas desasignaciones cuando ya hay asignaciones temporales pendientes
       if (asignacionesTemporales.length > 0) {
-        setSnackbarMsg('Ya hay neumáticos pendientes de asignación. Usa "Restaurar" para empezar de nuevo.');
-        setSnackbarSeverity('warning');
-        setSnackbarOpen(true);
+        toast.info('Ya hay neumáticos pendientes de asignación. Usa "Restaurar" para empezar de nuevo.')
         return;
       }
 
@@ -409,9 +399,7 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = ({
       );
 
       if (temporalEnDestino) {
-        setSnackbarMsg(`La posición ${overId} ya tiene un neumático asignado. No se puede mover el neumático desasignado aquí.`);
-        setSnackbarSeverity('warning');
-        setSnackbarOpen(true);
+        toast.warning(`La posición ${overId} ya tiene un neumático asignado. No se puede mover el neumático desasignado aquí.`)
         return;
       }
 
@@ -424,9 +412,7 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = ({
 
       if (posicionReservadaEnArea) {
         console.log(`[handleDragEnd] ⚠️ Posición ${overId} reservada por neumático en área de desasignación`);
-        setSnackbarMsg(`La posición ${overId} está reservada (neumático pendiente de desasignación)`);
-        setSnackbarSeverity('warning');
-        setSnackbarOpen(true);
+        toast.warning(`La posición ${overId} está reservada (neumático pendiente de desasignación)`)
         return;
       }
 
@@ -444,9 +430,7 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = ({
       // Si hay un neumático en destino que NO está en área de desasignación Y no es la posición original, bloquear
       if (neumaticoEnDestino && !esPosicionOriginal) {
         console.log(`[handleDragEnd] ⚠️ Posición ${overId} ocupada por ${neumaticoEnDestino.CODIGO_NEU || neumaticoEnDestino.CODIGO}`);
-        setSnackbarMsg(`La posición ${overId} ya está ocupada por ${neumaticoEnDestino.CODIGO_NEU || neumaticoEnDestino.CODIGO}`);
-        setSnackbarSeverity('warning');
-        setSnackbarOpen(true);
+        toast.info(`La posición ${overId} ya está ocupada por ${neumaticoEnDestino.CODIGO_NEU || neumaticoEnDestino.CODIGO}`)
         return;
       }
 
@@ -549,87 +533,29 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = ({
   const handleGuardarDesasignacion = async () => {
     // 1. Validar observación obligatoria
     if (!observacion || observacion.trim() === '') {
-      setSnackbarMsg('La observación es obligatoria. Por favor, ingresa una observación.');
-      setSnackbarSeverity('warning');
-      setSnackbarOpen(true);
+      toast.warning('La observación es obligatoria. Por favor, ingresa una observación.')
       return;
     }
 
     // 2. Validar que haya neumáticos seleccionados
     if (neumaticosSeleccionados.length === 0) {
-      setSnackbarMsg('Selecciona al menos un neumático para desasignar.');
-      setSnackbarSeverity('info');
-      setSnackbarOpen(true);
+      toast.warning('Selecciona al menos un neumático para desasignar.')
       return;
     }
 
     // 3. Validar que haya acción seleccionada
     if (!accion) {
-      setSnackbarMsg('Selecciona una acción para la desasignación.');
-      setSnackbarSeverity('info');
-      setSnackbarOpen(true);
+      toast.warning('Selecciona una acción para la desasignación.')
       return;
     }
 
     // 4. Validar inspección previa
     if (!fechaUltimaInspeccion || isNaN(new Date(fechaUltimaInspeccion).getTime())) {
-      setSnackbarMsg('No se puede desasignar: primero debe existir una inspección válida para este neumático.');
-      setSnackbarSeverity('error');
-      setSnackbarOpen(true);
+      toast.error('No se puede desasignar: primero debe existir una inspección válida para este neumático.', {
+        duration: 6000
+      })
       return;
     }
-
-
-    // NOTA: La validación de posiciones vacías se hace en el BACKEND
-    // El backend rechazará la operación si alguna posición queda vacía
-    // y mostrará un mensaje claro al usuario
-    // Esto evita duplicar lógica y mantiene el backend como fuente de verdad
-
-    /* VALIDACIÓN COMENTADA - El backend ya valida esto
-    const posicionesVacias = detectarPosicionesVacias();
-    if (posicionesVacias.length > 0) {
-      const posicionesStr = posicionesVacias.join(', ');
-      setSnackbarMsg(
-        `No se puede guardar la desasignación: las siguientes posiciones quedarán vacías: ${posicionesStr}. ` +
-        `Debes asignar neumáticos a estas posiciones antes de guardar.`
-      );
-      setSnackbarSeverity('error');
-      setSnackbarOpen(true);
-
-      // Preparar datos cacheados y abrir modal de asignación
-      const neumaticosNoDesasignados = neumaticosAsignadosState.filter(n => !n.enAreaDesasignacion);
-      const neumaticosPorPosicion = new Map<string, typeof neumaticosNoDesasignados[0]>();
-      neumaticosNoDesasignados.forEach(n => {
-        const pos = (n.POSICION_NEU || n.POSICION);
-        if (pos) {
-          const existente = neumaticosPorPosicion.get(pos);
-          if (!existente || (n.ID_MOVIMIENTO || 0) > (existente.ID_MOVIMIENTO || 0)) {
-            neumaticosPorPosicion.set(pos, n);
-          }
-        }
-      });
-
-      const neumaticosActuales = Array.from(neumaticosPorPosicion.values()).map(n => {
-        const pos = n.POSICION_NEU || n.POSICION;
-        return {
-          ...n,
-          POSICION: pos,
-          POSICION_NEU: pos
-        };
-      });
-
-      if (onAbrirAsignacion) {
-        setTimeout(() => {
-          onAbrirAsignacion({
-            cachedNeumaticosAsignados: neumaticosActuales,
-            posicionesVacias: posicionesVacias
-          });
-        }, 2000);
-      }
-      return;
-    }
-    */
-
 
     try {
       console.log('[DEBUG] Enviando desasignaciones con:', {
@@ -643,9 +569,9 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = ({
 
       // Asignaciones temporales son OBLIGATORIAS para guardar la desasignación
       if (asignacionesTemporales.length === 0) {
-        setSnackbarMsg('Debes asignar neumáticos de reemplazo antes de guardar la desasignación. Usa el botón "Asignar Neumáticos".');
-        setSnackbarSeverity('error');
-        setSnackbarOpen(true);
+        toast.error('Debes asignar neumáticos de reemplazo antes de guardar la desasignación. Usa el botón "Asignar Neumáticos".', {
+          duration: 6000
+        })
         return;
       }
 
@@ -707,10 +633,10 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = ({
 
         console.log({ dasldwifwa: data })
 
-
-        setSnackbarMsg(`${neumaticosSeleccionados.length} desasignación(es) y ${asignacionesTempo.length} asignación(es) registradas correctamente.`);
-        setSnackbarSeverity('success');
-        setSnackbarOpen(true);
+        toast.success(`${neumaticosSeleccionados.length} desasignación(es) y ${asignacionesTempo.length} asignación(es) registradas correctamente.`, {
+          position: 'top-right',
+          duration: 6000
+        })
 
         // Limpiar asignaciones temporales
         setAsignacionesTemporales([]);
@@ -739,9 +665,9 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = ({
       onClose();
     } catch (error: any) {
       const mensajeError = error?.response?.data?.detalle || error?.message || 'Error desconocido';
-      setSnackbarMsg('Error al registrar la desasignación: ' + mensajeError);
-      setSnackbarSeverity('error');
-      setSnackbarOpen(true);
+      toast.error(`Error al registrar la desasignación: ${mensajeError}`, {
+        duration: 8000
+      })
     }
   };
 
@@ -753,34 +679,6 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = ({
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth>
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={3000}
-        onClose={(_event, reason) => {
-          setSnackbarOpen(false);
-          // Verificar si el mensaje contiene "registrada(s) correctamente" para detectar éxito
-          if (snackbarSeverity === 'success' && snackbarMsg.includes('registrada(s) correctamente')) {
-            // onSuccess ya fue llamado en handleGuardarDesasignacion, solo cerrar
-            onClose();
-          }
-        }}
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-      >
-        <MuiAlert
-          onClose={() => setSnackbarOpen(false)}
-          severity={snackbarSeverity}
-          elevation={6}
-          variant="filled"
-          sx={{ width: '100%' }}
-        >
-          {snackbarSeverity === 'success' && <AlertTitle>Éxito</AlertTitle>}
-          {snackbarSeverity === 'error' && <AlertTitle>Error</AlertTitle>}
-          {snackbarSeverity === 'info' && <AlertTitle>Información</AlertTitle>}
-          {snackbarSeverity === 'warning' && <AlertTitle>Advertencia</AlertTitle>}
-          {snackbarMsg}
-        </MuiAlert>
-      </Snackbar>
-
       <DialogContent>
         <DndContext onDragEnd={handleDragEnd}>
           <Stack direction="row" spacing={2}>
@@ -836,14 +734,14 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = ({
                 </Box>
 
                 <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', gap: 2 }}>
-                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, minWidth: 220, flex: 1, height: 150 }}>
+                  <Box sx={{ flexDirection: 'column', gap: 1, minWidth: 220, flex: 1, height: 190 }}>
                     <TextField
                       select
                       label="Acción"
                       size="small"
                       value={accion}
                       onChange={(e) => setAccion(e.target.value)}
-                      sx={{ minWidth: 220, flex: 0.4 }}
+                      sx={{ minWidth: 220, flex: 0.4, marginBottom: '14px', marginTop: '10px' }}
                     >
                       <MenuItem value="RECUPERADO">RECUPERADO</MenuItem>
                       <MenuItem value="BAJA DEFINITIVA">BAJA DEFINITIVA</MenuItem>
@@ -859,6 +757,48 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = ({
                         sx: { height: '100%', alignItems: 'flex-start' }
                       }}
                     />
+                    {
+                      // const tienePosicionesVacias = posicionesVaciasActuales.length > 0;
+                      posicionesVaciasActuales.length > 0 && (
+                        <Box
+                          sx={{
+                            marginTop: '8px',
+                            marginBottom: '8px',
+                            p: 1.5,
+                            bgcolor: todasPosicionesVaciasAsignadas ? 'success.lighter' : 'warning.lighter',
+                            border: '1px solid',
+                            borderColor: todasPosicionesVaciasAsignadas ? 'success.main' : 'warning.main',
+                            borderRadius: 1,
+                            maxWidth: 350,
+                            mb: 1
+                          }}
+                        >
+                          <Typography
+                            variant="caption"
+                            color={todasPosicionesVaciasAsignadas ? 'success.dark' : 'warning.dark'}
+                            sx={{ fontWeight: 500 }}
+                          >
+                            {todasPosicionesVaciasAsignadas
+                              ? (
+                                <div className='flex gap-2 items-center'>
+                                  <CheckCircle width={15} />
+                                  <span>
+                                    {`Posiciones cubiertas: ${posicionesVaciasActuales.join(', ')}`}
+                                  </span>
+                                </div>
+                              )
+                              : (
+                                <div className='flex gap-2 items-center'>
+                                  <TriangleAlertIcon width={28} />
+                                  <span>
+                                    {`Debes asignar nuevos neumáticos en: ${posicionesVaciasActuales.filter(pos => !asignacionesTemporales.some((a: any) => a.Posicion === pos)).join(', ')}`}
+                                  </span>
+                                </div>
+                              )
+                            }
+                          </Typography>
+                        </Box>
+                      )}
 
                   </Box>
 
@@ -913,7 +853,7 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = ({
                     onClick={handleGuardarDesasignacion}
                     disabled={neumaticosSeleccionados.length === 0 || !accion || !todasPosicionesVaciasAsignadas}
                   >
-                    Guardar Desasignación
+                    Guardar Desasignación y Asignación
                   </Button>
                   {onAbrirAsignacion && (() => {
                     const tienePosicionesVacias = posicionesVaciasActuales.length > 0;
@@ -922,31 +862,7 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = ({
                     return (
                       <>
                         {/* Mensaje informativo si hay posiciones vacías */}
-                        {tienePosicionesVacias && (
-                          <Box
-                            sx={{
-                              marginTop: '8px',
-                              p: 1.5,
-                              bgcolor: todasPosicionesVaciasAsignadas ? 'success.lighter' : 'warning.lighter',
-                              border: '1px solid',
-                              borderColor: todasPosicionesVaciasAsignadas ? 'success.main' : 'warning.main',
-                              borderRadius: 1,
-                              maxWidth: 350,
-                              mb: 1
-                            }}
-                          >
-                            <Typography
-                              variant="caption"
-                              color={todasPosicionesVaciasAsignadas ? 'success.dark' : 'warning.dark'}
-                              sx={{ fontWeight: 500 }}
-                            >
-                              {todasPosicionesVaciasAsignadas
-                                ? `✅ Posiciones cubiertas: ${posicionesVaciasActuales.join(', ')}`
-                                : `⚠️ Debes asignar nuevos neumáticos en: ${posicionesVaciasActuales.filter(pos => !asignacionesTemporales.some((a: any) => a.Posicion === pos)).join(', ')}`
-                              }
-                            </Typography>
-                          </Box>
-                        )}
+
 
                         {/* Botón Asignar Neumáticos */}
                         <Button

@@ -22,6 +22,7 @@ import { useNeuStats } from '@/hooks/use-neu-stats';
 import { exportToExcel } from '@/utils/export-to-excel';
 import { mappedPadronNeumaticos } from '@/mapped/padron-neumaticos.mapped';
 import Image from 'next/image';
+import { toast } from 'sonner';
 
 export default function Page(): React.JSX.Element {
 
@@ -170,6 +171,12 @@ export default function Page(): React.JSX.Element {
   const esJefeTaller = Array.isArray(user?.perfiles) && user.perfiles.some((p: any) => p.codigo === '002');
 
   const handleExportExcel = () => {
+    if (filteredCustomers.length === 0) {
+      toast.warning('No se pudo exportar', {
+        description: 'No se encontraron resultados.'
+      });
+      return;
+    }
     const data = mappedPadronNeumaticos({ filteredCustomers })
     exportToExcel({ data, username: user?.usuario as string, title: 'GESNEU: PADRÓN DE NEUMÁTICOS' })
   }
@@ -363,7 +370,10 @@ export default function Page(): React.JSX.Element {
       <ModalInsertExcel
         open={modalImportarVisible}
         onClose={() => setModalImportarVisible(false)}
-        onSuccess={() => handleRefresh}
+        onSuccess={() => {
+          handleRefresh()
+          customersRefetch()
+        }}
         isLoading={loading}
         onHandleSetLoading={(value: boolean) => setLoading(value)}
       />

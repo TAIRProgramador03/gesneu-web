@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import {
-  Dialog, DialogContent, Typography, Button, Stack, Box, Card, TextField,
-  Snackbar, Alert as MuiAlert, AlertTitle
+  Dialog, DialogContent, Typography, Button, Stack, Box, Card, TextField
 } from '@mui/material';
 import { DndContext, DragEndEvent, DragStartEvent, useDraggable, useDroppable } from '@dnd-kit/core';
 import DiagramaVehiculo from '../../../styles/theme/components/DiagramaVehiculo';
@@ -10,6 +9,7 @@ import {
   registrarReubicacionNeumatico,
   getUltimaFechaInspeccionPorPlaca
 } from '../../../api/Neumaticos';
+import { toast } from 'sonner';
 
 interface ModalReubicarProps {
   open: boolean;
@@ -58,11 +58,6 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = ({
 
   // Estado para mapa de posiciones ocupadas
   const [posicionesOcupadas, setPosicionesOcupadas] = useState<Map<string, Neumatico>>(new Map());
-
-  // Estados para notificaciones
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMsg, setSnackbarMsg] = useState('');
-  const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error' | 'warning' | 'info'>('success');
 
   // Inicializar state cuando se abre el modal
   useEffect(() => {
@@ -221,9 +216,7 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = ({
       // Moviendo a zona temporal - solo permitir si no hay otro neumático
       if (neumaticoEnZonaTemporal) {
         console.log('[handleDropNeumatico] Rechazando: zona temporal ya ocupada');
-        setSnackbarMsg('Solo puede haber un neumático en la zona de reubicación a la vez.');
-        setSnackbarSeverity('warning');
-        setSnackbarOpen(true);
+        toast.warning('Solo puede haber un neumático en la zona de reubicación a la vez.');
         return;
       }
 
@@ -289,9 +282,7 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = ({
         console.log(`[handleDragEnd] Verificando posición ${overId}, ocupada por:`, neumaticoEnDestino ? (neumaticoEnDestino.CODIGO_NEU || neumaticoEnDestino.CODIGO) : 'nadie');
 
         if (neumaticoEnDestino) {
-          setSnackbarMsg(`La posición ${overId} ya está ocupada por ${neumaticoEnDestino.CODIGO_NEU || neumaticoEnDestino.CODIGO}`);
-          setSnackbarSeverity('warning');
-          setSnackbarOpen(true);
+          toast.warning(`La posición ${overId} ya está ocupada por ${neumaticoEnDestino.CODIGO_NEU || neumaticoEnDestino.CODIGO}`)
           return;
         }
         // Eliminar cualquier instancia previa de este neumático (por código)
@@ -378,9 +369,7 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = ({
 
       if (neumaticoEnDestino) {
         console.log(`[handleDragEnd] ⚠️ Posición ${overId} ocupada por ${neumaticoEnDestino.CODIGO_NEU || neumaticoEnDestino.CODIGO}`);
-        setSnackbarMsg(`La posición ${overId} ya está ocupada por ${neumaticoEnDestino.CODIGO_NEU || neumaticoEnDestino.CODIGO}`);
-        setSnackbarSeverity('warning');
-        setSnackbarOpen(true);
+        toast.warning(`La posición ${overId} ya está ocupada por ${neumaticoEnDestino.CODIGO_NEU || neumaticoEnDestino.CODIGO}`)
         return;
       }
 
@@ -406,9 +395,7 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = ({
   // Handler para guardar reubicación
   const handleGuardarReubicacion = async () => {
     if (!fechaUltimaInspeccion) {
-      setSnackbarMsg('No se puede reubicar: primero debe existir una inspección válida.');
-      setSnackbarSeverity('error');
-      setSnackbarOpen(true);
+      toast.error('No se puede reubicar: primero debe existir una inspección válida.');
       return;
     }
 
@@ -489,9 +476,7 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = ({
     }
 
     if (movimientos.length === 0) {
-      setSnackbarMsg('No hay cambios de posición para registrar.');
-      setSnackbarSeverity('info');
-      setSnackbarOpen(true);
+      toast.info('No hay cambios de posición para registrar.');
       return;
     }
 
@@ -501,9 +486,10 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = ({
       const normalizedPayloadArray = movimientos.map(normalizePayload);
       await registrarReubicacionNeumatico(normalizedPayloadArray);
 
-      // setSnackbarMsg('Reubicación registrada correctamente');
-      // setSnackbarSeverity('success');
-      // setSnackbarOpen(true);
+      toast.success('Reubicación registrada correctamente', {
+        duration: 6000,
+        position: 'top-right'
+      })
 
       setPosicionOriginal(null);
       setCodigoOriginal(null);
@@ -520,12 +506,10 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = ({
       handleClose();
     } catch (error) {
       if (error instanceof Error) {
-        setSnackbarMsg('Error al registrar la reubicación: ' + error.message);
+        toast.error('Error al registrar la reubicación: ' + error.message);
       } else {
-        setSnackbarMsg('Error al registrar la reubicación: ' + String(error));
+        toast.error('Error al registrar la reubicación: ' + String(error));
       }
-      setSnackbarSeverity('error');
-      setSnackbarOpen(true);
     }
   };
 
@@ -601,254 +585,231 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = ({
   // Función para manejar cierre del modal
   const handleClose = () => {
     setNeumaticoEnZonaTemporal(null); // Limpiar zona temporal
-    setSnackbarOpen(false);
     onClose();
   };
 
   return (
-    <>
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={3000}
-        onClose={() => setSnackbarOpen(false)}
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-      >
-        <MuiAlert
-          onClose={() => setSnackbarOpen(false)}
-          severity={snackbarSeverity}
-          elevation={6}
-          variant="filled"
-          sx={{ width: '100%' }}
+    <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
+      <DialogContent>
+        <DndContext
+          onDragStart={(event: DragStartEvent) => {
+            console.log('[DndContext] 🚀 DRAG START - activeId:', event.active.id, 'data:', event.active.data.current);
+          }}
+          onDragEnd={handleDragEnd}
         >
-          {snackbarSeverity === 'success' && <AlertTitle>Éxito</AlertTitle>}
-          {snackbarSeverity === 'error' && <AlertTitle>Error</AlertTitle>}
-          {snackbarSeverity === 'info' && <AlertTitle>Información</AlertTitle>}
-          {snackbarSeverity === 'warning' && <AlertTitle>Advertencia</AlertTitle>}
-          {snackbarMsg}
-        </MuiAlert>
-      </Snackbar>
-      <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
-        <DialogContent>
-          <DndContext
-            onDragStart={(event: DragStartEvent) => {
-              console.log('[DndContext] 🚀 DRAG START - activeId:', event.active.id, 'data:', event.active.data.current);
-            }}
-            onDragEnd={handleDragEnd}
-          >
-            <Stack direction="row" spacing={2}>
-              <Stack direction="column" spacing={2} sx={{
-                flex: 1, width: '350px',
-                maxWidth: 400, minWidth: 320
+          <Stack direction="row" spacing={2}>
+            <Stack direction="column" spacing={2} sx={{
+              flex: 1, width: '350px',
+              maxWidth: 400, minWidth: 320
+            }}>
+              {/* Card de información del vehículo */}
+              <Card sx={{
+                p: 2, boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)',
+                maxWidth: 400, minWidth: 320, width: '100%'
               }}>
-                {/* Card de información del vehículo */}
-                <Card sx={{
-                  p: 2, boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)',
-                  maxWidth: 400, minWidth: 320, width: '100%'
-                }}>
-                  <Box>
-                    <Typography variant="h6" fontWeight="bold" gutterBottom>
-                      Reubicar Neumáticos
-                    </Typography>
-                    {vehiculo ? (
-                      <Stack direction="row" spacing={4} alignItems="flex-start" sx={{ mb: 1 }}>
+                <Box>
+                  <Typography variant="h6" fontWeight="bold" gutterBottom>
+                    Reubicar Neumáticos
+                  </Typography>
+                  {vehiculo ? (
+                    <Stack direction="row" spacing={4} alignItems="flex-start" sx={{ mb: 1 }}>
+                      <Box>
+                        <Typography variant="caption" color="text.secondary">Marca</Typography>
+                        <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                          {vehiculo.marca}
+                        </Typography>
+                      </Box>
+                      <Box>
+                        <Typography variant="caption" color="text.secondary">Modelo</Typography>
+                        <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                          {vehiculo.modelo}
+                        </Typography>
+                      </Box>
+                      {vehiculo.proyecto && (
                         <Box>
-                          <Typography variant="caption" color="text.secondary">Marca</Typography>
+                          <Typography variant="caption" color="text.secondary">Proyecto</Typography>
                           <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                            {vehiculo.marca}
+                            {vehiculo.proyecto}
                           </Typography>
                         </Box>
-                        <Box>
-                          <Typography variant="caption" color="text.secondary">Modelo</Typography>
-                          <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                            {vehiculo.modelo}
-                          </Typography>
-                        </Box>
-                        {vehiculo.proyecto && (
-                          <Box>
-                            <Typography variant="caption" color="text.secondary">Proyecto</Typography>
-                            <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                              {vehiculo.proyecto}
-                            </Typography>
-                          </Box>
-                        )}
-                      </Stack>
-                    ) : (
-                      <Typography variant="body2" color="text.secondary">
-                        No hay datos del vehículo.
-                      </Typography>
-                    )}
-                  </Box>
-                </Card>
-
-                {/* Card para REUBICAR */}
-                <Card sx={{
-                  p: 2, boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)',
-                  maxWidth: 400, minWidth: 320, width: '100%'
-                }}>
-                  <Box sx={{ display: 'flex', alignItems: 'flex-end', mb: 1, gap: 2 }}>
-                    <Typography variant="h6" sx={{ mt: 1, mb: 0 }}>REUBICAR</Typography>
-                    <Box sx={{ flex: 1 }} />
-                    <Box>
-                      <Typography variant="caption" color="text.secondary">Fecha última inspección:</Typography>
-                      <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                        {fechaUltimaInspeccion || 'Sin registro'}
-                      </Typography>
-                    </Box>
-                  </Box>
-
-                  <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 2 }}>
-                    <Box sx={{ display: 'flex', flexDirection: 'column', minWidth: '100%', flex: 1, height: 100 }}>
-                      <TextField
-                        label="Motivo de la reubicación"
-                        size="small"
-                        multiline
-                        value={observacion}
-                        onChange={(e) => setObservacion(e.target.value)}
-                        sx={{ minWidth: '100%', width: '100%', flex: 1 }}
-                        InputProps={{
-                          sx: { height: '100%', alignItems: 'flex-start' }
-                        }}
-                      />
-                    </Box>
-                    <Box sx={{ position: 'relative' }}>
-                      <Typography variant="subtitle2" sx={{ mb: 1, textAlign: 'center', fontWeight: 'bold' }}>
-                        Zona de Reubicación
-                      </Typography>
-
-                      {/* Área de drop solo cuando está vacía */}
-                      {!neumaticoEnZonaTemporal && (
-                        <DropNeumaticosPorRotar onDropNeumatico={(neu) => handleDropNeumatico(neu, '')}>
-                          <Box sx={{
-                            mt: 0, display: 'flex', justifyContent: 'center', alignItems: 'center',
-                            minHeight: 120, height: 120, width: '230px', maxWidth: '230px',
-                            mx: 0, p: 1,
-                          }}>
-                            <Typography variant="body2" color="text.secondary" sx={{ p: 2, fontStyle: 'italic', textAlign: 'center' }}>
-                              Arrastre un neumático aquí para reubicarlo
-                              <br />
-                              <Typography variant="caption" color="text.secondary">
-                                (Solo uno a la vez)
-                              </Typography>
-                            </Typography>
-                          </Box>
-                        </DropNeumaticosPorRotar>
                       )}
+                    </Stack>
+                  ) : (
+                    <Typography variant="body2" color="text.secondary">
+                      No hay datos del vehículo.
+                    </Typography>
+                  )}
+                </Box>
+              </Card>
 
-                      {/* Neumático en zona temporal - renderizado idéntico a desasignación */}
-                      {neumaticoEnZonaTemporal && (
+              {/* Card para REUBICAR */}
+              <Card sx={{
+                p: 2, boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)',
+                maxWidth: 400, minWidth: 320, width: '100%'
+              }}>
+                <Box sx={{ display: 'flex', alignItems: 'flex-end', mb: 1, gap: 2 }}>
+                  <Typography variant="h6" sx={{ mt: 1, mb: 0 }}>REUBICAR</Typography>
+                  <Box sx={{ flex: 1 }} />
+                  <Box>
+                    <Typography variant="caption" color="text.secondary">Fecha última inspección:</Typography>
+                    <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                      {fechaUltimaInspeccion || 'Sin registro'}
+                    </Typography>
+                  </Box>
+                </Box>
+
+                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 2 }}>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', minWidth: '100%', flex: 1, height: 100 }}>
+                    <TextField
+                      label="Motivo de la reubicación"
+                      size="small"
+                      multiline
+                      value={observacion}
+                      onChange={(e) => setObservacion(e.target.value)}
+                      sx={{ minWidth: '100%', width: '100%', flex: 1 }}
+                      InputProps={{
+                        sx: { height: '100%', alignItems: 'flex-start' }
+                      }}
+                    />
+                  </Box>
+                  <Box sx={{ position: 'relative' }}>
+                    <Typography variant="subtitle2" sx={{ mb: 1, textAlign: 'center', fontWeight: 'bold' }}>
+                      Zona de Reubicación
+                    </Typography>
+
+                    {/* Área de drop solo cuando está vacía */}
+                    {!neumaticoEnZonaTemporal && (
+                      <DropNeumaticosPorRotar onDropNeumatico={(neu) => handleDropNeumatico(neu, '')}>
                         <Box sx={{
-                          minHeight: 150,
-                          width: '250px', // Mismo ancho que en desasignación
+                          mt: 0, display: 'flex', justifyContent: 'center', alignItems: 'center',
+                          minHeight: 120, height: 120, width: '230px', maxWidth: '230px',
+                          mx: 0, p: 1,
+                        }}>
+                          <Typography variant="body2" color="text.secondary" sx={{ p: 2, fontStyle: 'italic', textAlign: 'center' }}>
+                            Arrastre un neumático aquí para reubicarlo
+                            <br />
+                            <Typography variant="caption" color="text.secondary">
+                              (Solo uno a la vez)
+                            </Typography>
+                          </Typography>
+                        </Box>
+                      </DropNeumaticosPorRotar>
+                    )}
+
+                    {/* Neumático en zona temporal - renderizado idéntico a desasignación */}
+                    {neumaticoEnZonaTemporal && (
+                      <Box sx={{
+                        minHeight: 150,
+                        width: '250px', // Mismo ancho que en desasignación
+                        display: 'flex',
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'flex-start',
+                        position: 'relative',
+                        border: '1px solid #bdbdbd',
+                        borderRadius: 2,
+                        background: '#fafafa',
+                        p: 1,
+                        gap: 1,
+                        flexWrap: 'wrap',
+                      }}>
+                        <Box sx={{
                           display: 'flex',
-                          flexDirection: 'row',
+                          flexDirection: 'column',
                           alignItems: 'center',
-                          justifyContent: 'flex-start',
+                          minWidth: 70,
+                          maxWidth: 70, // Ancho fijo para cada neumático
                           position: 'relative',
-                          border: '1px solid #bdbdbd',
-                          borderRadius: 2,
-                          background: '#fafafa',
-                          p: 1,
-                          gap: 1,
-                          flexWrap: 'wrap',
                         }}>
                           <Box sx={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            minWidth: 70,
-                            maxWidth: 70, // Ancho fijo para cada neumático
                             position: 'relative',
+                            zIndex: 20, // Asegurar que el neumático esté por encima
+                            pointerEvents: 'auto', // Asegurar que reciba eventos
                           }}>
-                            <Box sx={{
-                              position: 'relative',
-                              zIndex: 20, // Asegurar que el neumático esté por encima
-                              pointerEvents: 'auto', // Asegurar que reciba eventos
-                            }}>
-                              <DraggableNeumatico
-                                neumatico={{
-                                  ...neumaticoEnZonaTemporal,
-                                  POSICION: 'zona-temporal' // Identificar que está en zona temporal
-                                }}
-                              />
-                            </Box>
-                            <Box sx={{ pointerEvents: 'none' }}> {/* Evitar que NeumaticoInfo capture eventos */}
-                              <NeumaticoInfo neumatico={neumaticoEnZonaTemporal} />
-                            </Box>
+                            <DraggableNeumatico
+                              neumatico={{
+                                ...neumaticoEnZonaTemporal,
+                                POSICION: 'zona-temporal' // Identificar que está en zona temporal
+                              }}
+                            />
+                          </Box>
+                          <Box sx={{ pointerEvents: 'none' }}> {/* Evitar que NeumaticoInfo capture eventos */}
+                            <NeumaticoInfo neumatico={neumaticoEnZonaTemporal} />
                           </Box>
                         </Box>
-                      )}
-                    </Box>
+                      </Box>
+                    )}
                   </Box>
+                </Box>
 
-                  <Box sx={{ mt: 2 }}>
-                    <Button onClick={handleClose} color="primary" variant="contained">
-                      Cerrar
-                    </Button>
-                    <Button
-                      color="success"
-                      variant="contained"
-                      sx={{ ml: 1 }}
-                      onClick={handleGuardarReubicacion}
-                    >
-                      Guardar Reubicación
-                    </Button>
-                  </Box>
-                </Card>
-              </Stack>
-
-              {/* Columna derecha: Diagrama del vehículo */}
-              <Card sx={{
-                flex: 0.5, p: 2, position: 'relative',
-                boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)',
-                maxWidth: 400, minWidth: 320, width: '100%',
-              }}>
-                <Box sx={{ position: 'relative', width: '370px', height: '430px' }}>
-                  <DiagramaVehiculo
-                    key={`diagrama-live-${refreshKey}-${Date.now()}`}
-                    neumaticosAsignados={(() => {
-                      // USAR DATOS SINCRONIZADOS DIRECTOS
-                      const dataWithForce = diagramaData.map((n, idx) => ({
-                        ...n,
-                        _forceRender: Date.now() + idx // Garantizar nueva referencia
-                      }));
-
-                      console.log('[DiagramaVehiculo] 🚀 DATOS SINCRONIZADOS ENVIADOS:', dataWithForce.map(n => `${n.CODIGO_NEU || n.CODIGO}:${n.POSICION || 'SIN_POS'}`));
-                      return dataWithForce;
-                    })() as any}
-                    layout="modal"
-                    tipoModal="mantenimiento"
-                    onPosicionClick={(() => { }) as any}
-                    fromMantenimientoModal={true}
-                    placa={placa}
-                  />
-
-                  {/* Imagen de placa */}
-                  <img
-                    src="/assets/placa.png"
-                    alt="Placa"
-                    style={{
-                      width: '130px', height: '60px', objectFit: 'contain',
-                      position: 'absolute', top: '10px', right: '55px',
-                      zIndex: 2, pointerEvents: 'none',
-                    }}
-                  />
-
-                  {/* Texto de placa */}
-                  <Box sx={{
-                    position: 'absolute', top: '24px', right: '60px', zIndex: 3,
-                    color: 'black', padding: '2px 8px', borderRadius: '5px',
-                    fontFamily: 'Arial, sans-serif', fontWeight: 'bold',
-                    fontSize: '24px', textAlign: 'center',
-                  }}>
-                    {placa}
-                  </Box>
+                <Box sx={{ mt: 2 }}>
+                  <Button onClick={handleClose} color="primary" variant="contained">
+                    Cerrar
+                  </Button>
+                  <Button
+                    color="success"
+                    variant="contained"
+                    sx={{ ml: 1 }}
+                    onClick={handleGuardarReubicacion}
+                  >
+                    Guardar Reubicación
+                  </Button>
                 </Box>
               </Card>
             </Stack>
-          </DndContext>
-        </DialogContent>
-      </Dialog>
-    </>
+
+            {/* Columna derecha: Diagrama del vehículo */}
+            <Card sx={{
+              flex: 0.5, p: 2, position: 'relative',
+              boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)',
+              maxWidth: 400, minWidth: 320, width: '100%',
+            }}>
+              <Box sx={{ position: 'relative', width: '370px', height: '430px' }}>
+                <DiagramaVehiculo
+                  key={`diagrama-live-${refreshKey}-${Date.now()}`}
+                  neumaticosAsignados={(() => {
+                    // USAR DATOS SINCRONIZADOS DIRECTOS
+                    const dataWithForce = diagramaData.map((n, idx) => ({
+                      ...n,
+                      _forceRender: Date.now() + idx // Garantizar nueva referencia
+                    }));
+
+                    console.log('[DiagramaVehiculo] 🚀 DATOS SINCRONIZADOS ENVIADOS:', dataWithForce.map(n => `${n.CODIGO_NEU || n.CODIGO}:${n.POSICION || 'SIN_POS'}`));
+                    return dataWithForce;
+                  })() as any}
+                  layout="modal"
+                  tipoModal="mantenimiento"
+                  onPosicionClick={(() => { }) as any}
+                  fromMantenimientoModal={true}
+                  placa={placa}
+                />
+
+                {/* Imagen de placa */}
+                <img
+                  src="/assets/placa.png"
+                  alt="Placa"
+                  style={{
+                    width: '130px', height: '60px', objectFit: 'contain',
+                    position: 'absolute', top: '10px', right: '55px',
+                    zIndex: 2, pointerEvents: 'none',
+                  }}
+                />
+
+                {/* Texto de placa */}
+                <Box sx={{
+                  position: 'absolute', top: '24px', right: '60px', zIndex: 3,
+                  color: 'black', padding: '2px 8px', borderRadius: '5px',
+                  fontFamily: 'Arial, sans-serif', fontWeight: 'bold',
+                  fontSize: '24px', textAlign: 'center',
+                }}>
+                  {placa}
+                </Box>
+              </Box>
+            </Card>
+          </Stack>
+        </DndContext>
+      </DialogContent>
+    </Dialog>
   );
 };
 

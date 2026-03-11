@@ -15,7 +15,6 @@ import {
     useTheme,
 } from '@mui/material';
 import Button from '@mui/material/Button';
-import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import Menu from '@mui/material/Menu';
@@ -27,10 +26,8 @@ import ModalAvertAsigNeu from './modal-avert-asig-neu';
 import ModalInputsNeu from './modal-inputs-neu';
 import { Neumatico } from '@/types/types';
 import { asignarNeumatico } from '../../../api/Neumaticos';
-import MuiAlert from '@mui/material/Alert';
-import AlertTitle from '@mui/material/AlertTitle';
-import Snackbar from '@mui/material/Snackbar';
-import TablePagination from '@mui/material/TablePagination';
+import { EsRecuperadoBadge } from '@/components/ui/EsRecuperadoBadge';
+import { toast } from 'sonner';
 
 const ItemType = {
     NEUMATICO: 'neumatico',
@@ -360,13 +357,6 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
     // Ahora requiere las 5 posiciones asignadas
     const allPositionsAssigned = Object.values(assignedNeumaticos).filter(Boolean).length === 5;
 
-    // Snackbar personalizado para feedback visual
-    const [snackbarOpen, setSnackbarOpen] = useState(false);
-    const [snackbarMsg, setSnackbarMsg] = useState('');
-    const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error' | 'info' | 'warning'>('success');
-
-
-
     const theme = useTheme();
 
     // ——————————————————————————————————————
@@ -447,9 +437,7 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
         const allPositionsAssigned1 = Object.values(assignedNeumaticos).filter(Boolean).length === 5;
 
         if (!allPositionsAssigned1) {
-            setSnackbarMsg('Debes asignar un neumático en las 5 posiciones antes de confirmar.');
-            setSnackbarSeverity('warning');
-            setSnackbarOpen(true);
+            toast.warning('Debes asignar un neumático en las 5 posiciones antes de confirmar.');
             return;
         }
 
@@ -458,9 +446,7 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
             .map((neu) => neu!.FECHA_ASIGNACION ?? '');
         const todasIguales = fechas.every((f) => f === fechas[0]);
         if (!todasIguales) {
-            setSnackbarMsg('Todos los neumáticos deben tener la misma fecha de asignación.');
-            setSnackbarSeverity('error');
-            setSnackbarOpen(true);
+            toast.error('Todos los neumáticos deben tener la misma fecha de asignación.');
             return;
         }
 
@@ -474,9 +460,7 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
             }
         );
         if (toAssign.length === 0) {
-            setSnackbarMsg('No hay neumáticos asignados para actualizar.');
-            setSnackbarSeverity('info');
-            setSnackbarOpen(true);
+            toast.info('No hay neumáticos asignados para actualizar.');
             return;
         }
         // Validación robusta de campos requeridos
@@ -486,16 +470,12 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
                 // Permite 0 como valor válido, pero no null, undefined o NaN
                 const valor = (neu as any)[campo] ?? (neu as any)[campo.toUpperCase()];
                 if (valor === null || valor === undefined || (typeof valor === 'string' && valor.trim() === '') || (typeof valor === 'number' && isNaN(valor))) {
-                    setSnackbarMsg(`Falta completar el campo "${campo}" en la posición ${pos}.`);
-                    setSnackbarSeverity('error');
-                    setSnackbarOpen(true);
+                    toast.error(`Falta completar el campo "${campo}" en la posición ${pos}.`);
                     return;
                 }
                 // Validación extra: el backend no acepta 0, así que bloqueamos 0 explícitamente (excepto FECHA_ASIGNACION)
                 if (campo !== 'FECHA_ASIGNACION' && typeof valor === 'number' && valor === 0) {
-                    setSnackbarMsg(`El campo "${campo}" no puede ser 0 en la posición ${pos}.`);
-                    setSnackbarSeverity('error');
-                    setSnackbarOpen(true);
+                    toast.error(`El campo "${campo}" no puede ser 0 en la posición ${pos}.`);
                     return;
                 }
             }
@@ -550,9 +530,10 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
 
             console.log('Payload enviado a asignarNeumatico:', payloadArray);
             await asignarNeumatico(payloadArray); // axios ya envía Content-Type: application/json
-            setSnackbarMsg('Neumático(s) asignado(s) y kilometraje actualizado.');
-            setSnackbarSeverity('success');
-            setSnackbarOpen(true);
+            toast.success('Neumático(s) asignado(s) y kilometraje actualizado.', {
+                position: 'top-right',
+                duration: 6000
+            });
             if (typeof onAssignedUpdate === 'function') {
                 await onAssignedUpdate();
             }
@@ -560,9 +541,7 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
             onClose();
         } catch (e: any) {
             console.error(e);
-            setSnackbarMsg(e.message || 'Error al asignar neumático.');
-            setSnackbarSeverity('error');
-            setSnackbarOpen(true);
+            toast.error(e.message || 'Error al asignar neumático.');
         }
     };
     // ------------------------------------------------
@@ -583,34 +562,6 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
 
     return (
         <DndProvider backend={HTML5Backend}>
-            <Snackbar
-                open={snackbarOpen}
-                autoHideDuration={4000}
-                onClose={() => setSnackbarOpen(false)}
-                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-            >
-                <MuiAlert
-                    onClose={() => setSnackbarOpen(false)}
-                    severity={snackbarSeverity}
-                    elevation={6}
-                    variant="filled"
-                    sx={{ width: '100%' }}
-                >
-                    {snackbarSeverity === 'success' && (
-                        <AlertTitle>Éxito</AlertTitle>
-                    )}
-                    {snackbarSeverity === 'error' && (
-                        <AlertTitle>Error</AlertTitle>
-                    )}
-                    {snackbarSeverity === 'info' && (
-                        <AlertTitle>Información</AlertTitle>
-                    )}
-                    {snackbarSeverity === 'warning' && (
-                        <AlertTitle>Advertencia</AlertTitle>
-                    )}
-                    {snackbarMsg}
-                </MuiAlert>
-            </Snackbar>
             <Dialog
                 open={open}
                 onClose={handleDialogClose}
@@ -955,6 +906,7 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
                                                     <TableCell sx={{ fontWeight: 'bold', backgroundColor: '#fff', zIndex: 2, fontSize: '0.78rem' }}>Remanente</TableCell>
                                                     <TableCell sx={{ fontWeight: 'bold', backgroundColor: '#fff', zIndex: 2, fontSize: '0.78rem' }}>Medida</TableCell>
                                                     <TableCell sx={{ fontWeight: 'bold', backgroundColor: '#fff', zIndex: 2, fontSize: '0.78rem' }}>F.Registro</TableCell>
+                                                    <TableCell sx={{ fontWeight: 'bold', backgroundColor: '#fff', zIndex: 2, fontSize: '0.78rem' }}>Recuperado</TableCell>
                                                     <TableCell sx={{ fontWeight: 'bold', backgroundColor: '#fff', zIndex: 2, fontSize: '0.78rem' }}>Estado</TableCell>
                                                 </TableRow>
                                             </TableHead>
@@ -991,6 +943,9 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
                                                                 <TableCell sx={{ fontSize: '0.78rem' }}>{neumatico.REMANENTE}</TableCell>
                                                                 <TableCell sx={{ fontSize: '0.78rem' }}>{neumatico.MEDIDA}</TableCell>
                                                                 <TableCell sx={{ fontSize: '0.78rem' }}>{neumatico?.FECHA_REGISTRO.split(" ")[0]}</TableCell>
+                                                                <TableCell sx={{ fontSize: '0.78rem' }} align='center'>
+                                                                    <EsRecuperadoBadge esRecuperado={neumatico.RECUPERADO} />
+                                                                </TableCell>
                                                                 <TableCell align="center" sx={{ fontSize: '0.78rem' }}>
                                                                     <Box sx={{ position: 'relative', width: '100px' }}>
                                                                         <LinearProgress
