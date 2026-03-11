@@ -17,6 +17,7 @@ import {
 } from '../../../api/Neumaticos';
 import { CheckCircle, TriangleAlertIcon } from 'lucide-react';
 import { toast } from 'sonner';
+import Image from 'next/image';
 
 interface ModalDesasignarProps {
   open: boolean;
@@ -930,21 +931,18 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = ({
                   fromMantenimientoModal={true}
                   placa={placa}
                 />
-
-                {/* Imagen de placa */}
-                <img
-                  src="/assets/placa.png"
-                  alt="Placa"
-                  style={{
-                    width: '130px', height: '60px', objectFit: 'contain',
-                    position: 'absolute', top: '10px', right: '55px',
-                    zIndex: 2, pointerEvents: 'none',
-                  }}
+                <Image src='/assets/placa.png' alt='Placa' width={130} height={60} style={{
+                  objectFit: 'contain',
+                  position: 'absolute',
+                  top: '10px',
+                  right: '55px',
+                  zIndex: 2,
+                  pointerEvents: 'none'
+                }}
                 />
-
                 {/* Texto de placa */}
                 <Box sx={{
-                  position: 'absolute', top: '24px', right: '60px', zIndex: 3,
+                  position: 'absolute', top: '28px', right: '65px', zIndex: 3,
                   color: 'black', padding: '2px 8px', borderRadius: '5px',
                   fontFamily: 'Arial, sans-serif', fontWeight: 'bold',
                   fontSize: '24px', textAlign: 'center',

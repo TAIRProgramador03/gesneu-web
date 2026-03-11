@@ -10,6 +10,7 @@ import {
   getUltimaFechaInspeccionPorPlaca
 } from '../../../api/Neumaticos';
 import { toast } from 'sonner';
+import Image from 'next/image';
 
 interface ModalReubicarProps {
   open: boolean;
@@ -785,7 +786,7 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = ({
                 />
 
                 {/* Imagen de placa */}
-                <img
+                {/* <img
                   src="/assets/placa.png"
                   alt="Placa"
                   style={{
@@ -793,11 +794,21 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = ({
                     position: 'absolute', top: '10px', right: '55px',
                     zIndex: 2, pointerEvents: 'none',
                   }}
+                /> */}
+
+                <Image src='/assets/placa.png' alt='Placa' width={130} height={60} style={{
+                  objectFit: 'contain',
+                  position: 'absolute',
+                  top: '0px',
+                  right: '75px',
+                  zIndex: 2,
+                  pointerEvents: 'none'
+                }}
                 />
 
                 {/* Texto de placa */}
                 <Box sx={{
-                  position: 'absolute', top: '24px', right: '60px', zIndex: 3,
+                  position: 'absolute', top: '16px', right: '85px', zIndex: 3,
                   color: 'black', padding: '2px 8px', borderRadius: '5px',
                   fontFamily: 'Arial, sans-serif', fontWeight: 'bold',
                   fontSize: '24px', textAlign: 'center',

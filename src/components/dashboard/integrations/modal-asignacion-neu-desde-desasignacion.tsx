@@ -29,6 +29,7 @@ import ModalInputsNeu from './modal-inputs-neu';
 import { Neumatico } from '@/types/types';
 import { EsRecuperadoBadge } from '@/components/ui/EsRecuperadoBadge';
 import { toast } from 'sonner';
+import Image from 'next/image';
 
 const ItemType = {
     NEUMATICO: 'neumatico',
@@ -849,24 +850,19 @@ const ModalAsignacionNeuDesdeDesasignacion: React.FC<ModalAsignacionNeuDesdeDesa
                                         }}>{assignedNeumaticos.RES01.CODIGO_NEU || assignedNeumaticos.RES01.CODIGO}</span>
                                     ) : null}
                                 </Box>
-                                <img
-                                    src="/assets/placa.png"
-                                    alt="Placa"
-                                    style={{
-                                        width: '120px',
-                                        height: '70px',
-                                        objectFit: 'contain',
-                                        position: 'absolute',
-                                        top: '-8px',
-                                        left: '225px',
-                                        zIndex: 1,
-                                    }}
+                                <Image src='/assets/placa.png' alt='Placa' width={120} height={70} style={{
+                                    objectFit: 'contain',
+                                    position: 'absolute',
+                                    top: '-8px',
+                                    left: '225px',
+                                    zIndex: 1,
+                                }}
                                 />
                                 <Typography
                                     variant="h6"
                                     sx={{
                                         position: 'absolute',
-                                        top: '14px',
+                                        top: '8px',
                                         left: '284px',
                                         transform: 'translateX(-50%)',
                                         zIndex: 2,

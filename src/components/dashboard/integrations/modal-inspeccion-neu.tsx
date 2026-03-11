@@ -1,6 +1,5 @@
 import * as React from 'react';
 import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
@@ -16,6 +15,7 @@ import { consultarInspeccionHoy, listarNeumaticosAsignados, guardarInspeccion, N
 import { UserContext } from '../../../contexts/user-context';
 import ModalAsignacionNeu from './modal-asignacion-neu';
 import { toast } from 'sonner';
+import Image from 'next/image';
 
 // --- Declaraciones de tipos fuera del componente ---
 interface FormValues {
@@ -1212,24 +1212,19 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = ({ open, onClose, pl
                       // Mantenimiento functionality removed
                     }}
                   />
-                  <img
-                    src="/assets/placa.png"
-                    alt="Placa"
-                    style={{
-                      width: '120px',
-                      height: '60px',
-                      objectFit: 'contain',
-                      position: 'absolute',
-                      top: '10px',
-                      right: '68px',
-                      zIndex: 2,
-                    }}
+                  <Image src='/assets/placa.png' alt='Placa' width={120} height={60} style={{
+                    objectFit: 'contain',
+                    position: 'absolute',
+                    top: '10px',
+                    right: '68px',
+                    zIndex: 2,
+                  }}
                   />
                   <Box
                     sx={{
                       position: 'absolute',
                       top: '24px',
-                      right: '68px',
+                      right: '74px',
                       zIndex: 3,
                       color: 'black',
                       padding: '2px 8px',

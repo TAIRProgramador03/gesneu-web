@@ -6,6 +6,7 @@ import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import RecyclingIcon from '@mui/icons-material/Recycling';
+import Image from 'next/image';
 
 export interface CustomersFiltersProps {
   projectCount: number;
@@ -98,7 +99,7 @@ export const CustomersFilters = memo(({ projectCount, disponiblesCount, asignado
             }}
           >
             <div ref={countRef}>0</div>
-            <img src="/assets/llantas.png" alt="llantas" style={{ position: 'absolute', right: 8, bottom: 8, width: 36, height: 36 }} />
+            <Image src="/assets/llantas.png" alt="llantas" width={36} height={36} style={{ position: 'absolute', right: 8, bottom: 8, width: 36, height: 36 }} />
           </Box>
           <Typography align="center" variant="body2" color="text.secondary">
             Total neumáticos

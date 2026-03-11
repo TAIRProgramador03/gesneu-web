@@ -10,6 +10,7 @@ import { LineChart, Line, ResponsiveContainer, XAxis, YAxis, Tooltip } from 'rec
 import { useEffect, useState } from 'react';
 import { obtenerNeumaticosDisponiblesPorMes } from '../../../api/Neumaticos';
 import { useUser } from '@/hooks/use-user';
+import Image from 'next/image';
 
 export interface TotalCustomersProps {
   diff?: number;
@@ -63,7 +64,7 @@ export function TotalCustomers({ diff, trend, sx, value }: TotalCustomersProps):
             </Stack>
 
             <Stack sx={{ width: 115, objectFit: 'cover' }}>
-              <img src="/assets/disponibles.ico" alt="Neumático Disponible" style={{ width: 115, height: 115, zIndex: 1, opacity: 1 }} />
+              <Image src="/assets/disponibles.ico" alt="Neumático Disponible" width={115} height={115} style={{ width: 115, height: 115, zIndex: 1, opacity: 1 }} />
             </Stack>
           </Stack>
           {/* <div style={{ width: '100%', height: 60 }}>

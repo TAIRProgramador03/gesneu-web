@@ -8,6 +8,7 @@ import Typography from '@mui/material/Typography';
 import { ArrowDown as ArrowDownIcon } from '@phosphor-icons/react/dist/ssr/ArrowDown';
 import { ArrowUp as ArrowUpIcon } from '@phosphor-icons/react/dist/ssr/ArrowUp';
 import { CurrencyDollar as CurrencyDollarIcon } from '@phosphor-icons/react/dist/ssr/CurrencyDollar';
+import Image from 'next/image';
 
 export interface BudgetProps {
   diff?: number;
@@ -32,7 +33,7 @@ export function Budget({ diff, trend, sx, value }: BudgetProps): React.JSX.Eleme
               <Typography variant="h4">{value}</Typography>
             </Stack>
             <Stack sx={{ width: 115, objectFit: 'cover' }}>
-              <img src="/assets/cantidad.png" alt="Neumático" style={{ width: 115, height: 115, position: 'absolute', zIndex: 1, opacity: 1 }} />
+              <Image src="/assets/cantidad.png" alt="Neumático" width={115} height={115} style={{ width: 115, height: 115, position: 'absolute', zIndex: 1, opacity: 1 }} />
             </Stack>
           </Stack>
           {/* {diff ? (

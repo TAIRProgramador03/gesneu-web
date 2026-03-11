@@ -13,6 +13,7 @@ import Stack from '@mui/material/Stack';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import ModalTodasPlacas from './modal-todas-placas';
+import Image from 'next/image';
 
 interface CompaniesFiltersProps {
   onSearchChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
@@ -190,16 +191,15 @@ export const CompaniesFilters = memo(({ onSearchChange, operationName, autosDisp
         </Box>
         <Box sx={{ position: 'relative', display: 'inline-block' }}>
           <Box
-            component="img"
-            src="/assets/placa.png"
-            alt="Placa"
+            component="div"
             sx={{
               width: 170,
-              height: 70,
               ml: 1,
               display: 'block',
             }}
-          />
+          >
+            <Image src='/assets/placa.png' alt='Placa' width={170} height={40} />
+          </Box >
           {(inputValue.trim() !== '' || placaSeleccionada) && (
             <Typography
               variant="h6"
@@ -227,7 +227,7 @@ export const CompaniesFilters = memo(({ onSearchChange, operationName, autosDisp
       {/* Modal para todas las placas */}
       <ModalTodasPlacas open={openModal} onClose={handleCloseModal} onVehiculoSeleccionado={handleVehiculoSeleccionado} />
 
-    </Card>
+    </Card >
   );
 })
 

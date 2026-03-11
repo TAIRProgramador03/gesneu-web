@@ -7,6 +7,7 @@ import Typography from '@mui/material/Typography';
 import { LineChart, Line, ResponsiveContainer, XAxis, YAxis, Tooltip } from 'recharts';
 import { obtenerNeumaticosAsignadosPorMes } from '../../../api/Neumaticos';
 import { useUser } from '@/hooks/use-user';
+import Image from 'next/image';
 
 export interface TasksProgressProps {
   sx?: SxProps;
@@ -51,7 +52,7 @@ export function TasksProgress({ value, sx }: TasksProgressProps): React.JSX.Elem
               <Typography variant="h4">{value}</Typography>
             </Stack>
             <Stack sx={{ width: 115, objectFit: 'cover' }}>
-              <img src="/assets/asignados.png" alt="Neumático Asignado" style={{ width: 115, height: 115, zIndex: 1, opacity: 1 }} />
+              <Image src="/assets/asignados.png" alt="Neumático Asignado" width={115} height={115} style={{ width: 115, height: 115, zIndex: 1, opacity: 1 }} />
             </Stack>
           </Stack>
           {/* <div style={{ width: '100%', height: 60 }}>
