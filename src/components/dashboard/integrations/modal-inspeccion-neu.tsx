@@ -16,6 +16,7 @@ import { UserContext } from '../../../contexts/user-context';
 import ModalAsignacionNeu from './modal-asignacion-neu';
 import { toast } from 'sonner';
 import Image from 'next/image';
+import { convertToDateHuman } from '@/lib/utils';
 
 // --- Declaraciones de tipos fuera del componente ---
 interface FormValues {
@@ -199,10 +200,10 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = ({ open, onClose, pl
 
     // Regla base: debe estar en rango hoy-3 a hoy (4 días contando hoy)
     if (value < fechaLimiteMin) {
-      return `La fecha no puede ser anterior a ${fechaLimiteMin} (máximo 3 días atrás)`;
+      return `La fecha no puede ser anterior a ${convertToDateHuman(fechaLimiteMin)} (máximo 3 días atrás)`;
     }
     if (value > fechaLimiteMax) {
-      return `La fecha no puede ser posterior a hoy (${fechaLimiteMax})`;
+      return `La fecha no puede ser posterior a hoy (${convertToDateHuman(fechaLimiteMax)})`;
     }
 
     // Determinar fecha de referencia: MAX(fecha_montaje, ultima_inspeccion) o solo fecha_montaje
@@ -212,9 +213,9 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = ({ open, onClose, pl
 
     if (fechaReferencia && value <= fechaReferencia) {
       if (ultimaFechaInspeccion && fechaReferencia === ultimaFechaInspeccion) {
-        return `Debe ser posterior a la última inspección: ${ultimaFechaInspeccion}`;
+        return `Debe ser posterior a la última inspección: ${convertToDateHuman(ultimaFechaInspeccion)}`;
       }
-      return `Debe ser posterior a la fecha de montaje: ${fechaAsignacionOriginal}`;
+      return `Debe ser posterior a la fecha de la asignación: ${convertToDateHuman(fechaAsignacionOriginal ?? '')}`;
     }
 
     return null;
@@ -1267,7 +1268,9 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = ({ open, onClose, pl
                 !inspeccionesPendientes.some(i => i.posicion === 'RES01')
               }
               error={!!fechaInspeccionError}
-              helperText={fechaInspeccionError || `Rango válido: ${fechaMinEfectiva} a ${fechaLimiteMax}`}
+              helperText={fechaInspeccionError || (fechaMinEfectiva > fechaLimiteMax
+                ? `Fecha de asignación a partir de ${convertToDateHuman(fechaMinEfectiva)}`
+                : `Rango válido: ${convertToDateHuman(fechaMinEfectiva)} a ${convertToDateHuman(fechaLimiteMax)}`)}
             />
             <TextField
               label="Kilometraje"

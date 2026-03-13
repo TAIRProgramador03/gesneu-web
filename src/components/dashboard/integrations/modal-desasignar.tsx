@@ -18,6 +18,7 @@ import {
 import { CheckCircle, TriangleAlertIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import Image from 'next/image';
+import { convertToDateHuman } from '@/lib/utils';
 
 interface ModalDesasignarProps {
   open: boolean;
@@ -51,6 +52,10 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = ({
   if (open) {
     console.log('[ModalDesasignar] Abriendo modal con props:', { placa, neumaticosAsignados: neumaticosAsignados.length });
   }
+
+
+  console.log({ asignadr12xr: neumaticosAsignados })
+
 
   const [neumaticosAsignadosState, setNeumaticosAsignadosState] = useState<NeumaticoExtendido[]>([]);
   const [initialAssignedMap, setInitialAssignedMap] = useState<Record<string, Neumatico>>({});
@@ -729,7 +734,7 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = ({
                   <Box>
                     <Typography variant="caption" color="text.secondary">Fecha última inspección</Typography>
                     <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                      {fechaUltimaInspeccion || 'Sin registro'}
+                      {convertToDateHuman(fechaUltimaInspeccion) || 'Sin registro'}
                     </Typography>
                   </Box>
                 </Box>

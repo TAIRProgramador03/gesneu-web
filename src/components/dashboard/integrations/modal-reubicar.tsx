@@ -11,6 +11,7 @@ import {
 } from '../../../api/Neumaticos';
 import { toast } from 'sonner';
 import Image from 'next/image';
+import { convertToDateHuman } from '@/lib/utils';
 
 interface ModalReubicarProps {
   open: boolean;
@@ -654,7 +655,7 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = ({
                   <Box>
                     <Typography variant="caption" color="text.secondary">Fecha última inspección:</Typography>
                     <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                      {fechaUltimaInspeccion || 'Sin registro'}
+                      {convertToDateHuman(fechaUltimaInspeccion) || 'Sin registro'}
                     </Typography>
                   </Box>
                 </Box>

@@ -9,6 +9,7 @@ import Box from '@mui/material/Box';
 import WarningIcon from '@mui/icons-material/Warning';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import { convertToDateHuman } from '@/lib/utils';
 
 interface ModalInspeccionAverProps {
     open: boolean;
@@ -85,7 +86,7 @@ const ModalInspeccionAver: React.FC<ModalInspeccionAverProps> = ({
                                     {esInspeccionHoy ? 'INSPECCIÓN YA REALIZADA' : 'ADVERTENCIA'}
                                 </Typography>
                                 <Typography sx={{ fontSize: 16, color: '#222' }}>
-                                    La última inspección fue el {ultimaInspeccionFecha}.
+                                    La última inspección fue el {convertToDateHuman(ultimaInspeccionFecha)}.
                                 </Typography>
                             </Box>
                             <Box sx={{ ml: 2, display: 'flex', alignItems: 'center', height: '100%' }}>

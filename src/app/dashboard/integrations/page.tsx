@@ -51,6 +51,7 @@ import ModalInspeccionAntigua from '@/components/core/theme-provider/modal-reubi
 import ModalInspeccionAnterior from '@/components/core/theme-provider/modal-reubicar/modal-inspeccion-anterior';
 import { EsRecuperadoBadge } from '@/components/ui/EsRecuperadoBadge';
 import { toast } from 'sonner';
+import { convertToDateHuman } from '@/lib/utils';
 
 function NeumaticosDisponiblesTable({ neumaticos }: { neumaticos: any[] }) {
   const [page, setPage] = React.useState(0);
@@ -1363,7 +1364,7 @@ export default function Page(): React.JSX.Element {
                   <TableCell sx={{ backgroundColor: '#e0f7fa', fontWeight: 'bold', fontSize: '0.78rem' }}>Medida</TableCell>
                   <TableCell sx={{ backgroundColor: '#e0f7fa', fontWeight: 'bold', fontSize: '0.78rem' }}>Remanente</TableCell>
                   <TableCell sx={{ backgroundColor: '#e0f7fa', fontWeight: 'bold', fontSize: '0.78rem' }}>Fecha de Asignación</TableCell>
-                  <TableCell sx={{ backgroundColor: '#e0f7fa', fontWeight: 'bold', fontSize: '0.78rem' }}>Fecha Movimiento</TableCell>
+                  <TableCell sx={{ backgroundColor: '#e0f7fa', fontWeight: 'bold', fontSize: '0.78rem' }}>Fecha Registro</TableCell>
                   <TableCell sx={{ backgroundColor: '#e0f7fa', fontWeight: 'bold', fontSize: '0.78rem' }}>Estado</TableCell>
                 </TableRow>
               </TableHead>
@@ -1389,10 +1390,10 @@ export default function Page(): React.JSX.Element {
                         <TableCell align="center">{neumatico.MARCA}</TableCell>
                         <TableCell align="center">{neumatico.MEDIDA}</TableCell>
                         <TableCell align="center">{neumatico.REMANENTE ?? 0}</TableCell>
-                        <TableCell align="center">{neumatico.FECHA_ASIGNADO}
+                        <TableCell align="center">{convertToDateHuman(neumatico.FECHA_ASIGNACION)}
                         </TableCell>
                         {/* <TableCell align='center'>{getUltimaFechaRegistro(neumatico)}</TableCell> */}
-                        <TableCell align='center'>{neumatico.FECHA_ULTIMO_SUCESO.split(' ')[0]}</TableCell>
+                        <TableCell align='center'>{convertToDateHuman(neumatico.FECHA_ULTIMO_SUCESO)}</TableCell>
                         <TableCell align="center">
                           {typeof neumatico.ESTADO === 'number' || (typeof neumatico.ESTADO === 'string' && neumatico.ESTADO !== '') ? (
                             <Box sx={{ position: 'relative', width: '120px' }}>

@@ -33,6 +33,8 @@ export interface Neumatico {
   KILOMETRO?: string | number; // Kilometraje (opcional)
   ID_OPERACION: number
   COD_SUPERVISOR: string
+  RECUPERADO?: boolean
+  FECHA_RECUPERADO?: string | null
 }
 
 export interface Vehiculo {

@@ -30,6 +30,8 @@ import { Neumatico } from '@/types/types';
 import { EsRecuperadoBadge } from '@/components/ui/EsRecuperadoBadge';
 import { toast } from 'sonner';
 import Image from 'next/image';
+import { convertToDateHuman } from '@/lib/utils';
+import { TipoMovimientoBadge } from '@/components/ui/TipoMovimientoBadge';
 
 const ItemType = {
     NEUMATICO: 'neumatico',
@@ -230,13 +232,13 @@ const DropZone: React.FC<DropZoneProps> = ({
 
     // Estilo especial para posiciones vacías requeridas
     const backgroundColor = esPosicionVacia && !isAssigned
-        ? '#fff3cd' // Amarillo claro para indicar que debe ser llenada
+        ? 'rgb(255 204 211)' // Amarillo claro para indicar que debe ser llenada
         : isAssigned && !esBajaORecuperado
             ? (neumatico?.TIPO_MOVIMIENTO === 'TEMPORAL' ? '#00ACC1' : 'lightgreen') // Turquesa: recién asignado sin inspección
             : 'transparent';
 
     const borderColor = esPosicionVacia && !isAssigned
-        ? '2px dashed #ff9800' // Borde naranja para posiciones vacías requeridas
+        ? '2px dashed rgb(199 0 54)' // Borde naranja para posiciones vacías requeridas
         : 'none';
 
     const dropZoneStyle: React.CSSProperties = isPosicionPrincipal
@@ -251,7 +253,7 @@ const DropZone: React.FC<DropZoneProps> = ({
             border: borderColor,
             pointerEvents: 'auto',
             cursor: esPosicionVacia ? 'grab' : (isAssigned && !esBajaORecuperado ? 'pointer' : 'not-allowed'),
-            boxShadow: isShaking ? '0 0 10px 4px red' : (esPosicionVacia && !isAssigned ? '0 0 8px 2px #ff9800' : 'none'),
+            boxShadow: isShaking ? '0 0 10px 4px red' : (esPosicionVacia && !isAssigned ? '0 0 8px 2px rgb(126, 2, 2)' : 'none'),
             transition: 'box-shadow 0.2s ease-in-out',
         }
         : {
@@ -265,7 +267,7 @@ const DropZone: React.FC<DropZoneProps> = ({
             border: borderColor,
             pointerEvents: 'auto',
             cursor: esPosicionVacia ? 'grab' : (isAssigned && !esBajaORecuperado ? 'pointer' : 'not-allowed'),
-            boxShadow: isShaking ? '0 0 10px 4px red' : (esPosicionVacia && !isAssigned ? '0 0 8px 2px #ff9800' : 'none'),
+            boxShadow: isShaking ? '0 0 10px 4px red' : (esPosicionVacia && !isAssigned ? '0 0 8px 2px rgb(126, 2, 2)' : 'none'),
             transition: 'box-shadow 0.2s ease-in-out',
         };
 
@@ -296,6 +298,8 @@ const DropZone: React.FC<DropZoneProps> = ({
                 initialTorqueAplicado={assignedNeumaticos[position]?.TORQUE_APLICADO ? Number(assignedNeumaticos[position]?.TORQUE_APLICADO) : 0}
                 initialFechaAsignacion={assignedNeumaticos[position]?.FECHA_ASIGNACION || ''}
                 fechaRegistroNeumatico={assignedNeumaticos[position]?.FECHA_REGISTRO || ''}
+                esRecuperado={assignedNeumaticos[position]?.RECUPERADO || false}
+                fechaRecuperado={assignedNeumaticos[position]?.FECHA_RECUPERADO || null}
             />
         </div>
     );
@@ -487,7 +491,9 @@ const ModalAsignacionNeuDesdeDesasignacion: React.FC<ModalAsignacionNeuDesdeDesa
             .map((neu) => neu.FECHA_ASIGNACION ?? '');
         const todasIguales = fechasTemporales.length === 0 || fechasTemporales.every((f) => f === fechasTemporales[0]);
         if (!todasIguales) {
-            toast.warning('Todos los neumáticos nuevos deben tener la misma fecha de asignación.');
+            toast.info('Todos los neumáticos temporales deben tener la misma fecha de asignación.', {
+                duration: 6000
+            });
             return;
         }
 
@@ -609,14 +615,17 @@ const ModalAsignacionNeuDesdeDesasignacion: React.FC<ModalAsignacionNeuDesdeDesa
                             Debes asignar neumáticos a las siguientes posiciones que quedaron vacías:
                         </Typography>
                         <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                            {posicionesVacias.map(pos => (
-                                <Chip
-                                    key={pos}
-                                    label={pos}
-                                    color={assignedNeumaticos[pos] ? 'success' : 'warning'}
-                                    sx={{ fontWeight: 'bold' }}
-                                />
-                            ))}
+                            {posicionesVacias.map(pos => {
+                                let classNameExtra = assignedNeumaticos[pos] ? 'bg-cyan-600' : 'bg-rose-600';
+                                return (
+                                    <div
+                                        key={pos}
+                                        className={`font-bold text-white ${classNameExtra} p-2 rounded-md text-xs uppercase italic`}
+                                    >
+                                        {pos}
+                                    </div>
+                                )
+                            })}
                         </Box>
                         <Typography variant="caption" sx={{ display: 'block', mt: 1, color: '#856404', fontStyle: 'italic' }}>
                             Nota: Solo puedes asignar a las posiciones marcadas. Las demás posiciones están bloqueadas.
@@ -626,70 +635,36 @@ const ModalAsignacionNeuDesdeDesasignacion: React.FC<ModalAsignacionNeuDesdeDesa
                     <Stack direction="row" spacing={2}>
                         {/* Panel Izquierdo: Diagrama y tabla de instalados */}
                         <Card sx={{ flex: 0.6, p: 2, position: 'relative', boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)' }}>
-                            <Box sx={{ position: 'relative', width: '100%', height: '370px' }}>
-                                {/* <TextField
-                                    label="Kilometraje"
-                                    type="number"
-                                    value={Odometro}
-                                    onChange={(e) => {
-                                        const value = e.target.value;
-                                        const numValue = Number(value);
 
-                                        if (value === '' || isNaN(numValue)) {
-                                            setKmError(true);
-                                            return;
-                                        }
-
-                                        // if (numValue > (initialOdometro + 25000)) return;
-
-                                        setOdometro(value);
-
-                                        if (numValue >= initialOdometro && numValue < (initialOdometro + 25000)) {
-                                            setKmError(false);
-                                        } else {
-                                            setKmError(true);
-                                        }
+                            <div className='flex justify-end h-20'>
+                                <div className='relative'>
+                                    <Image src='/assets/placa.png' alt='Placa' width={120} height={70} style={{
+                                        objectFit: 'contain',
+                                        zIndex: 1,
                                     }}
-                                    fullWidth
-                                    error={kmError && Odometro !== ''}
-                                    InputProps={{
-                                        inputProps: { min: initialOdometro, max: initialOdometro + 25000 },
-                                        sx: {
-                                            'input[type=number]::-webkit-outer-spin-button, input[type=number]::-webkit-inner-spin-button': {
-                                                WebkitAppearance: 'none',
-                                                margin: 0,
-                                            },
-                                            'input[type=number]': {
-                                                MozAppearance: 'textfield',
-                                            },
-                                        },
-                                    }}
-                                    sx={{ maxWidth: 180, ml: 2 }}
-                                /> */}
-                                {/* <Typography
-                                    variant="body2"
-                                    sx={{
-                                        color: kmError || Odometro === '' ? 'error.main' : 'text.secondary',
-                                        minWidth: 180,
-                                        ml: 1,
-                                        marginTop: '5px',
-                                        whiteSpace: 'nowrap',
-                                        fontWeight: kmError || Odometro === '' ? 'bold' : 'normal',
-                                    }}
-                                >
-                                    {Odometro === ''
-                                        ? ` (último ${initialOdometro.toLocaleString()} km)`
-                                        : kmError
-                                            ?
-                                            (
-                                                <>
-                                                    <span>{`Kilometraje aceptado: Mayor a ${initialOdometro.toLocaleString()} km`}</span>
-                                                    <br />
-                                                    <span>{`y menor a ${(initialOdometro + 25000).toLocaleString()} km`}</span>
-                                                </>
-                                            )
-                                            : `Kilometraje actual: ${Number(Odometro).toLocaleString()} km`}
-                                </Typography> */}
+                                    />
+                                    <Typography
+                                        variant="h6"
+                                        sx={{
+                                            position: 'absolute',
+                                            top: '16px',
+                                            left: '10px',
+                                            zIndex: 2,
+                                            color: 'black',
+                                            padding: '3px 2px',
+                                            borderRadius: '5px',
+                                            fontWeight: 'bold',
+                                            fontSize: '25px',
+                                            textAlign: 'center',
+                                        }}>
+                                        {placa}
+                                    </Typography>
+                                </div>
+
+                            </div>
+
+
+                            <div style={{ position: 'relative', width: '470px', height: '390px', flexShrink: 0 }}>
                                 <img
                                     src="/assets/car-diagram.png"
                                     alt="Diagrama del Vehículo"
@@ -698,13 +673,14 @@ const ModalAsignacionNeuDesdeDesasignacion: React.FC<ModalAsignacionNeuDesdeDesa
                                         height: '380px',
                                         objectFit: 'contain',
                                         position: 'absolute',
-                                        top: '-6px',
-                                        left: '308px',
+                                        left: '50%',
+                                        transform: 'translateX(-50%)',
+                                        top: 0,
                                         zIndex: 1,
                                     }}
                                 />
                                 {/* DropZones */}
-                                <Box sx={{ position: 'absolute', top: '58px', left: '472px', zIndex: 2 }}>
+                                <Box sx={{ position: 'absolute', top: '65px', left: '272px', zIndex: 2 }}>
                                     {(() => {
                                         const pos01Neu = assignedNeumaticos.POS01;
                                         console.log('[Render POS01] Estado actual:', {
@@ -741,7 +717,7 @@ const ModalAsignacionNeuDesdeDesasignacion: React.FC<ModalAsignacionNeuDesdeDesa
                                         }}>{assignedNeumaticos.POS01.CODIGO_NEU || assignedNeumaticos.POS01.CODIGO}</span>
                                     ) : null}
                                 </Box>
-                                <Box sx={{ position: 'absolute', top: '58px', left: '374px', zIndex: 2 }}>
+                                <Box sx={{ position: 'absolute', top: '65px', left: '172px', zIndex: 2 }}>
                                     <DropZone
                                         position="POS02"
                                         onDrop={(neumatico) => handleDrop('POS02', neumatico)}
@@ -768,7 +744,7 @@ const ModalAsignacionNeuDesdeDesasignacion: React.FC<ModalAsignacionNeuDesdeDesa
                                         }}>{assignedNeumaticos.POS02.CODIGO_NEU || assignedNeumaticos.POS02.CODIGO}</span>
                                     ) : null}
                                 </Box>
-                                <Box sx={{ position: 'absolute', top: '223px', left: '474px', zIndex: 2 }}>
+                                <Box sx={{ position: 'absolute', top: '230px', left: '272px', zIndex: 2 }}>
                                     <DropZone
                                         position="POS03"
                                         onDrop={(neumatico) => handleDrop('POS03', neumatico)}
@@ -795,7 +771,7 @@ const ModalAsignacionNeuDesdeDesasignacion: React.FC<ModalAsignacionNeuDesdeDesa
                                         }}>{assignedNeumaticos.POS03.CODIGO_NEU || assignedNeumaticos.POS03.CODIGO}</span>
                                     ) : null}
                                 </Box>
-                                <Box sx={{ position: 'absolute', top: '223px', left: '374px', zIndex: 2 }}>
+                                <Box sx={{ position: 'absolute', top: '230px', left: '172px', zIndex: 2 }}>
                                     <DropZone
                                         position="POS04"
                                         onDrop={(neumatico) => handleDrop('POS04', neumatico)}
@@ -822,7 +798,7 @@ const ModalAsignacionNeuDesdeDesasignacion: React.FC<ModalAsignacionNeuDesdeDesa
                                         }}>{assignedNeumaticos.POS04.CODIGO_NEU || assignedNeumaticos.POS04.CODIGO}</span>
                                     ) : null}
                                 </Box>
-                                <Box sx={{ position: 'absolute', top: '293px', left: '407px', zIndex: 2 }}>
+                                <Box sx={{ position: 'absolute', top: '299px', left: '206px', zIndex: 2 }}>
                                     <DropZone
                                         position="RES01"
                                         onDrop={(neumatico) => handleDrop('RES01', neumatico)}
@@ -850,33 +826,13 @@ const ModalAsignacionNeuDesdeDesasignacion: React.FC<ModalAsignacionNeuDesdeDesa
                                         }}>{assignedNeumaticos.RES01.CODIGO_NEU || assignedNeumaticos.RES01.CODIGO}</span>
                                     ) : null}
                                 </Box>
-                                <Image src='/assets/placa.png' alt='Placa' width={120} height={70} style={{
-                                    objectFit: 'contain',
-                                    position: 'absolute',
-                                    top: '-8px',
-                                    left: '225px',
-                                    zIndex: 1,
-                                }}
-                                />
-                                <Typography
-                                    variant="h6"
-                                    sx={{
-                                        position: 'absolute',
-                                        top: '8px',
-                                        left: '284px',
-                                        transform: 'translateX(-50%)',
-                                        zIndex: 2,
-                                        color: 'black',
-                                        padding: '3px 2px',
-                                        borderRadius: '5px',
-                                        fontFamily: 'Arial, sans-serif',
-                                        fontWeight: 'bold',
-                                        fontSize: '25px',
-                                        textAlign: 'center',
-                                    }}>
-                                    {placa}
-                                </Typography>
-                            </Box>
+                            </div>
+
+
+
+
+
+
                             {/* Tabla de Neumáticos Actuales */}
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, mt: 2 }}>
                                 <Typography variant="h6">Neumáticos Instalados</Typography>
@@ -899,30 +855,26 @@ const ModalAsignacionNeuDesdeDesasignacion: React.FC<ModalAsignacionNeuDesdeDesa
                                             return (
                                                 <TableRow
                                                     key={position}
-                                                    sx={{
-                                                        bgcolor: esVacia && !neumatico ? '#fff3cd' : 'inherit',
-                                                    }}
+                                                    className={esVacia && !neumatico ? `bg-rose-200` : 'inherit'}
+                                                // sx={{
+                                                //     bgcolor: esVacia && !neumatico ? '#fff3cd' : 'inherit',
+                                                // }}
                                                 >
                                                     <TableCell sx={{ fontSize: '0.78rem', display: 'flex', flexDirection: 'column' }}>
                                                         {position}
-                                                        {esVacia && !neumatico && (
+                                                        {/* {esVacia && !neumatico && (
                                                             <Chip label="REQUERIDA" size="small" color="warning" sx={{ marginTop: '5px' }} />
-                                                        )}
+                                                        )} */}
                                                     </TableCell>
                                                     <TableCell sx={{ fontSize: '0.78rem' }}>{esBajaORecuperado ? '----' : (neumatico?.CODIGO || '----')}</TableCell>
                                                     <TableCell sx={{ fontSize: '0.78rem' }}>{esBajaORecuperado ? '----' : (neumatico?.MARCA || '----')}</TableCell>
-                                                    <TableCell sx={{ fontSize: '0.78rem' }}>{esBajaORecuperado ? '----' : (neumatico?.FECHA_ASIGNACION || neumatico?.FECHA_REGISTRO?.split(" ")[0] || '----')}</TableCell>
+                                                    <TableCell sx={{ fontSize: '0.78rem' }}>{esBajaORecuperado ? '----' : (convertToDateHuman(neumatico?.FECHA_ASIGNACION ?? '') || '----')}</TableCell>
                                                     <TableCell sx={{ fontSize: '0.78rem' }}>
                                                         {esBajaORecuperado
                                                             ? '----'
-                                                            : neumatico?.TIPO_MOVIMIENTO === 'ASIGNADO'
-                                                                ? (
-                                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                                                        <span>ASIGNADO</span>
-                                                                        <CheckBoxIcon style={{ color: 'green' }} />
-                                                                    </div>
-                                                                )
-                                                                : (neumatico?.TIPO_MOVIMIENTO || '----')
+                                                            : (
+                                                                <TipoMovimientoBadge tipoMovimiento={neumatico?.TIPO_MOVIMIENTO ?? 'REQUERIDO'} />
+                                                            )
                                                         }
                                                     </TableCell>
                                                 </TableRow>
@@ -1011,7 +963,7 @@ const ModalAsignacionNeuDesdeDesasignacion: React.FC<ModalAsignacionNeuDesdeDesa
                                                                 <TableCell sx={{ fontSize: '0.78rem' }}>{neumatico.DISEÑO}</TableCell>
                                                                 <TableCell sx={{ fontSize: '0.78rem' }}>{neumatico.REMANENTE}</TableCell>
                                                                 <TableCell sx={{ fontSize: '0.78rem' }}>{neumatico.MEDIDA}</TableCell>
-                                                                <TableCell sx={{ fontSize: '0.78rem' }}>{neumatico.FECHA_REGISTRO?.split(" ")[0]}</TableCell>
+                                                                <TableCell sx={{ fontSize: '0.78rem' }}>{convertToDateHuman(neumatico.FECHA_REGISTRO)}</TableCell>
                                                                 <TableCell sx={{ fontSize: '0.78rem' }} align='center'>
                                                                     <EsRecuperadoBadge esRecuperado={neumatico.RECUPERADO} />
                                                                 </TableCell>

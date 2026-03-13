@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Dialog, DialogContent, TextField, Button, Stack, DialogTitle } from '@mui/material';
+import { Dialog, DialogContent, TextField, Button, Stack, DialogTitle, Typography } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
+import { convertToDateHuman } from '@/lib/utils';
 
 interface ModalInputsNeuProps {
     open: boolean;
@@ -13,10 +14,18 @@ interface ModalInputsNeuProps {
     initialTorqueAplicado?: number;
     initialFechaAsignacion?: string; // Nueva prop para pre-llenar fecha al editar
     fechaRegistroNeumatico: string; // Fecha de registro del neumático (YYYY-MM-DD)
+    esRecuperado?: boolean
+    fechaRecuperado?: string | null
 }
 
-const ModalInputsNeu: React.FC<ModalInputsNeuProps> = ({ open, onClose, onSubmit, initialRemanente = 0, initialOdometro = 0, initialPresionAire = 0, initialTorqueAplicado = 0, initialFechaAsignacion = '', fechaRegistroNeumatico }) => {
+const ModalInputsNeu: React.FC<ModalInputsNeuProps> = ({ open, onClose, onSubmit, initialRemanente = 0, initialOdometro = 0, initialPresionAire = 0, initialTorqueAplicado = 0, initialFechaAsignacion = '', fechaRegistroNeumatico, esRecuperado, fechaRecuperado = null }) => {
 
+    console.log({
+        hduwd231231kn: {
+            initialFechaAsignacion,// puede ser ""
+            fechaRegistroNeumatico // si o si habrá
+        }
+    })
 
     const [Odometro, setOdometro] = React.useState<number>(initialOdometro);
     const [Remanente, setRemanente] = React.useState<number>(initialRemanente);
@@ -47,32 +56,54 @@ const ModalInputsNeu: React.FC<ModalInputsNeuProps> = ({ open, onClose, onSubmit
         return new Date(d.getTime() - tzOffset).toISOString().slice(0, 10);
     }, []);
 
-    // Fecha mínima efectiva: max(hoy-3, fechaRegistroNeumatico)
+    // Fecha mínima efectiva:
+    // - si esRecuperado: max(hoy-3, fechaRecuperado)
+    // - sino: max(hoy-3, fechaRegistroNeumatico)
+
+    console.log({ wdihahidhiawhidaw8o22: fechaRegistroNeumatico })
+    console.log({ esRecuperado })
+
+
     const fechaMinEfectiva = React.useMemo(() => {
         let min = fechaLimiteMin;
-        if (fechaRegistroNeumatico) {
-            const fechaReg = fechaRegistroNeumatico.split(' ')[0]; // en caso de "YYYY-MM-DD HH:MM:SS"
+        if (esRecuperado && fechaRecuperado) {
+            const fechaRec = new Date(fechaRecuperado).toISOString().slice(0, 10);
+            if (fechaRec > min) min = fechaRec;
+        } else if (fechaRegistroNeumatico) {
+            const fechaReg = fechaRegistroNeumatico;
             if (fechaReg > min) min = fechaReg;
         }
         return min;
-    }, [fechaLimiteMin, fechaRegistroNeumatico]);
+    }, [fechaLimiteMin, fechaRegistroNeumatico, esRecuperado, fechaRecuperado]);
 
     // Validar fecha de asignación según reglas de negocio
     const validarFechaAsignacion = React.useCallback((value: string): string | null => {
         if (!value) return null;
-        const fechaReg = fechaRegistroNeumatico ? fechaRegistroNeumatico.split(' ')[0] : null;
 
-        if (value < fechaLimiteMin) {
-            return `No puede ser anterior a ${fechaLimiteMin} (máximo 3 días atrás)`;
-        }
         if (value > hoy) {
-            return `No puede ser posterior a hoy (${hoy})`;
+            return `No puede ser posterior a hoy (${convertToDateHuman(hoy)})`;
         }
-        if (fechaReg && value < fechaReg) {
-            return `Debe ser mayor o igual a la fecha de registro: ${fechaReg}`;
+
+        if (esRecuperado && fechaRecuperado) {
+            const fechaRec = new Date(fechaRecuperado).toISOString().slice(0, 10);
+            if (value < fechaRec) {
+                return `Debe ser mayor o igual a la fecha de recupero: ${convertToDateHuman(fechaRec)}`;
+            }
+            if (value < fechaLimiteMin) {
+                return `No puede ser anterior a ${convertToDateHuman(fechaLimiteMin)} (intervalo de 4 días)`;
+            }
+        } else {
+            const fechaReg = fechaRegistroNeumatico ? fechaRegistroNeumatico : null;
+            if (value < fechaLimiteMin) {
+                return `No puede ser anterior a ${convertToDateHuman(fechaLimiteMin)} (intervalo de 4 días)`;
+            }
+            if (fechaReg && value < fechaReg) {
+                return `Debe ser mayor o igual a la fecha de registro: ${convertToDateHuman(fechaReg)}`;
+            }
         }
+
         return null;
-    }, [hoy, fechaLimiteMin, fechaRegistroNeumatico]);
+    }, [hoy, fechaLimiteMin, fechaRegistroNeumatico, esRecuperado, fechaRecuperado]);
 
     React.useEffect(() => {
         if (open) {
@@ -99,6 +130,9 @@ const ModalInputsNeu: React.FC<ModalInputsNeuProps> = ({ open, onClose, onSubmit
     };
 
     const handleSubmit = () => {
+
+        console.log(Remanente)
+
 
         if (Remanente > 25 || Remanente < 0) {
             setRemanenteError(true);
@@ -142,45 +176,63 @@ const ModalInputsNeu: React.FC<ModalInputsNeuProps> = ({ open, onClose, onSubmit
         onClose();
     };
 
+    const esRecuperadoTexto = 0;
+
     return (
         <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth fullScreen={fullScreen}>
             {/* <DialogTitle>Ingresar datos</DialogTitle> */}
             <DialogContent>
                 <Stack spacing={2}>
                     <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-                        <TextField
-                            label="Remanente"
-                            type="number"
-                            value={Remanente === 0 ? '' : Remanente}
-                            onChange={e => {
-                                let value = e.target.value.replace(/,/g, '.');
-                                // Permitir solo números y hasta 2 decimales
-                                if (!/^\d*(\.?\d{0,2})?$/.test(value)) return;
-                                let remanente = parseFloat(value)
 
-                                if (remanente > 25 || remanente < 0) {
-                                    setRemanenteError(true);
-                                } else setRemanenteError(false);
+                        {/* TODO: */}
+                        <div className='flex flex-col w-100'>
+                            <TextField
+                                label="Remanente"
+                                type="number"
+                                disabled={esRecuperado}
+                                value={Remanente === 0 ? '' : Remanente}
+                                onChange={e => {
 
-                                setRemanente(value === '' ? 0 : remanente);
-                            }}
-                            fullWidth
-                            error={remanenteError}
-                            helperText={remanenteError ? 'Debe estar entre 0 y 25' : 'Rango permitido: 0-25'}
-                            inputProps={{ min: 0, step: '0.01', inputMode: 'decimal', pattern: "^\\d*(\\.\\d{0,2})?$", max: 25 }}
-                            InputProps={{
-                                inputProps: { min: 0, max: 25 },
-                                sx: {
-                                    'input[type=number]::-webkit-outer-spin-button, input[type=number]::-webkit-inner-spin-button': {
-                                        WebkitAppearance: 'none',
-                                        margin: 0,
+                                    if (esRecuperado) return;
+
+                                    let value = e.target.value.replace(/,/g, '.');
+                                    if (!/^\d*(\.?\d{0,2})?$/.test(value)) return;
+                                    let remanente = parseFloat(value)
+
+                                    if (remanente > 25 || remanente < 0) {
+                                        setRemanenteError(true);
+                                    } else setRemanenteError(false);
+
+                                    setRemanente(value === '' ? 0 : remanente);
+                                }}
+                                fullWidth
+                                error={remanenteError}
+                                helperText={!esRecuperado ? (remanenteError ? 'Debe estar entre 0 y 25' : 'Rango permitido: 0-25') : ''}
+                                inputProps={{ min: 0, step: '0.01', inputMode: 'decimal', pattern: "^\\d*(\\.\\d{0,2})?$", max: 25 }}
+                                InputProps={{
+                                    inputProps: { min: 0, max: 25 },
+                                    sx: {
+                                        'input[type=number]::-webkit-outer-spin-button, input[type=number]::-webkit-inner-spin-button': {
+                                            WebkitAppearance: 'none',
+                                            margin: 0,
+                                        },
+                                        'input[type=number]': {
+                                            MozAppearance: 'textfield',
+                                        },
                                     },
-                                    'input[type=number]': {
-                                        MozAppearance: 'textfield',
-                                    },
-                                },
-                            }}
-                        />
+                                }}
+                            />
+
+                            {
+                                esRecuperado && (
+                                    <span className='text-green-600 ml-3.5 font-normal italic text-xs mt-0.75'>
+                                        {`Neúmatico recuperado`}
+                                    </span>
+                                )
+                            }
+                        </div>
+
                         <TextField
                             label="Presión de Aire"
                             type="number"
@@ -241,31 +293,44 @@ const ModalInputsNeu: React.FC<ModalInputsNeuProps> = ({ open, onClose, onSubmit
                                 },
                             }}
                         />
-                        <TextField
-                            label="Fecha de Asignación"
-                            type="date"
-                            value={fechaAsignacion}
-                            onChange={e => {
-                                const value = e.target.value;
-                                setFechaAsignacion(value);
-                                setFechaFormatoError(value ? !validarFormatoFecha(value) : false);
-                                setFechaError(validarFechaAsignacion(value));
-                            }}
-                            fullWidth
-                            InputLabelProps={{ shrink: true }}
-                            inputProps={{
-                                min: fechaMinEfectiva,
-                                max: hoy,
-                            }}
-                            error={!!fechaError || fechaFormatoError}
-                            helperText={
-                                fechaFormatoError
-                                    ? 'Formato inválido (YYYY-MM-DD)'
-                                    : fechaError
-                                        ? fechaError
-                                        : `Rango válido: ${fechaMinEfectiva} a ${hoy}`
+                        <div className='flex flex-col w-100'>
+                            <TextField
+                                label="Fecha de Asignación"
+                                type="date"
+                                value={fechaAsignacion}
+                                onChange={e => {
+                                    const value = e.target.value;
+                                    setFechaAsignacion(value);
+                                    setFechaFormatoError(value ? !validarFormatoFecha(value) : false);
+                                    setFechaError(validarFechaAsignacion(value));
+                                }}
+                                fullWidth
+                                InputLabelProps={{ shrink: true }}
+                                inputProps={{
+                                    min: fechaMinEfectiva,
+                                    max: hoy,
+                                }}
+                                error={!!fechaError || fechaFormatoError}
+                                helperText={
+                                    fechaFormatoError
+                                        ? 'Formato inválido (YYYY-MM-DD)'
+                                        : fechaError
+                                            ? fechaError
+                                            : `Rango válido: ${convertToDateHuman(fechaMinEfectiva)} a ${convertToDateHuman(hoy)}`
+                                }
+                            />
+                            {
+                                esRecuperado ? (
+                                    <span className='text-sky-600 ml-3.5 font-normal italic text-xs mt-0.75'>
+                                        {`F. Recuperación: ${convertToDateHuman(fechaRecuperado ?? '')}`}
+                                    </span>
+                                ) : (
+                                    <span className='text-teal-600 ml-3.5 font-normal italic text-xs mt-0.75'>
+                                        {`F. Envio: ${convertToDateHuman(fechaRegistroNeumatico ?? '')}`}
+                                    </span>
+                                )
                             }
-                        />
+                        </div>
                     </Stack>
                     <Button onClick={handleSubmit} variant="contained" color="primary" fullWidth>
                         Guardar

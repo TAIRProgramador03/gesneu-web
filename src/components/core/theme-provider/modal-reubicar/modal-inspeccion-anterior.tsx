@@ -6,6 +6,7 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import FactCheckIcon from '@mui/icons-material/FactCheck';
+import { convertToDateHuman } from '@/lib/utils';
 
 interface ModalInspeccionObligatoriaProps {
   open: boolean;
@@ -30,7 +31,7 @@ const ModalInspeccionAnterior: React.FC<ModalInspeccionObligatoriaProps> = ({ op
             INSPECCIÓN USABLE
           </Typography>
           <Typography sx={{ fontSize: 16, color: '#222', mb: 1 }}>
-            La última inspección ({fechaInspeccion}) de este vehiculo esta dentro de los 4 dias. ¿Deseas usar la misma o realizar una nueva inspección?.
+            La última inspección ({convertToDateHuman(fechaInspeccion)}) de este vehiculo esta dentro de los 4 dias. ¿Deseas usar la misma o realizar una nueva inspección?.
           </Typography>
         </Box>
         <img
