@@ -44,8 +44,8 @@ export const CompaniesFilters = memo(({ onSearchChange, operationName, autosDisp
   };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    let value = event.target.value.toUpperCase().replace(/[^A-Z0-9-]/g, '');
 
+    let value = event.target.value.toUpperCase().replace(/[^A-Z0-9-]/g, '');
     const valueWithoutDash = value.replace(/-/g, '');
     if (valueWithoutDash.length > 7) {
       value = valueWithoutDash.substring(0, 7);
@@ -55,22 +55,33 @@ export const CompaniesFilters = memo(({ onSearchChange, operationName, autosDisp
     setPlacaSeleccionada('');
     if (value.trim() !== '') {
       setCheckboxChecked(false);
+    } else {
+      handleBuscar(value)
     }
   };
 
-  const handleBuscar = () => {
+  const handleBuscar = (value: string | null = null) => {
+    let newValue = value
+    if (newValue !== null) {
+      const syntheticEvent = {
+        target: { value: newValue?.trim() }
+      } as React.ChangeEvent<HTMLInputElement>;
+      onSearchChange(syntheticEvent);
+      return;
+    }
+
     if (inputValue.trim()) {
       const syntheticEvent = {
         target: { value: inputValue.trim() }
       } as React.ChangeEvent<HTMLInputElement>;
       onSearchChange(syntheticEvent);
+      return;
     }
   };
 
   const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    // Permitir búsqueda con Enter
     if (event.key === 'Enter') {
-      handleBuscar();
+      handleBuscar(null);
     }
   };
 
@@ -116,7 +127,7 @@ export const CompaniesFilters = memo(({ onSearchChange, operationName, autosDisp
           endAdornment={
             <InputAdornment position="end">
               <Button
-                onClick={handleBuscar}
+                onClick={() => handleBuscar(null)}
                 disabled={checkboxChecked || !inputValue.trim()}
                 variant="text"
                 sx={{

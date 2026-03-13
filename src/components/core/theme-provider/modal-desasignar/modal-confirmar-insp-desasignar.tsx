@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
@@ -16,7 +16,7 @@ interface ModalConfirmarInspDesasignarProps {
     onContinuarDesasignacion: () => void; // Propiedad para continuar la desasignación
 }
 
-const ModalConfirmarInspDesasignar: React.FC<ModalConfirmarInspDesasignarProps> = ({
+const ModalConfirmarInspDesasignar: React.FC<ModalConfirmarInspDesasignarProps> = memo(({
     open,
     fechaUltimaInspeccion,
     diasDiferencia = 0,
@@ -111,6 +111,6 @@ const ModalConfirmarInspDesasignar: React.FC<ModalConfirmarInspDesasignarProps> 
             </DialogActions>
         </Dialog>
     );
-};
+});
 
 export default ModalConfirmarInspDesasignar;

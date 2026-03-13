@@ -310,9 +310,7 @@ function useChartOptions(): ApexOptions {
     },
     yaxis: {
       labels: {
-        formatter: (value) => `${value}`,
-        offsetX: -10,
-        style: { colors: theme.palette.text.secondary, fontWeight: 600, fontSize: '13px' },
+        formatter: (value) => ``,
       },
     },
     tooltip: {

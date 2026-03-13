@@ -1,4 +1,4 @@
-import React, { forwardRef, useState, useMemo, useEffect } from 'react';
+import React, { forwardRef, useState, useMemo, useEffect, memo } from 'react';
 import {
     Box,
     Card,
@@ -111,7 +111,7 @@ interface DropZoneProps {
     posicionesVacias: string[]; // Lista de posiciones vacías requeridas
 }
 
-const DropZone: React.FC<DropZoneProps> = ({
+const DropZone: React.FC<DropZoneProps> = memo(({
     position,
     onDrop,
     isAssigned,
@@ -303,9 +303,9 @@ const DropZone: React.FC<DropZoneProps> = ({
             />
         </div>
     );
-};
+});
 
-const ModalAsignacionNeuDesdeDesasignacion: React.FC<ModalAsignacionNeuDesdeDesasignacionProps> = ({
+const ModalAsignacionNeuDesdeDesasignacion: React.FC<ModalAsignacionNeuDesdeDesasignacionProps> = memo(({
     open,
     onClose,
     data,
@@ -1034,7 +1034,7 @@ const ModalAsignacionNeuDesdeDesasignacion: React.FC<ModalAsignacionNeuDesdeDesa
             </Dialog>
         </DndProvider>
     );
-};
+});
 
 export default ModalAsignacionNeuDesdeDesasignacion;
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, memo } from 'react';
 import {
   Dialog, DialogContent, Typography, Button, Stack, Box, Card, TextField
 } from '@mui/material';
@@ -24,7 +24,7 @@ interface ModalReubicarProps {
   onAbrirInspeccion?: () => void;
 }
 
-export const ModalReubicar: React.FC<ModalReubicarProps> = ({
+export const ModalReubicar: React.FC<ModalReubicarProps> = memo(({
   open,
   onClose,
   onSuccess,
@@ -823,10 +823,10 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = ({
       </DialogContent>
     </Dialog>
   );
-};
+});
 
 // Componente para neumático draggable
-export const DraggableNeumatico: React.FC<{ neumatico: Neumatico }> = ({ neumatico }) => {
+export const DraggableNeumatico: React.FC<{ neumatico: Neumatico }> = memo(({ neumatico }) => {
   // Usar un ID único que incluya la posición para evitar conflictos
   const baseId = neumatico.CODIGO_NEU || neumatico.CODIGO || 'neumatico-' + Math.random();
   const dragId = neumatico.POSICION === 'zona-temporal'
@@ -891,10 +891,10 @@ export const DraggableNeumatico: React.FC<{ neumatico: Neumatico }> = ({ neumati
       />
     </div>
   );
-};
+});
 
 // Componente para mostrar información de neumático
-const NeumaticoInfo: React.FC<{ neumatico: Neumatico }> = ({ neumatico }) => (
+const NeumaticoInfo: React.FC<{ neumatico: Neumatico }> = memo(({ neumatico }) => (
   <>
     <Typography variant="caption" fontWeight="bold" sx={{ mt: 0.5, fontSize: 11, textAlign: 'center', width: '100%' }}>
       {neumatico.CODIGO_NEU || neumatico.CODIGO || 'Sin código'}
@@ -904,13 +904,13 @@ const NeumaticoInfo: React.FC<{ neumatico: Neumatico }> = ({ neumatico }) => (
       {neumatico.MARCA || ''}
     </Typography>
   </>
-);
+));
 
 // Dropzone para neumáticos
 export const DropNeumaticosPorRotar: React.FC<{
   onDropNeumatico: (neu: Neumatico) => void;
   children: React.ReactNode
-}> = ({ onDropNeumatico, children }) => {
+}> = memo(({ onDropNeumatico, children }) => {
   const { setNodeRef, isOver, active } = useDroppable({ id: 'neumaticos-por-rotar' });
 
   React.useEffect(() => {
@@ -939,7 +939,7 @@ export const DropNeumaticosPorRotar: React.FC<{
       {children}
     </Box>
   );
-};
+});
 
 // Función auxiliar para normalizar payload
 function normalizePayload(mov: any) {

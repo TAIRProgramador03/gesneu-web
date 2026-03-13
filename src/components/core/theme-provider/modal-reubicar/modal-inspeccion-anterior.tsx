@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
@@ -17,7 +17,7 @@ interface ModalInspeccionObligatoriaProps {
   onContinuarReubicar: () => void
 }
 
-const ModalInspeccionAnterior: React.FC<ModalInspeccionObligatoriaProps> = ({ open, onClose, onRegistrarInspeccion, diffDias, fechaInspeccion, onContinuarReubicar }) => (
+const ModalInspeccionAnterior: React.FC<ModalInspeccionObligatoriaProps> = memo(({ open, onClose, onRegistrarInspeccion, diffDias, fechaInspeccion, onContinuarReubicar }) => (
   <Dialog
     open={open}
     onClose={onClose}
@@ -69,6 +69,6 @@ const ModalInspeccionAnterior: React.FC<ModalInspeccionObligatoriaProps> = ({ op
       </Button>
     </DialogActions>
   </Dialog >
-);
+))
 
 export default ModalInspeccionAnterior;

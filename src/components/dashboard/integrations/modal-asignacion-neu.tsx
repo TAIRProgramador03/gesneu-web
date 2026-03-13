@@ -111,7 +111,7 @@ interface DropZoneProps {
 
 // Elimina la interfaz ModalInputsNeuData, ya que no es compatible con el componente ModalInputsNeu
 
-const DropZone: React.FC<DropZoneProps> = ({
+const DropZone: React.FC<DropZoneProps> = memo(({
     position,
     onDrop,
     isAssigned,
@@ -119,8 +119,6 @@ const DropZone: React.FC<DropZoneProps> = ({
     setAssignedNeumaticos,
     kilometro, // <-- Agregado
 }) => {
-
-    console.log({ haaa: assignedNeumaticos })
 
     const [menuAnchor, setMenuAnchor] = React.useState<null | HTMLElement>(null);
     const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
@@ -304,7 +302,7 @@ const DropZone: React.FC<DropZoneProps> = ({
             />
         </div>
     );
-};
+});
 
 
 

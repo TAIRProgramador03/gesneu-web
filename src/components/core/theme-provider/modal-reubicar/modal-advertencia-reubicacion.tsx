@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
@@ -16,7 +16,7 @@ interface ModalAdvertenciaReubicacionProps {
     tituloBloqueo?: string;
 }
 
-const ModalAdvertenciaReubicacion: React.FC<ModalAdvertenciaReubicacionProps> = ({
+const ModalAdvertenciaReubicacion: React.FC<ModalAdvertenciaReubicacionProps> = memo(({
     open,
     onClose,
     onAsignarNeumatico,
@@ -111,6 +111,6 @@ const ModalAdvertenciaReubicacion: React.FC<ModalAdvertenciaReubicacionProps> = 
             </DialogActions>
         </Dialog>
     );
-};
+});
 
 export default ModalAdvertenciaReubicacion;

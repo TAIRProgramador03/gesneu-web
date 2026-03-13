@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef, memo } from 'react';
 import {
   Dialog, DialogContent, Typography, Button, Stack, Box, Card, TextField, MenuItem
 } from '@mui/material';
@@ -35,7 +35,7 @@ interface ModalDesasignarProps {
   asignacionesTemporalesExternas?: any[]; // Asignaciones temporales desde modal de asignación
 }
 
-export const ModalDesasignar: React.FC<ModalDesasignarProps> = ({
+export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
   open,
   onClose,
   onSuccess,
@@ -961,10 +961,10 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = ({
       </DialogContent>
     </Dialog >
   );
-};
+});
 
 // Componente para neumático draggable
-export const DraggableNeumatico: React.FC<{ neumatico: Neumatico }> = ({ neumatico }) => {
+export const DraggableNeumatico: React.FC<{ neumatico: Neumatico }> = memo(({ neumatico }) => {
   const dragId = neumatico.CODIGO_NEU || neumatico.CODIGO || neumatico.POSICION || 'neumatico-' + Math.random();
 
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
@@ -1012,10 +1012,10 @@ export const DraggableNeumatico: React.FC<{ neumatico: Neumatico }> = ({ neumati
       />
     </div>
   );
-};
+});
 
 // Componente para mostrar información de neumático
-const NeumaticoInfo: React.FC<{ neumatico: Neumatico }> = ({ neumatico }) => (
+const NeumaticoInfo: React.FC<{ neumatico: Neumatico }> = memo(({ neumatico }) => (
   <>
     <Typography variant="caption" fontWeight="bold" sx={{ mt: 0.5, fontSize: 11, textAlign: 'center', width: '100%' }}>
       {neumatico.CODIGO_NEU || neumatico.CODIGO || 'Sin código'}
@@ -1027,13 +1027,13 @@ const NeumaticoInfo: React.FC<{ neumatico: Neumatico }> = ({ neumatico }) => (
       {neumatico.MARCA || ''}
     </Typography>
   </>
-);
+));
 
 // Dropzone para neumáticos por desasignar
 export const DropNeumaticosPorDesasignar: React.FC<{
   onDropNeumatico: (neu: Neumatico) => void;
   children: React.ReactNode
-}> = ({ onDropNeumatico, children }) => {
+}> = memo(({ onDropNeumatico, children }) => {
   const { setNodeRef, isOver, active } = useDroppable({ id: 'neumaticos-por-desasignar' });
 
   useEffect(() => {
@@ -1062,7 +1062,7 @@ export const DropNeumaticosPorDesasignar: React.FC<{
       {children}
     </Box>
   );
-};
+});
 
 // Función auxiliar para obtener última inspección
 async function obtenerYSetearUltimaInspeccionPorPlaca(placa: string): Promise<string | null> {

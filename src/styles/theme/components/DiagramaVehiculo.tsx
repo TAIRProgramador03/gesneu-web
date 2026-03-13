@@ -59,9 +59,7 @@ const posiciones = {
     ],
 };
 
-const DiagramaVehiculo: React.FC<DiagramaVehiculoProps & {
-    onPosicionClick?: (neumatico: Neumatico | undefined) => void; onMantenimientoClick?: () => void; fromMantenimientoModal?: boolean; placa?: string;
-}> = ({ neumaticosAsignados = [], layout = 'dashboard', tipoModal, onPosicionClick, fromMantenimientoModal, placa, posicionResaltada, ...props }) => {
+const DiagramaVehiculo: React.FC<DiagramaVehiculoProps & { onPosicionClick?: (neumatico: Neumatico | undefined) => void; onMantenimientoClick?: () => void; fromMantenimientoModal?: boolean; placa?: string; }> = React.memo(({ neumaticosAsignados = [], layout = 'dashboard', tipoModal, onPosicionClick, fromMantenimientoModal, placa, posicionResaltada, ...props }) => {
     // Selección de layout según tipoModal
     let pos;
     if (layout === 'modal') {
@@ -213,7 +211,7 @@ const DiagramaVehiculo: React.FC<DiagramaVehiculoProps & {
             />
         </>
     );
-};
+});
 
 // Nuevo componente hijo para cada posición
 const PosicionNeumatico: React.FC<{
@@ -226,7 +224,7 @@ const PosicionNeumatico: React.FC<{
     onPosicionClick?: (neumatico: Neumatico | undefined) => void;
     posicionResaltada?: string;
     placa?: string | undefined
-}> = ({ keyPos, top, left, neumatico, layout, tipoModal, onPosicionClick, posicionResaltada, placa = '' }) => {
+}> = React.memo(({ keyPos, top, left, neumatico, layout, tipoModal, onPosicionClick, posicionResaltada, placa = '' }) => {
     // Drop target para cada posición
     const { setNodeRef: setDropRef, isOver } = useDroppable({ id: keyPos });
     // Siempre ejecuta el hook, pero solo activa el draggable si hay neumático
@@ -531,6 +529,6 @@ const PosicionNeumatico: React.FC<{
             )}
         </>
     );
-};
+});
 
 export default DiagramaVehiculo;

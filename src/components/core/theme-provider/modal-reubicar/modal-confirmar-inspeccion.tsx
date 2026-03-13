@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
@@ -17,7 +17,7 @@ interface ModalConfirmarInspeccionProps {
 }
 
 
-const ModalConfirmarInspeccion: React.FC<ModalConfirmarInspeccionProps> = ({
+const ModalConfirmarInspeccion: React.FC<ModalConfirmarInspeccionProps> = memo(({
     open,
     fechaUltimaInspeccion,
     diasDiferencia = 0,
@@ -123,6 +123,6 @@ const ModalConfirmarInspeccion: React.FC<ModalConfirmarInspeccionProps> = ({
             </DialogActions>
         </Dialog>
     );
-};
+});
 
 export default ModalConfirmarInspeccion;

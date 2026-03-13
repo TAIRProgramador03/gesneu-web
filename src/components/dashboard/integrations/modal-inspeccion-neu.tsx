@@ -84,7 +84,7 @@ interface ModalInpeccionNeuProps {
   onAbrirAsignacion?: () => void; // <-- AGREGADO para permitir la prop desde page.tsx
 }
 
-const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = ({ open, onClose, placa, neumaticosAsignados, vehiculo, onSeleccionarNeumatico, onUpdateAsignados, onAbrirAsignacion }) => {
+const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, onClose, placa, neumaticosAsignados, vehiculo, onSeleccionarNeumatico, onUpdateAsignados, onAbrirAsignacion }) => {
   // Mostrar el array de neumáticos asignados cada vez que se abre el modal
   React.useEffect(() => {
     if (open) {
@@ -314,7 +314,7 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = ({ open, onClose, pl
       };
 
       verificarInspeccionPorBackend();
-      verificarInspeccionPorBackend();
+      // verificarInspeccionPorBackend();
     } else {
       //console.log('[ModalInspeccionNeu] Modal cerrado o sin placa, reseteando estados'); // <-- Comentado
       // Resetear estados cuando el modal se cierre o no haya placa
@@ -1359,6 +1359,6 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = ({ open, onClose, pl
       {/* <ModalAsignacionNeumatico open={openAsignacion} onClose={() => setOpenAsignacion(false)} placa={placa} /> */}
     </>
   );
-};
+});
 
 export default ModalInpeccionNeu;

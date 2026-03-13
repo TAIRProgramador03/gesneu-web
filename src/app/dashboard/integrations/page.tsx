@@ -81,7 +81,7 @@ function NeumaticosDisponiblesTable({ neumaticos }: { neumaticos: any[] }) {
                 <TableCell align="center">{neumatico.MEDIDA}</TableCell>
                 <TableCell align="center">{neumatico.FECHA_FABRICACION_COD}</TableCell>
                 <TableCell align="center">
-                  <EsRecuperadoBadge esRecuperado={neumatico.RECUPERADO} />
+                  <EsRecuperadoBadge esRecuperado={neumatico.RECUPERADO ?? false} />
                 </TableCell>
                 <TableCell align="center">
                   {typeof neumatico.ESTADO === 'number' || (typeof neumatico.ESTADO === 'string' && neumatico.ESTADO !== '') ? (
@@ -217,6 +217,14 @@ export default function Page(): React.JSX.Element {
 
   const handleSearchChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const placa = event.target.value.trim();
+
+    if (placa.trim().length === 0) {
+      setVehiculo(null);
+      setNeumaticosFiltrados([]);
+      setNeumaticosAsignados([]);
+      return;
+    }
+
     if (placa) {
       // Limpiar datos anteriores antes de buscar un nuevo vehículo
       setVehiculo(null);
@@ -1365,6 +1373,7 @@ export default function Page(): React.JSX.Element {
                   <TableCell sx={{ backgroundColor: '#e0f7fa', fontWeight: 'bold', fontSize: '0.78rem' }}>Remanente</TableCell>
                   <TableCell sx={{ backgroundColor: '#e0f7fa', fontWeight: 'bold', fontSize: '0.78rem' }}>Fecha de Asignación</TableCell>
                   <TableCell sx={{ backgroundColor: '#e0f7fa', fontWeight: 'bold', fontSize: '0.78rem' }}>Fecha Registro</TableCell>
+                  <TableCell sx={{ backgroundColor: '#e0f7fa', fontWeight: 'bold', fontSize: '0.78rem' }}>Recuperado</TableCell>
                   <TableCell sx={{ backgroundColor: '#e0f7fa', fontWeight: 'bold', fontSize: '0.78rem' }}>Estado</TableCell>
                 </TableRow>
               </TableHead>
@@ -1394,6 +1403,9 @@ export default function Page(): React.JSX.Element {
                         </TableCell>
                         {/* <TableCell align='center'>{getUltimaFechaRegistro(neumatico)}</TableCell> */}
                         <TableCell align='center'>{convertToDateHuman(neumatico.FECHA_ULTIMO_SUCESO)}</TableCell>
+                        <TableCell align='center'>
+                          <EsRecuperadoBadge esRecuperado={neumatico.RECUPERADO ?? false} />
+                        </TableCell>
                         <TableCell align="center">
                           {typeof neumatico.ESTADO === 'number' || (typeof neumatico.ESTADO === 'string' && neumatico.ESTADO !== '') ? (
                             <Box sx={{ position: 'relative', width: '120px' }}>

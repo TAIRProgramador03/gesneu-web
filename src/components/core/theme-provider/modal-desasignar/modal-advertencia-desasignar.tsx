@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
@@ -16,7 +16,7 @@ interface ModalAdvertenciaDesasignacionProps {
     tituloBloqueo?: string;
 }
 
-const ModalAdvertenciaDesasignacion: React.FC<ModalAdvertenciaDesasignacionProps> = ({
+const ModalAdvertenciaDesasignacion: React.FC<ModalAdvertenciaDesasignacionProps> = memo(({
     open,
     onClose,
     onDesasignarNeumatico,
@@ -111,6 +111,6 @@ const ModalAdvertenciaDesasignacion: React.FC<ModalAdvertenciaDesasignacionProps
             </DialogActions>
         </Dialog>
     );
-};
+});
 
 export default ModalAdvertenciaDesasignacion;

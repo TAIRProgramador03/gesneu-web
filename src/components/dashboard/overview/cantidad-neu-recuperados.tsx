@@ -8,6 +8,11 @@ import Typography from '@mui/material/Typography';
 import { ArrowDown as ArrowDownIcon } from '@phosphor-icons/react/dist/ssr/ArrowDown';
 import { ArrowUp as ArrowUpIcon } from '@phosphor-icons/react/dist/ssr/ArrowUp';
 import RecyclingIcon from '@mui/icons-material/Recycling';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 
 export interface RecuperadosProps {
   diff?: number;
@@ -26,9 +31,18 @@ export function Recuperados({ diff, trend, sx, value }: RecuperadosProps): React
         <Stack spacing={3}>
           <Stack direction="row" sx={{ alignItems: 'flex-start', justifyContent: 'space-between' }} spacing={3}>
             <Stack spacing={1}>
-              <Typography color="text.secondary" variant="overline">
-                Recuperados
-              </Typography>
+
+              <Tooltip>
+                <TooltipTrigger>
+                  <Typography color="text.secondary" variant="overline">
+                    Recuperados
+                  </Typography>
+                </TooltipTrigger>
+                <TooltipContent >
+                  Neumáticos que pueden ser reutilizados no entran en el conteo para el total de neumáticos.
+                </TooltipContent>
+              </Tooltip>
+
               <Typography variant="h4" sx={{ color: '#2196f3' }}>{value}</Typography>
             </Stack>
             <Stack sx={{ position: 'relative', width: 75, height: 75 }}>

@@ -13,6 +13,7 @@ import { UserProvider } from '@/contexts/user-context';
 import { LocalizationProvider } from '@/components/core/localization-provider';
 import { ThemeProvider } from '@/components/core/theme-provider/theme-provider';
 import { Toaster } from '@/components/ui/sonner';
+import { TooltipProvider } from '@/components/ui/tooltip';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -35,7 +36,9 @@ export default function Layout({ children }: LayoutProps): React.JSX.Element {
         <QueryClientProvider client={queryClient}>
           <LocalizationProvider>
             <UserProvider>
-              <ThemeProvider>{children}</ThemeProvider>
+              <ThemeProvider>
+                <TooltipProvider>{children}</TooltipProvider>
+              </ThemeProvider>
             </UserProvider>
           </LocalizationProvider>
           <ReactQueryDevtools initialIsOpen={false} />

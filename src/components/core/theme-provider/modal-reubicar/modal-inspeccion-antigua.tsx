@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
@@ -6,7 +6,6 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import FactCheckIcon from '@mui/icons-material/FactCheck';
-import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 
 interface ModalInspeccionObligatoriaProps {
   open: boolean;
@@ -16,7 +15,7 @@ interface ModalInspeccionObligatoriaProps {
   fechaInspeccion: string
 }
 
-const ModalInspeccionAntigua: React.FC<ModalInspeccionObligatoriaProps> = ({ open, onClose, onRegistrarInspeccion, diffDias, fechaInspeccion }) => (
+const ModalInspeccionAntigua: React.FC<ModalInspeccionObligatoriaProps> = memo(({ open, onClose, onRegistrarInspeccion, diffDias, fechaInspeccion }) => (
   <Dialog
     open={open}
     onClose={onClose}
@@ -62,6 +61,6 @@ const ModalInspeccionAntigua: React.FC<ModalInspeccionObligatoriaProps> = ({ ope
       </Button>
     </DialogActions>
   </Dialog>
-);
+));
 
 export default ModalInspeccionAntigua;

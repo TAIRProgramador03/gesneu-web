@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
@@ -6,7 +6,6 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import FactCheckIcon from '@mui/icons-material/FactCheck';
-import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 
 interface ModalInspeccionObligatoriaDesasignarProps {
     open: boolean;
@@ -14,7 +13,7 @@ interface ModalInspeccionObligatoriaDesasignarProps {
     onRegistrarInspeccion: () => void;
 }
 
-const ModalInsDesasignacionObligatoria: React.FC<ModalInspeccionObligatoriaDesasignarProps> = ({ open, onClose, onRegistrarInspeccion }) => (
+const ModalInsDesasignacionObligatoria: React.FC<ModalInspeccionObligatoriaDesasignarProps> = memo(({ open, onClose, onRegistrarInspeccion }) => (
     <Dialog
         open={open}
         onClose={onClose}
@@ -60,6 +59,6 @@ const ModalInsDesasignacionObligatoria: React.FC<ModalInspeccionObligatoriaDesas
             </Button>
         </DialogActions>
     </Dialog>
-);
+));
 
 export default ModalInsDesasignacionObligatoria;
