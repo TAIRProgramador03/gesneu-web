@@ -1,145 +1,48 @@
 'use client';
 
 import * as React from 'react';
-import { useEffect, useState } from 'react';
+import { ClipboardText } from '@phosphor-icons/react/dist/ssr/ClipboardText';
+import { columnsNeuAsignado, columnsNeuDisponible } from './columns';
+import { CompaniesFilters } from '@/components/dashboard/integrations/integrations-filters';
+import { Customer } from '@/components/dashboard/customer/customers-table';
+import { DataTableNeumaticos } from '@/components/ui/data-table/data-table';
+import { Neumatico } from '@/types/types';
 import { Neumaticos, obtenerNeumaticosAsignadosPorPlaca, buscarVehiculoPorPlaca, obtenerCantidadAutosDisponibles, obtenerUltimosMovimientosPorPlaca, obtenerUltimosMovimientosPorCodigo, getUltimaFechaInspeccionPorPlaca, obtenerNeumaticosDisponibles, getFechasInspeccionVehicularPorPlaca } from '@/api/Neumaticos';
-import Alert from '@mui/material/Alert';
-import ModalAdvertenciaReubicacion from '@/components/core/theme-provider/modal-reubicar/modal-advertencia-reubicacion';
-import ModalAdvertenciaDesasignacion from '@/components/core/theme-provider/modal-desasignar/modal-advertencia-desasignar';
-import ModalInspDesasignacionObligatoria from '@/components/core/theme-provider/modal-desasignar/modal-insp-desasignacion-obligatoria';
-import ModalInspeccionObligatoria from '@/components/core/theme-provider/modal-reubicar/modal-inspeccion-obligatoria';
-import ModalConfirmarInspeccion from '@/components/core/theme-provider/modal-reubicar/modal-confirmar-inspeccion';
+import { Plus } from '@phosphor-icons/react/dist/ssr/Plus';
+import { toast } from 'sonner';
+import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { useUser } from '@/hooks/use-user';
+import { Wrench } from '@phosphor-icons/react/dist/ssr/Wrench';
 import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
-import InputAdornment from '@mui/material/InputAdornment';
-import LinearProgress from '@mui/material/LinearProgress';
-import MenuItem from '@mui/material/MenuItem';
+import DiagramaVehiculo from '@/styles/theme/components/DiagramaVehiculo';
 import Menu from '@mui/material/Menu';
-import OutlinedInput from '@mui/material/OutlinedInput';
+import MenuItem from '@mui/material/MenuItem';
+import ModalAdvertenciaDesasignacion from '@/components/core/theme-provider/modal-desasignar/modal-advertencia-desasignar';
+import ModalAdvertenciaReubicacion from '@/components/core/theme-provider/modal-reubicar/modal-advertencia-reubicacion';
+import ModalAsignacionNeu from '@/components/dashboard/integrations/modal-asignacion-neu';
+import ModalAsignacionNeuDesdeDesasignacion from '@/components/dashboard/integrations/modal-asignacion-neu-desde-desasignacion';
+import ModalConfirmarInspDesasignar from '@/components/core/theme-provider/modal-desasignar/modal-confirmar-insp-desasignar';
+import ModalConfirmarInspeccion from '@/components/core/theme-provider/modal-reubicar/modal-confirmar-inspeccion';
+import ModalDesasignar from '@/components/dashboard/integrations/modal-desasignar';
+import ModalInpeccionNeu from '@/components/dashboard/integrations/modal-inspeccion-neu';
+import ModalInspDesasignacionObligatoria from '@/components/core/theme-provider/modal-desasignar/modal-insp-desasignacion-obligatoria';
+import ModalInspeccionAnterior from '@/components/core/theme-provider/modal-reubicar/modal-inspeccion-anterior';
+import ModalInspeccionAntigua from '@/components/core/theme-provider/modal-reubicar/modal-inspeccion-antigua';
+import ModalInspeccionObligatoria from '@/components/core/theme-provider/modal-reubicar/modal-inspeccion-obligatoria';
+import ModalReubicar from '@/components/dashboard/integrations/modal-reubicar';
 import Paper from '@mui/material/Paper';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
 import Stack from '@mui/material/Stack';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
-import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
-import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
-import { MagnifyingGlass } from '@phosphor-icons/react/dist/ssr/MagnifyingGlass';
-import { Plus } from '@phosphor-icons/react/dist/ssr/Plus';
-import { ClipboardText } from '@phosphor-icons/react/dist/ssr/ClipboardText';
-import { Wrench } from '@phosphor-icons/react/dist/ssr/Wrench';
-import ModalAsignacionNeu from '@/components/dashboard/integrations/modal-asignacion-neu';
-import ModalAsignacionNeuDesdeDesasignacion from '@/components/dashboard/integrations/modal-asignacion-neu-desde-desasignacion';
-import ModalDeleteNeu from '@/components/dashboard/integrations/modal-delete-neu';
-import ModalInpeccionNeu from '@/components/dashboard/integrations/modal-inspeccion-neu';
-import ModalReubicar from '@/components/dashboard/integrations/modal-reubicar';
-import ModalDesasignar from '@/components/dashboard/integrations/modal-desasignar';
-import DiagramaVehiculo from '@/styles/theme/components/DiagramaVehiculo';
-import { Neumatico } from '@/types/types';
-import { useUser } from '@/hooks/use-user';
-import ModalConfirmarInspDesasignar from '@/components/core/theme-provider/modal-desasignar/modal-confirmar-insp-desasignar';
-import { obtenerInfoDesgaste, calcularPorcentajeDesgaste } from '@/utils/tire-utils';
-import { Customer } from '@/components/dashboard/customer/customers-table';
-import { CompaniesFilters } from '@/components/dashboard/integrations/integrations-filters';
-import { useQuery } from '@tanstack/react-query';
-import ModalInspeccionAntigua from '@/components/core/theme-provider/modal-reubicar/modal-inspeccion-antigua';
-import ModalInspeccionAnterior from '@/components/core/theme-provider/modal-reubicar/modal-inspeccion-anterior';
-import { EsRecuperadoBadge } from '@/components/ui/EsRecuperadoBadge';
-import { toast } from 'sonner';
-import { convertToDateHuman } from '@/lib/utils';
 
-function NeumaticosDisponiblesTable({ neumaticos }: { neumaticos: any[] }) {
-  const [page, setPage] = React.useState(0);
-  return (
-    <>
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell sx={{ backgroundColor: '#e0f7fa', fontWeight: 'bold', fontSize: '0.78rem' }}>Código</TableCell>
-              <TableCell sx={{ backgroundColor: '#e0f7fa', fontWeight: 'bold', fontSize: '0.78rem' }}>Marca</TableCell>
-              <TableCell sx={{ backgroundColor: '#e0f7fa', fontWeight: 'bold', fontSize: '0.78rem' }}>Diseño</TableCell>
-              <TableCell sx={{ backgroundColor: '#e0f7fa', fontWeight: 'bold', fontSize: '0.78rem' }}>Remanente</TableCell>
-              <TableCell sx={{ backgroundColor: '#e0f7fa', fontWeight: 'bold', fontSize: '0.78rem' }}>Medida</TableCell>
-              <TableCell sx={{ backgroundColor: '#e0f7fa', fontWeight: 'bold', fontSize: '0.78rem' }}>Fecha</TableCell>
-              <TableCell sx={{ backgroundColor: '#e0f7fa', fontWeight: 'bold', fontSize: '0.78rem' }}>Recuperado</TableCell>
-              <TableCell sx={{ backgroundColor: '#e0f7fa', fontWeight: 'bold', fontSize: '0.78rem' }}>Estado</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {neumaticos.slice(page * 5, page * 5 + 5).map((neumatico: any) => (
-              <TableRow key={neumatico.CODIGO}>
-                <TableCell align="center">{neumatico.CODIGO}</TableCell>
-                <TableCell align="center">{neumatico.MARCA}</TableCell>
-                <TableCell align="center">{neumatico.DISEÑO}</TableCell>
-                <TableCell align="center">{neumatico.REMANENTE}</TableCell>
-                <TableCell align="center">{neumatico.MEDIDA}</TableCell>
-                <TableCell align="center">{neumatico.FECHA_FABRICACION_COD}</TableCell>
-                <TableCell align="center">
-                  <EsRecuperadoBadge esRecuperado={neumatico.RECUPERADO ?? false} />
-                </TableCell>
-                <TableCell align="center">
-                  {typeof neumatico.ESTADO === 'number' || (typeof neumatico.ESTADO === 'string' && neumatico.ESTADO !== '') ? (
-                    <Box sx={{ position: 'relative', width: '180px' }}>
-                      <LinearProgress
-                        variant="determinate"
-                        value={typeof neumatico.ESTADO === 'string' ? parseInt(neumatico.ESTADO.replace('%', ''), 10) : neumatico.ESTADO}
-                        sx={{
-                          height: 16,
-                          borderRadius: 5,
-                          border: `.5px solid #2a2a2a`,
-                          padding: '10px',
-                          backgroundColor: '#eee',
-                          '& .MuiLinearProgress-bar': {
-                            backgroundColor:
-                              (typeof neumatico.ESTADO === 'string' ? parseInt(neumatico.ESTADO.replace('%', ''), 10) : neumatico.ESTADO) < 39
-                                ? '#d32f2f'
-                                : (typeof neumatico.ESTADO === 'string' ? parseInt(neumatico.ESTADO.replace('%', ''), 10) : neumatico.ESTADO) < 79
-                                  ? '#FFEB3B'
-                                  : '#2e7d32',
-                            borderRadius: 5,
-                          },
-                        }}
-                      />
-                      <Typography
-                        variant="caption"
-                        fontWeight="bold"
-                        sx={{
-                          position: 'absolute',
-                          left: 0, right: 0, top: 0, bottom: 0,
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          color: (parseInt(neumatico.ESTADO) < 79) ? '#000' : '#fff',
-                          fontWeight: 'bold', fontSize: 13, letterSpacing: 0.5,
-                          textShadow: '0 1px 2px rgba(255,255,255,0.15)'
-                        }}
-                      >
-                        {typeof neumatico.ESTADO === 'string' ? neumatico.ESTADO.replace('%', '') : neumatico.ESTADO}%
-                      </Typography>
-                    </Box>
-                  ) : ''}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      <TablePagination
-        rowsPerPageOptions={[]}
-        component="div"
-        count={neumaticos.length}
-        rowsPerPage={5}
-        page={page}
-        onPageChange={(_, newPage) => setPage(newPage)}
-        onRowsPerPageChange={undefined}
-      />
-    </>
-  );
-}
 
 export default function Page(): React.JSX.Element {
   const [bloqueoReubicacion, setBloqueoReubicacion] = useState(false);
@@ -149,8 +52,6 @@ export default function Page(): React.JSX.Element {
   const [fechaUltimaInspeccion, setFechaUltimaInspeccion] = useState('');
   const [diasDiferenciaInspeccion, setDiasDiferenciaInspeccion] = useState(0);
   const { user } = useUser();
-  const [filterCol1, setFilterCol1] = React.useState('');
-  const [filterCol2, setFilterCol2] = React.useState('');
   const [vehiculo, setVehiculo] = React.useState<Vehiculo | null>(null);
   const [error, setError] = React.useState<string | null>(null);
 
@@ -160,10 +61,8 @@ export default function Page(): React.JSX.Element {
   const [neumaticos, setNeumaticos] = React.useState<Customer[]>([]);
   const [neumaticosFiltrados, setNeumaticosFiltrados] = React.useState<Customer[]>([]);
   const [neumaticosAsignados, setNeumaticosAsignados] = React.useState<any[]>([]);
-  const [busqueda, setBusqueda] = React.useState('');
   // Estados para los modales
   const [openModal, setOpenModal] = React.useState(false);
-  const [openDeleteModal, setOpenDeleteModal] = React.useState(false);
   // Modal de inspección - ahora integrado con modal de advertencia centralizado
   const [openInspeccionModal, setOpenInspeccionModal] = React.useState(false);
   // Modal de asignación desde desasignación
@@ -177,8 +76,6 @@ export default function Page(): React.JSX.Element {
   const [modoMantenimiento, setModoMantenimiento] = React.useState<'REUBICAR' | 'DESASIGNAR' | null>(null);
   const [anchorMenuMantenimiento, setAnchorMenuMantenimiento] = React.useState<null | HTMLElement>(null);
   // const [loading, setLoading] = React.useState(false);
-  const [assignedNeumaticos, setAssignedNeumaticos] = React.useState<{ [key: string]: Neumatico | null }>({});
-  const [assignedFromAPI, setAssignedFromAPI] = useState<Neumatico[]>([]);
   const [autosDisponiblesCount, setAutosDisponiblesCount] = useState<number>(0);
 
   const { data: neumaticosDisponiblesUseQuery = [], refetch: neumaticosDispobilesRefetch } = useQuery({
@@ -200,20 +97,6 @@ export default function Page(): React.JSX.Element {
     ID_OPERACION: number;
     ID_SUPERVISOR: string;
   }
-
-
-  const handleFilterChangeCol1 = (event: SelectChangeEvent<string>) => {
-    const value = event.target.value;
-    setFilterCol1(value);
-    if (value === 'opcionB') {
-      handleOpenModalConRefresh(); // Usar el handler con validación
-    }
-  };
-
-  const handleFilterChangeCol2 = (event: SelectChangeEvent<string>) => {
-    setFilterCol2(event.target.value);
-  };
-
 
   const handleSearchChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const placa = event.target.value.trim();
@@ -296,39 +179,6 @@ export default function Page(): React.JSX.Element {
 
         const listaNeumaticos = await Neumaticos();
 
-        // Determinar si es vehículo de tránsito (proyecto diferente al del usuario)
-        // const esVehiculoTransito = user?.proyecto && vehiculoData.PROYECTO !== user.proyecto;
-
-        // Filtrar neumáticos:
-        // - Si es vehículo de tránsito: cargar DISPONIBLES del usuario (sin filtrar por proyecto del vehículo)
-        // - Si es vehículo de la flota: filtrar por proyecto del vehículo
-
-
-        // const filtrados: Neumatico[] = listaNeumaticos
-        //   .filter((neumatico: any) => {
-        //     // Filtro de supervisor: neumáticos del usuario o globales sin supervisor
-        //     const perteneceAlUsuario = !user?.usuario ||
-        //       neumatico.USUARIO_SUPER?.trim() === user.usuario?.trim() ||
-        //       (neumatico.TIPO_MOVIMIENTO === 'DISPONIBLE' && !neumatico.USUARIO_SUPER);
-
-        //     if (!perteneceAlUsuario) return false;
-
-        //     // Si es vehículo de tránsito, solo mostrar DISPONIBLES (sin filtrar por proyecto)
-        //     if (esVehiculoTransito) {
-        //       return neumatico.TIPO_MOVIMIENTO === 'DISPONIBLE';
-        //     }
-
-
-        //     // Si es vehículo de la flota, filtrar por proyecto
-        //     return neumatico.PROYECTO === vehiculoData.PROYECTO;
-        //   })
-        //   .map((neumatico: Neumatico) => ({
-        //     ...neumatico,
-        //     CODIGO: neumatico.CODIGO_NEU || neumatico.CODIGO,
-        //     DISEÑO: neumatico.DISEÑO || '',
-        //     FECHA_FABRICACION_COD: neumatico.FECHA_FABRICACION_COD || '',
-        //   }));
-
         setNeumaticos(listaNeumaticos);
         setNeumaticosFiltrados(listaNeumaticos);
         animateTotalNeumaticos(0, listaNeumaticos.length);
@@ -348,50 +198,13 @@ export default function Page(): React.JSX.Element {
     }
   };
 
-  const handleBusquedaNeumatico = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const valor = event.target.value.toLowerCase();
-    setBusqueda(valor);
-    const filtrados = neumaticos.filter(
-      (neumatico: any) =>
-        (typeof neumatico.CODIGO === 'string' && neumatico.CODIGO.toLowerCase().includes(valor)) ||
-        (typeof neumatico.MARCA === 'string' && neumatico.MARCA.toLowerCase().includes(valor))
-    );
-
-    setNeumaticosFiltrados(filtrados);
-  };
 
   const animateKilometraje = (start: number, end: number) => {
-
     setAnimatedKilometraje(end);
-
-    // const duration = 1000;
-    // const startTime = performance.now();
-    // const step = (currentTime: number) => {
-    //   const elapsed = currentTime - startTime;
-    //   const progress = Math.min(elapsed / duration, 1);
-    //   const currentKilometraje = Math.floor(start + (end - start) * progress);
-    //   setAnimatedKilometraje(currentKilometraje);
-    //   if (progress < 1) {
-    //     requestAnimationFrame(step);
-    //   }
-    // };
-    // requestAnimationFrame(step);
   };
 
   const animateTotalNeumaticos = (start: number, end: number) => {
     setAnimatedTotalNeumaticos(end);
-    // const duration = 1000;
-    // const startTime = performance.now();
-    // const step = (currentTime: number) => {
-    //   const elapsed = currentTime - startTime;
-    //   const progress = Math.min(elapsed / duration, 1);
-    //   const currentTotal = Math.floor(start + (end - start) * progress);
-    //   setAnimatedTotalNeumaticos(currentTotal);
-    //   if (progress < 1) {
-    //     requestAnimationFrame(step);
-    //   }
-    // };
-    // requestAnimationFrame(step);
   };
 
   const handleOpenModal = async () => {
@@ -507,35 +320,7 @@ export default function Page(): React.JSX.Element {
       const ultimoKmReal = odometros.length > 0 ? Math.max(...odometros) : Number(vehiculoSeleccionado.KILOMETRO ?? vehiculoSeleccionado.KILOMETRAJE ?? 0);
       animateKilometraje(0, ultimoKmReal);
 
-      // Cargar neumáticos disponibles
       const listaNeumaticos = await Neumaticos();
-
-      // IMPORTANTE: Si viene de ModalTodasPlacas (tránsito), siempre mostrar DISPONIBLES del usuario
-      // sin filtrar por proyecto del vehículo
-      // const esVehiculoTransito = true; // Siempre true porque viene del modal de tránsito
-
-      // Filtrar neumáticos:
-      // Para vehículos de tránsito: cargar SOLO DISPONIBLES del usuario (sin filtrar por proyecto)
-      // const filtrados: Neumatico[] = listaNeumaticos
-      //   .filter((neumatico: any) => {
-      //     // Filtro de supervisor: neumáticos del usuario o globales sin supervisor
-      //     const perteneceAlUsuario = !user?.usuario ||
-      //       neumatico.USUARIO_SUPER?.trim() === user.usuario?.trim() ||
-      //       (neumatico.TIPO_MOVIMIENTO === 'DISPONIBLE' && !neumatico.USUARIO_SUPER);
-
-      //     if (!perteneceAlUsuario) return false;
-
-      //     // Solo mostrar DISPONIBLES (sin filtrar por proyecto del vehículo)
-      //     return neumatico.TIPO_MOVIMIENTO === 'DISPONIBLE';
-      //   })
-      //   .map((neumatico: Neumatico) => ({
-      //     ...neumatico,
-      //     CODIGO: neumatico.CODIGO_NEU || neumatico.CODIGO,
-      //     DISEÑO: neumatico.DISEÑO || '',
-      //     FECHA_FABRICACION_COD: neumatico.FECHA_FABRICACION_COD || '',
-      //   }));
-
-
 
       setNeumaticos(listaNeumaticos);
       setNeumaticosFiltrados(listaNeumaticos);
@@ -688,48 +473,6 @@ export default function Page(): React.JSX.Element {
     }
   };
 
-  const unicosPorPosicion = React.useMemo(() => {
-    const filtrados = neumaticosAsignados.filter(n => typeof n.POSICION_NEU === 'string' && n.POSICION_NEU.length > 0);
-    const porPosicion = Object.values(
-      filtrados.reduce((acc: Record<string, typeof neumaticosAsignados[0]>, curr) => {
-        const pos = curr.POSICION_NEU as string;
-        if (!acc[pos] || ((curr.ID_MOVIMIENTO ?? 0) > (acc[pos].ID_MOVIMIENTO ?? 0))) {
-          acc[pos] = curr;
-        }
-        return acc;
-      }, {})
-    );
-    const porCodigo = Object.values(
-      porPosicion.reduce((acc: Record<string, typeof porPosicion[0]>, curr) => {
-        const cod = curr.CODIGO as string;
-        if (!acc[cod] || ((curr.ID_MOVIMIENTO ?? 0) > (acc[cod].ID_MOVIMIENTO ?? 0))) {
-          acc[cod] = curr;
-        }
-        return acc;
-      }, {})
-    );
-    return porCodigo;
-  }, [neumaticosAsignados]);
-
-  const unicosPorPosicionYCodigo = React.useMemo(() => {
-    const filtrados = neumaticosAsignados.filter(n => typeof n.POSICION_NEU === 'string' && n.POSICION_NEU.length > 0);
-    const porPosicion = new Map<string, typeof neumaticosAsignados[0]>();
-    for (const n of filtrados) {
-      const pos = n.POSICION_NEU as string;
-      if (!porPosicion.has(pos) || ((n.ID_MOVIMIENTO ?? 0) > (porPosicion.get(pos)?.ID_MOVIMIENTO ?? 0))) {
-        porPosicion.set(pos, n);
-      }
-    }
-    const porCodigo = new Map<string, typeof neumaticosAsignados[0]>();
-    for (const n of porPosicion.values()) {
-      const cod = n.CODIGO as string;
-      if (!porCodigo.has(cod) || ((n.ID_MOVIMIENTO ?? 0) > (porCodigo.get(cod)?.ID_MOVIMIENTO ?? 0))) {
-        porCodigo.set(cod, n);
-      }
-    }
-    return Array.from(porCodigo.values());
-  }, [neumaticosAsignados]);
-
   // REFACTOR: Carga de fechas segura para evitar bucle infinito
   const [fechasRegistro, setFechasRegistro] = useState<{ [codigo: string]: string }>({});
 
@@ -773,19 +516,6 @@ export default function Page(): React.JSX.Element {
 
   }, [neumaticosAsignados]); // Dependencia clave: solo cuando cambia la lista
 
-  const getUltimaFechaRegistro = (neumatico: string | any) => {
-    // Si viene el objeto completo y tiene FECHA_ULTIMO_SUCESO explícita
-    if (typeof neumatico === 'object' && neumatico.FECHA_ULTIMO_SUCESO) {
-      return new Date(neumatico.FECHA_ULTIMO_SUCESO).toLocaleDateString('es-PE', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit'
-      });
-    }
-    // Fallback por compatibilidad: si viene solo el código
-    const codigo = typeof neumatico === 'string' ? neumatico : neumatico.CODIGO;
-    return fechasRegistro[codigo] || '—';
-  };
 
   // Memo para filtrar por el último movimiento por código usando FECHA_MOVIMIENTO
   const neumaticosAsignadosUnicos = React.useMemo(() => {
@@ -930,93 +660,6 @@ export default function Page(): React.JSX.Element {
 
   const [openModalInspeccionAnterior, setOpenModalInspeccionAnterior] = useState(false);
 
-  const handleReubicacion = () => {
-    // Cerrar el menú antes de abrir cualquier modal
-    setAnchorMenuMantenimiento(null);
-
-    // Quitar foco manualmente para evitar problemas de accesibilidad
-    if (document && document.activeElement) {
-      try {
-        (document.activeElement as HTMLElement).blur();
-      } catch (e) { }
-    }
-
-    setTimeout(() => {
-      console.log('[DEBUG] neumaticosAsignados RAW:', neumaticosAsignados);
-
-      const asignadosValidos = neumaticosAsignados.filter(
-        n => n.TIPO_MOVIMIENTO !== 'BAJA DEFINITIVA'
-      );
-      console.log('[DEBUG] asignadosValidos:', asignadosValidos);
-
-      // Si no hay neumáticos válidos
-      if (asignadosValidos.length === 0) {
-        setBloqueoReubicacion(false);
-        setMensajeBloqueo(undefined);
-        setOpenModalAdvertenciaReubicacion(true);
-        return;
-      }
-
-      // Buscar inspecciones
-      console.log('[Reubicacion] neumaticosAsignados:', neumaticosAsignados);
-      const inspecciones = neumaticosAsignados.filter((n: any) => n.TIPO_MOVIMIENTO === 'INSPECCION');
-      console.log('[Reubicacion] inspecciones:', inspecciones);
-
-      let bloqueo = false;
-      let ultimaFechaInspeccion = '';
-
-      if (inspecciones.length > 0) {
-        // Tomar FECHA_REGISTRO más reciente
-        ultimaFechaInspeccion = inspecciones.reduce<string>((max, curr) => {
-          const fecha = curr.FECHA_REGISTRO || curr.FECHA_MOVIMIENTO || curr.FECHA_INSPECCION;
-          if (!fecha) return max;
-          if (!max) return fecha;
-          return new Date(fecha) > new Date(max) ? fecha : max;
-        }, '');
-        console.log('[Reubicacion] ultimaFechaInspeccion:', ultimaFechaInspeccion);
-
-        // Validar si hubo reubicación el mismo día
-        const reubicados = neumaticosAsignados.filter(
-          (n: any) =>
-            n.TIPO_MOVIMIENTO === 'REUBICADO' &&
-            (n.FECHA_MOVIMIENTO === ultimaFechaInspeccion || n.FECHA_REGISTRO === ultimaFechaInspeccion)
-        );
-        console.log('[Reubicacion] reubicados:', reubicados);
-
-        bloqueo = reubicados.length > 0;
-      }
-
-      if (bloqueo) {
-        setMensajeBloqueo(
-          `Ya realizaste una reubicación con fecha ${ultimaFechaInspeccion}. Debes realizar una nueva inspección para poder reubicar nuevamente.`
-        );
-        setBloqueoReubicacion(true);
-        setOpenModalAdvertenciaReubicacion(true);
-        return;
-      }
-
-      if (inspecciones.length === 0) {
-        console.log('[Reubicacion] Abriendo modal inspeccion obligatoria');
-        setOpenModalInspeccionObligatoria(true);
-        return;
-      }
-
-      // Calcular diferencia de días
-      const fechaObj = ultimaFechaInspeccion ? new Date(ultimaFechaInspeccion) : new Date();
-      const hoy = new Date();
-      const diffDias = Math.floor((hoy.getTime() - fechaObj.getTime()) / (1000 * 60 * 60 * 24));
-      setFechaUltimaInspeccion(ultimaFechaInspeccion);
-      setDiasDiferenciaInspeccion(diffDias);
-
-      console.log('[Reubicacion] Abriendo modal confirmar inspeccion', {
-        ultimaFechaInspeccion,
-        diffDias,
-      });
-      setOpenModalConfirmarInspeccion(true);
-    }, 200);
-  };
-
-
   // todo: ABRIR MODAL ANTES DE REUBICAR
   // Función para REUBICAR - Ejecuta TODAS las validaciones ANTES de abrir modal
   const handleAbrirMantenimientoReubicar = async () => {
@@ -1104,38 +747,6 @@ export default function Page(): React.JSX.Element {
     }
   };
 
-  const handleDesasignar = async () => {
-    setAnchorMenuMantenimiento(null);
-
-    const asignadosValidos = neumaticosAsignados.filter(
-      n => n.TIPO_MOVIMIENTO !== 'BAJA DEFINITIVA'
-    );
-
-    // Si no hay neumáticos, abre el modal de advertencia para asignar.
-    if (asignadosValidos.length === 0) {
-      setOpenModalDesasignar(true);
-      return;
-    }
-
-    // Busca la última inspección
-    const ultimaInspeccion = asignadosValidos.find(n => n.TIPO_MOVIMIENTO === 'INSPECCION');
-    const ultimaInspeccionFecha = ultimaInspeccion?.FECHA_MOVIMIENTO;
-    const diasDiferencia = ultimaInspeccionFecha ? Math.floor((new Date().getTime() - new Date(ultimaInspeccionFecha).getTime()) / (1000 * 60 * 60 * 24)) : null;
-
-    if (ultimaInspeccionFecha && diasDiferencia !== null) {
-      // Si hay una inspección, abre el modal de confirmación
-      setFechaUltimaInspeccion(ultimaInspeccionFecha); // Asume que tienes este estado
-      setDiasDiferenciaInspeccion(diasDiferencia); // Asume que tienes este estado
-      setOpenModalConfirmarInspDesasignar(true);
-      return;
-    } else {
-      // Si no hay inspección, abre el modal de inspección obligatoria.
-      setOpenModalInspDesasignacionObligatoria(true);
-      return;
-    }
-
-  };
-
   // Función para DESASIGNAR - Ejecuta TODAS las validaciones ANTES de abrir modal
   const handleAbrirMantenimientoDesasignar = async () => {
     setAnchorMenuMantenimiento(null);
@@ -1183,11 +794,6 @@ export default function Page(): React.JSX.Element {
 
   return (
     <Stack spacing={3}>
-      {/* <Stack direction="row" spacing={3}>
-        <Stack spacing={1} sx={{ flex: '1 1 auto' }}>
-          <Typography variant="h4">Asignación de Neumáticos</Typography>
-        </Stack>
-      </Stack> */}
       <CompaniesFilters
         onSearchChange={handleSearchChange}
         // projectName={vehiculo?.PROYECTO || '—'}
@@ -1352,6 +958,8 @@ export default function Page(): React.JSX.Element {
 
 
         </Card>
+
+        {/* <ScrollArea className="rounded-md border "> */}
         <Card sx={{
           flex: 1.3,
           p: 2,
@@ -1362,154 +970,40 @@ export default function Page(): React.JSX.Element {
           <Typography variant="h6" sx={{ mb: 2 }}>
             Neumáticos instalados en esta unidad:
           </Typography>
-          <TableContainer component={Paper} sx={{ mb: 4 }}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell sx={{ backgroundColor: '#e0f7fa', fontWeight: 'bold', fontSize: '0.78rem' }}>Posición</TableCell>
-                  <TableCell sx={{ backgroundColor: '#e0f7fa', fontWeight: 'bold', fontSize: '0.78rem' }}>Codi Neu</TableCell>
-                  <TableCell sx={{ backgroundColor: '#e0f7fa', fontWeight: 'bold', fontSize: '0.78rem' }}>Marca</TableCell>
-                  <TableCell sx={{ backgroundColor: '#e0f7fa', fontWeight: 'bold', fontSize: '0.78rem' }}>Medida</TableCell>
-                  <TableCell sx={{ backgroundColor: '#e0f7fa', fontWeight: 'bold', fontSize: '0.78rem' }}>Remanente</TableCell>
-                  <TableCell sx={{ backgroundColor: '#e0f7fa', fontWeight: 'bold', fontSize: '0.78rem' }}>Fecha de Asignación</TableCell>
-                  <TableCell sx={{ backgroundColor: '#e0f7fa', fontWeight: 'bold', fontSize: '0.78rem' }}>Fecha Registro</TableCell>
-                  <TableCell sx={{ backgroundColor: '#e0f7fa', fontWeight: 'bold', fontSize: '0.78rem' }}>Recuperado</TableCell>
-                  <TableCell sx={{ backgroundColor: '#e0f7fa', fontWeight: 'bold', fontSize: '0.78rem' }}>Estado</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {neumaticosAsignadosUnicos.filter((n: any) => n.TIPO_MOVIMIENTO !== 'BAJA DEFINITIVA').length > 0 ? (
-                  neumaticosAsignadosUnicos
-                    .filter((n: any) => n.TIPO_MOVIMIENTO !== 'BAJA DEFINITIVA')
-                    .sort((a: any, b: any) => {
-                      // Si alguno es RES01, lo ponemos al final
-                      const isResA = (a.POSICION_NEU || '').toUpperCase() === 'RES01';
-                      const isResB = (b.POSICION_NEU || '').toUpperCase() === 'RES01';
-                      if (isResA && !isResB) return 1;
-                      if (!isResA && isResB) return -1;
-                      // Si ambos son RES01 o ninguno, ordenar por número
-                      const posA = (a.POSICION_NEU || '').replace(/[^\d]/g, '');
-                      const posB = (b.POSICION_NEU || '').replace(/[^\d]/g, '');
-                      return Number(posA) - Number(posB);
-                    })
-                    .map((neumatico: any, index: number) => (
-                      <TableRow key={neumatico.ID_MOVIMIENTO || `${neumatico.CODIGO}-${neumatico.POSICION_NEU}`}>
-                        <TableCell align="center">{neumatico.POSICION_NEU}</TableCell>
-                        <TableCell align="center">{neumatico.CODIGO}</TableCell>
-                        <TableCell align="center">{neumatico.MARCA}</TableCell>
-                        <TableCell align="center">{neumatico.MEDIDA}</TableCell>
-                        <TableCell align="center">{neumatico.REMANENTE ?? 0}</TableCell>
-                        <TableCell align="center">{convertToDateHuman(neumatico.FECHA_ASIGNACION)}
-                        </TableCell>
-                        {/* <TableCell align='center'>{getUltimaFechaRegistro(neumatico)}</TableCell> */}
-                        <TableCell align='center'>{convertToDateHuman(neumatico.FECHA_ULTIMO_SUCESO)}</TableCell>
-                        <TableCell align='center'>
-                          <EsRecuperadoBadge esRecuperado={neumatico.RECUPERADO ?? false} />
-                        </TableCell>
-                        <TableCell align="center">
-                          {typeof neumatico.ESTADO === 'number' || (typeof neumatico.ESTADO === 'string' && neumatico.ESTADO !== '') ? (
-                            <Box sx={{ position: 'relative', width: '120px' }}>
-                              <LinearProgress
-                                variant="determinate"
-                                value={typeof neumatico.ESTADO === 'string' ? parseInt(neumatico.ESTADO.replace('%', ''), 10) : neumatico.ESTADO}
-                                sx={{
-                                  border: `.5px solid #2a2a2a`,
-                                  height: 16,
-                                  borderRadius: 5,
-                                  padding: '10px',
-                                  backgroundColor: '#eee',
-                                  '& .MuiLinearProgress-bar': {
-                                    backgroundColor:
-                                      (typeof neumatico.ESTADO === 'string' ? parseInt(neumatico.ESTADO.replace('%', ''), 10) : neumatico.ESTADO) < 39
-                                        ? '#d32f2f'
-                                        : (typeof neumatico.ESTADO === 'string' ? parseInt(neumatico.ESTADO.replace('%', ''), 10) : neumatico.ESTADO) < 79
-                                          ? '#FFEB3B'
-                                          : '#2e7d32',
-                                    borderRadius: 5,
-                                  },
-                                }}
-                              />
-                              <Typography
-                                variant="caption"
-                                fontWeight="bold"
-                                sx={{
-                                  position: 'absolute',
-                                  left: 0,
-                                  right: 0,
-                                  top: 0,
-                                  bottom: 0,
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  color: `${neumatico.ESTADO < 79 && neumatico.ESTADO > 39 ? '#000' : (neumatico.ESTADO <= 39) ? '#000' : '#fff'}`,
-                                  fontWeight: 'bold',
-                                  fontSize: 13,
-                                  letterSpacing: 0.5,
-                                  textShadow: '0 1px 2px rgba(255,255,255,0.15)'
-                                }}
-                              >
-                                {typeof neumatico.ESTADO === 'string' ? neumatico.ESTADO.replace('%', '') : neumatico.ESTADO}%
-                              </Typography>
-                            </Box>
-                          ) : ''}
-                        </TableCell>
-                      </TableRow>
-                    ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={8} align="center">
-                      No hay neumáticos asignados para esta placa.
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </TableContainer>
+
+          <DataTableNeumaticos columns={columnsNeuAsignado} data={neumaticosAsignadosUnicos} />
 
           {/* Neúmaticos Disponibles */}
-          <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
-            <Stack direction="row" alignItems="center" spacing={2}>
-              <Typography variant="h6"> </Typography>
-              <Box
-                sx={{
-                  backgroundColor: '#e0f7fa',
-                  borderRadius: '8px',
-                  padding: '8px 16px',
-                  fontWeight: 'bold',
-                  color: 'black',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
-                }}
-              >
-                <span>
-                  Disponibles:
-                  <span className='font-normal'> &nbsp;
-                    {`${neumaticosDisponiblesUseQuery.length.toLocaleString()} Neumáticos`}
-                  </span>
+          <Stack direction="row" alignItems="center" spacing={2} className='mb-3 mt-3' >
+            <Box
+              sx={{
+                backgroundColor: '#e0f7fa',
+                borderRadius: '8px',
+                padding: '8px 16px',
+                fontWeight: 'bold',
+                color: 'black',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
+              }}
+            >
+              <span>
+                Disponibles:
+                <span className='font-normal'> &nbsp;
+                  {`${neumaticosDisponiblesUseQuery.length.toLocaleString()} Neumáticos`}
                 </span>
-              </Box>
-            </Stack>
-
-
-            {/* TODO: */}
-            {/* <OutlinedInput
-              fullWidth
-              placeholder="Buscar neumáticos"
-              value={busqueda}
-              onChange={handleBusquedaNeumatico}
-              startAdornment={
-                <InputAdornment position="start">
-                  <MagnifyingGlass fontSize="var(--icon-fontSize-md)" />
-                </InputAdornment>
-              }
-              sx={{ maxWidth: '250px' }}
-              disabled={!vehiculo}
-            /> */}
+              </span>
+            </Box>
           </Stack>
-          <NeumaticosDisponiblesTable neumaticos={neumaticosDisponiblesUseQuery} />
+
+          <DataTableNeumaticos columns={columnsNeuDisponible} data={neumaticosDisponiblesUseQuery} type='pagination' />
+
         </Card>
+        {/* </ScrollArea> */}
+
+
+
       </Stack>
       <ModalAdvertenciaReubicacion
         open={openModalAdvertenciaReubicacion}
@@ -1527,7 +1021,6 @@ export default function Page(): React.JSX.Element {
         onDesasignarNeumatico={handleOpenModalConRefresh}
         bloqueoDesasignacion={bloqueoReubicacion}
         mensajeBloqueo={mensajeBloqueo}
-      //onDesasignarNeumatico={handleDesasignarConfirmado}
       />
       <ModalInspDesasignacionObligatoria
         open={openModalInspDesasignacionObligatoria}
@@ -1537,8 +1030,6 @@ export default function Page(): React.JSX.Element {
           setOpenInspeccionModal(true);
         }}
       />
-
-
 
       {/* Modal de inspección obligatoria */}
       <ModalInspeccionObligatoria
@@ -1669,28 +1160,6 @@ export default function Page(): React.JSX.Element {
           // Solo cerrar el modal, sin recargar datos
           setOpenInspeccionModal(false);
         }}
-        // onUpdateAsignados={async () => {
-        //   // Recargar datos solo cuando la inspección se completa exitosamente
-        //   if (vehiculo?.PLACA) {
-        //     await Promise.all([refreshAsignados(), refreshVehiculo()]);
-        //     // Recargar también los neumáticos asignados
-        //     const data = await obtenerNeumaticosAsignadosPorPlaca(vehiculo.PLACA);
-        //     const neumaticosActivos = data.filter((n: any) =>
-        //       n.TIPO_MOVIMIENTO !== 'BAJA DEFINITIVA' && n.TIPO_MOVIMIENTO !== 'RECUPERADO'
-        //     );
-        //     const porPosicion = new Map<string, typeof neumaticosActivos[0]>();
-        //     neumaticosActivos.forEach((n: any) => {
-        //       const pos = n.POSICION_NEU;
-        //       if (pos && ['POS01', 'POS02', 'POS03', 'POS04', 'RES01'].includes(pos)) {
-        //         const existente = porPosicion.get(pos);
-        //         if (!existente || (n.ID_MOVIMIENTO || 0) > (existente.ID_MOVIMIENTO || 0)) {
-        //           porPosicion.set(pos, n);
-        //         }
-        //       }
-        //     });
-        //     setNeumaticosAsignados(Array.from(porPosicion.values()));
-        //   }
-        // }}
         placa={vehiculo?.PLACA ?? ''}
         neumaticosAsignados={neumaticosAsignadosUnicos
           .filter(n => typeof n.POSICION_NEU === 'string' && n.POSICION_NEU.length > 0 && n.TIPO_MOVIMIENTO !== 'BAJA DEFINITIVA')
@@ -1779,22 +1248,6 @@ export default function Page(): React.JSX.Element {
           // Recargar datos solo cuando la acción se completa exitosamente
           if (vehiculo?.PLACA) {
             await Promise.all([refreshAsignados(), refreshVehiculo()]);
-            // Recargar también los neumáticos asignados
-            // const data = await obtenerNeumaticosAsignadosPorPlaca(vehiculo.PLACA);
-            // const neumaticosActivos = data.filter((n: any) =>
-            //   n.TIPO_MOVIMIENTO !== 'BAJA DEFINITIVA' && n.TIPO_MOVIMIENTO !== 'RECUPERADO'
-            // );
-            // const porPosicion = new Map<string, typeof neumaticosActivos[0]>();
-            // neumaticosActivos.forEach((n: any) => {
-            //   const pos = n.POSICION_NEU;
-            //   if (pos && ['POS01', 'POS02', 'POS03', 'POS04', 'RES01'].includes(pos)) {
-            //     const existente = porPosicion.get(pos);
-            //     if (!existente || (n.ID_MOVIMIENTO || 0) > (existente.ID_MOVIMIENTO || 0)) {
-            //       porPosicion.set(pos, n);
-            //     }
-            //   }
-            // });
-            // setNeumaticosAsignados(Array.from(porPosicion.values()));
             neumaticosDispobilesRefetch();
           }
         }}

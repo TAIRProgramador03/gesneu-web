@@ -1,16 +1,12 @@
 'use client';
 
 import * as React from 'react';
-import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
-import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import CardHeader from '@mui/material/CardHeader';
 import Divider from '@mui/material/Divider';
 import { alpha, useTheme } from '@mui/material/styles';
 import type { SxProps } from '@mui/material/styles';
-import { ArrowClockwise as ArrowClockwiseIcon } from '@phosphor-icons/react/dist/ssr/ArrowClockwise';
-import { ArrowRight as ArrowRightIcon } from '@phosphor-icons/react/dist/ssr/ArrowRight';
 import type { ApexOptions } from 'apexcharts';
 import dayjs from 'dayjs';
 import 'dayjs/locale/es';
@@ -22,6 +18,7 @@ import { obtenerInspeccionesNeumaticosPorFechas } from '@/api/Neumaticos';
 import { useUser } from '@/hooks/use-user';
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
+import { useQuery } from '@tanstack/react-query';
 
 // Agregar declaración global para window.placasPorBarra
 declare global {
@@ -38,7 +35,7 @@ export interface SalesProps {
   sx?: SxProps;
 }
 
-export function Sales({ chartSeries: _chartSeries, sx }: SalesProps): React.JSX.Element {
+export const Sales = React.memo(({ chartSeries: _chartSeries, sx }: SalesProps): React.JSX.Element => {
   const chartOptions = useChartOptions();
   const { user } = useUser();
   const [startDate, setStartDate] = React.useState<dayjs.Dayjs | null>(dayjs().subtract(4, 'day'));
@@ -50,6 +47,24 @@ export function Sales({ chartSeries: _chartSeries, sx }: SalesProps): React.JSX.
   const [selectedSeries, setSelectedSeries] = React.useState<string[]>([]);
   const [fullChartSeries, setFullChartSeries] = React.useState<{ name: string; data: number[] }[]>([]);
   const [fullXCategories, setFullXCategories] = React.useState<string[]>([]);
+
+
+  const { data: inspecciones } = useQuery({
+
+    queryKey: ['inspecciones-vechiculo', {
+      usuario: user?.usuario,
+      fechaInicio: startDate?.format('YYYY-MM-DD'),
+      fechaFin: endDate?.format('YYYY-MM-DD'),
+    }],
+
+    queryFn: () => obtenerInspeccionesNeumaticosPorFechas({
+      usuario: user?.usuario,
+      fechaInicio: startDate?.format('YYYY-MM-DD'),
+      fechaFin: endDate?.format('YYYY-MM-DD'),
+    })
+  })
+
+  console.log({ inspecciones })
 
   React.useEffect(() => {
     if (startDate && endDate && user?.usuario) {
@@ -213,7 +228,7 @@ export function Sales({ chartSeries: _chartSeries, sx }: SalesProps): React.JSX.
       <Divider />
     </Card>
   );
-}
+});
 
 function useChartOptions(): ApexOptions {
   const theme = useTheme();

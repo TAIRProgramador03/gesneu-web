@@ -3,13 +3,13 @@
 import * as React from 'react';
 import Grid from '@mui/material/Unstable_Grid2';
 import { Budget } from '@/components/dashboard/overview/cantidad-neu';
-import { Sales } from '@/components/dashboard/overview/inspeccion-neu';
 import { TasksProgress } from '@/components/dashboard/overview/cantidad-neu-asig';
 import { TotalCustomers } from '@/components/dashboard/overview/cantidad-neu-disp';
 import { BajaDefinitiva } from '@/components/dashboard/overview/cantidad-neu-baja';
 import { Recuperados } from '@/components/dashboard/overview/cantidad-neu-recuperados';
 import { TotalProfit } from '@/components/dashboard/overview/total-profit';
 import { useNeuStats } from '@/hooks/use-neu-stats';
+import { Sales } from '@/components/dashboard/overview/inspeccion-neu';
 
 export default function Page(): React.JSX.Element {
 
@@ -28,7 +28,7 @@ export default function Page(): React.JSX.Element {
         <TasksProgress sx={{ height: '100%' }} value={Number(assignedQtyNeu.data ?? 0)} />
       </Grid>
       <Grid lg={3} sm={6} xs={12}>
-        <TotalProfit sx={{ height: '100%' }} value={`$${assignedCostNeu.data ?? 0}`} />
+        <TotalProfit sx={{ height: '100%' }} value={assignedCostNeu.data ?? 0} />
       </Grid>
 
       {/* Segunda fila - Nuevas tarjetas del Módulo I */}

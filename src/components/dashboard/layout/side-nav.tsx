@@ -19,6 +19,8 @@ import { useUser } from '@/hooks/use-user';
 
 import { navItems } from './config';
 import { navIcons } from './nav-icons';
+import { Car, LayoutDashboardIcon, UserCircle } from 'lucide-react';
+import { TyreIcon } from '@/components/icons/Tyre';
 
 interface SideNavProps {
   collapsed: boolean;
@@ -189,9 +191,10 @@ function NavItem({
         <Box sx={{ alignItems: 'center', display: 'flex', justifyContent: 'center', flex: '0 0 auto' }}>
           {Icon ? (
             <Icon
-              fill={active ? '#fff' : '#fff'}
-              fontSize="var(--icon-fontSize-md)"
-              weight={'fill'}
+              strokeWidth={2.5}
+              fill={active ? '#fff' : ''}
+              fontSize="var(--icon-fontSize-lg)"
+              weight={'bold'}
             />
           ) : null}
         </Box>

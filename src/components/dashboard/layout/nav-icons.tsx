@@ -1,16 +1,13 @@
 import type { Icon } from '@phosphor-icons/react/dist/lib/types';
-import { ChartPie as ChartPieIcon } from '@phosphor-icons/react/dist/ssr/ChartPie';
 import { GearSix as GearSixIcon } from '@phosphor-icons/react/dist/ssr/GearSix';
-import { PlugsConnected as PlugsConnectedIcon } from '@phosphor-icons/react/dist/ssr/PlugsConnected';
-import { User as UserIcon } from '@phosphor-icons/react/dist/ssr/User';
-import { Users as UsersIcon } from '@phosphor-icons/react/dist/ssr/Users';
 import { XSquare } from '@phosphor-icons/react/dist/ssr/XSquare';
+import { Car, Layers3Icon, LayoutDashboardIcon, User2Icon } from 'lucide-react';
 
 export const navIcons = {
-  'chart-pie': ChartPieIcon,
+  'chart-pie': LayoutDashboardIcon,
   'gear-six': GearSixIcon,
-  'plugs-connected': PlugsConnectedIcon,
+  'plugs-connected': Car,
   'x-square': XSquare,
-  user: UserIcon,
-  users: UsersIcon,
+  user: User2Icon,
+  users: Layers3Icon,
 } as Record<string, Icon>;

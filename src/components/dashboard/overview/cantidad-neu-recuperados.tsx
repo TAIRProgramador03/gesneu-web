@@ -13,17 +13,16 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import CountUp from 'react-countup';
 
 export interface RecuperadosProps {
   diff?: number;
   trend: 'up' | 'down';
   sx?: SxProps;
-  value: string;
+  value: number;
 }
 
 export function Recuperados({ diff, trend, sx, value }: RecuperadosProps): React.JSX.Element {
-  const TrendIcon = trend === 'up' ? ArrowUpIcon : ArrowDownIcon;
-  const trendColor = trend === 'up' ? 'var(--mui-palette-success-main)' : 'var(--mui-palette-error-main)';
 
   return (
     <Card sx={{ ...sx, border: '2px solid #2196f3' }}> {/* Borde azul para recuperados */}
@@ -43,7 +42,9 @@ export function Recuperados({ diff, trend, sx, value }: RecuperadosProps): React
                 </TooltipContent>
               </Tooltip>
 
-              <Typography variant="h4" sx={{ color: '#2196f3' }}>{value}</Typography>
+              <Typography variant="h4" sx={{ color: '#2196f3' }}>
+                <CountUp end={value} />
+              </Typography>
             </Stack>
             <Stack sx={{ position: 'relative', width: 75, height: 75 }}>
               <Avatar

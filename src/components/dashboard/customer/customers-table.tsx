@@ -26,9 +26,9 @@ export interface Customer {
   FECHA_FABRICACION_COD: string;
   USUARIO_SUPER: string;
   TIPO_MOVIMIENTO: string;
-  ESTADO: string;
+  ESTADO: number;
   PLACA?: string; // Añadido para poder agrupar por placa
-  RECUPERADO?: boolean
+  RECUPERADO?: boolean,
 }
 
 interface CustomersTableProps {

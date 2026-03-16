@@ -1,40 +1,34 @@
 'use client';
 
 import * as React from 'react';
-import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
-import { useState } from "react";
-import Stack from '@mui/material/Stack';
-import Box from '@mui/material/Box';
-import { Download as DownloadIcon } from '@phosphor-icons/react/dist/ssr/Download';
-import { Upload as UploadIcon } from '@phosphor-icons/react/dist/ssr/Upload';
 import { ArrowClockwise as RefreshIcon } from '@phosphor-icons/react/dist/ssr/ArrowClockwise';
+import { Card } from '@mui/material';
+import { columnsPadron } from './columns';
+import { CustomersFilters } from '@/components/dashboard/customer/customers-filters';
+import { DataTableNeumaticos } from '@/components/ui/data-table/data-table';
+import { Download as DownloadIcon } from '@phosphor-icons/react/dist/ssr/Download';
+import { Neumaticos } from '@/api/Neumaticos';
+import { useNeuStats } from '@/hooks/use-neu-stats';
+import { useQuery } from '@tanstack/react-query';
+import { useState } from "react";
+import { useTheme } from '@mui/material/styles';
+import { useUser } from '@/hooks/use-user';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Image from 'next/image';
+import ModalInsertExcel from '@/components/dashboard/customer/modal-insert-excel';
+import Stack from '@mui/material/Stack';
 import styled from '@emotion/styled';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import { useTheme } from '@mui/material/styles';
-import { CustomersFilters } from '@/components/dashboard/customer/customers-filters';
-import { CustomersTable, Customer } from '@/components/dashboard/customer/customers-table';
-import { Neumaticos } from '@/api/Neumaticos';
-import { useUser } from '@/hooks/use-user';
-import ModalInsertExcel from '@/components/dashboard/customer/modal-insert-excel';
-import { useQuery } from '@tanstack/react-query';
-import { useNeuStats } from '@/hooks/use-neu-stats';
-import { exportToExcel } from '@/utils/export-to-excel';
-import { mappedPadronNeumaticos } from '@/mapped/padron-neumaticos.mapped';
-import Image from 'next/image';
-import { toast } from 'sonner';
 
 export default function Page(): React.JSX.Element {
 
   const { user } = useUser();
 
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [loading, setLoading] = useState(false);
   const [resultadoCarga, setResultadoCarga] = useState<any>(null);
   const [modalCargaVisible, setModalCargaVisible] = useState(false);
   const [modalErroresVisible, setModalErroresVisible] = useState(false);
-  const [searchText, setSearchText] = useState('');
   const [modalImportarVisible, setModalImportarVisible] = useState(false);
 
   const { data: customers = [], refetch: customersRefetch } = useQuery({
@@ -43,31 +37,6 @@ export default function Page(): React.JSX.Element {
   })
 
   const { allQtyNeu, avaibleQtyNeu, assignedQtyNeu, dropQtyNeu, recoverQtyNeu, avaibleQtyAuto } = useNeuStats();
-
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchText(e.target.value.toLowerCase());
-    setPage(0);
-  };
-
-  let filteredCustomers = []
-
-  filteredCustomers = customers?.length >= 1 ? (customers?.filter((c: Customer) =>
-    c.CODIGO.toString().toLowerCase().includes(searchText) ||
-    c.MARCA.toLowerCase().includes(searchText) ||
-    c.MEDIDA.toLowerCase().includes(searchText) ||
-    c.DISEÑO.toLowerCase().includes(searchText) ||
-    c.REMANENTE.toString().toLowerCase().includes(searchText) ||
-    c.PR.toString().toLowerCase().includes(searchText) ||
-    c.CARGA.toString().toLowerCase().includes(searchText) ||
-    c.RQ.toString().toLowerCase().includes(searchText) ||
-    c.OC.toString().toLowerCase().includes(searchText) ||
-    c.PROYECTO.toLowerCase().includes(searchText) ||
-    c.PROVEEDOR.toLowerCase().includes(searchText) ||
-    c.FECHA_FABRICACION_COD.toLowerCase().includes(searchText) ||
-    c.TIPO_MOVIMIENTO.toLowerCase().includes(searchText)
-  )) : [];
-
-  const paginatedCustomers = applyPagination(filteredCustomers, page, rowsPerPage);
 
   const ModalOverlay = styled.div`
   position: fixed;
@@ -103,22 +72,6 @@ export default function Page(): React.JSX.Element {
     border: none;
     border-radius: 5px;
     cursor: pointer;
-  }
-`;
-
-  const ErrorTable = styled.table`
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 10px;
-
-  th, td {
-    border: 1px solid #ccc;
-    padding: 6px;
-    text-align: left;
-  }
-
-  th {
-    background: #f5f5f5;
   }
 `;
 
@@ -170,17 +123,6 @@ export default function Page(): React.JSX.Element {
 
   const esJefeTaller = Array.isArray(user?.perfiles) && user.perfiles.some((p: any) => p.codigo === '002');
 
-  const handleExportExcel = () => {
-    if (filteredCustomers.length === 0) {
-      toast.warning('No se pudo exportar', {
-        description: 'No se encontraron resultados.'
-      });
-      return;
-    }
-    const data = mappedPadronNeumaticos({ filteredCustomers })
-    exportToExcel({ data, username: user?.usuario as string, title: 'GESNEU: PADRÓN DE NEUMÁTICOS' })
-  }
-
   return (
     <>
       {loading && (
@@ -196,25 +138,10 @@ export default function Page(): React.JSX.Element {
         <Stack
           direction={{ xs: 'column', md: 'row' }}
           alignItems={{ xs: 'stretch', md: 'center' }}
-          justifyContent="space-between"
+          className='justify-end'
           spacing={2}
           sx={{ width: '100%' }}
         >
-          <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flex: 1 }}>
-            <TextField
-              size="small"
-              value={searchText}
-              onChange={handleSearchChange}
-              placeholder="Buscar neumático..."
-              sx={{
-                width: {
-                  xs: '100%',
-                  sm: 300
-                },
-                backgroundColor: "#fff"
-              }}
-            />
-          </Box>
           <Box sx={{ display: 'flex', gap: 2, mt: { xs: 2, md: 0 } }}>
             <Button
               color="success"
@@ -226,29 +153,14 @@ export default function Page(): React.JSX.Element {
               {isMobile ? null : (loading ? "Cargando..." : "Importar")}
             </Button>
             <Button
-              color="secondary"
-              variant="contained"
-              startIcon={<UploadIcon />}
-              onClick={handleExportExcel}
-            >
-              {isMobile ? null : "Exportar"}
-            </Button>
-            <Button
               color="info"
               variant="contained"
               startIcon={<RefreshIcon fontSize="var(--icon-fontSize-md)" />}
               onClick={handleRefresh}
               disabled={loading}
             >
-              {isMobile ? null : "Refrescar"}
+              Refrescar
             </Button>
-            {/* <Button
-              startIcon={<PlusIcon fontSize="var(--icon-fontSize-md)" />}
-              variant="contained"
-              disabled={esJefeTaller}
-            >
-              Agregar
-            </Button> */}
           </Box>
         </Stack>
 
@@ -261,17 +173,19 @@ export default function Page(): React.JSX.Element {
           recuperadosCount={recoverQtyNeu.data}
         />
 
-        <CustomersTable
-          count={filteredCustomers?.length ?? 0}
-          page={page}
-          rows={paginatedCustomers}
-          rowsPerPage={rowsPerPage}
-          onPageChange={(event, newPage) => setPage(newPage)}
-          onRowsPerPageChange={(event) => {
-            setRowsPerPage(parseInt(event.target.value, 10));
-            setPage(0);
-          }}
-        />
+        <Card className='p-5'>
+          <DataTableNeumaticos
+            columns={columnsPadron}
+            data={customers}
+            type='pagination'
+            filters={true}
+            withExport={true}
+            exportConfig={{
+              title: 'GESNEU: PADRÓN DE NEUMÁTICOS',
+              username: user?.usuario
+            }}
+          />
+        </Card>
 
       </Stack >
 
@@ -379,8 +293,4 @@ export default function Page(): React.JSX.Element {
       />
     </>
   );
-}
-
-function applyPagination(rows: Customer[], page: number, rowsPerPage: number): Customer[] {
-  return rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 }

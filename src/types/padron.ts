@@ -19,4 +19,25 @@ interface PadronMapped {
   'Porcentaje de Vida (%)': number
 }
 
+export interface PadronExcel {
+  CODIGO: number,
+  MARCA: string
+  MEDIDA: string
+  DISEÑO: string
+  REMANENTE: number
+  PR: number
+  CARGA: number
+  RQ: number
+  OC: number
+  VELOCIDAD: string
+  PROYECTO: string
+  COSTO: number
+  PROVEEDOR: string
+  FECHA_FABRICACION_COD: string
+  TIPO_MOVIMIENTO: string
+  RECUPERADO?: boolean | undefined
+  ESTADO: number
+  PLACA?: string
+}
+
 export type ListPadronMapped = PadronMapped[]

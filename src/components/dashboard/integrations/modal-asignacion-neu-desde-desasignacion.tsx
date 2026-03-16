@@ -32,6 +32,8 @@ import { toast } from 'sonner';
 import Image from 'next/image';
 import { convertToDateHuman } from '@/lib/utils';
 import { TipoMovimientoBadge } from '@/components/ui/TipoMovimientoBadge';
+import { DataTableNeumaticos } from '@/components/ui/data-table/data-table';
+import { columnsNeuParaAsignar } from '@/app/dashboard/integrations/columns';
 
 const ItemType = {
     NEUMATICO: 'neumatico',
@@ -600,7 +602,7 @@ const ModalAsignacionNeuDesdeDesasignacion: React.FC<ModalAsignacionNeuDesdeDesa
                 disableAutoFocus
                 sx={{
                     '& .MuiDialog-paper': {
-                        maxWidth: '1400px',
+                        maxWidth: '1500px',
                         width: '100%',
                     },
                 }}
@@ -888,16 +890,7 @@ const ModalAsignacionNeuDesdeDesasignacion: React.FC<ModalAsignacionNeuDesdeDesa
                         <Stack direction="column" spacing={2} sx={{ flex: 0.4, width: '100%', height: '100%' }}>
                             <Card sx={{ p: 2, boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)', height: '100%', display: 'flex', flexDirection: 'column' }}>
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                                    <TextField
-                                        label="Buscar por Neu."
-                                        variant="outlined"
-                                        sx={{ maxWidth: '200px' }}
-                                        value={searchTerm}
-                                        onChange={(e) => {
-                                            setSearchTerm(e.target.value);
-                                            setPage(0);
-                                        }}
-                                    />
+                                    <div></div>
                                     <Box sx={{ ml: 2, display: 'flex', alignItems: 'center', minWidth: 110 }}>
                                         <Typography variant="body2" sx={{ fontWeight: 600, color: '#1976d2', fontSize: '1rem', background: '#e3f2fd', borderRadius: 2, px: 1.5, py: 0.5, border: '1px solid #1976d2' }}>
                                             Neu. Disponibles: {filteredData.length}
@@ -913,119 +906,7 @@ const ModalAsignacionNeuDesdeDesasignacion: React.FC<ModalAsignacionNeuDesdeDesa
                                     </Button>
                                 </Box>
                                 <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-                                    <TableContainer component={Paper} sx={{ flex: 1, minHeight: 0, maxHeight: '100%', maxWidth: '100%', minWidth: 0, mx: 0, overflowY: 'auto' }}>
-                                        <Table size="small" stickyHeader>
-                                            <TableHead>
-                                                <TableRow>
-                                                    <TableCell sx={{ width: '50px', backgroundColor: '#fff', zIndex: 2, fontSize: '0.78rem' }} />
-                                                    <TableCell sx={{ fontWeight: 'bold', backgroundColor: '#fff', zIndex: 2, fontSize: '0.78rem' }}>Código</TableCell>
-                                                    <TableCell sx={{ fontWeight: 'bold', backgroundColor: '#fff', zIndex: 2, fontSize: '0.78rem' }}>Marca</TableCell>
-                                                    <TableCell sx={{ fontWeight: 'bold', backgroundColor: '#fff', zIndex: 2, fontSize: '0.78rem' }}>Diseño</TableCell>
-                                                    <TableCell sx={{ fontWeight: 'bold', backgroundColor: '#fff', zIndex: 2, fontSize: '0.78rem' }}>Remanente</TableCell>
-                                                    <TableCell sx={{ fontWeight: 'bold', backgroundColor: '#fff', zIndex: 2, fontSize: '0.78rem' }}>Medida</TableCell>
-                                                    <TableCell sx={{ fontWeight: 'bold', backgroundColor: '#fff', zIndex: 2, fontSize: '0.78rem' }}>Fecha</TableCell>
-                                                    <TableCell sx={{ fontWeight: 'bold', backgroundColor: '#fff', zIndex: 2, fontSize: '0.78rem' }}>Recuperado</TableCell>
-                                                    <TableCell sx={{ fontWeight: 'bold', backgroundColor: '#fff', zIndex: 2, fontSize: '0.78rem' }}>Estado</TableCell>
-                                                </TableRow>
-                                            </TableHead>
-                                            <TableBody>
-
-                                                {/* paginatedData */}
-
-                                                {filteredData.length > 0 ? (
-                                                    filteredData.map((neumatico) => {
-                                                        const isDisabled = neumatico.TIPO_MOVIMIENTO === 'ASIGNADO';
-                                                        return (
-                                                            <TableRow
-                                                                key={neumatico.CODIGO}
-                                                                sx={{
-                                                                    backgroundColor: isDisabled
-                                                                        ? theme.palette.action.disabledBackground
-                                                                        : 'inherit',
-                                                                    pointerEvents: isDisabled ? 'none' : 'auto',
-                                                                    transition: 'box-shadow 0.2s, background 0.2s',
-                                                                    '&:hover': !isDisabled
-                                                                        ? {
-                                                                            boxShadow: '0 2px 12px 0 #bdbdbd',
-                                                                            backgroundColor: '#f5f5f5',
-                                                                        }
-                                                                        : {},
-                                                                }}
-                                                            >
-                                                                <TableCell sx={{ fontSize: '0.78rem', padding: '5px 5px', textAlign: 'center' }}>
-                                                                    <DraggableNeumatico
-                                                                        neumatico={neumatico}
-                                                                        disabled={isDisabled}
-                                                                    />
-                                                                </TableCell>
-                                                                <TableCell sx={{ fontSize: '0.78rem' }}>{neumatico.CODIGO}</TableCell>
-                                                                <TableCell sx={{ fontSize: '0.78rem' }}>{neumatico.MARCA}</TableCell>
-                                                                <TableCell sx={{ fontSize: '0.78rem' }}>{neumatico.DISEÑO}</TableCell>
-                                                                <TableCell sx={{ fontSize: '0.78rem' }}>{neumatico.REMANENTE}</TableCell>
-                                                                <TableCell sx={{ fontSize: '0.78rem' }}>{neumatico.MEDIDA}</TableCell>
-                                                                <TableCell sx={{ fontSize: '0.78rem' }}>{convertToDateHuman(neumatico.FECHA_REGISTRO)}</TableCell>
-                                                                <TableCell sx={{ fontSize: '0.78rem' }} align='center'>
-                                                                    <EsRecuperadoBadge esRecuperado={neumatico.RECUPERADO} />
-                                                                </TableCell>
-                                                                <TableCell align="center" sx={{ fontSize: '0.78rem' }}>
-                                                                    <Box sx={{ position: 'relative', width: '100px' }}>
-                                                                        <LinearProgress
-                                                                            variant="determinate"
-                                                                            value={
-                                                                                typeof neumatico.ESTADO === 'string'
-                                                                                    ? parseInt(neumatico.ESTADO.replace('%', ''), 10)
-                                                                                    : neumatico.ESTADO
-                                                                            }
-                                                                            sx={{
-                                                                                border: `.5px solid #2a2a2a`,
-                                                                                height: 20,
-                                                                                borderRadius: 5,
-                                                                                backgroundColor: '#eee',
-                                                                                '& .MuiLinearProgress-bar': {
-                                                                                    backgroundColor:
-                                                                                        (typeof neumatico.ESTADO === 'string' ? parseInt(neumatico.ESTADO.replace('%', ''), 10) : neumatico.ESTADO) < 39
-                                                                                            ? '#d32f2f'
-                                                                                            : (typeof neumatico.ESTADO === 'string' ? parseInt(neumatico.ESTADO.replace('%', ''), 10) : neumatico.ESTADO) < 79
-                                                                                                ? '#FFEB3B'
-                                                                                                : '#2e7d32',
-                                                                                    borderRadius: 5,
-                                                                                },
-                                                                            }}
-                                                                        />
-                                                                        <Typography
-                                                                            variant="caption"
-                                                                            sx={{
-                                                                                position: 'absolute',
-                                                                                top: 0,
-                                                                                left: 0,
-                                                                                width: '100%',
-                                                                                height: '100%',
-                                                                                display: 'flex',
-                                                                                alignItems: 'center',
-                                                                                justifyContent: 'center',
-                                                                                fontWeight: 'bold',
-                                                                                color: `${parseFloat(neumatico.ESTADO) < 79 && parseFloat(neumatico.ESTADO) > 39 ? '#000' : (parseFloat(neumatico.ESTADO) <= 39) ? '#000' : '#fff'}`,
-                                                                            }}
-                                                                        >
-                                                                            {typeof neumatico.ESTADO === 'string'
-                                                                                ? neumatico.ESTADO
-                                                                                : `${neumatico.ESTADO}%`}
-                                                                        </Typography>
-                                                                    </Box>
-                                                                </TableCell>
-                                                            </TableRow>
-                                                        );
-                                                    })
-                                                ) : (
-                                                    <TableRow>
-                                                        <TableCell colSpan={8} align="center" sx={{ fontSize: '0.78rem' }}>
-                                                            No hay neumáticos disponibles.
-                                                        </TableCell>
-                                                    </TableRow>
-                                                )}
-                                            </TableBody>
-                                        </Table>
-                                    </TableContainer>
+                                    <DataTableNeumaticos columns={columnsNeuParaAsignar} data={filteredData} type='pagination' filters={true} />
                                 </Box>
                             </Card>
                         </Stack>

@@ -25,7 +25,7 @@ export const exportToExcel = ({ data, username, title = 'Default title' }: Expor
     v: title,
     t: 's',
     s: {
-      font: { bold: true, color: { rgb: 'FFFFFF' }, sz: 14 },
+      font: { bold: true, color: { rgb: 'FFFFFF' }, sz: 22 },
       fill: { fgColor: { rgb: '002141' } },
       alignment: { horizontal: 'center', vertical: 'center' },
       border: thinBorder,
