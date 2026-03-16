@@ -42,6 +42,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
+import { LoadingButton } from '@/components/ui/loading-button';
 
 
 export default function Page(): React.JSX.Element {
@@ -835,12 +836,11 @@ export default function Page(): React.JSX.Element {
                 </Box>
                 {/* Opciones */}
                 {/* Botón Asignar Neumático */}
-                <Button
+                <LoadingButton
                   variant="contained"
                   color='success'
                   startIcon={<Plus size={20} />}
                   onClick={handleOpenModalConRefresh}
-                  disabled={false} // Siempre habilitado
                   sx={{
                     color: '#fff',
                     textTransform: 'none',
@@ -852,9 +852,9 @@ export default function Page(): React.JSX.Element {
                   }}
                 >
                   Asignar Neumático
-                </Button>
+                </LoadingButton>
                 {/* Botón Inspección */}
-                <Button
+                <LoadingButton
                   variant="contained"
                   color='info'
                   startIcon={<ClipboardText size={20} />}
@@ -874,7 +874,9 @@ export default function Page(): React.JSX.Element {
                   }}
                 >
                   Inspección
-                </Button>
+                </LoadingButton>
+
+
                 {/* Botón Mantenimiento */}
                 <Button
                   variant="contained"

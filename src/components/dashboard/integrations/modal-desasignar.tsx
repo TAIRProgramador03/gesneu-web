@@ -19,6 +19,7 @@ import { CheckCircle, TriangleAlertIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import Image from 'next/image';
 import { convertToDateHuman } from '@/lib/utils';
+import { LoadingButton } from '@/components/ui/loading-button';
 
 interface ModalDesasignarProps {
   open: boolean;
@@ -852,7 +853,7 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
                   >
                     Restaurar
                   </Button>
-                  <Button
+                  <LoadingButton
                     color="success"
                     variant="contained"
                     sx={{ ml: 1 }}
@@ -860,7 +861,7 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
                     disabled={neumaticosSeleccionados.length === 0 || !accion || !todasPosicionesVaciasAsignadas}
                   >
                     Guardar Desasignación y Asignación
-                  </Button>
+                  </LoadingButton>
                   {onAbrirAsignacion && (() => {
                     const tienePosicionesVacias = posicionesVaciasActuales.length > 0;
                     const tieneAccionYObservacion = accion.trim() !== '' && observacion.trim() !== '';

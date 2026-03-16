@@ -17,6 +17,8 @@ import ModalAsignacionNeu from './modal-asignacion-neu';
 import { toast } from 'sonner';
 import Image from 'next/image';
 import { convertToDateHuman } from '@/lib/utils';
+import { CheckCircle } from 'lucide-react';
+import { LoadingButton } from '@/components/ui/loading-button';
 
 // --- Declaraciones de tipos fuera del componente ---
 interface FormValues {
@@ -342,12 +344,16 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
   const handleSeleccionarNeumatico = async (neumatico: any) => {
     // Buscar si ya existe inspección local para esta posición
     const inspeccionLocal = inspeccionesPendientes.find(i => i.posicion === (neumatico.POSICION || neumatico.POSICION_NEU));
+
+    console.log({ inspeccionLocal })
+
     if (inspeccionLocal) {
       // Si existe, cargar los datos guardados localmente
       setNeumaticoSeleccionado(neumatico);
       setFormValues({ ...inspeccionLocal });
       setOdometro(Number(inspeccionLocal.kilometro));
       setMinKilometro(Number(inspeccionLocal.kilometro));
+      setRemanenteAsignacionReal(inspeccionLocal.remanente_referencia ?? null);
       setKmError(false);
       setRemanenteError(false);
       setFormValuesInicial({ ...inspeccionLocal });
@@ -422,7 +428,13 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
       });
 
       // 4. PRE-FILL ODOMETER & VALIDATION
-      setOdometro(odoInicial);
+
+      console.log({
+        Odometro,
+        odoInicial
+      })
+
+      if (Odometro === 0) setOdometro(odoInicial);
       setMinKilometro(odoInicial);
 
       setKmError(false);
@@ -493,11 +505,14 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
     }
   }, [open, vehiculo?.kilometro]);
 
+
+
+  // ERROR DE PORQUERIA
   // Sincronizar Odometro con el valor inicial al abrir modal o cambiar neumático
-  React.useEffect(() => {
-    setOdometro(initialOdometro);
-    setKmError(false);
-  }, [initialOdometro]);
+  // React.useEffect(() => {
+  //   setOdometro(initialOdometro);
+  //   setKmError(false);
+  // }, [initialOdometro]);
 
   // VALIDACIÓN DE REMANENTE EN TIEMPO REAL
   useEffect(() => {
@@ -572,6 +587,14 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
       toast.error(`El número de kilometro no puede ser menor al actual (${formValues.kilometro} km).`)
       return;
     }
+
+    if (formValues.posicion !== 'RES01') {
+      if (Number(formValues.remanente) >= valorReferenciaRemanente) {
+        toast.error(`El valor de remanente no puede ser igual o mayor a ${valorReferenciaRemanente}`)
+        return;
+      }
+    }
+
     if (remanenteError) {
       toast.error(`El valor de remanente no puede ser igual o mayor a ${valorReferenciaRemanente}`)
       return;
@@ -597,7 +620,7 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
       fechaAsignacion = movAsign?.FECHA_ASIGNACION || movAsign?.FECHA_REGISTRO || null;
     }
     // Guardar/actualizar inspección localmente por posición, incluyendo la fecha de asignación
-    const nuevaInspeccion = { ...formValues, kilometro: Odometro.toString(), fecha_asignacion: fechaAsignacion ? new Date(fechaAsignacion).toISOString().slice(0, 10) : null };
+    const nuevaInspeccion = { ...formValues, kilometro: Odometro.toString(), fecha_asignacion: fechaAsignacion ? new Date(fechaAsignacion).toISOString().slice(0, 10) : null, remanente_referencia: remanenteAsignacionReal };
     setInspeccionesPendientes(prev => {
       const idx = prev.findIndex(i => i.posicion === nuevaInspeccion.posicion);
       let nuevoArray;
@@ -1187,13 +1210,16 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
                           color: `${formValues.posicion === n.POSICION ? '#fff' : '#222'}`,
                         }}
                         onClick={() => {
+                          if (formValues.posicion === n.POSICION) return;
                           console.log(`[LOG POSICION] Click en botón ${n.POSICION} - Neumático:`, n);
                           handleSeleccionarNeumatico(n);
                         }}
                       >
                         {n.POSICION === 'RES01' ? 'RES' : n.POSICION}
                         {inspeccionada && (
-                          <span style={{ marginLeft: 6, fontSize: 18, color: '#388e3c' }}>✔</span>
+                          <span style={{ marginLeft: 6, fontSize: 18, color: '#000' }}>
+                            <CheckCircle />
+                          </span>
                         )}
                       </Button>
                     );
@@ -1348,9 +1374,15 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
               }>
                 Siguiente posición
               </Button>
-              <Button color="success" variant="contained" sx={{ ml: 1 }} onClick={handleEnviarYGuardar} disabled={inspeccionesPendientes.length !== 5 || bloquearFormulario || kmError}>
+              <LoadingButton
+                color="success"
+                variant="contained"
+                sx={{ ml: 1 }}
+                onClick={handleEnviarYGuardar}
+                disabled={inspeccionesPendientes.length !== 5 || bloquearFormulario || kmError}
+              >
                 Enviar y Guardar
-              </Button>
+              </LoadingButton>
             </Box>
           </Box>
         </DialogActions>

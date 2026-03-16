@@ -23,6 +23,7 @@ import Image from 'next/image';
 import { DataTableNeumaticos } from '@/components/ui/data-table/data-table';
 import { columnsNeuParaAsignar, columnsNeuTemporales } from '@/app/dashboard/integrations/columns';
 import { NeuTemporalTable } from '@/types/neumatico';
+import { LoadingButton } from '@/components/ui/loading-button';
 
 const ItemType = {
     NEUMATICO: 'neumatico',
@@ -844,14 +845,23 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
                                             Neu. Disponibles: {filteredData.length}
                                         </Typography>
                                     </Box>
-                                    <Button
+                                    {/* <Button
                                         variant="contained"
                                         color="primary"
                                         disabled={!hasAssignedNeumaticos || !allPositionsAssigned || kmError || Odometro === '' || isNaN(Number(Odometro))}
                                         onClick={handleConfirm}
                                     >
                                         Confirmar Asignación
-                                    </Button>
+                                    </Button> */}
+
+                                    <LoadingButton
+                                        variant="contained"
+                                        color="primary"
+                                        disabled={!hasAssignedNeumaticos || !allPositionsAssigned || kmError || Odometro === '' || isNaN(Number(Odometro))}
+                                        onClick={handleConfirm}
+                                    >
+                                        Confirmar Asignación
+                                    </LoadingButton>
                                 </Box>
                                 <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
                                     <DataTableNeumaticos columns={columnsNeuParaAsignar} data={filteredData} type='pagination' filters={true} />

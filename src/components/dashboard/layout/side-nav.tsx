@@ -192,7 +192,7 @@ function NavItem({
           {Icon ? (
             <Icon
               strokeWidth={2.5}
-              fill={active ? '#fff' : ''}
+              fill={active ? '#fff' : '#002141'}
               fontSize="var(--icon-fontSize-lg)"
               weight={'bold'}
             />
