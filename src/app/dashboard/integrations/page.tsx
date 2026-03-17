@@ -1156,42 +1156,52 @@ export default function Page(): React.JSX.Element {
         }}
       />
       {/* Modal de Inspección de Neumáticos - Integrado con modal de advertencia centralizado */}
-      <ModalInpeccionNeu
-        open={openInspeccionModal}
-        onClose={() => {
-          // Solo cerrar el modal, sin recargar datos
-          setOpenInspeccionModal(false);
-        }}
-        placa={vehiculo?.PLACA ?? ''}
-        neumaticosAsignados={neumaticosAsignadosUnicos
-          .filter(n => typeof n.POSICION_NEU === 'string' && n.POSICION_NEU.length > 0 && n.TIPO_MOVIMIENTO !== 'BAJA DEFINITIVA')
-          .map(n => ({
-            ...n,
-            POSICION: n.POSICION_NEU ?? '',
-            POSICION_NEU: n.POSICION_NEU ?? '',
-            REMANENTE: n.REMANENTE,
-            PRESION_AIRE: n.PRESION_AIRE,
-            TORQUE_APLICADO: n.TORQUE_APLICADO,
-            ESTADO: n.ESTADO,
-            COD_SUPERVISOR: vehiculo?.ID_SUPERVISOR,
-            ID_OPERACION: vehiculo?.ID_OPERACION
-          }))}
-        vehiculo={vehiculo ? {
-          placa: vehiculo.PLACA,
-          marca: vehiculo.MARCA,
-          modelo: vehiculo.MODELO,
-          anio: String(vehiculo.ANO),
-          color: vehiculo.COLOR,
-          proyecto: vehiculo.PROYECTO,
-          operacion: vehiculo.OPERACION,
-          id_operacion: vehiculo.ID_OPERACION,
-          kilometro: vehiculo.KILOMETRO,
-          cod_supervisor: vehiculo.ID_SUPERVISOR
-        } : undefined}
-        onSeleccionarNeumatico={() => { }}
-        onUpdateAsignados={refreshAsignados}
-        onAbrirAsignacion={handleOpenModalConRefresh}
-      />
+
+      {
+        openInspeccionModal && (
+          <ModalInpeccionNeu
+            open={openInspeccionModal}
+            onClose={() => {
+              // Solo cerrar el modal, sin recargar datos
+              setOpenInspeccionModal(false);
+            }}
+            placa={vehiculo?.PLACA ?? ''}
+            neumaticosAsignados={neumaticosAsignadosUnicos
+              .filter(n => typeof n.POSICION_NEU === 'string' && n.POSICION_NEU.length > 0 && n.TIPO_MOVIMIENTO !== 'BAJA DEFINITIVA')
+              .map(n => ({
+                ...n,
+                POSICION: n.POSICION_NEU ?? '',
+                POSICION_NEU: n.POSICION_NEU ?? '',
+                REMANENTE: n.REMANENTE,
+                PRESION_AIRE: n.PRESION_AIRE,
+                TORQUE_APLICADO: n.TORQUE_APLICADO,
+                ESTADO: n.ESTADO,
+                COD_SUPERVISOR: vehiculo?.ID_SUPERVISOR,
+                ID_OPERACION: vehiculo?.ID_OPERACION
+              }))}
+            vehiculo={vehiculo ? {
+              placa: vehiculo.PLACA,
+              marca: vehiculo.MARCA,
+              modelo: vehiculo.MODELO,
+              anio: String(vehiculo.ANO),
+              color: vehiculo.COLOR,
+              proyecto: vehiculo.PROYECTO,
+              operacion: vehiculo.OPERACION,
+              id_operacion: vehiculo.ID_OPERACION,
+              kilometro: vehiculo.KILOMETRO,
+              cod_supervisor: vehiculo.ID_SUPERVISOR
+            } : undefined}
+            kilometroRealActual={ultimoKilometroReal}
+            onSeleccionarNeumatico={() => { }}
+            onUpdateAsignados={refreshAsignados}
+            onAbrirAsignacion={handleOpenModalConRefresh}
+          />
+        )
+      }
+
+
+
+
       {/* Modal para REUBICAR */}
       <ModalReubicar
         open={openMantenimientoModal && modoMantenimiento === 'REUBICAR'}

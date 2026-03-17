@@ -84,15 +84,26 @@ interface ModalInpeccionNeuProps {
   onSeleccionarNeumatico?: (neumatico: any) => void; // NUEVO
   onUpdateAsignados?: () => void; // NUEVO: callback para refrescar asignados
   onAbrirAsignacion?: () => void; // <-- AGREGADO para permitir la prop desde page.tsx
+  kilometroRealActual: number
 }
 
-const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, onClose, placa, neumaticosAsignados, vehiculo, onSeleccionarNeumatico, onUpdateAsignados, onAbrirAsignacion }) => {
+const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, onClose, placa, neumaticosAsignados, vehiculo, onSeleccionarNeumatico, onUpdateAsignados, onAbrirAsignacion, kilometroRealActual }) => {
   // Mostrar el array de neumáticos asignados cada vez que se abre el modal
-  React.useEffect(() => {
-    if (open) {
-      console.log('[DEBUG] neumaticosAsignados al abrir modal:', neumaticosAsignados);
-    }
-  }, [open, neumaticosAsignados]);
+
+  // React.useEffect(() => {
+  //   if (open) {
+  //     console.log('[DEBUG] neumaticosAsignados al abrir modal:', neumaticosAsignados);
+  //   }
+  // }, [open, neumaticosAsignados]);
+
+
+  console.log({ dwdw244wadw: vehiculo, dwadwdw: open })
+
+  console.log({ jhdawkjdgukwakfgujw: kilometroRealActual })
+
+
+
+
   const { user } = useContext(UserContext) || {};
   const [neumaticoSeleccionado, setNeumaticoSeleccionado] = useState<any | null>(null);
   const [formValues, setFormValues] = React.useState<FormValues>({
@@ -122,10 +133,12 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
   const [remanenteAsignacion, setRemanenteAsignacion] = useState<number | null>(null);
   const [remanenteUltimoMovimiento, setRemanenteUltimoMovimiento] = useState<number | null>(null);
   const [remanenteAsignacionReal, setRemanenteAsignacionReal] = useState<number | null>(null);
-  const initialOdometro = React.useMemo(() => {
-    const num = Number(formValues.kilometro);
-    return isNaN(num) ? 0 : num;
-  }, [formValues.kilometro]);
+  // const initialOdometro = React.useMemo(() => {
+  //   const num = Number(formValues.kilometro);
+  //   return isNaN(num) ? 0 : num;
+  // }, [formValues.kilometro]);
+
+  const initialOdometro = kilometroRealActual ?? 0
 
   // Estado local para inspecciones pendientes
   const [inspeccionesPendientes, setInspeccionesPendientes] = useState<any[]>([]);
@@ -338,21 +351,20 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
   }, [open, placa]);
 
   // 1. Agrega un estado fijo para el kilometraje mínimo permitido
-  const [minKilometro, setMinKilometro] = useState(0);
+  // const [minKilometro, setMinKilometro] = useState(0);
 
   // Cuando se selecciona un neumático, llenar el formulario con datos completos de neu_asignado
   const handleSeleccionarNeumatico = async (neumatico: any) => {
     // Buscar si ya existe inspección local para esta posición
     const inspeccionLocal = inspeccionesPendientes.find(i => i.posicion === (neumatico.POSICION || neumatico.POSICION_NEU));
 
-    console.log({ inspeccionLocal })
 
     if (inspeccionLocal) {
       // Si existe, cargar los datos guardados localmente
       setNeumaticoSeleccionado(neumatico);
       setFormValues({ ...inspeccionLocal });
       setOdometro(Number(inspeccionLocal.kilometro));
-      setMinKilometro(Number(inspeccionLocal.kilometro));
+      // setMinKilometro(Number(inspeccionLocal.kilometro));
       setRemanenteAsignacionReal(inspeccionLocal.remanente_referencia ?? null);
       setKmError(false);
       setRemanenteError(false);
@@ -434,8 +446,8 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
         odoInicial
       })
 
-      if (Odometro === 0) setOdometro(odoInicial);
-      setMinKilometro(odoInicial);
+      // if (Odometro === 0) setOdometro(odoInicial);
+      // setMinKilometro(odoInicial);
 
       setKmError(false);
       setRemanenteError(false);
@@ -470,7 +482,7 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
 
       const odoFallback = fallbackData.KILOMETRO ? Number(fallbackData.KILOMETRO) : fallbackData?.ODOMETRO_INICIAL ? Number(fallbackData.ODOMETRO_INICIAL) : (fallbackData?.ODOMETRO_AL_MONTAR ? Number(fallbackData.ODOMETRO_AL_MONTAR) : 0);
       setOdometro(odoFallback);
-      setMinKilometro(odoFallback);
+      // setMinKilometro(odoFallback);
     }
     // Cleaned up legacy logic (Handled inside try block)
     if (onSeleccionarNeumatico) onSeleccionarNeumatico(neuFull);
@@ -498,21 +510,20 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
   };
 
   // Inicializar el kilometro al abrir el modal si hay vehículo
-  React.useEffect(() => {
-    if (open && vehiculo?.kilometro !== undefined) {
-      setFormValues((prev) => ({ ...prev, kilometro: vehiculo.kilometro?.toString() ?? '' }));
-      setMinKilometro(vehiculo.kilometro);
-    }
-  }, [open, vehiculo?.kilometro]);
-
+  // React.useEffect(() => {
+  //   if (open && vehiculo?.kilometro !== undefined) {
+  //     setFormValues((prev) => ({ ...prev, kilometro: vehiculo.kilometro?.toString() ?? '' }));
+  //     // setMinKilometro(vehiculo.kilometro);
+  //   }
+  // }, [open, vehiculo?.kilometro]);
 
 
   // ERROR DE PORQUERIA
   // Sincronizar Odometro con el valor inicial al abrir modal o cambiar neumático
-  // React.useEffect(() => {
-  //   setOdometro(initialOdometro);
-  //   setKmError(false);
-  // }, [initialOdometro]);
+  React.useEffect(() => {
+    setOdometro(initialOdometro);
+    setKmError(false);
+  }, [initialOdometro]);
 
   // VALIDACIÓN DE REMANENTE EN TIEMPO REAL
   useEffect(() => {
@@ -730,8 +741,8 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
       return;
     }
 
-    if (Odometro <= minKilometro) {
-      toast.error(`El kilometro debe ser mayor al actual (${minKilometro.toLocaleString()} km).`)
+    if (Odometro <= initialOdometro) {
+      toast.error(`El kilometro debe ser mayor al actual (${initialOdometro.toLocaleString()} km).`)
       return;
     }
 
@@ -1007,6 +1018,9 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
               <Card sx={{ p: 2, boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)' }}>
                 <Box>
                   <Typography variant="h6" fontWeight="bold" gutterBottom>Datos del vehículo</Typography>
+
+                  {/* <h1>Kilometraje q me importa:{kilometroRealActual}</h1> */}
+
                   {vehiculo ? (
                     <Box component="form" sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 2, mb: 1 }}>
                       <Box>
@@ -1307,7 +1321,7 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
                 if (raw.includes('.') || raw.includes(',')) return;
                 const value = Number(raw);
                 setOdometro(value);
-                if (value > minKilometro && ((minKilometro + 25000) > value)) {
+                if (value > initialOdometro && ((initialOdometro + 25000) > value)) {
                   setKmError(false);
                 } else {
                   setKmError(true);
@@ -1318,7 +1332,7 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
               }}
               error={kmError}
               InputProps={{
-                inputProps: { min: minKilometro + 1, step: 1, max: minKilometro + 25000 },
+                inputProps: { min: initialOdometro + 1, step: 1, max: initialOdometro + 25000 },
                 sx: {
                   'input[type=number]::-webkit-outer-spin-button, input[type=number]::-webkit-inner-spin-button': {
                     WebkitAppearance: 'none',
@@ -1347,7 +1361,7 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
                   mr: 2
                 }}
               >
-                {`Kilometro actual: ${minKilometro.toLocaleString()} km`}
+                {`Kilometro actual: ${initialOdometro.toLocaleString()} km`}
               </Typography>
               {kmError && (
                 <Typography
@@ -1361,9 +1375,9 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
                     mr: 2
                   }}
                 >
-                  <span>{`El kilometraje debe ser mayor que ${minKilometro.toLocaleString()} km`}</span>
+                  <span>{`El kilometraje debe ser mayor que ${initialOdometro.toLocaleString()} km`}</span>
                   <br />
-                  <span>{`y menor que ${(minKilometro + 25000).toLocaleString()} km`}</span>
+                  <span>{`y menor que ${(initialOdometro + 25000).toLocaleString()} km`}</span>
                 </Typography>
               )}
             </div>
