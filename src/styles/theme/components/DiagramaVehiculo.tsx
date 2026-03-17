@@ -200,15 +200,6 @@ const DiagramaVehiculo: React.FC<DiagramaVehiculoProps & { onPosicionClick?: (ne
                     );
                 })}
             </Box>
-            {/* Modales integrados */}
-            {/* Modal de mantenimiento ahora manejado desde page.tsx con modales separados */}
-            <ModalInpeccionNeu
-                open={openInspeccion}
-                onClose={() => setOpenInspeccion(false)}
-                placa={placaModal}
-                neumaticosAsignados={neumaticosAsignadosModal}
-            // ...otros props necesarios...
-            />
         </>
     );
 });
