@@ -15,7 +15,6 @@ import { useQuery } from '@tanstack/react-query';
 import { useUser } from '@/hooks/use-user';
 import { Wrench } from '@phosphor-icons/react/dist/ssr/Wrench';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import DiagramaVehiculo from '@/styles/theme/components/DiagramaVehiculo';
 import Menu from '@mui/material/Menu';
@@ -43,6 +42,14 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
 import { LoadingButton } from '@/components/ui/loading-button';
+import { ArchiveIcon, ArrowLeftIcon, ArrowLeftRightIcon, BookMarked, CalendarPlusIcon, ClockIcon, Eye, EyeClosed, EyeIcon, ListFilterIcon, MailCheckIcon, MoreHorizontalIcon, Replace, TagIcon, Trash2Icon } from 'lucide-react';
+import { ModalVerInspecciones } from '@/components/dashboard/integrations/modal-ver-inspecciones';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { ButtonGroup } from '@/components/ui/button-group';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuSeparator, DropdownMenuShortcut, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Button as ButtonCustom } from '@/components/ui/button';
+import { Button } from '@mui/material';
+import { LoadingButton2 } from '@/components/ui/loading-button2';
 
 
 export default function Page(): React.JSX.Element {
@@ -75,7 +82,6 @@ export default function Page(): React.JSX.Element {
   const [asignacionesTemporales, setAsignacionesTemporales] = React.useState<any[]>([]); // Asignaciones temporales desde modal asignación
   const [openMantenimientoModal, setOpenMantenimientoModal] = React.useState(false);
   const [modoMantenimiento, setModoMantenimiento] = React.useState<'REUBICAR' | 'DESASIGNAR' | null>(null);
-  const [anchorMenuMantenimiento, setAnchorMenuMantenimiento] = React.useState<null | HTMLElement>(null);
   // const [loading, setLoading] = React.useState(false);
   const [autosDisponiblesCount, setAutosDisponiblesCount] = useState<number>(0);
 
@@ -640,13 +646,6 @@ export default function Page(): React.JSX.Element {
     }, 0);
   };
 
-  // Handler para abrir el menú al hacer click en la imagen
-  const handleMenuMantenimientoClick = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorMenuMantenimiento(event.currentTarget);
-  };
-  const handleMenuMantenimientoClose = () => {
-    setAnchorMenuMantenimiento(null);
-  };
 
   const [mensajeBloqueo, setMensajeBloqueo] = useState<string | undefined>(undefined);
   // Acciones de cada opción
@@ -660,11 +659,11 @@ export default function Page(): React.JSX.Element {
   const [openModalInspeccionAntigua, setOpenModalInspeccionAntigua] = useState(false);
 
   const [openModalInspeccionAnterior, setOpenModalInspeccionAnterior] = useState(false);
+  const [openVerInspecciones, setOpenVerInspecciones] = useState(false);
 
   // todo: ABRIR MODAL ANTES DE REUBICAR
   // Función para REUBICAR - Ejecuta TODAS las validaciones ANTES de abrir modal
   const handleAbrirMantenimientoReubicar = async () => {
-    setAnchorMenuMantenimiento(null);
 
     // Quitar foco manualmente para evitar problemas de accesibilidad
     if (document && document.activeElement) {
@@ -750,7 +749,6 @@ export default function Page(): React.JSX.Element {
 
   // Función para DESASIGNAR - Ejecuta TODAS las validaciones ANTES de abrir modal
   const handleAbrirMantenimientoDesasignar = async () => {
-    setAnchorMenuMantenimiento(null);
 
     const asignadosValidos = neumaticosAsignados.filter(
       n => n.TIPO_MOVIMIENTO !== 'BAJA DEFINITIVA'
@@ -810,12 +808,12 @@ export default function Page(): React.JSX.Element {
           maxHeight: '700px',
           overflow: 'auto'
         }}>
-          <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={2}>
-          </Stack>
+          {/* <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={2}>
+          </Stack> */}
 
           <Stack direction="row" alignItems="center" spacing={1.5} sx={{ flexWrap: 'nowrap' }}>
             {vehiculo && (
-              <>
+              <div className='flex gap-2 flex-wrap items-center'>
                 {/* Kilometraje */}
                 <Box
                   sx={{
@@ -835,81 +833,71 @@ export default function Page(): React.JSX.Element {
                   {`${animatedKilometraje.toLocaleString()} km`}
                 </Box>
                 {/* Opciones */}
-                {/* Botón Asignar Neumático */}
-                <LoadingButton
-                  variant="contained"
-                  color='success'
-                  startIcon={<Plus size={20} />}
+                <LoadingButton2
+                  variant="teal"
                   onClick={handleOpenModalConRefresh}
-                  sx={{
-                    color: '#fff',
-                    textTransform: 'none',
-                    padding: '10px 16px',
-                    fontWeight: 500,
-                    boxShadow: '0px 1px 3px rgba(0, 0, 0, 0.1)',
-                    transition: 'all 0.2s ease-in-out',
-                    minWidth: 'auto',
-                  }}
+                  icon={<ClipboardText />}
                 >
                   Asignar Neumático
-                </LoadingButton>
-                {/* Botón Inspección */}
-                <LoadingButton
-                  variant="contained"
-                  color='info'
-                  startIcon={<ClipboardText size={20} />}
-                  onClick={async () => {
-                    await refreshAsignados();
-                    setOpenInspeccionModal(true);
-                  }}
-                  disabled={neumaticosAsignadosUnicos.length === 0} // Solo habilitado si hay neumáticos
-                  sx={{
-                    color: '#fff',
-                    textTransform: 'none',
-                    padding: '10px 16px',
-                    fontWeight: 500,
-                    boxShadow: '0px 1px 3px rgba(0, 0, 0, 0.1)',
-                    transition: 'all 0.2s ease-in-out',
-                    minWidth: 'auto',
-                  }}
-                >
-                  Inspección
-                </LoadingButton>
+                </LoadingButton2>
 
-
-                {/* Botón Mantenimiento */}
-                <Button
-                  variant="contained"
-                  color='primary'
-                  startIcon={<Wrench size={20} />}
-                  onClick={handleMenuMantenimientoClick}
-                  disabled={neumaticosAsignadosUnicos.length === 0} // Solo habilitado si hay neumáticos
-                  sx={{
-                    color: '#fff',
-                    textTransform: 'none',
-                    padding: '10px 16px',
-                    fontWeight: 500,
-                    boxShadow: '0px 1px 3px rgba(0, 0, 0, 0.1)',
-                    transition: 'all 0.2s ease-in-out',
-                    minWidth: 'auto',
-                  }}
-                >
-                  Mantenimiento
-                </Button>
-              </>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <ButtonCustom variant="life"
+                    >
+                      <ClipboardText />
+                      Inspección
+                    </ButtonCustom>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-40" align="start">
+                    <DropdownMenuGroup>
+                      <DropdownMenuItem
+                        onClick={async () => {
+                          await refreshAsignados();
+                          setOpenInspeccionModal(true);
+                        }}
+                      >
+                        <BookMarked />
+                        Registrar
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => setOpenVerInspecciones(true)}
+                      >
+                        <EyeIcon />
+                        Historial
+                      </DropdownMenuItem>
+                    </DropdownMenuGroup>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <ButtonCustom variant="warning"
+                    >
+                      <ClipboardText />
+                      Mantenimiento
+                    </ButtonCustom>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-40" align="start">
+                    <DropdownMenuGroup>
+                      <DropdownMenuItem
+                        onClick={handleAbrirMantenimientoReubicar}
+                      >
+                        <ArrowLeftRightIcon />
+                        Reubicar
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={handleAbrirMantenimientoDesasignar}
+                      >
+                        <Replace />
+                        Desasignar
+                      </DropdownMenuItem>
+                    </DropdownMenuGroup>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             )}
           </Stack>
-          {/* Menú desplegable para mantenimiento */}
-          <Menu
-            anchorEl={anchorMenuMantenimiento}
-            open={Boolean(anchorMenuMantenimiento)}
-            onClose={handleMenuMantenimientoClose}
-          >
-            {/* TODO: Mantenimientoga */}
-            <MenuItem onClick={handleAbrirMantenimientoReubicar}>Reubicar</MenuItem>
-            <MenuItem onClick={handleAbrirMantenimientoDesasignar}>Desasignar</MenuItem>
-          </Menu>
-          <Box sx={{ mt: 6 }}>
+          <Box sx={{ mt: 2 }}>
             <TableContainer component={Paper}>
               <Table>
                 <TableHead>
@@ -942,6 +930,30 @@ export default function Page(): React.JSX.Element {
             </TableContainer>
           </Box>
 
+          {/* Button para ver inspecciones */}
+          {/* {
+            vehiculo && (
+              <div className='flex justify-end'>
+                <LoadingButton
+                  variant="contained"
+                  color='info'
+                  onClick={() => setOpenVerInspecciones(true)}
+                  sx={{
+                    color: '#fff',
+                    textTransform: 'none',
+                    padding: '10px 16px',
+                    fontWeight: 500,
+                    boxShadow: '0px 1px 3px rgba(0, 0, 0, 0.1)',
+                    transition: 'all 0.2s ease-in-out',
+                    minWidth: 'auto',
+                    marginTop: '10px'
+                  }}
+                >
+                  <Eye size={20} />
+                </LoadingButton>
+              </div>
+            )
+          } */}
 
           <Box sx={{ mt: 4, textAlign: 'left', position: 'relative', width: '262px', height: '365px' }}>
             <DiagramaVehiculo
@@ -958,10 +970,10 @@ export default function Page(): React.JSX.Element {
             />
           </Box>
 
-
         </Card>
 
-        {/* <ScrollArea className="rounded-md border "> */}
+
+
         <Card sx={{
           flex: 1.3,
           p: 2,
@@ -1002,9 +1014,6 @@ export default function Page(): React.JSX.Element {
           <DataTableNeumaticos columns={columnsNeuDisponible} data={neumaticosDisponiblesUseQuery} type='pagination' />
 
         </Card>
-        {/* </ScrollArea> */}
-
-
 
       </Stack>
       <ModalAdvertenciaReubicacion
@@ -1200,6 +1209,17 @@ export default function Page(): React.JSX.Element {
       }
 
 
+      {/* Nuevo modal para ver inspecciones */}
+
+      {
+        openVerInspecciones && (
+          <ModalVerInspecciones
+            open={openVerInspecciones}
+            onClose={() => setOpenVerInspecciones(false)}
+            placa={vehiculo?.PLACA ?? ''}
+          />
+        )
+      }
 
 
       {/* Modal para REUBICAR */}

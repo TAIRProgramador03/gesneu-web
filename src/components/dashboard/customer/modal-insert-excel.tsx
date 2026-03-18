@@ -5,6 +5,9 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
 import { cargarPadronNeumatico } from '@/api/Neumaticos';
+import { Button as ButtonCustom } from '@/components/ui/button';
+import { LoadingButton2 } from '@/components/ui/loading-button2';
+import { CircleAlert } from 'lucide-react';
 
 interface ModalInsertExcelProps {
   open: boolean;
@@ -225,50 +228,23 @@ const ModalInsertExcel: React.FC<ModalInsertExcelProps> = ({ open, onClose, onSu
               </FileNameBox>
             )}
             <InfoBar>
-              <svg width="22" height="22" fill="#f7f7f7" viewBox="0 0 24 24" style={{ marginRight: 4 }}>
-                <circle cx="12" cy="12" r="10" stroke="#f7f7f7" strokeWidth="2" fill="none" />
-                <line x1="12" y1="8" x2="12" y2="12" stroke="#f7f7f7" strokeWidth="2" />
-                <circle cx="12" cy="16" r="1" fill="#f7f7f7" />
-              </svg>
+              <CircleAlert />
               Esta acción puede demorar unos minutos.
             </InfoBar>
             <Actions>
-              <Button
-                color="info"
-                variant="contained"
-                startIcon={isLoading ? <CircularProgress size={18} color="inherit" /> : undefined}
+              <LoadingButton2
+                variant={'teal'}
                 onClick={handleImport}
                 disabled={!selectedFile || isLoading}
               >
                 Importar
-              </Button>
-              <Button
-                color="error"
-                variant="outlined"
+              </LoadingButton2>
+              <ButtonCustom
                 onClick={onClose}
                 disabled={isLoading}
               >
                 Cancelar
-              </Button>
-
-              {/* 
-              <ImportButton
-                color='success'
-                variant="contained"
-                onClick={handleImport}
-                disabled={!selectedFile || loading}
-                startIcon={loading ? <CircularProgress size={18} color="inherit" /> : undefined}
-              >
-                Importar
-              </ImportButton>
-              <CancelButton
-                variant="outlined"
-                onClick={onClose}
-                disabled={loading}
-              >
-                Cancelar
-              </CancelButton>
-               */}
+              </ButtonCustom>
             </Actions>
           </>
         ) : (
@@ -322,13 +298,11 @@ const ModalInsertExcel: React.FC<ModalInsertExcelProps> = ({ open, onClose, onSu
               </>
             )}
             <Actions>
-              <Button
-                color='info'
-                variant="contained"
+              <ButtonCustom
                 onClick={handleCloseResumen}
               >
                 Salir
-              </Button>
+              </ButtonCustom>
             </Actions>
           </>
         )}

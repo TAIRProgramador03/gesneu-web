@@ -4,13 +4,15 @@ import React from "react"
 import { EsRecuperadoBadge } from "@/components/ui/EsRecuperadoBadge"
 import { ColumnDef } from "@tanstack/react-table"
 import { LinearProgressItem } from "@/components/ui/LinearProgress"
-import { convertToDateHuman } from "@/lib/utils"
+import { convertDateAndHour, convertToDateHuman } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { ArrowUpDown } from "lucide-react"
+import { ArrowBigRightDash, ArrowUpDown, Info, InfoIcon } from "lucide-react"
 import { DraggableNeumatico } from "@/components/dashboard/integrations/modal-asignacion-neu"
 import type { Neumatico } from "@/types/types"
 import { TipoMovimientoBadge } from "@/components/ui/TipoMovimientoBadge"
-import { NeuAsignadoTable, NeuAsignarTable, NeuDisponibleTable, NeuTemporalTable } from "@/types/neumatico"
+import { NeuAsignadoTable, NeuAsignarTable, NeuDisponibleTable, NeuInspeccionTable, NeuTemporalTable } from "@/types/neumatico"
+import { InspeccionTable } from "@/types/inspecciones"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 
 
 export const columnsNeuDisponible: ColumnDef<NeuDisponibleTable>[] = [
@@ -259,5 +261,118 @@ export const columnsNeuTemporales: ColumnDef<NeuTemporalTable>[] = [
       )
     },
     cell: ({ row }) => <TipoMovimientoBadge tipoMovimiento={row.original.TIPO_MOVIMIENTO ?? 'VACIO'} />
+  },
+]
+
+
+export const columnsInspecciones = (
+  onViewMore: (row: InspeccionTable) => void
+)
+  : ColumnDef<InspeccionTable>[] => [
+    {
+      accessorKey: "FECHA_INSPECCION",
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Fecha de inspección
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        )
+      },
+      cell: ({ row }) => convertToDateHuman(row.original.FECHA_INSPECCION ?? '-')
+    },
+    {
+      accessorKey: "KILOMETRAJE",
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Kilometraje (km)
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        )
+      },
+    },
+    {
+      accessorKey: "FECHA_TIEMPO",
+      header: 'Fecha Registro',
+      cell: ({ row }) => convertDateAndHour(row.original.FECHA_TIEMPO)
+    },
+    {
+      id: "actions",
+      cell: ({ row }) => {
+        return (
+          <span
+            className="cursor-pointer text-cyan-500"
+          >
+            <ArrowBigRightDash radius={20}
+              onClick={() => onViewMore(row.original)}
+            />
+          </span>
+        )
+      },
+    },
+  ]
+
+
+
+export const columnsNeuInspeccion: ColumnDef<NeuInspeccionTable>[] = [
+  {
+    accessorKey: "CODIGO",
+    header: "Código",
+  },
+  {
+    accessorKey: "POSICION",
+    header: "Posición",
+  },
+  {
+    accessorKey: "REMANENTE",
+    header: "Remanente",
+  },
+  {
+    accessorKey: "KM_RECORRIDO",
+    header: "Km x etapa",
+  },
+  {
+    accessorKey: "OBS",
+    header: "Observación",
+    cell: ({ row }) => {
+      const obs = row.original.OBS
+      let newObs = ''
+
+      if (obs.length === 0) newObs = '-'
+      else if (obs.length >= 8) {
+        newObs = obs.slice(0, 8) + '...'
+      } else {
+        newObs = obs
+      }
+
+      return (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <span className="text-xs">
+              {newObs}
+            </span>
+          </TooltipTrigger>
+          {
+            obs.length >= 8 ? (
+              <TooltipContent>
+                <p>{obs}</p>
+              </TooltipContent>
+            ) : null
+          }
+        </Tooltip>
+      )
+    }
+  },
+  {
+    accessorKey: "PORCENTAJE_VIDA",
+    header: "Estado (%)",
+    cell: ({ row }) => <LinearProgressItem estado={row.original.PORCENTAJE_VIDA ?? 0} />
   },
 ]

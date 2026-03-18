@@ -3,6 +3,7 @@ import { Dialog, DialogContent, TextField, Button, Stack, DialogTitle, Typograph
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 import { convertToDateHuman } from '@/lib/utils';
+import { Button as ButtonCustom } from '@/components/ui/button';
 
 interface ModalInputsNeuProps {
     open: boolean;
@@ -332,9 +333,12 @@ const ModalInputsNeu: React.FC<ModalInputsNeuProps> = ({ open, onClose, onSubmit
                             }
                         </div>
                     </Stack>
-                    <Button onClick={handleSubmit} variant="contained" color="primary" fullWidth>
+                    <ButtonCustom
+                        onClick={handleSubmit}
+                        variant={'primary'}
+                    >
                         Guardar
-                    </Button>
+                    </ButtonCustom>
                 </Stack>
             </DialogContent>
         </Dialog>

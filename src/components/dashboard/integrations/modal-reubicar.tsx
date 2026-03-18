@@ -13,6 +13,8 @@ import { toast } from 'sonner';
 import Image from 'next/image';
 import { convertToDateHuman } from '@/lib/utils';
 import { LoadingButton } from '@/components/ui/loading-button';
+import { Button as ButtonCustom } from '@/components/ui/button';
+import { LoadingButton2 } from '@/components/ui/loading-button2';
 
 interface ModalReubicarProps {
   open: boolean;
@@ -745,19 +747,20 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = memo(({
                   </Box>
                 </Box>
 
-                <Box sx={{ mt: 2 }}>
-                  <Button onClick={handleClose} color="primary" variant="contained">
+                <div className='flex gap-2 mt-4'>
+                  <ButtonCustom
+                    onClick={handleClose}
+                  >
                     Cerrar
-                  </Button>
-                  <LoadingButton
-                    color="success"
-                    variant="contained"
-                    sx={{ ml: 1 }}
+                  </ButtonCustom>
+                  <LoadingButton2
+                    variant="primary"
                     onClick={handleGuardarReubicacion}
                   >
                     Guardar Reubicación
-                  </LoadingButton>
-                </Box>
+                  </LoadingButton2>
+                </div>
+
               </Card>
             </Stack>
 

@@ -21,7 +21,7 @@ export const CustomersFilters = memo(({ projectCount, disponiblesCount, asignado
 
   return (
     <Card sx={{ p: 2 }}>
-      <Grid container spacing={2} justifyContent="center" alignItems="center" wrap="nowrap" sx={{ flexWrap: { xs: 'wrap', sm: 'nowrap' } }}>
+      <Grid container spacing={2} justifyContent="center" alignItems="center" wrap="wrap" sx={{ flexWrap: { xs: 'wrap', sm: 'nowrap' } }}>
         <Grid item xs={12} sm={2} md={2} lg={2}>
           <Box
             sx={{

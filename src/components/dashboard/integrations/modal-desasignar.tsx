@@ -15,11 +15,13 @@ import {
   getUltimaFechaInspeccionPorPlaca,
   desasignarConReemplazo
 } from '../../../api/Neumaticos';
-import { CheckCircle, TriangleAlertIcon } from 'lucide-react';
+import { CheckCircle, RotateCcw, TriangleAlertIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import Image from 'next/image';
 import { convertToDateHuman } from '@/lib/utils';
 import { LoadingButton } from '@/components/ui/loading-button';
+import { Button as ButtonCustom } from '@/components/ui/button';
+import { LoadingButton2 } from '@/components/ui/loading-button2';
 
 interface ModalDesasignarProps {
   open: boolean;
@@ -729,6 +731,14 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
 
               {/* Card para DESASIGNAR */}
               <Card sx={{ p: 2, boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)' }}>
+                <ButtonCustom
+                  variant={'warning'}
+                  onClick={handleLimpiar}
+                  disabled={neumaticosSeleccionados.length === 0 && asignacionesTemporales.length === 0 && !accion && !observacion}
+                  size="icon"
+                >
+                  <RotateCcw />
+                </ButtonCustom>
                 <Box sx={{ display: 'flex', alignItems: 'flex-end', mb: 1, gap: 2 }}>
                   <Typography variant="h6" sx={{ mt: 1, mb: 0 }}>DESASIGNAR</Typography>
                   <Box sx={{ flex: 1 }} />
@@ -840,79 +850,77 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
                   </Box>
                 </Box>
 
-                <Box sx={{ mt: 2 }}>
-                  <Button onClick={onClose} color="error" variant="outlined">
+                <Box sx={{ mt: 2, display: 'flex', gap: '6px' }} >
+                  <ButtonCustom
+                    onClick={onClose}
+                  >
                     Cerrar
-                  </Button>
-                  <Button
-                    color="inherit"
-                    variant="contained"
-                    sx={{ ml: 1 }}
-                    onClick={handleLimpiar}
-                    disabled={neumaticosSeleccionados.length === 0 && asignacionesTemporales.length === 0 && !accion && !observacion}
-                  >
-                    Restaurar
-                  </Button>
-                  <LoadingButton
-                    color="success"
-                    variant="contained"
-                    sx={{ ml: 1 }}
-                    onClick={handleGuardarDesasignacion}
-                    disabled={neumaticosSeleccionados.length === 0 || !accion || !todasPosicionesVaciasAsignadas}
-                  >
-                    Guardar Desasignación y Asignación
-                  </LoadingButton>
+                  </ButtonCustom>
+
+                  {
+                    neumaticosSeleccionados.length !== 0 && accion && todasPosicionesVaciasAsignadas && (
+                      <LoadingButton2
+                        variant={'primary'}
+                        onClick={handleGuardarDesasignacion}
+                        disabled={neumaticosSeleccionados.length === 0 || !accion || !todasPosicionesVaciasAsignadas}
+                      >
+                        Registrar Desasignación y Asignación
+                      </LoadingButton2>
+                    )
+                  }
+
                   {onAbrirAsignacion && (() => {
                     const tienePosicionesVacias = posicionesVaciasActuales.length > 0;
                     const tieneAccionYObservacion = accion.trim() !== '' && observacion.trim() !== '';
 
                     return (
                       <>
-                        {/* Mensaje informativo si hay posiciones vacías */}
-
-
                         {/* Botón Asignar Neumáticos */}
-                        <Button
-                          color="success"
-                          variant="contained"
-                          sx={{ ml: 1 }}
-                          disabled={!tienePosicionesVacias || !tieneAccionYObservacion}
-                          onClick={() => {
-                            // Agrupar por posición y quedarse con el más reciente (mayor ID_MOVIMIENTO)
-                            const neumaticosNoDesasignados = neumaticosAsignadosState.filter(n => !n.enAreaDesasignacion);
 
-                            const neumaticosPorPosicion = new Map<string, typeof neumaticosNoDesasignados[0]>();
-                            neumaticosNoDesasignados.forEach(n => {
-                              const pos = (n.POSICION_NEU || n.POSICION);
-                              if (pos) {
-                                const existente = neumaticosPorPosicion.get(pos);
-                                if (!existente || (n.ID_MOVIMIENTO || 0) > (existente.ID_MOVIMIENTO || 0)) {
-                                  neumaticosPorPosicion.set(pos, n);
-                                }
-                              }
-                            });
+                        {
+                          tienePosicionesVacias && tieneAccionYObservacion &&
+                          (
+                            <ButtonCustom
+                              variant={'teal'}
+                              disabled={!tienePosicionesVacias || !tieneAccionYObservacion}
+                              onClick={() => {
+                                // Agrupar por posición y quedarse con el más reciente (mayor ID_MOVIMIENTO)
+                                const neumaticosNoDesasignados = neumaticosAsignadosState.filter(n => !n.enAreaDesasignacion);
 
-                            const neumaticosActuales = Array.from(neumaticosPorPosicion.values()).map(n => {
-                              const pos = n.POSICION_NEU || n.POSICION;
-                              return {
-                                ...n,
-                                POSICION: pos,
-                                POSICION_NEU: pos
-                              };
-                            });
-                            console.log('[Button Asignar] Posiciones vacías:', posicionesVaciasActuales);
-                            console.log('[Button Asignar] Neumáticos actuales:', neumaticosActuales.map(n => ({
-                              codigo: n.CODIGO_NEU || n.CODIGO,
-                              posicion: n.POSICION || n.POSICION_NEU
-                            })));
-                            onAbrirAsignacion({
-                              cachedNeumaticosAsignados: neumaticosActuales,
-                              posicionesVacias: posicionesVaciasActuales
-                            });
-                          }}
-                        >
-                          Asignar Neumáticos
-                        </Button>
+                                const neumaticosPorPosicion = new Map<string, typeof neumaticosNoDesasignados[0]>();
+                                neumaticosNoDesasignados.forEach(n => {
+                                  const pos = (n.POSICION_NEU || n.POSICION);
+                                  if (pos) {
+                                    const existente = neumaticosPorPosicion.get(pos);
+                                    if (!existente || (n.ID_MOVIMIENTO || 0) > (existente.ID_MOVIMIENTO || 0)) {
+                                      neumaticosPorPosicion.set(pos, n);
+                                    }
+                                  }
+                                });
+
+                                const neumaticosActuales = Array.from(neumaticosPorPosicion.values()).map(n => {
+                                  const pos = n.POSICION_NEU || n.POSICION;
+                                  return {
+                                    ...n,
+                                    POSICION: pos,
+                                    POSICION_NEU: pos
+                                  };
+                                });
+                                console.log('[Button Asignar] Posiciones vacías:', posicionesVaciasActuales);
+                                console.log('[Button Asignar] Neumáticos actuales:', neumaticosActuales.map(n => ({
+                                  codigo: n.CODIGO_NEU || n.CODIGO,
+                                  posicion: n.POSICION || n.POSICION_NEU
+                                })));
+                                onAbrirAsignacion({
+                                  cachedNeumaticosAsignados: neumaticosActuales,
+                                  posicionesVacias: posicionesVaciasActuales
+                                });
+                              }}
+                            >
+                              Asignar Neumáticos
+                            </ButtonCustom>
+                          )
+                        }
                       </>
                     );
                   })()}
@@ -941,14 +949,14 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
                   objectFit: 'contain',
                   position: 'absolute',
                   top: '10px',
-                  right: '55px',
+                  right: '75px',
                   zIndex: 2,
                   pointerEvents: 'none'
                 }}
                 />
                 {/* Texto de placa */}
                 <Box sx={{
-                  position: 'absolute', top: '28px', right: '65px', zIndex: 3,
+                  position: 'absolute', top: '28px', right: '84px', zIndex: 3,
                   color: 'black', padding: '2px 8px', borderRadius: '5px',
                   fontFamily: 'Arial, sans-serif', fontWeight: 'bold',
                   fontSize: '24px', textAlign: 'center',

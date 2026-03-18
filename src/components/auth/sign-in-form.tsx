@@ -80,13 +80,13 @@ export function SignInForm(): React.JSX.Element {
   return (
     <Stack spacing={4}>
       <Stack spacing={1}>
-        <Typography variant="h4">Inicio Sesion</Typography>
-        <Typography color="text.secondary" variant="body2">
+        <Typography variant="h4">Inicio Sesión</Typography>
+        {/* <Typography color="text.secondary" variant="body2">
           No tienes una cuenta?{' '}
           <Link component={RouterLink} href={paths.auth.signUp} underline="hover" variant="subtitle2">
             Unete
           </Link>
-        </Typography>
+        </Typography> */}
       </Stack>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Stack spacing={2}>
@@ -134,11 +134,11 @@ export function SignInForm(): React.JSX.Element {
               </FormControl>
             )}
           />
-          <div>
+          {/* <div>
             <Link component={RouterLink} href={paths.auth.resetPassword} variant="subtitle2">
               Olvido su contraseña?
             </Link>
-          </div>
+          </div> */}
           {errors.root && (
             <Alert severity="error" sx={{ mb: 2 }}>
               {errors.root.message}

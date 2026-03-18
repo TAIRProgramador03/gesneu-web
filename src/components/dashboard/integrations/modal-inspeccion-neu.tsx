@@ -19,6 +19,8 @@ import Image from 'next/image';
 import { convertToDateHuman } from '@/lib/utils';
 import { CheckCircle } from 'lucide-react';
 import { LoadingButton } from '@/components/ui/loading-button';
+import { Button as ButtonCustom } from '@/components/ui/button';
+import { LoadingButton2 } from '@/components/ui/loading-button2';
 
 // --- Declaraciones de tipos fuera del componente ---
 interface FormValues {
@@ -1383,20 +1385,36 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
             </div>
 
             <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 1 }}>
-              <Button color="info" variant="outlined" onClick={handleGuardarInspeccionLocal} disabled={
-                !hayCambiosFormulario || bloquearFormulario || kmError || !camposRequeridosLlenos || inspeccionesPendientes.length >= 5
-              }>
+
+              {/* <Button
+                color="info"
+                variant="outlined"
+                onClick={handleGuardarInspeccionLocal}
+                disabled={
+                  !hayCambiosFormulario || bloquearFormulario || kmError || !camposRequeridosLlenos || inspeccionesPendientes.length >= 5
+                }
+              >
                 Siguiente posición
-              </Button>
-              <LoadingButton
-                color="success"
-                variant="contained"
-                sx={{ ml: 1 }}
+              </Button> */}
+
+
+              <ButtonCustom
+                variant={'teal'}
+                onClick={handleGuardarInspeccionLocal}
+                disabled={
+                  !hayCambiosFormulario || bloquearFormulario || kmError || !camposRequeridosLlenos || inspeccionesPendientes.length >= 5
+                }
+              >
+                Siguiente posición
+              </ButtonCustom>
+
+              <LoadingButton2
+                variant="primary"
                 onClick={handleEnviarYGuardar}
                 disabled={inspeccionesPendientes.length !== 5 || bloquearFormulario || kmError}
               >
-                Enviar y Guardar
-              </LoadingButton>
+                Registrar Inspección
+              </LoadingButton2>
             </Box>
           </Box>
         </DialogActions>

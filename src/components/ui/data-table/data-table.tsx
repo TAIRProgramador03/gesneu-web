@@ -25,6 +25,7 @@ import { Input } from "@/components/ui/input"
 import ButtonMateria from '@mui/material/Button';
 import { Upload as UploadIcon } from '@phosphor-icons/react/dist/ssr/Upload';
 import { exportToExcel } from "@/utils/export-to-excel"
+import { LoadingButton2 } from "../loading-button2"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -128,14 +129,12 @@ export function DataTableNeumaticos<TData, TValue>({
             {
               withExport && (
                 <div className="">
-                  <ButtonMateria
-                    color="secondary"
-                    variant="contained"
-                    startIcon={<UploadIcon />}
+                  <LoadingButton2
                     onClick={handleExportExcel}
+                    icon={<UploadIcon />}
                   >
                     Exportar
-                  </ButtonMateria>
+                  </LoadingButton2>
                 </div>
               )
             }

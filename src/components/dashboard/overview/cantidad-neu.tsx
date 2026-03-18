@@ -29,7 +29,7 @@ export function Budget({ diff, trend, sx, value }: BudgetProps): React.JSX.Eleme
               </Typography>
             </Stack>
             <Stack sx={{ width: 115, objectFit: 'cover' }}>
-              <Image src="/assets/cantidad.png" alt="Neumático" width={115} height={115} style={{ width: 115, height: 115, position: 'absolute', zIndex: 1, opacity: 1 }} />
+              <Image src="/assets/cantidad.png" alt="Neumático" width={115} height={115} style={{ width: 115, height: 115, zIndex: 1, opacity: 1 }} />
             </Stack>
           </Stack>
         </Stack>

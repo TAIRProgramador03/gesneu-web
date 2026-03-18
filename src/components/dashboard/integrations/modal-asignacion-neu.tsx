@@ -24,6 +24,8 @@ import { DataTableNeumaticos } from '@/components/ui/data-table/data-table';
 import { columnsNeuParaAsignar, columnsNeuTemporales } from '@/app/dashboard/integrations/columns';
 import { NeuTemporalTable } from '@/types/neumatico';
 import { LoadingButton } from '@/components/ui/loading-button';
+import { LoadingButton2 } from '@/components/ui/loading-button2';
+import { CloudCheck } from 'lucide-react';
 
 const ItemType = {
     NEUMATICO: 'neumatico',
@@ -53,19 +55,6 @@ export const DraggableNeumatico: React.FC<{
         [neumatico, disabled]
     );
 
-    React.useEffect(() => {
-        const img = new window.Image();
-        img.src = '/assets/neumatico-new.png';
-        img.onload = () => {
-            const canvas = document.createElement('canvas');
-            canvas.width = 20;
-            canvas.height = 50;
-            const ctx = canvas.getContext('2d');
-            if (ctx) ctx.drawImage(img, 0, 0, 20, 50);
-            dragPreview(canvas);
-        };
-    }, [dragPreview]);
-
     const ref = React.useRef<HTMLDivElement>(null);
     drag(ref);
 
@@ -75,8 +64,10 @@ export const DraggableNeumatico: React.FC<{
             style={{
                 cursor: disabled ? 'not-allowed' : 'grab',
                 opacity: disabled ? 0.5 : 1,
-                margin: '0px',
-                backgroundColor: 'transparent'
+                margin: '0 auto',
+                backgroundColor: 'transparent',
+                width: '25px',
+                height: '56px'
             }}
         >
             <Image
@@ -85,9 +76,6 @@ export const DraggableNeumatico: React.FC<{
                 width={25}
                 height={50}
                 style={{
-                    // width: '30px',
-                    // height: '60px',
-                    // display: 'block',
                     margin: '0px auto',
                     objectFit: 'contain',
                 }}
@@ -845,23 +833,14 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
                                             Neu. Disponibles: {filteredData.length}
                                         </Typography>
                                     </Box>
-                                    {/* <Button
-                                        variant="contained"
-                                        color="primary"
+                                    <LoadingButton2
+                                        variant="primary"
+                                        icon={<CloudCheck />}
                                         disabled={!hasAssignedNeumaticos || !allPositionsAssigned || kmError || Odometro === '' || isNaN(Number(Odometro))}
                                         onClick={handleConfirm}
                                     >
                                         Confirmar Asignación
-                                    </Button> */}
-
-                                    <LoadingButton
-                                        variant="contained"
-                                        color="primary"
-                                        disabled={!hasAssignedNeumaticos || !allPositionsAssigned || kmError || Odometro === '' || isNaN(Number(Odometro))}
-                                        onClick={handleConfirm}
-                                    >
-                                        Confirmar Asignación
-                                    </LoadingButton>
+                                    </LoadingButton2>
                                 </Box>
                                 <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
                                     <DataTableNeumaticos columns={columnsNeuParaAsignar} data={filteredData} type='pagination' filters={true} />

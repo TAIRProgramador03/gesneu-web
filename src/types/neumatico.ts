@@ -38,3 +38,14 @@ export interface NeuTemporalTable {
   FECHA_ASIGNACION: string
   TIPO_MOVIMIENTO: string
 }
+
+export interface NeuInspeccionTable {
+  ID_NEUMATICO: string,
+  CODIGO: string
+  PLACA: string
+  POSICION: string
+  REMANENTE: number
+  KM_RECORRIDO: number
+  OBS: string
+  PORCENTAJE_VIDA: number
+}

@@ -10,6 +10,7 @@ import WarningIcon from '@mui/icons-material/Warning';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { convertToDateHuman } from '@/lib/utils';
+import { Button as ButtonCustom } from '@/components/ui/button';
 
 interface ModalInspeccionAverProps {
     open: boolean;
@@ -105,83 +106,31 @@ const ModalInspeccionAver: React.FC<ModalInspeccionAverProps> = ({
 
             {advertenciaCantidadNeumaticos !== undefined ? (
                 <DialogActions sx={{ p: 3, backgroundColor: '#fff3cd', justifyContent: 'flex-end', gap: 2 }}>
-                    <Button
+                    <ButtonCustom
                         onClick={onClose}
-                        variant="outlined"
-                        size="large"
-                        sx={{
-                            fontWeight: 'bold',
-                            color: '#1976d2',
-                            borderColor: '#1976d2',
-                            borderRadius: 1.5,
-                            px: 3,
-                            py: 1.2,
-                            fontSize: 16,
-                            textTransform: 'none',
-                            transition: 'all 0.2s',
-                            '&:hover': {
-                                backgroundColor: '#1976d2',
-                                color: '#fff',
-                            },
-                        }}
                     >
                         Cerrar
-                    </Button>
+                    </ButtonCustom>
                     {onAbrirAsignacion && (
-                        <Button
+                        <ButtonCustom
+                            variant={'primary'}
                             onClick={handleIrAsignacion}
-                            variant="contained"
-                            size="large"
-                            sx={{
-                                fontWeight: 'bold',
-                                color: '#fff',
-                                bgcolor: '#1976d2',
-                                borderRadius: 1.5,
-                                px: 3,
-                                py: 1.2,
-                                fontSize: 16,
-                                textTransform: 'none',
-                                transition: 'background 0.2s',
-                                '&:hover': {
-                                    bgcolor: '#1565c0',
-                                },
-                            }}
                         >
                             Ir a asignar neumáticos
-                        </Button>
+                        </ButtonCustom>
                     )}
                 </DialogActions>
             )
                 : esInspeccionHoy === true ? (
                     <DialogActions sx={{ p: 3, backgroundColor: ultimaInspeccionFecha ? '#fff3cd' : undefined, justifyContent: 'flex-end' }}>
-                        <Button
+                        <ButtonCustom
                             onClick={() => {
                                 onClose();
                                 onCloseMain?.();
-
-                                console.log({ hahahajijiputa: esInspeccionHoy })
-
-                            }}
-                            variant="outlined"
-                            size="large"
-                            sx={{
-                                fontWeight: 'bold',
-                                color: '#1976d2',
-                                borderColor: '#1976d2',
-                                borderRadius: 1.5,
-                                px: 3,
-                                py: 1.2,
-                                fontSize: 16,
-                                textTransform: 'none',
-                                transition: 'all 0.2s',
-                                '&:hover': {
-                                    backgroundColor: '#1976d2',
-                                    color: '#fff',
-                                },
                             }}
                         >
                             Cerrar
-                        </Button>
+                        </ButtonCustom>
                     </DialogActions>
                 )
                     : esInspeccionHoy === false ? (
@@ -192,56 +141,23 @@ const ModalInspeccionAver: React.FC<ModalInspeccionAverProps> = ({
                             backgroundColor: ultimaInspeccionFecha ? '#fff3cd' : undefined,
                             justifyContent: 'flex-end',
                             gap: 2
-                        }}>
-                            <Button
+                        }}
+                        >
+                            <ButtonCustom
                                 onClick={() => {
-                                    onClose(); // Cerrar modal de advertencia
-                                    onCloseMain?.(); // Cerrar modal principal de inspección
-                                    console.log({ hahahajijiputa2: esInspeccionHoy })
-
-                                }}
-                                variant="outlined"
-                                size="large"
-                                sx={{
-                                    fontWeight: 'bold',
-                                    color: '#1976d2',
-                                    borderColor: '#1976d2',
-                                    borderRadius: 1.5,
-                                    px: 3,
-                                    py: 1.2,
-                                    fontSize: 16,
-                                    textTransform: 'none',
-                                    transition: 'all 0.2s',
-                                    '&:hover': {
-                                        backgroundColor: '#1976d2',
-                                        color: '#fff',
-                                    },
+                                    onClose();
+                                    onCloseMain?.();
                                 }}
                             >
                                 Cerrar
-                            </Button>
-                            <Button
+                            </ButtonCustom>
+
+                            <ButtonCustom
                                 onClick={onContinue}
-                                variant="contained"
-                                size="large"
-                                sx={{
-                                    fontWeight: 'bold',
-                                    color: '#fff',
-                                    bgcolor: '#1976d2',
-                                    borderRadius: 1.5,
-                                    px: 3,
-                                    py: 1.2,
-                                    fontSize: 16,
-                                    boxShadow: '0 2px 8px #bbdefb',
-                                    textTransform: 'none',
-                                    transition: 'background 0.2s',
-                                    '&:hover': {
-                                        bgcolor: '#1565c0',
-                                    },
-                                }}
+                                variant={'warning'}
                             >
                                 Registrar nueva inspección
-                            </Button>
+                            </ButtonCustom>
                         </DialogActions>
                         // )
                     ) : null

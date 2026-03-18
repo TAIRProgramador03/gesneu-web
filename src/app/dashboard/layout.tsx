@@ -42,7 +42,8 @@ export default function Layout({ children }: LayoutProps): React.JSX.Element {
           display: 'flex',
           flexDirection: 'column',
           position: 'relative',
-          minHeight: '100%',
+          height: '100vh',
+          overflow: 'hidden',
         }}
       >
         {/* SideNav solo visible en escritorio */}
@@ -77,10 +78,12 @@ export default function Layout({ children }: LayoutProps): React.JSX.Element {
             flexDirection: 'column',
             pl: { lg: collapsed ? '72px' : 'var(--SideNav-width)' },
             transition: 'padding-left 0.2s',
+            overflow: 'hidden',
+            height: '100%',
           }}
         >
           <MainNav />
-          <main>
+          <main style={{ flex: 1, overflow: 'auto', height: '100%' }}>
             <Container maxWidth={false} sx={{ py: '32px', px: { xs: 1, md: 3 }, marginTop: '17px' }}>
               {children}
             </Container>

@@ -20,6 +20,7 @@ import ModalInsertExcel from '@/components/dashboard/customer/modal-insert-excel
 import Stack from '@mui/material/Stack';
 import styled from '@emotion/styled';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import { LoadingButton2 } from '@/components/ui/loading-button2';
 
 export default function Page(): React.JSX.Element {
 
@@ -143,24 +144,22 @@ export default function Page(): React.JSX.Element {
           sx={{ width: '100%' }}
         >
           <Box sx={{ display: 'flex', gap: 2, mt: { xs: 2, md: 0 } }}>
-            <Button
-              color="success"
-              variant="contained"
-              startIcon={<DownloadIcon fontSize="var(--icon-fontSize-md)" />}
+            <LoadingButton2
+              variant={'teal'}
+              icon={<DownloadIcon />}
               onClick={() => setModalImportarVisible(true)}
               disabled={loading || esJefeTaller}
             >
               {isMobile ? null : (loading ? "Cargando..." : "Importar")}
-            </Button>
-            <Button
-              color="info"
-              variant="contained"
-              startIcon={<RefreshIcon fontSize="var(--icon-fontSize-md)" />}
+            </LoadingButton2>
+            <LoadingButton2
+              variant={'life'}
+              icon={<RefreshIcon />}
               onClick={handleRefresh}
               disabled={loading}
             >
               Refrescar
-            </Button>
+            </LoadingButton2>
           </Box>
         </Stack>
 

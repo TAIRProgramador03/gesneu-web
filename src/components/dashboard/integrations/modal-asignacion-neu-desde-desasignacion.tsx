@@ -34,6 +34,8 @@ import { convertToDateHuman } from '@/lib/utils';
 import { TipoMovimientoBadge } from '@/components/ui/TipoMovimientoBadge';
 import { DataTableNeumaticos } from '@/components/ui/data-table/data-table';
 import { columnsNeuParaAsignar } from '@/app/dashboard/integrations/columns';
+import { LoadingButton2 } from '@/components/ui/loading-button2';
+import { ClipboardCheck } from 'lucide-react';
 
 const ItemType = {
     NEUMATICO: 'neumatico',
@@ -896,14 +898,14 @@ const ModalAsignacionNeuDesdeDesasignacion: React.FC<ModalAsignacionNeuDesdeDesa
                                             Neu. Disponibles: {filteredData.length}
                                         </Typography>
                                     </Box>
-                                    <Button
-                                        variant="contained"
-                                        color="primary"
+                                    <LoadingButton2
+                                        variant={'primary'}
                                         disabled={!todasPosicionesVaciasLlenas || kmError}
                                         onClick={handleConfirm}
+                                        icon={<ClipboardCheck />}
                                     >
                                         Confirmar Asignación
-                                    </Button>
+                                    </LoadingButton2>
                                 </Box>
                                 <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
                                     <DataTableNeumaticos columns={columnsNeuParaAsignar} data={filteredData} type='pagination' filters={true} />

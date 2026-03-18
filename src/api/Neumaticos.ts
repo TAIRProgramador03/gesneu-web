@@ -313,6 +313,34 @@ export const getFechasInspeccionVehicularPorPlaca = async (placa: string) => {
   }
 };
 
+export const getInspeccionesPorPlaca = async (placa: string) => {
+  try {
+    const response = await axios.get(`/api/inspecciones-por-placa`, {
+      params: { placa },
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error en getInspeccionesPorPlaca:', error);
+    throw error;
+  }
+};
+
+export const getNeumaticosPorInspeccion = async (payload: { PLACA: string, FECHA_INSPECCION: string } | null) => {
+  try {
+
+    const response = await axios.get(`/api/neumaticos-por-inspeccion`, {
+      params: payload,
+      withCredentials: true,
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error('Error en getInspeccionesPorPlaca:', error);
+    throw error;
+  }
+};
+
 // Obtener la cantidad de neumáticos en baja definitiva
 export const obtenerCantidadNeumaticosBajaDefinitiva = async () => {
   const response = await axios.get(`/api/po-neumaticos/baja-definitiva/cantidad`, { withCredentials: true });

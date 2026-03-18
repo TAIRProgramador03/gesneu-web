@@ -42,6 +42,20 @@ export const neonBlue = {
   950: '#1e1650',
 } satisfies PaletteRange;
 
+export const tairBlue = {
+  50: '#e9f4fb',
+  100: '#bcdfee',
+  200: '#7fc3f1',
+  300: '#39a5ef',
+  400: '#0c87da',
+  500: '#0068a7',
+  600: '#00538a',
+  700: '#00406b',
+  800: '#002e4d',
+  900: '#001f33',
+  950: '#00121f',
+} satisfies PaletteRange;
+
 export const nevada = {
   50: '#fbfcfe',
   100: '#f0f4f8',

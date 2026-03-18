@@ -6,6 +6,7 @@ import Typography from '@mui/material/Typography';
 
 import { paths } from '@/paths';
 import { DynamicLogo } from '@/components/core/logo';
+import Image from 'next/image';
 
 export interface LayoutProps {
   children: React.ReactNode;
@@ -45,20 +46,26 @@ export function Layout({ children }: LayoutProps): React.JSX.Element {
           <Stack spacing={1}>
             <Typography color="inherit" sx={{ fontSize: '24px', lineHeight: '32px', textAlign: 'center' }} variant="h1">
               Bienvenido a{' '}
-              <Box component="span" sx={{ color: '#15b79e' }}>
+              <Box component="span" sx={{ color: '#0dcaf0' }}>
                 Gestión de Neumaticos
               </Box>
             </Typography>
             <Typography align="center" variant="subtitle1">
-            Visualiza, gestiona y registra cada movimiento de tus neumáticos con precisión.
+              Visualiza, gestiona y registra cada movimiento de tus neumáticos con precisión.
             </Typography>
           </Stack>
           <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-            <Box
-              component="img"
+            <Image
               alt="Widgets"
-              src="/assets/auth-widgets.png"
-              sx={{ height: 'auto', width: '100%', maxWidth: '600px' }}
+              src="/assets/gemini-login2.png"
+              height={500}
+              width={500}
+              style={{
+                height: 'auto',
+                width: '100%',
+                borderRadius: '15px'
+                // maxWidth: '600px'
+              }}
             />
           </Box>
         </Stack>

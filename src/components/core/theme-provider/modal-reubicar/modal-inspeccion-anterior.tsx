@@ -7,6 +7,7 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import FactCheckIcon from '@mui/icons-material/FactCheck';
 import { convertToDateHuman } from '@/lib/utils';
+import { Button as ButtonCustom } from '@/components/ui/button';
 
 interface ModalInspeccionObligatoriaProps {
   open: boolean;
@@ -42,31 +43,24 @@ const ModalInspeccionAnterior: React.FC<ModalInspeccionObligatoriaProps> = memo(
       </Box>
     </DialogContent>
     <DialogActions sx={{ p: 3, backgroundColor: '#eaf6fb', justifyContent: 'flex-end', gap: 2 }}>
-      <Button
+      <ButtonCustom
         onClick={onClose}
-        color='primary'
-        variant="outlined"
-        size="large"
-        sx={{ fontWeight: 'bold', borderRadius: 1.5, px: 3, py: 1.2, fontSize: 13, textTransform: 'none', transition: 'all 0.2s' }}
       >
         Cerrar
-      </Button>
-      <Button
+      </ButtonCustom>
+
+      <ButtonCustom
+        variant={'teal'}
         onClick={onRegistrarInspeccion}
-        variant="contained"
-        size="large"
-        sx={{ fontWeight: 'bold', backgroundColor: '#289d8c', color: '#fff', borderRadius: 1.5, px: 3, py: 1.2, fontSize: 13, textTransform: 'none', boxShadow: 'none', '&:hover': { backgroundColor: '#289d8c' } }}
       >
         Registrar nueva inspección
-      </Button>
-      <Button
+      </ButtonCustom>
+      <ButtonCustom
+        variant={'primary'}
         onClick={onContinuarReubicar}
-        variant="contained"
-        size="large"
-        sx={{ fontWeight: 'bold', backgroundColor: '#1976d2', color: '#fff', borderRadius: 1.5, px: 3, py: 1.2, fontSize: 13, textTransform: 'none', boxShadow: 'none', '&:hover': { backgroundColor: '#115293' } }}
       >
         Continuar con la anterior inspección
-      </Button>
+      </ButtonCustom>
     </DialogActions>
   </Dialog >
 ))

@@ -6,6 +6,7 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import { Button as ButtonCustom } from '@/components/ui/button';
 
 interface ModalConfirmarInspDesasignarProps {
     open: boolean;
@@ -81,32 +82,25 @@ const ModalConfirmarInspDesasignar: React.FC<ModalConfirmarInspDesasignarProps> 
                 </Box>
             </DialogContent>
             <DialogActions sx={{ p: 3, backgroundColor: fondo, justifyContent: 'flex-end', gap: 2 }}>
-                <Button
+
+                <ButtonCustom
                     onClick={onClose}
-                    variant="outlined"
-                    size="large"
-                    sx={{ fontWeight: 'bold', color: '#1976d2', borderColor: '#1976d2', borderRadius: 1.5, px: 3, py: 1.2, fontSize: 16, textTransform: 'none', transition: 'all 0.2s', '&:hover': { backgroundColor: '#1976d2', color: '#fff' } }}
                 >
                     Cerrar
-                </Button>
-                <Button
+                </ButtonCustom>
+                <ButtonCustom
+                    variant={'teal'}
                     onClick={onRegistrarInspeccion}
-                    variant="contained"
-                    size="large"
-                    sx={{ fontWeight: 'bold', backgroundColor: '#1976d2', color: '#fff', borderRadius: 1.5, px: 3, py: 1.2, fontSize: 16, textTransform: 'none', boxShadow: 'none', '&:hover': { backgroundColor: '#115293' } }}
                 >
                     Registrar nueva inspección
-                </Button>
-                {/* Solo mostrar continuar si no es muy antigua la inspección */}
+                </ButtonCustom>
                 {!esMuyAntigua && (
-                    <Button
+                    <ButtonCustom
+                        variant={'primary'}
                         onClick={onContinuarDesasignacion}
-                        variant="contained"
-                        size="large"
-                        sx={{ fontWeight: 'bold', backgroundColor: '#2ecc40', color: '#fff', borderRadius: 1.5, px: 3, py: 1.2, fontSize: 16, textTransform: 'none', boxShadow: 'none', '&:hover': { backgroundColor: '#27ae60' } }}
                     >
                         Continuar desasignación
-                    </Button>
+                    </ButtonCustom>
                 )}
             </DialogActions>
         </Dialog>
