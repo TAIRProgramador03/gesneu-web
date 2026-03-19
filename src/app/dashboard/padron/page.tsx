@@ -21,6 +21,8 @@ import Stack from '@mui/material/Stack';
 import styled from '@emotion/styled';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { LoadingButton2 } from '@/components/ui/loading-button2';
+import { TrendingUpDown } from 'lucide-react';
+import { ModalReubicarNeumatico } from '@/components/dashboard/padron/modal-reubicar-neumatico';
 
 export default function Page(): React.JSX.Element {
 
@@ -31,6 +33,7 @@ export default function Page(): React.JSX.Element {
   const [modalCargaVisible, setModalCargaVisible] = useState(false);
   const [modalErroresVisible, setModalErroresVisible] = useState(false);
   const [modalImportarVisible, setModalImportarVisible] = useState(false);
+  const [modalReubicarVisible, setModalReubicarVisible] = useState(false);
 
   const { data: customers = [], refetch: customersRefetch } = useQuery({
     queryKey: ['customers'],
@@ -144,6 +147,15 @@ export default function Page(): React.JSX.Element {
           sx={{ width: '100%' }}
         >
           <Box sx={{ display: 'flex', gap: 2, mt: { xs: 2, md: 0 } }}>
+            <LoadingButton2
+              variant={'indigo'}
+              // icon={<DownloadIcon />}
+              onClick={() => setModalReubicarVisible(true)}
+              disabled={loading || esJefeTaller}
+            >
+              <TrendingUpDown />
+              Reubicar Neumático
+            </LoadingButton2>
             <LoadingButton2
               variant={'teal'}
               icon={<DownloadIcon />}
@@ -290,6 +302,17 @@ export default function Page(): React.JSX.Element {
         isLoading={loading}
         onHandleSetLoading={(value: boolean) => setLoading(value)}
       />
+
+      {
+        modalReubicarVisible && (
+          <ModalReubicarNeumatico
+            open={modalReubicarVisible}
+            onClose={() => setModalReubicarVisible(false)}
+            onSuccess={() => customersRefetch()}
+          />
+        )
+      }
+
     </>
   );
 }

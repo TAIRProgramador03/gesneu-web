@@ -1,4 +1,5 @@
 import { Customer } from "@/components/dashboard/customer/customers-table";
+import { NeumaticoFetch } from "@/components/dashboard/padron/modal-reubicar-neumatico";
 import { Neumatico } from "@/types/types";
 import axios, { AxiosError } from "axios";
 
@@ -172,6 +173,67 @@ export const listarNeumaticosAsignados = async (placa: string) => {
     throw error;
   }
 };
+
+// Obtener neumaticos para la reubicación
+export const listarNeumaticosParaReubicar = async (proyectoOrigen: string, codigoNeu: string): Promise<NeumaticoFetch[]> => {
+  try {
+
+    const response = await axios.get(`/api/po-neumaticos/recuperados-para-asignar`, {
+      params: {
+        proyectoOrigen,
+        codigoNeu
+      },
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error en listarNeumaticosParaReubicar:', error);
+    throw error;
+  }
+};
+
+interface ProyectFetch {
+  ID: string,
+  DESCRIPCION: string
+}
+
+export const listarProyectos = async (): Promise<ProyectFetch[]> => {
+  try {
+    const response = await axios.get(`/api/po-neumaticos/listar-proyectos`);
+    return response.data;
+  } catch (error) {
+    console.error('Error en listarProyectos:', error);
+    throw error;
+  }
+};
+
+interface NeumaticoFetchPost {
+  id: string;
+  codigo: string;
+  proyecto: string;
+  esRecuperado: boolean;
+  tipoMovimiento: string;
+  vida: number;
+}
+
+export const reubicarNeumaticosPorProyecto = async ({ neumaticosTrasladados, proyectoDestino }: { neumaticosTrasladados: NeumaticoFetchPost[], proyectoDestino: string }) => {
+  try {
+
+    const response = await axios.post(
+      `/api/po-neumaticos/reubicar-neumaticos-por-proyecto`,
+      {
+        neumaticosTrasladados,
+        proyectoDestino
+      },
+      { withCredentials: true }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error en asignarNeumatico:', error);
+    throw error;
+  }
+};
+
 
 // Obtener el último movimiento de cada neumático instalado en una placa
 export const obtenerUltimosMovimientosPorPlaca = async (placa: string) => {
