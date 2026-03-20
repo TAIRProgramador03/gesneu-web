@@ -562,7 +562,8 @@ function useChartOptions({ categories, chartHeight, lookupMapRef, filteredPlacas
 
         if (!segmentos.length) return '<div></div>';
 
-        const km = Number(segmentos[0].item.KILOMETRO).toLocaleString('es');
+        const kilometrajeMayor = Math.max(...segmentos.map((seg) => seg.item.KILOMETRO))
+        const km = Number(kilometrajeMayor).toLocaleString('es');
         const bg = isDark ? '#1e293b' : '#fff';
         const border = isDark ? '#334155' : '#e2e8f0';
         const textPrimary = isDark ? '#f1f5f9' : '#1e293b';
