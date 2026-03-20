@@ -38,7 +38,7 @@ export interface SalesProps {
 export const Sales = React.memo(({ chartSeries: _chartSeries, sx }: SalesProps): React.JSX.Element => {
   const chartOptions = useChartOptions();
   const { user } = useUser();
-  const [startDate, setStartDate] = React.useState<dayjs.Dayjs | null>(dayjs().subtract(4, 'day'));
+  const [startDate, setStartDate] = React.useState<dayjs.Dayjs | null>(dayjs().subtract(2, 'day'));
   const [endDate, setEndDate] = React.useState<dayjs.Dayjs | null>(dayjs());
   const [chartSeries, setChartSeries] = React.useState<{ name: string; data: number[] }[]>([]);
   const [categories, setCategories] = React.useState<string[]>([]);

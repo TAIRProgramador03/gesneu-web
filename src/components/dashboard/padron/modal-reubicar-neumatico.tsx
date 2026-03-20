@@ -1,6 +1,6 @@
 'use client'
 
-import { Card, Dialog, DialogContent, DialogTitle, Typography } from '@mui/material';
+import { Card, Dialog, DialogContent, DialogTitle, Typography, Box, Chip } from '@mui/material';
 import { Stack } from '@mui/system';
 import React, { useMemo, useRef, useState } from 'react'
 import DialogActions from '@mui/material/DialogActions';
@@ -133,17 +133,37 @@ export const ModalReubicarNeumatico = ({ open, onClose, onSuccess }: ModalReubic
   }, [neumaticosTrasladados])
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth>
-      <DialogTitle sx={{ pb: 0 }}>
-        Reubicar Neumáticos para un proyecto distinto
+    <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth
+      PaperProps={{ sx: { borderRadius: 3, overflow: 'hidden' } }}
+    >
+      {/* Franja superior */}
+      <Box sx={{ height: 4, background: 'linear-gradient(90deg, #3b82f6 0%, #6366f1 100%)' }} />
+
+      <DialogTitle sx={{ pb: 1.5, pt: 2, display: 'flex', alignItems: 'center', gap: 1.5, borderBottom: '1px solid', borderColor: 'divider' }}>
+        <Box sx={{
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          width: 40, height: 40, borderRadius: 2, flexShrink: 0,
+          background: 'linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%)',
+        }}>
+          <CircleChevronRight size={20} className="text-blue-600" />
+        </Box>
+        <Box>
+          <Typography variant="h6" fontWeight={700} lineHeight={1.2}>
+            Reubicar Neumáticos
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Mueve neumáticos de un proyecto origen a un proyecto destino
+          </Typography>
+        </Box>
       </DialogTitle>
-      <DialogContent dividers sx={{ pt: 2 }}>
+
+      <DialogContent sx={{ pt: 2.5, bgcolor: '#f8fafc' }}>
 
 
         <Stack direction="row" spacing={3} alignItems="flex-start">
 
           {/* Panel izquierdo — lista de neumáticos */}
-          <Card sx={{ flex: 1, p: 2, minWidth: 340 }} className='relative'>
+          <Card sx={{ flex: 1, p: 2.5, minWidth: 340, borderRadius: 2.5, border: '1px solid #e2e8f0', marginTop: '10px' }} elevation={0} className='relative'>
             <span className="inline-flex items-center gap-1 mb-3 px-2 py-0.5 rounded-full bg-blue-100 text-blue-500 text-sm font-medium">
               Origen
             </span>
@@ -268,13 +288,21 @@ export const ModalReubicarNeumatico = ({ open, onClose, onSuccess }: ModalReubic
             }
           </Card>
 
+          {/* Conector entre paneles */}
+          <Box sx={{ display: 'flex', alignItems: 'center', alignSelf: 'center', color: '#94a3b8', flexShrink: 0 }}>
+            <ChevronsRight size={28} />
+          </Box>
+
           {/* Panel derecho */}
           <Card sx={{
-            flex: 1, p: 2,
-            boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)',
+            flex: 1, p: 2.5,
             minWidth: 320,
-            border: '2px solid #dbeafe',
-          }}
+            borderRadius: 2.5,
+            border: '2px solid #fef08a',
+            marginTop: '10px',
+            background: neumaticosTrasladados.length === 0 ? 'linear-gradient(135deg, #fefce8 0%, #fef9c3 100%)' : '#fff',
+            transition: 'background 0.3s ease',
+          }} elevation={0}
           >
 
             <div className='flex justify-between items-start'>
@@ -328,7 +356,19 @@ export const ModalReubicarNeumatico = ({ open, onClose, onSuccess }: ModalReubic
               {
 
                 !neumaticosTrasladados || neumaticosTrasladados?.length === 0 ? (
-                  <p className='text-center text-sm mt-2 italic'>Sin resultados.</p>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: 180, gap: 2 }}>
+                    <Box sx={{
+                      width: 56, height: 56, borderRadius: '50%',
+                      background: 'linear-gradient(135deg, #fef9c3 0%, #fef08a 100%)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }} className="animate-pulse">
+                      <ChevronsRight size={26} className="text-yellow-500" />
+                    </Box>
+                    <Box sx={{ textAlign: 'center' }}>
+                      <Typography variant="body2" fontWeight={600} color="text.secondary">Sin neumáticos para reubicar</Typography>
+                      <Typography variant="caption" color="text.disabled">Selecciona y mueve neumáticos desde el panel izquierdo</Typography>
+                    </Box>
+                  </Box>
                 ) :
                   !!neumaticosTrasladados && neumaticosTrasladados.map((neu) => {
 
@@ -383,7 +423,7 @@ export const ModalReubicarNeumatico = ({ open, onClose, onSuccess }: ModalReubic
           </Card>
         </Stack>
       </DialogContent>
-      <DialogActions>
+      <DialogActions sx={{ px: 3, py: 1.5, borderTop: '1px solid', borderColor: 'divider' }}>
         <ButtonCustom onClick={onClose}>
           Cerrar
         </ButtonCustom>
@@ -398,7 +438,7 @@ export const ModalReubicarNeumatico = ({ open, onClose, onSuccess }: ModalReubic
             await reubicarNeumaticosPorProyecto({ neumaticosTrasladados, proyectoDestino })
             onSuccess()
             handleReset()
-            toast.success("Reubicación registrado exitosamente.", {
+            toast.success("Reubicación registrada exitosamente.", {
               position: 'top-right'
             })
           }}
@@ -406,6 +446,6 @@ export const ModalReubicarNeumatico = ({ open, onClose, onSuccess }: ModalReubic
           Guardar Reubicación
         </LoadingButton2>
       </DialogActions>
-    </Dialog>
+    </Dialog >
   )
 }
