@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_API_GESNEU_URL;
 
+export const runtime = 'edge';
+
 export async function GET(request: NextRequest) {
   const path = request.nextUrl.pathname.replace('/api', '');
   const searchParams = request.nextUrl.searchParams.toString();
