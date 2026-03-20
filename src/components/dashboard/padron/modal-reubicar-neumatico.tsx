@@ -244,7 +244,7 @@ export const ModalReubicarNeumatico = ({ open, onClose, onSuccess }: ModalReubic
                         onClick={() => handleClickOnNeumatico({ neumatico: neu })}
                         onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && handleClickOnNeumatico({ neumatico: neu })}
                         className={`
-                      relative grid grid-cols-[1fr_auto_auto_auto] items-center gap-x-4 select-none
+                      relative grid grid-cols-[1fr_auto_auto_auto] items-center gap-x-4
                       rounded-xl px-3 py-2.5 cursor-pointer border-2 transition-all duration-150
                       ${isSelected
                             ? 'border-blue-500 bg-blue-50 shadow-sm'
@@ -382,7 +382,7 @@ export const ModalReubicarNeumatico = ({ open, onClose, onSuccess }: ModalReubic
                         onClick={() => handleClickOnNeumaticoTrasladado({ neumatico: neu })}
                         onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && handleClickOnNeumaticoTrasladado({ neumatico: neu })}
                         className={`
-                      relative grid grid-cols-[1fr_auto_auto_auto] items-center gap-x-4 select-none
+                      relative grid grid-cols-[1fr_auto_auto_auto] items-center gap-x-4
                       rounded-xl px-3 py-2.5 cursor-pointer border-2 transition-all duration-150
                       ${isSelected
                             ? 'border-yellow-500 bg-yellow-50 shadow-sm'

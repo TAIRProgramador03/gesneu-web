@@ -125,6 +125,9 @@ export default function Page(): React.JSX.Element {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
+  console.log({ user })
+
+
   const esJefeTaller = Array.isArray(user?.perfiles) && user.perfiles.some((p: any) => p.codigo === '002');
 
   return (
@@ -149,11 +152,10 @@ export default function Page(): React.JSX.Element {
           <Box sx={{ display: 'flex', gap: 2, mt: { xs: 2, md: 0 } }}>
             <LoadingButton2
               variant={'indigo'}
-              // icon={<DownloadIcon />}
+              icon={<TrendingUpDown />}
               onClick={() => setModalReubicarVisible(true)}
               disabled={loading || esJefeTaller}
             >
-              <TrendingUpDown />
               Reubicar Neumático
             </LoadingButton2>
             <LoadingButton2

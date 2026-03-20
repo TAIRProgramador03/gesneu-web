@@ -32,6 +32,9 @@ interface LayoutProps {
 export default function Layout({ children }: LayoutProps): React.JSX.Element {
   return (
     <html lang="en">
+      <head>
+        <link href="/assets/icon-tair.jpg" rel="shortcut icon" type="image/vnd.microsoft.icon"></link>
+      </head>
       <body>
         <QueryClientProvider client={queryClient}>
           <LocalizationProvider>

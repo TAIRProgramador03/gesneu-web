@@ -48,7 +48,8 @@ export const ModalVerInspecciones = ({ open, onClose, placa }: ModalVerInspeccio
 
   const { data: inspeccionesPorPlaca = [], isLoading: loadingInspecciones } = useQuery({
     queryKey: ['inspecciones-placa', { placa }],
-    queryFn: () => getInspeccionesPorPlaca(placa)
+    queryFn: () => getInspeccionesPorPlaca(placa),
+    staleTime: 0
   })
 
   const { data: neumaticosPorInspeccion = [], isLoading: loadingNeumaticos } = useQuery({

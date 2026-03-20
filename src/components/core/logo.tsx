@@ -5,6 +5,7 @@ import Box from '@mui/material/Box';
 import { useColorScheme } from '@mui/material/styles';
 
 import { NoSsr } from '@/components/core/no-ssr';
+import Image from 'next/image';
 
 const HEIGHT = 60;
 const WIDTH = 60;
@@ -24,10 +25,12 @@ export function Logo({ color = 'dark', emblem, height = HEIGHT, width = WIDTH }:
   if (emblem) {
     url = color === 'light' ? '/assets/logo-emblem.svg' : '/assets/logo-emblem--dark.svg';
   } else {
-    url = color === 'light' ? '/assets/logo.svg' : '/assets/logo--dark.svg';
+    url = color === 'light' ? '/assets/logo.svg' : '/assets/tair_renting.png';
   }
 
-  return <Box alt="logo" component="img" height={height} src={url} width={width} />;
+  return (
+    <Image alt="logo" height={height} src={url} width={width} />
+  );
 }
 
 export interface DynamicLogoProps {
