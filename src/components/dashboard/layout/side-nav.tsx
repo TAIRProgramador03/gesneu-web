@@ -101,7 +101,7 @@ export function SideNav({ collapsed, setCollapsed }: SideNavProps): React.JSX.El
       {/* Menú */}
       <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', pt: 2, marginTop: '25px' }}>
         <Box component="nav" sx={{ width: '100%', padding: '10px' }}>
-          {renderNavItems({ pathname, collapsed })}
+          {renderNavItems({ pathname, items: navItems, collapsed })}
         </Box>
       </Box>
       <Divider />
