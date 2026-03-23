@@ -1,8 +1,7 @@
-import React, { forwardRef, useState, useMemo, useEffect, memo } from 'react';
+import React, { useState, useMemo, useEffect, memo } from 'react';
 import {
     Box,
     Card,
-    LinearProgress,
     Paper,
     Stack,
     Table,
@@ -11,14 +10,12 @@ import {
     TableContainer,
     TableHead,
     TableRow,
-    TextField,
     useTheme,
     Chip,
 } from '@mui/material';
-import Button from '@mui/material/Button';
-import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
@@ -27,7 +24,6 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import ModalAvertAsigNeu from './modal-avert-asig-neu';
 import ModalInputsNeu from './modal-inputs-neu';
 import { Neumatico } from '@/types/types';
-import { EsRecuperadoBadge } from '@/components/ui/EsRecuperadoBadge';
 import { toast } from 'sonner';
 import Image from 'next/image';
 import { convertToDateHuman } from '@/lib/utils';
@@ -35,7 +31,7 @@ import { TipoMovimientoBadge } from '@/components/ui/TipoMovimientoBadge';
 import { DataTableNeumaticos } from '@/components/ui/data-table/data-table';
 import { columnsNeuParaAsignar } from '@/app/dashboard/integrations/columns';
 import { LoadingButton2 } from '@/components/ui/loading-button2';
-import { ClipboardCheck } from 'lucide-react';
+import { ClipboardCheck, ClipboardList } from 'lucide-react';
 
 const ItemType = {
     NEUMATICO: 'neumatico',
@@ -606,39 +602,55 @@ const ModalAsignacionNeuDesdeDesasignacion: React.FC<ModalAsignacionNeuDesdeDesa
                     '& .MuiDialog-paper': {
                         maxWidth: '1500px',
                         width: '100%',
+                        overflowY: 'hidden'
                     },
                 }}
             >
-                <DialogContent>
-                    {/* Banner informativo */}
-                    <Box sx={{ mb: 2, p: 2, bgcolor: '#fff3cd', borderRadius: 2, border: '1px solid #ffc107' }}>
-                        <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1, color: '#856404' }}>
-                            Asignación desde Desasignación
+                <DialogTitle sx={{ pb: 1.5, pt: 2, display: 'flex', alignItems: 'center', gap: 1.5, borderBottom: '1px solid', borderColor: 'divider' }}>
+                    <Box sx={{
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        width: 40, height: 40, borderRadius: 2,
+                        background: 'linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%)',
+                        flexShrink: 0,
+                    }}>
+                        <ClipboardList size={20} className="text-blue-600" />
+                    </Box>
+                    <Box sx={{ flex: 1 }}>
+                        <Typography variant="h6" fontWeight={700} lineHeight={1.2}>
+                            Asignación desde una Desasignación
                         </Typography>
-                        <Typography variant="body2" sx={{ mb: 1, color: '#856404' }}>
-                            Debes asignar neumáticos a las siguientes posiciones que quedaron vacías:
-                        </Typography>
-                        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                            {posicionesVacias.map(pos => {
-                                let classNameExtra = assignedNeumaticos[pos] ? 'bg-cyan-600' : 'bg-rose-600';
-                                return (
-                                    <div
-                                        key={pos}
-                                        className={`font-bold text-white ${classNameExtra} p-2 rounded-md text-xs uppercase italic`}
-                                    >
-                                        {pos}
-                                    </div>
-                                )
-                            })}
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.4, flexWrap: 'wrap' }}>
+                            <Typography variant="body2" color="text.secondary">Vehículo:</Typography>
+                            <Chip
+                                label={placa}
+                                size="small"
+                                sx={{ fontWeight: 700, fontSize: 12, bgcolor: '#f1f5f9', color: '#334155', letterSpacing: 0.5 }}
+                            />
+                            <Typography variant="body2" color="text.secondary">Posiciones vacías:</Typography>
+                            {posicionesVacias.map(pos => (
+                                <Chip
+                                    key={pos}
+                                    label={pos}
+                                    size="small"
+                                    sx={{
+                                        fontWeight: 700, fontSize: 11,
+                                        bgcolor: assignedNeumaticos[pos] ? '#0891b2' : '#e11d48',
+                                        color: '#fff',
+                                    }}
+                                />
+                            ))}
                         </Box>
-                        <Typography variant="caption" sx={{ display: 'block', mt: 1, color: '#856404', fontStyle: 'italic' }}>
-                            Nota: Solo puedes asignar a las posiciones marcadas. Las demás posiciones están bloqueadas.
+                        <Typography variant="caption" className='text-amber-600' sx={{ display: 'block', mt: 1, fontStyle: 'italic' }}>
+                            <span className='font-bold'>Nota: </span>
+                            Solo puedes asignar a las posiciones marcadas. Las demás posiciones están bloqueadas.
                         </Typography>
                     </Box>
+                </DialogTitle>
+                <DialogContent sx={{ pt: 2.5, overflowY: 'auto' }}>
 
                     <Stack direction="row" spacing={2}>
                         {/* Panel Izquierdo: Diagrama y tabla de instalados */}
-                        <Card sx={{ flex: 0.6, p: 2, position: 'relative', boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)' }}>
+                        <Card sx={{ flex: 0.6, p: 2, position: 'relative', boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)', marginTop: '10px' }}>
 
                             <div className='flex justify-end h-20'>
                                 <div className='relative'>
@@ -889,7 +901,7 @@ const ModalAsignacionNeuDesdeDesasignacion: React.FC<ModalAsignacionNeuDesdeDesa
                             </TableContainer>
                         </Card>
                         {/* Panel Derecho: Neumáticos nuevos disponibles */}
-                        <Stack direction="column" spacing={2} sx={{ flex: 0.4, width: '100%', height: '100%' }}>
+                        <Stack direction="column" spacing={2} sx={{ flex: 0.4, width: '100%', height: '100%', marginTop: '10px' }}>
                             <Card sx={{ p: 2, boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)', height: '100%', display: 'flex', flexDirection: 'column' }}>
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                                     <div></div>
@@ -915,7 +927,7 @@ const ModalAsignacionNeuDesdeDesasignacion: React.FC<ModalAsignacionNeuDesdeDesa
                     </Stack>
                 </DialogContent>
             </Dialog>
-        </DndProvider>
+        </DndProvider >
     );
 });
 

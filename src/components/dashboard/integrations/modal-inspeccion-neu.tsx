@@ -74,7 +74,8 @@ interface Vehiculo {
   presion_aire?: number;
   torque?: number;
   cod_supervisor?: string,
-  id_operacion?: number
+  id_operacion?: number,
+  tipo_terreno: string
 }
 
 interface ModalInpeccionNeuProps {
@@ -815,6 +816,7 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
         COD_SUPERVISOR: vehiculo?.cod_supervisor,
         ID_OPERACION: vehiculo?.id_operacion,
         FECHA_INSPECCION: formatDate(fechaInspeccionGlobal) || null,
+        TIPO_TERRENO: vehiculo?.tipo_terreno
       };
       return obj;
     });
@@ -1055,12 +1057,21 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
                           <Typography variant="body2" sx={{ fontWeight: 'bold' }}>{vehiculo.color}</Typography>
                         </Box>
                       )}
+
                       {vehiculo?.kilometro !== undefined && (
                         <Box>
                           <Typography variant="caption" color="text.secondary">Kilometraje</Typography>
                           <Typography variant="body2" sx={{ fontWeight: 'bold' }}>{vehiculo.kilometro.toLocaleString()} km</Typography>
                         </Box>
                       )}
+
+                      {vehiculo?.tipo_terreno !== undefined && (
+                        <Box>
+                          <Typography variant="caption" color="text.secondary">Tipo de terreno</Typography>
+                          <Typography variant="body2" sx={{ fontWeight: 'bold' }}>{vehiculo.tipo_terreno}</Typography>
+                        </Box>
+                      )}
+
                     </Box>
                   ) : (
                     <Typography variant="body2" color="text.secondary">No hay datos del vehículo.</Typography>

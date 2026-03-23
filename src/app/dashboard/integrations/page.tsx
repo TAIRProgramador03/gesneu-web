@@ -103,6 +103,7 @@ export default function Page(): React.JSX.Element {
     KILOMETRAJE: number;
     ID_OPERACION: number;
     ID_SUPERVISOR: string;
+    TIPO_TERRENO: string
   }
 
   const handleSearchChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -1198,7 +1199,8 @@ export default function Page(): React.JSX.Element {
               operacion: vehiculo.OPERACION,
               id_operacion: vehiculo.ID_OPERACION,
               kilometro: vehiculo.KILOMETRO,
-              cod_supervisor: vehiculo.ID_SUPERVISOR
+              cod_supervisor: vehiculo.ID_SUPERVISOR,
+              tipo_terreno: vehiculo.TIPO_TERRENO
             } : undefined}
             kilometroRealActual={ultimoKilometroReal}
             onSeleccionarNeumatico={() => { }}
@@ -1265,53 +1267,57 @@ export default function Page(): React.JSX.Element {
       />
 
       {/* Modal para DESASIGNAR */}
-      <ModalDesasignar
-        open={openMantenimientoModal && modoMantenimiento === 'DESASIGNAR'}
-        onClose={() => {
-          // Limpiar asignaciones temporales al cerrar modal
-          setAsignacionesTemporales([]);
-          // Solo cerrar el modal, sin recargar datos
-          setOpenMantenimientoModal(false);
-          setModoMantenimiento(null);
-        }}
-        onSuccess={async () => {
-          // Limpiar asignaciones temporales después de guardar exitosamente
-          setAsignacionesTemporales([]);
-          // Recargar datos solo cuando la acción se completa exitosamente
-          if (vehiculo?.PLACA) {
-            await Promise.all([refreshAsignados(), refreshVehiculo()]);
-            neumaticosDispobilesRefetch();
-          }
-        }}
-        placa={vehiculo?.PLACA ?? ''}
-        neumaticosAsignados={neumaticosAsignadosUnicos.map(n => ({
-          ...n,
-          POSICION: n.POSICION_NEU ?? '',
-          REMANENTE: n.REMANENTE,
-          PRESION_AIRE: n.PRESION_AIRE,
-          TORQUE_APLICADO: n.TORQUE_APLICADO,
-          ESTADO: n.ESTADO,
-          COD_SUPERVISOR: vehiculo?.ID_SUPERVISOR,
-          ID_OPERACION: vehiculo?.ID_OPERACION
-        }))}
-        vehiculo={vehiculo ? {
-          placa: vehiculo.PLACA,
-          marca: vehiculo.MARCA,
-          modelo: vehiculo.MODELO,
-          anio: String(vehiculo.ANO),
-          color: vehiculo.COLOR,
-          proyecto: vehiculo.PROYECTO,
-          operacion: vehiculo.OPERACION,
-          kilometro: vehiculo.KILOMETRO,
-          id_operacion: vehiculo.ID_OPERACION,
-          cod_supervisor: vehiculo.ID_SUPERVISOR
-        } : undefined}
-        kilometraje={ultimoKilometroReal}
-        user={user || undefined}
-        onAbrirInspeccion={handleAbrirInspeccionDesdeMantenimiento}
-        onAbrirAsignacion={handleAbrirAsignacionDesdeDesasignacion}
-        asignacionesTemporalesExternas={asignacionesTemporales}
-      />
+      {
+        openMantenimientoModal && modoMantenimiento === 'DESASIGNAR' && (
+          <ModalDesasignar
+            open={openMantenimientoModal && modoMantenimiento === 'DESASIGNAR'}
+            onClose={() => {
+              // Limpiar asignaciones temporales al cerrar modal
+              setAsignacionesTemporales([]);
+              // Solo cerrar el modal, sin recargar datos
+              setOpenMantenimientoModal(false);
+              setModoMantenimiento(null);
+            }}
+            onSuccess={async () => {
+              // Limpiar asignaciones temporales después de guardar exitosamente
+              setAsignacionesTemporales([]);
+              // Recargar datos solo cuando la acción se completa exitosamente
+              if (vehiculo?.PLACA) {
+                await Promise.all([refreshAsignados(), refreshVehiculo()]);
+                neumaticosDispobilesRefetch();
+              }
+            }}
+            placa={vehiculo?.PLACA ?? ''}
+            neumaticosAsignados={neumaticosAsignadosUnicos.map(n => ({
+              ...n,
+              POSICION: n.POSICION_NEU ?? '',
+              REMANENTE: n.REMANENTE,
+              PRESION_AIRE: n.PRESION_AIRE,
+              TORQUE_APLICADO: n.TORQUE_APLICADO,
+              ESTADO: n.ESTADO,
+              COD_SUPERVISOR: vehiculo?.ID_SUPERVISOR,
+              ID_OPERACION: vehiculo?.ID_OPERACION
+            }))}
+            vehiculo={vehiculo ? {
+              placa: vehiculo.PLACA,
+              marca: vehiculo.MARCA,
+              modelo: vehiculo.MODELO,
+              anio: String(vehiculo.ANO),
+              color: vehiculo.COLOR,
+              proyecto: vehiculo.PROYECTO,
+              operacion: vehiculo.OPERACION,
+              kilometro: vehiculo.KILOMETRO,
+              id_operacion: vehiculo.ID_OPERACION,
+              cod_supervisor: vehiculo.ID_SUPERVISOR
+            } : undefined}
+            kilometraje={ultimoKilometroReal}
+            user={user || undefined}
+            onAbrirInspeccion={handleAbrirInspeccionDesdeMantenimiento}
+            onAbrirAsignacion={handleAbrirAsignacionDesdeDesasignacion}
+            asignacionesTemporalesExternas={asignacionesTemporales}
+          />
+        )
+      }
 
       {/* Modal de Asignación desde Desasignación */}
       {datosAsignacionDesdeDesasignacion && (

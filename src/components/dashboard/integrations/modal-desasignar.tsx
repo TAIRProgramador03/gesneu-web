@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useRef, memo } from 'react';
 import {
-  Dialog, DialogContent, Typography, Button, Stack, Box, Card, TextField, MenuItem
+  Dialog, DialogContent, Typography, Button, Stack, Box, Card, TextField, MenuItem,
+  DialogActions
 } from '@mui/material';
 import { DndContext, DragEndEvent, useDraggable, useDroppable } from '@dnd-kit/core';
 import DiagramaVehiculo from '../../../styles/theme/components/DiagramaVehiculo';
@@ -22,6 +23,7 @@ import { convertToDateHuman } from '@/lib/utils';
 import { LoadingButton } from '@/components/ui/loading-button';
 import { Button as ButtonCustom } from '@/components/ui/button';
 import { LoadingButton2 } from '@/components/ui/loading-button2';
+import { Textarea } from '@/components/ui/textarea';
 
 interface ModalDesasignarProps {
   open: boolean;
@@ -69,6 +71,7 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
   const [ultimaPosicionDesasignada, setUltimaPosicionDesasignada] = useState<string>('');
   const [posicionResaltada, setPosicionResaltada] = useState<string>('');
   const [accion, setAccion] = useState<string>('');
+  const [tipoAccion, setTipoAccion] = useState<string>('');
   const [observacion, setObservacion] = useState<string>('');
 
   // Estado para asignaciones temporales (NO guardadas en BD)
@@ -302,6 +305,7 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
     setAsignacionesTemporales([]);
     setAccion('');
     setObservacion('');
+    setTipoAccion('');
     // Restaurar diagrama al estado original sin temporales ni marcas de desasignación
     setNeumaticosAsignadosState(
       neumaticosAsignados.map(n => ({ ...n, enAreaDesasignacion: false }))
@@ -558,6 +562,15 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
       return;
     }
 
+    if (accion.trim() === 'BAJA DEFINITIVA') {
+      if (tipoAccion.trim() === '') {
+        toast.error('No se puede desasignar: Seleccionar un tipo de baja definitiva.', {
+          duration: 4000
+        })
+        return;
+      }
+    }
+
     // 4. Validar inspección previa
     if (!fechaUltimaInspeccion || isNaN(new Date(fechaUltimaInspeccion).getTime())) {
       toast.error('No se puede desasignar: primero debe existir una inspección válida para este neumático.', {
@@ -571,6 +584,7 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
         placa,
         neumaticosSeleccionados: neumaticosSeleccionados.length,
         accion,
+        tipoAccion,
         observacion,
         fechaUltimaInspeccion,
         asignacionesTemporales: asignacionesTemporales.length
@@ -613,6 +627,7 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
           desasignaciones.push({
             CODIGO: neumaticoSeleccionado.CODIGO_NEU || neumaticoSeleccionado.CODIGO,
             TIPO_MOVIMIENTO: accion,
+            TIPO_BAJA: accion === 'BAJA DEFINITIVA' ? tipoAccion : null,
             OBSERVACION: observacion,
             KILOMETRO: kilometroActual,
             REMANENTE: neumaticoSeleccionado.REMANENTE,
@@ -665,6 +680,7 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
 
       setNeumaticoSeleccionados([]);
       setAccion('');
+      setTipoAccion('');
       setObservacion('');
 
       // Solo llamar onSuccess cuando la acción se completa exitosamente
@@ -751,7 +767,7 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
                 </Box>
 
                 <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', gap: 2 }}>
-                  <Box sx={{ flexDirection: 'column', gap: 1, minWidth: 220, flex: 1, height: 190 }}>
+                  <Box sx={{ flexDirection: 'column', gap: 1, minWidth: 220, flex: 1, height: 260 }}>
                     <TextField
                       select
                       label="Acción"
@@ -760,20 +776,33 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
                       onChange={(e) => setAccion(e.target.value)}
                       sx={{ minWidth: 220, flex: 0.4, marginBottom: '14px', marginTop: '10px' }}
                     >
-                      <MenuItem value="RECUPERADO">RECUPERADO</MenuItem>
-                      <MenuItem value="BAJA DEFINITIVA">BAJA DEFINITIVA</MenuItem>
+                      <MenuItem value="RECUPERADO">Recuperado</MenuItem>
+                      <MenuItem value="BAJA DEFINITIVA">Baja Definitiva</MenuItem>
                     </TextField>
-                    <TextField
-                      label="Observación"
-                      size="small"
-                      multiline
+
+                    {
+                      accion === 'BAJA DEFINITIVA' && (
+                        <TextField
+                          select
+                          label="Tipo de baja"
+                          size="small"
+                          value={tipoAccion}
+                          onChange={(e) => setTipoAccion(e.target.value)}
+                          sx={{ minWidth: 220, flex: 0.4, marginBottom: '14px' }}
+                        >
+                          <MenuItem value="RECOBRO">Recobro</MenuItem>
+                          <MenuItem value="SINIESTRO">Siniestro</MenuItem>
+                          <MenuItem value="DESGASTE NATURAL">Desgaste natural</MenuItem>
+                        </TextField>
+                      )
+                    }
+
+                    <Textarea placeholder="Escribe la observación..."
+                      className='h-15 mb-4'
                       value={observacion}
                       onChange={(e) => setObservacion(e.target.value)}
-                      sx={{ minWidth: 220, width: '100%', flex: 0.6 }}
-                      InputProps={{
-                        sx: { height: '100%', alignItems: 'flex-start' }
-                      }}
                     />
+
                     {
                       // const tienePosicionesVacias = posicionesVaciasActuales.length > 0;
                       posicionesVaciasActuales.length > 0 && (
@@ -849,82 +878,6 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
                     </DropNeumaticosPorDesasignar>
                   </Box>
                 </Box>
-
-                <Box sx={{ mt: 2, display: 'flex', gap: '6px' }} >
-                  <ButtonCustom
-                    onClick={onClose}
-                  >
-                    Cerrar
-                  </ButtonCustom>
-
-                  {
-                    neumaticosSeleccionados.length !== 0 && accion && todasPosicionesVaciasAsignadas && (
-                      <LoadingButton2
-                        variant={'primary'}
-                        onClick={handleGuardarDesasignacion}
-                        disabled={neumaticosSeleccionados.length === 0 || !accion || !todasPosicionesVaciasAsignadas}
-                      >
-                        Registrar Desasignación y Asignación
-                      </LoadingButton2>
-                    )
-                  }
-
-                  {onAbrirAsignacion && (() => {
-                    const tienePosicionesVacias = posicionesVaciasActuales.length > 0;
-                    const tieneAccionYObservacion = accion.trim() !== '' && observacion.trim() !== '';
-
-                    return (
-                      <>
-                        {/* Botón Asignar Neumáticos */}
-
-                        {
-                          tienePosicionesVacias && tieneAccionYObservacion &&
-                          (
-                            <ButtonCustom
-                              variant={'teal'}
-                              disabled={!tienePosicionesVacias || !tieneAccionYObservacion}
-                              onClick={() => {
-                                // Agrupar por posición y quedarse con el más reciente (mayor ID_MOVIMIENTO)
-                                const neumaticosNoDesasignados = neumaticosAsignadosState.filter(n => !n.enAreaDesasignacion);
-
-                                const neumaticosPorPosicion = new Map<string, typeof neumaticosNoDesasignados[0]>();
-                                neumaticosNoDesasignados.forEach(n => {
-                                  const pos = (n.POSICION_NEU || n.POSICION);
-                                  if (pos) {
-                                    const existente = neumaticosPorPosicion.get(pos);
-                                    if (!existente || (n.ID_MOVIMIENTO || 0) > (existente.ID_MOVIMIENTO || 0)) {
-                                      neumaticosPorPosicion.set(pos, n);
-                                    }
-                                  }
-                                });
-
-                                const neumaticosActuales = Array.from(neumaticosPorPosicion.values()).map(n => {
-                                  const pos = n.POSICION_NEU || n.POSICION;
-                                  return {
-                                    ...n,
-                                    POSICION: pos,
-                                    POSICION_NEU: pos
-                                  };
-                                });
-                                console.log('[Button Asignar] Posiciones vacías:', posicionesVaciasActuales);
-                                console.log('[Button Asignar] Neumáticos actuales:', neumaticosActuales.map(n => ({
-                                  codigo: n.CODIGO_NEU || n.CODIGO,
-                                  posicion: n.POSICION || n.POSICION_NEU
-                                })));
-                                onAbrirAsignacion({
-                                  cachedNeumaticosAsignados: neumaticosActuales,
-                                  posicionesVacias: posicionesVaciasActuales
-                                });
-                              }}
-                            >
-                              Asignar Neumáticos
-                            </ButtonCustom>
-                          )
-                        }
-                      </>
-                    );
-                  })()}
-                </Box>
               </Card>
             </Stack>
 
@@ -968,6 +921,83 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
           </Stack>
         </DndContext>
       </DialogContent>
+
+      <DialogActions sx={{ px: 3, py: 1.5, borderTop: '1px solid', borderColor: 'divider' }}>
+        <ButtonCustom onClick={onClose} >
+          Cerrar
+        </ButtonCustom>
+
+        {
+          neumaticosSeleccionados.length !== 0 && accion && todasPosicionesVaciasAsignadas && (
+            <LoadingButton2
+              variant={'primary'}
+              onClick={handleGuardarDesasignacion}
+              disabled={neumaticosSeleccionados.length === 0 || !accion || !todasPosicionesVaciasAsignadas}
+            >
+              Registrar Desasignación y Asignación
+            </LoadingButton2>
+          )
+        }
+
+        {onAbrirAsignacion && (() => {
+          const tienePosicionesVacias = posicionesVaciasActuales.length > 0;
+          const tieneAccionYObservacion = accion.trim() !== '' && observacion.trim() !== '';
+          const siEsBajaDefinitiva = accion.trim() === 'BAJA DEFINITIVA' && tipoAccion.trim() !== '';
+
+          return (
+            <>
+              {/* Botón Asignar Neumáticos */}
+
+              {
+                tienePosicionesVacias && tieneAccionYObservacion && (accion.trim() !== 'BAJA DEFINITIVA' || siEsBajaDefinitiva) &&
+                (
+                  <ButtonCustom
+                    variant={'teal'}
+                    disabled={!tienePosicionesVacias || !tieneAccionYObservacion}
+                    onClick={() => {
+                      // Agrupar por posición y quedarse con el más reciente (mayor ID_MOVIMIENTO)
+                      const neumaticosNoDesasignados = neumaticosAsignadosState.filter(n => !n.enAreaDesasignacion);
+
+                      const neumaticosPorPosicion = new Map<string, typeof neumaticosNoDesasignados[0]>();
+                      neumaticosNoDesasignados.forEach(n => {
+                        const pos = (n.POSICION_NEU || n.POSICION);
+                        if (pos) {
+                          const existente = neumaticosPorPosicion.get(pos);
+                          if (!existente || (n.ID_MOVIMIENTO || 0) > (existente.ID_MOVIMIENTO || 0)) {
+                            neumaticosPorPosicion.set(pos, n);
+                          }
+                        }
+                      });
+
+                      const neumaticosActuales = Array.from(neumaticosPorPosicion.values()).map(n => {
+                        const pos = n.POSICION_NEU || n.POSICION;
+                        return {
+                          ...n,
+                          POSICION: pos,
+                          POSICION_NEU: pos
+                        };
+                      });
+                      console.log('[Button Asignar] Posiciones vacías:', posicionesVaciasActuales);
+                      console.log('[Button Asignar] Neumáticos actuales:', neumaticosActuales.map(n => ({
+                        codigo: n.CODIGO_NEU || n.CODIGO,
+                        posicion: n.POSICION || n.POSICION_NEU
+                      })));
+                      onAbrirAsignacion({
+                        cachedNeumaticosAsignados: neumaticosActuales,
+                        posicionesVacias: posicionesVaciasActuales
+                      });
+                    }}
+                  >
+                    Asignar Neumáticos
+                  </ButtonCustom>
+                )
+              }
+            </>
+          );
+        })()}
+
+      </DialogActions>
+
     </Dialog >
   );
 });
