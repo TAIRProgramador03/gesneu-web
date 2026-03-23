@@ -837,6 +837,7 @@ export default function Page(): React.JSX.Element {
                 <LoadingButton2
                   variant="teal"
                   onClick={handleOpenModalConRefresh}
+                  disabled={user?.usuario?.trim() === 'GESNEU'}
                   icon={<ClipboardText />}
                 >
                   Asignar Neumático
@@ -845,6 +846,7 @@ export default function Page(): React.JSX.Element {
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <ButtonCustom variant="life"
+                      disabled={neumaticosAsignadosUnicos.length === 0}
                     >
                       <ClipboardText />
                       Inspección
@@ -873,6 +875,7 @@ export default function Page(): React.JSX.Element {
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <ButtonCustom variant="warning"
+                      disabled={neumaticosAsignadosUnicos.length === 0}
                     >
                       <ClipboardText />
                       Mantenimiento

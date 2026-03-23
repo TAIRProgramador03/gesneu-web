@@ -7,8 +7,10 @@ export const metadata = {
 
 export default function Layout({ children }: { children: React.ReactNode }): React.JSX.Element {
   return (
-    <PermissionGuard blockedUsers={['GESNEU']}>
+    <>
       {children}
-    </PermissionGuard>
+    </>
+    // <PermissionGuard blockedUsers={['GESNEU']}>
+    // </PermissionGuard>
   );
 }
