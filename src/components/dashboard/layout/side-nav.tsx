@@ -32,11 +32,6 @@ export function SideNav({ collapsed, setCollapsed }: SideNavProps): React.JSX.El
   const navRef = React.useRef<HTMLDivElement>(null);
   const { user } = useUser();
 
-  let userName = user?.usuario?.trim() ?? ''
-  const visibleNavItems = navItems.filter(
-    (item) => !item.blockedUsers?.includes(userName ?? '')
-  );
-
   React.useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (navRef.current && !navRef.current.contains(event.target as Node)) {
@@ -106,7 +101,7 @@ export function SideNav({ collapsed, setCollapsed }: SideNavProps): React.JSX.El
       {/* Menú */}
       <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', pt: 2, marginTop: '25px' }}>
         <Box component="nav" sx={{ width: '100%', padding: '10px' }}>
-          {renderNavItems({ pathname, items: visibleNavItems, collapsed })}
+          {renderNavItems({ pathname, collapsed })}
         </Box>
       </Box>
       <Divider />
