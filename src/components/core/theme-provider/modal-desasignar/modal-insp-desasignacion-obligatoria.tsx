@@ -6,6 +6,7 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import FactCheckIcon from '@mui/icons-material/FactCheck';
+import { Button as ButtonCustom } from '@/components/ui/button';
 
 interface ModalInspeccionObligatoriaDesasignarProps {
     open: boolean;
@@ -41,22 +42,18 @@ const ModalInsDesasignacionObligatoria: React.FC<ModalInspeccionObligatoriaDesas
             </Box>
         </DialogContent>
         <DialogActions sx={{ p: 3, backgroundColor: '#eaf6fb', justifyContent: 'flex-end', gap: 2 }}>
-            <Button
+            <ButtonCustom
                 onClick={onClose}
-                variant="outlined"
-                size="large"
-                sx={{ fontWeight: 'bold', color: '#1976d2', borderColor: '#1976d2', borderRadius: 1.5, px: 3, py: 1.2, fontSize: 16, textTransform: 'none', transition: 'all 0.2s', '&:hover': { backgroundColor: '#1976d2', color: '#fff' } }}
             >
                 Cerrar
-            </Button>
-            <Button
+            </ButtonCustom>
+
+            <ButtonCustom
+                variant={'primary'}
                 onClick={onRegistrarInspeccion}
-                variant="contained"
-                size="large"
-                sx={{ fontWeight: 'bold', backgroundColor: '#1976d2', color: '#fff', borderRadius: 1.5, px: 3, py: 1.2, fontSize: 16, textTransform: 'none', boxShadow: 'none', '&:hover': { backgroundColor: '#115293' } }}
             >
                 Registrar nueva inspección
-            </Button>
+            </ButtonCustom>
         </DialogActions>
     </Dialog>
 ));

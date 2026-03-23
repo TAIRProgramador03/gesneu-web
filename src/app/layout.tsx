@@ -34,6 +34,7 @@ export default function Layout({ children }: LayoutProps): React.JSX.Element {
     <html lang="en">
       <head>
         <link href="/assets/icon-tair.jpg" rel="shortcut icon" type="image/vnd.microsoft.icon"></link>
+        <title>Gesneu</title>
       </head>
       <body>
         <QueryClientProvider client={queryClient}>
