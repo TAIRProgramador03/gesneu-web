@@ -178,12 +178,6 @@ const DiagramaVehiculo: React.FC<DiagramaVehiculoProps & { onPosicionClick?: (ne
 
                 {pos.map(({ key, top, left }) => {
                     const neumatico = neumaticosFiltrados.find((n: any) => (n.POSICION_NEU || n.POSICION) === key);
-                    if (neumatico) {
-                        console.log(`[DiagramaVehiculo] 🎯 Renderizando ${key}:`, neumatico.CODIGO_NEU || neumatico.CODIGO);
-                    } else {
-                        console.log(`[DiagramaVehiculo] ❌ Posición ${key} vacía`);
-                    }
-
                     return (
                         <PosicionNeumatico
                             key={`${key}-${neumatico ? (neumatico.CODIGO_NEU || neumatico.CODIGO) : 'empty'}-${Date.now()}`}
@@ -230,13 +224,6 @@ const PosicionNeumatico: React.FC<{
         REMANENTE_ORIGINAL: (neumatico as any).REMANENTE_ORIGINAL,
         ESTADO: neumatico.ESTADO
     }) : { porcentajeDesgaste: 0, color: 'transparent' as const, bgColor: 'transparent' };
-
-    // Log para debugging - solo para el primer neumático para no saturar
-    if (neumatico && keyPos === 'POS01') {
-        console.log(`[DiagramaVehiculo] POS01 - ESTADO recibido: ${neumatico.ESTADO} (tipo: ${typeof neumatico.ESTADO})`);
-        console.log(`[DiagramaVehiculo] POS01 - REMANENTE: ${neumatico.REMANENTE}, REMANENTE_ORIGINAL: ${(neumatico as any).REMANENTE_ORIGINAL || 'NULL'}`);
-        console.log(`[DiagramaVehiculo] POS01 - infoDesgaste: porcentaje=${infoDesgaste.porcentajeDesgaste}, color=${infoDesgaste.color}, bgColor=${infoDesgaste.bgColor}`);
-    }
 
     // Determinar si esta posición debe resaltarse
     const esResaltada = posicionResaltada === keyPos;
@@ -298,24 +285,6 @@ const PosicionNeumatico: React.FC<{
             setKmRecorrido('—');
             return;
         }
-        // try {
-        //     // Usar el endpoint correcto para historial completo
-        //     const { obtenerHistorialMovimientosPorCodigo } = await import('../../../api/Neumaticos');
-        //     const historial = await obtenerHistorialMovimientosPorCodigo(codigo);
-        //     if (!Array.isArray(historial) || historial.length === 0) {
-        //         setKmRecorrido('—');
-        //         return;
-        //     }
-        //     // Log de depuración para ver los datos reales
-        //     //console.log('[DEBUG calculoKmRecorrido] keyPos:', keyPos);
-        //     //console.log('[DEBUG calculoKmRecorrido] historial:', historial);
-        //     // Usar la función centralizada para calcular el km recorrido acumulado
-        //     const kmTotal = calcularKmRecorrido(historial as MovimientoNeumatico[], keyPos);
-        //     //console.log('[DEBUG calculoKmRecorrido] resultado kmTotal:', kmTotal);
-        //     setKmRecorrido(kmTotal > 0 ? kmTotal.toLocaleString() + ' km' : '0 km');
-        // } catch (e: any) {
-        //     setKmRecorrido('—');
-        // }
     }, [neumatico]);
     // Estilos personalizados para REPUESTO
     const isReserva = keyPos === 'RES01';

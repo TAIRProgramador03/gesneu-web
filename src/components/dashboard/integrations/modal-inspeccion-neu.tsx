@@ -93,20 +93,6 @@ interface ModalInpeccionNeuProps {
 const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, onClose, placa, neumaticosAsignados, vehiculo, onSeleccionarNeumatico, onUpdateAsignados, onAbrirAsignacion, kilometroRealActual }) => {
   // Mostrar el array de neumáticos asignados cada vez que se abre el modal
 
-  // React.useEffect(() => {
-  //   if (open) {
-  //     console.log('[DEBUG] neumaticosAsignados al abrir modal:', neumaticosAsignados);
-  //   }
-  // }, [open, neumaticosAsignados]);
-
-
-  console.log({ dwdw244wadw: vehiculo, dwadwdw: open })
-
-  console.log({ jhdawkjdgukwakfgujw: kilometroRealActual })
-
-
-
-
   const { user } = useContext(UserContext) || {};
   const [neumaticoSeleccionado, setNeumaticoSeleccionado] = useState<any | null>(null);
   const [formValues, setFormValues] = React.useState<FormValues>({
@@ -200,9 +186,6 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
     }
     if (ultimaFechaInspeccion && ultimaFechaInspeccion >= min) {
 
-      console.log({ gaaadatefehcaultima: ultimaFechaInspeccion })
-
-
       // fecha_para_inspección debe ser > ultima_inspección, así que min es última + 1 día
       const d = new Date(ultimaFechaInspeccion + 'T00:00:00');
       d.setDate(d.getDate() + 1);
@@ -248,13 +231,7 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
           // --- LOG SOLICITADO: Mostrar si hay neumáticos con BAJA DEFINITIVA o RECUPERADO ---
           if (Array.isArray(data)) {
             const bajas = data.filter(n => n.TIPO_MOVIMIENTO === 'BAJA DEFINITIVA' || n.TIPO_MOVIMIENTO === 'RECUPERADO');
-            if (bajas.length > 0) {
-              console.log('[BAJA/RECUPERADO] Neumáticos encontrados:', bajas);
-            } else {
-              console.log('[BAJA/RECUPERADO] No hay neumáticos con BAJA DEFINITIVA ni RECUPERADO.');
-            }
           }
-          //console.log('neuAsignados después de listarNeumaticosAsignados:', data); // <-- Comentado
           // Limpiar selección y formulario si los asignados cambian
           setNeumaticoSeleccionado(null);
           setFormValues({
@@ -283,31 +260,26 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
   // Verificar si ya existe inspección hoy al abrir el modal usando el endpoint correcto
   useEffect(() => {
     if (open && placa) {
-      //console.log('[ModalInspeccionNeu] Verificando inspección para placa:', placa); // <-- Comentado
       const hoyx = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
 
       const verificarInspeccionPorBackend = async () => {
         try {
-          //console.log('[ModalInspeccionNeu] Obteniendo última fecha de inspección para placa:', placa); // <-- Comentado
 
           // Usar el endpoint correcto para obtener la última fecha de inspección
           const ultimaFechaInspeccionX = await getUltimaFechaInspeccionPorPlaca(placa);
 
-          //console.log('[ModalInspeccionNeu] Resultado de inspección:', { placa, ultimaFechaInspeccion, fechaHoy: hoy }); // <-- Comentado
 
           setFechaAsignacionOriginal(ultimaFechaInspeccionX.fecha_asignacion)
 
           if (ultimaFechaInspeccionX.fecha_registro) {
             if (ultimaFechaInspeccionX.fecha_registro === hoyx) {
               // Hay inspección de hoy - bloquear completamente
-              //console.log('[ModalInspeccionNeu] Hay inspección de hoy - bloqueando formulario'); // <-- Comentado
               setAlertaInspeccionHoy(true);
               setBloquearFormulario(true);
               setInspeccionHoyRealizada(true);
               setUltimaFechaInspeccion(ultimaFechaInspeccionX.fecha_registro);
             } else {
               // Hay inspección anterior - mostrar advertencia pero permitir continuar
-              //console.log('[ModalInspeccionNeu] Hay inspección anterior - mostrando advertencia'); // <-- Comentado
               setAlertaInspeccionHoy(true);
               setBloquearFormulario(false);
               setInspeccionHoyRealizada(false);
@@ -315,7 +287,6 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
             }
           } else {
             // No hay inspecciones previas
-            //console.log('[ModalInspeccionNeu] No hay inspecciones previas'); // <-- Comentado
             setAlertaInspeccionHoy(false);
             setBloquearFormulario(false);
             setInspeccionHoyRealizada(false);
@@ -334,7 +305,6 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
       verificarInspeccionPorBackend();
       // verificarInspeccionPorBackend();
     } else {
-      //console.log('[ModalInspeccionNeu] Modal cerrado o sin placa, reseteando estados'); // <-- Comentado
       // Resetear estados cuando el modal se cierre o no haya placa
       setAlertaInspeccionHoy(false);
       setBloquearFormulario(false);
@@ -342,7 +312,6 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
       setUltimaFechaInspeccion(null);
       // CLEANUP CRÍTICO: Limpiar cache de inspecciones pendientes al cerrar
       if (!open) {
-        console.log('[ModalInspeccionNeu] 🧹 Limpiando cache de inspecciones pendientes...');
         setInspeccionesPendientes([]);
         setFormValues({
           kilometro: '', marca: '', modelo: '', codigo: '', posicion: '', medida: '', diseño: '', remanente: '', presion_aire: '', torque: '', tipo_movimiento: '', estado: '', observacion: '', fecha_inspeccion: '',
@@ -374,13 +343,10 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
       setFormValuesInicial({ ...inspeccionLocal });
       return;
     }
-    // console.log('neumatico clickeado:', neumatico);
-    // console.log('neuAsignados en handleSeleccionarNeumatico:', neuAsignados);
     // Buscar el neumático asignado a esta posición (Relaxed: solo coincidir posición)
     const neuActual = neuAsignados.find(
       n => (n.POSICION === neumatico.POSICION || n.POSICION_NEU === neumatico.POSICION)
     );
-    //console.log('neuActual encontrado:', neuActual); // <-- Comentado
     const neuFull = neuActual || neumatico; // Usar el asignado, o el recibido si no hay
     setNeumaticoSeleccionado(neuFull);
     // Buscar datos completos en po_neumaticos por código
@@ -393,10 +359,8 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
     let kilometroUltimoMovimiento = '';
     try {
       // DEBUG: Log Inputs
-      console.log('--- MODAL INSPECCION DEBUG ---', { codigoBuscar, neuFull });
 
       const movimientos = await obtenerUltimosMovimientosPorCodigo(codigoBuscar);
-      console.log('Movimientos (Backend):', movimientos);
 
       let dataFromBackend = null;
       if (Array.isArray(movimientos) && movimientos.length > 0) {
@@ -405,11 +369,9 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
 
       // MERGE STRATEGY: Backend Data > Button List Data > Default
       const finalData = { ...neuFull, ...dataFromBackend };
-      console.log('Final Data for Form:', finalData);
 
       // 3. Direct Mapping from Final Data
       const odoInicial = finalData.KILOMETRO ? Number(finalData.KILOMETRO) : finalData.ODOMETRO_INICIAL ? Number(finalData.ODOMETRO_INICIAL) : (finalData.ODOMETRO_AL_MONTAR ? Number(finalData.ODOMETRO_AL_MONTAR) : 0);
-      console.log('ODOMETRO_AL_MONTAR (INICIAL):', odoInicial);
 
       remanenteUltimoMovimientoX = finalData.REMANENTE ? finalData.REMANENTE.toString() : '';
       presionUltimoMovimiento = finalData.PRESION_AIRE ? finalData.PRESION_AIRE.toString() : '';
@@ -443,11 +405,6 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
       });
 
       // 4. PRE-FILL ODOMETER & VALIDATION
-
-      console.log({
-        Odometro,
-        odoInicial
-      })
 
       // if (Odometro === 0) setOdometro(odoInicial);
       // setMinKilometro(odoInicial);
@@ -498,7 +455,6 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
       if (open && neuAsignados.length > 0 && !neumaticoSeleccionado && !bloquearFormulario) {
         const pos01 = neuAsignados.find(n => (n.POSICION === 'POS01' || n.POSICION_NEU === 'POS01') && n.TIPO_MOVIMIENTO !== 'BAJA DEFINITIVA');
         if (pos01) {
-          console.log('[AutoSelect] Seleccionando POS01 automáticamente:', pos01);
           handleSeleccionarNeumatico(pos01);
         }
       }
@@ -701,8 +657,6 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
   // TODO: Registrar la inspección 
   const handleEnviarYGuardar = async () => {
 
-    console.log('haaresponse')
-
     const fechaSeleccionada = formValues.fecha_inspeccion.trim();
 
     if (!fechaSeleccionada || fechaSeleccionada.length === 0) {
@@ -820,10 +774,6 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
       };
       return obj;
     });
-    if (payloads.length > 0) {
-      // console.log('Claves del primer objeto del payload:', Object.keys(payloads[0]));
-    }
-    console.log('Payload FINAL a enviar al backend:', payloads);
     try {
       await guardarInspeccion(payloads); // El backend acepta array
       toast.success('Inspecciones guardadas correctamente.', {
@@ -894,16 +844,11 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
   // Al abrir el modal o cambiar la placa, verificar si hay 4 posiciones ocupadas
   React.useEffect(() => {
     if (open && placa) {
-      console.log('[DEBUG] Llamando a obtenerUltimosMovimientosPorPosicion con placa:', placa);
       obtenerUltimosMovimientosPorPosicion(placa)
         .then((data: any[]) => {
-          console.log('[DEBUG] Respuesta de obtenerUltimosMovimientosPorPosicion:', data);
           const posiciones = Array.isArray(data)
             ? Array.from(new Set(data.map(n => n.POSICION_NEU || n.POSICION)))
             : [];
-          console.log('[DEBUG] Posiciones únicas encontradas:', posiciones);
-
-          console.log({ cantidadNeus: posiciones.length })
 
           setCantidadPosicionesValidas(posiciones.length);
           if (posiciones.length < 4) {
@@ -920,7 +865,6 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
           }
         })
         .catch((err) => {
-          console.log('[DEBUG] Error en obtenerUltimosMovimientosPorPosicion:', err);
           setAdvertenciaPosiciones({ open: false, faltan: 0 });
           setCantidadPosicionesValidas(0);
         });
@@ -933,12 +877,10 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
   // Solo ejecutar la validación de inspección si hay 4 posiciones válidas y no hay advertencia de cantidad
   useEffect(() => {
     if (open && placa && cantidadPosicionesValidas === 4 && !advertenciaPosiciones.open) {
-      console.log('[DEBUG] Hay 4 posiciones válidas, ejecutando verificación de inspección.');
       const hoyF = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
       const verificarInspeccionPorBackend = async () => {
         try {
           const ultimaFechaInspeccionY = await getUltimaFechaInspeccionPorPlaca(placa);
-          console.log('[DEBUG] Respuesta de getUltimaFechaInspeccionPorPlaca:', ultimaFechaInspeccionY?.fecha_asignacion);
           if (ultimaFechaInspeccionY?.fecha_asignacion) {
             if (ultimaFechaInspeccionY?.fecha_asignacion === hoyF) {
               setAlertaInspeccionHoy(true);
@@ -958,7 +900,6 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
             setUltimaFechaInspeccion(null);
           }
         } catch (error) {
-          console.log('[DEBUG] Error en getUltimaFechaInspeccionPorPlaca:', error);
           setAlertaInspeccionHoy(false);
           setBloquearFormulario(false);
           setInspeccionHoyRealizada(false);
@@ -1238,7 +1179,6 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
                         }}
                         onClick={() => {
                           if (formValues.posicion === n.POSICION) return;
-                          console.log(`[LOG POSICION] Click en botón ${n.POSICION} - Neumático:`, n);
                           handleSeleccionarNeumatico(n);
                         }}
                       >
@@ -1259,7 +1199,6 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
                     layout="modal"
                     tipoModal="inspeccion"
                     onPosicionClick={n => {
-                      console.log('[LOG DROPZONE] Click en dropzone inspección', n?.POSICION, n);
                       handleSeleccionarNeumatico(n);
                     }}
                     onMantenimientoClick={() => {

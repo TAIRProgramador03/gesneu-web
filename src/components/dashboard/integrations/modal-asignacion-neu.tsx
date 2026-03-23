@@ -155,7 +155,6 @@ const DropZone: React.FC<DropZoneProps> = memo(({
         drop: (item: Neumatico) => {
             if (isModalOpen || dropBlocked) return;
             if (item.CODIGO === lastRemovedCode) {
-                console.log('Drop ignorado: mismo código que el eliminado recientemente.');
                 return;
             }
             let shouldShake = false;
@@ -220,19 +219,8 @@ const DropZone: React.FC<DropZoneProps> = memo(({
     // Determinar si el neumático de la posición está en baja definitiva o recuperado
     const neumatico = assignedNeumaticos[position];
 
-    console.log({ JIJI: neumatico })
-
 
     const esBajaORecuperado = neumatico && (neumatico.TIPO_MOVIMIENTO === 'BAJA DEFINITIVA' || neumatico.TIPO_MOVIMIENTO === 'RECUPERADO');
-
-    // Log para depuración: mostrar qué neumático está asignado a esta posición
-    useEffect(() => {
-        if (neumatico) {
-            console.log(`[DropZone] Posición: ${position} | Neumático asignado:`, neumatico);
-        } else {
-            console.log(`[DropZone] Posición: ${position} | Sin neumático asignado`);
-        }
-    }, [neumatico, position]);
 
     // Estilo para POS01-04 y RES01
     const isPosicionPrincipal = ['POS01', 'POS02', 'POS03', 'POS04'].includes(position);
@@ -306,11 +294,6 @@ const DropZone: React.FC<DropZoneProps> = memo(({
 const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onClose, data, assignedNeumaticos: initialAssignedNeumaticos, placa, kilometro, onAssignedUpdate }) => {
 
 
-    console.log({ ModalJe: initialAssignedNeumaticos })
-    console.log({ dawdwjdilw: data })
-
-
-    //console.log('ModalAsignacionNeu props:', { open, onClose, data, initialAssignedNeumaticos, placa, kilometro, onAssignedUpdate });
     const initialAssignedMap = useMemo<Record<string, Neumatico | null>>(
         () => {
             // Ahora incluye las cinco posiciones
@@ -362,19 +345,9 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
         if (open) {
             setAssignedNeumaticos(initialAssignedMap);
         }
-        // LOG extra para ver qué props llegan desde el padre
-        // console.log('PROPS assignedNeumaticos (initialAssignedNeumaticos):', initialAssignedNeumaticos);
-        // console.log('initialAssignedMap:', initialAssignedMap);
     }, [open, initialAssignedMap, initialAssignedNeumaticos]);
 
-    useEffect(() => {
-        // LOG para ver el estado local del modal
-        // console.log('Assigned Neumaticos (estado local):', assignedNeumaticos);
-    }, [assignedNeumaticos]);
-
     const [searchTerm, setSearchTerm] = useState('');
-
-
 
     const handleDrop = (position: string, neumatico: Neumatico) => {
         const isDuplicate = Object.entries(assignedNeumaticos).some(
@@ -495,25 +468,6 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
                 };
             });
 
-            // --- INICIO DEPURACIÓN DE PAYLOAD ---
-            console.log('--- INICIO DEPURACIÓN DE PAYLOAD ---');
-            payloadArray.forEach((item, index) => {
-                console.log(`Elemento ${index}:`);
-                console.log(`  - CodigoNeumatico: ${item.CodigoNeumatico} (Tipo: ${typeof item.CodigoNeumatico})`);
-                console.log(`  - Remanente: ${item.Remanente} (Tipo: ${typeof item.Remanente})`);
-                console.log(`  - PresionAire: ${item.PresionAire} (Tipo: ${typeof item.PresionAire})`);
-                console.log(`  - TorqueAplicado: ${item.TorqueAplicado} (Tipo: ${typeof item.TorqueAplicado})`);
-                console.log(`  - Placa: ${item.Placa} (Tipo: ${typeof item.Placa})`);
-                console.log(`  - Posicion: ${item.Posicion} (Tipo: ${typeof item.Posicion})`);
-                console.log(`  - Odometro: ${item.Odometro} (Tipo: ${typeof item.Odometro})`);
-                console.log(`  - FechaAsignacion: ${item.FechaAsignacion} (Tipo: ${typeof item.FechaAsignacion})`);
-                console.log(`  - ID_OPERACION: ${item.ID_OPERACION} (Tipo: ${typeof item.ID_OPERACION})`);
-                console.log(`  - COD_SUPERVISOR: ${item.COD_SUPERVISOR} (Tipo: ${typeof item.COD_SUPERVISOR})`);
-                // console.log(`  - KmRecorridoxEtapa: ${item.KmRecorridoxEtapa} (Tipo: ${typeof item.KmRecorridoxEtapa})`);
-            });
-            console.log('--- FIN DEPURACIÓN DE PAYLOAD ---');
-
-            console.log('Payload enviado a asignarNeumatico:', payloadArray);
             await asignarNeumatico(payloadArray); // axios ya envía Content-Type: application/json
             toast.success('Neumático(s) asignado(s) y kilometraje actualizado.', {
                 position: 'top-right',

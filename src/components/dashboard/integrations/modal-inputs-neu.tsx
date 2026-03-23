@@ -21,13 +21,6 @@ interface ModalInputsNeuProps {
 
 const ModalInputsNeu: React.FC<ModalInputsNeuProps> = ({ open, onClose, onSubmit, initialRemanente = 0, initialOdometro = 0, initialPresionAire = 0, initialTorqueAplicado = 0, initialFechaAsignacion = '', fechaRegistroNeumatico, esRecuperado, fechaRecuperado = null }) => {
 
-    console.log({
-        hduwd231231kn: {
-            initialFechaAsignacion,// puede ser ""
-            fechaRegistroNeumatico // si o si habrá
-        }
-    })
-
     const [Odometro, setOdometro] = React.useState<number>(initialOdometro);
     const [Remanente, setRemanente] = React.useState<number>(initialRemanente);
     const [PresionAire, setPresionAire] = React.useState<number>(initialPresionAire);
@@ -60,10 +53,6 @@ const ModalInputsNeu: React.FC<ModalInputsNeuProps> = ({ open, onClose, onSubmit
     // Fecha mínima efectiva:
     // - si esRecuperado: max(hoy-3, fechaRecuperado)
     // - sino: max(hoy-3, fechaRegistroNeumatico)
-
-    console.log({ wdihahidhiawhidaw8o22: fechaRegistroNeumatico })
-    console.log({ esRecuperado })
-
 
     const fechaMinEfectiva = React.useMemo(() => {
         let min = fechaLimiteMin;
@@ -108,7 +97,6 @@ const ModalInputsNeu: React.FC<ModalInputsNeuProps> = ({ open, onClose, onSubmit
 
     React.useEffect(() => {
         if (open) {
-            console.log('[ModalInputsNeu] fechaRegistroNeumatico recibido:', fechaRegistroNeumatico);
             setOdometro(initialOdometro);
             setRemanente(initialRemanente);
             setPresionAire(initialPresionAire);
@@ -131,9 +119,6 @@ const ModalInputsNeu: React.FC<ModalInputsNeuProps> = ({ open, onClose, onSubmit
     };
 
     const handleSubmit = () => {
-
-        console.log(Remanente)
-
 
         if (Remanente > 25 || Remanente < 0) {
             setRemanenteError(true);

@@ -165,7 +165,6 @@ const DropZone: React.FC<DropZoneProps> = memo(({
 
             if (isModalOpen || dropBlocked) return;
             if (item.CODIGO === lastRemovedCode) {
-                console.log('Drop ignorado: mismo código que el eliminado recientemente.');
                 return;
             }
             let shouldShake = false;
@@ -316,17 +315,6 @@ const ModalAsignacionNeuDesdeDesasignacion: React.FC<ModalAsignacionNeuDesdeDesa
     onAssignedUpdate,
     onTemporaryAssign
 }) => {
-    // Log para debug
-    useEffect(() => {
-        if (open) {
-            console.log('[ModalAsignacionDesdeDesasignacion] Abriendo modal con:');
-            console.log('  - Posiciones vacías recibidas:', posicionesVacias);
-            console.log('  - Neumáticos cacheados:', cachedNeumaticosAsignados.map(n => ({
-                codigo: n.CODIGO_NEU || n.CODIGO,
-                posicion: n.POSICION || n.POSICION_NEU
-            })));
-        }
-    }, [open, posicionesVacias, cachedNeumaticosAsignados]);
 
     // Inicializar con mapa vacío, se llenará en el useEffect cuando el modal se abra
     const [assignedNeumaticos, setAssignedNeumaticos] = useState<Record<string, Neumatico | null>>({
@@ -348,7 +336,6 @@ const ModalAsignacionNeuDesdeDesasignacion: React.FC<ModalAsignacionNeuDesdeDesa
                 RES01: null,
             };
 
-            console.log('[ModalAsignacionDesdeDesasignacion] useEffect - Procesando neumáticos cacheados:', cachedNeumaticosAsignados.length);
 
             cachedNeumaticosAsignados.forEach((neu) => {
                 // Usar POSICION_NEU primero (como el modal original), luego POSICION como fallback
@@ -360,7 +347,6 @@ const ModalAsignacionNeuDesdeDesasignacion: React.FC<ModalAsignacionNeuDesdeDesa
                         POSICION: pos,
                         POSICION_NEU: pos
                     };
-                    console.log(`[ModalAsignacionDesdeDesasignacion] Asignando neumático ${neu.CODIGO_NEU || neu.CODIGO} a posición ${pos}`);
                 } else {
                     console.warn(`[ModalAsignacionDesdeDesasignacion] Neumático sin posición válida:`, {
                         codigo: neu.CODIGO_NEU || neu.CODIGO,
@@ -371,18 +357,6 @@ const ModalAsignacionNeuDesdeDesasignacion: React.FC<ModalAsignacionNeuDesdeDesa
                 }
             });
 
-            console.log('[ModalAsignacionDesdeDesasignacion] useEffect - Nuevo mapa creado:', {
-                POS01: nuevoMapa.POS01 ? (nuevoMapa.POS01.CODIGO_NEU || nuevoMapa.POS01.CODIGO) : 'null',
-                POS02: nuevoMapa.POS02 ? (nuevoMapa.POS02.CODIGO_NEU || nuevoMapa.POS02.CODIGO) : 'null',
-                POS03: nuevoMapa.POS03 ? (nuevoMapa.POS03.CODIGO_NEU || nuevoMapa.POS03.CODIGO) : 'null',
-                POS04: nuevoMapa.POS04 ? (nuevoMapa.POS04.CODIGO_NEU || nuevoMapa.POS04.CODIGO) : 'null',
-                RES01: nuevoMapa.RES01 ? (nuevoMapa.RES01.CODIGO_NEU || nuevoMapa.RES01.CODIGO) : 'null',
-            });
-            console.log('[ModalAsignacionDesdeDesasignacion] useEffect - Detalle POS01:', nuevoMapa.POS01 ? {
-                codigo: nuevoMapa.POS01.CODIGO_NEU || nuevoMapa.POS01.CODIGO,
-                posicion: nuevoMapa.POS01.POSICION || nuevoMapa.POS01.POSICION_NEU,
-                tipo: nuevoMapa.POS01.TIPO_MOVIMIENTO
-            } : 'null');
             setAssignedNeumaticos(nuevoMapa);
         } else if (open) {
             // Si el modal se abre pero no hay datos cacheados, inicializar vacío
@@ -435,9 +409,6 @@ const ModalAsignacionNeuDesdeDesasignacion: React.FC<ModalAsignacionNeuDesdeDesa
 
     const handleDrop = (position: string, neumatico: Neumatico) => {
         // Validar que la posición esté en la lista de posiciones vacías
-        console.log('[handleDrop] Intentando asignar a posición:', position);
-        console.log('[handleDrop] Posiciones vacías permitidas:', posicionesVacias);
-        console.log('[handleDrop] ¿Está permitida?:', posicionesVacias.includes(position));
 
         if (!posicionesVacias.includes(position)) {
             toast.warning(`No puedes asignar a la posición ${position}. Solo puedes asignar a las posiciones vacías: ${posicionesVacias.join(', ')}.`);
@@ -470,8 +441,6 @@ const ModalAsignacionNeuDesdeDesasignacion: React.FC<ModalAsignacionNeuDesdeDesa
         );
     }, [data, searchTerm]);
 
-
-    console.log({ dajdhwauwPOliii: filteredData })
 
 
     const paginatedData = useMemo(() => {
@@ -545,7 +514,6 @@ const ModalAsignacionNeuDesdeDesasignacion: React.FC<ModalAsignacionNeuDesdeDesa
                 };
             });
 
-            console.log('[ModalAsignacionDesdeDesasignacion] Payload preparado (TEMPORAL):', payloadArray);
 
             // NO guardar en BD, solo retornar al modal desasignar
             if (typeof onTemporaryAssign === 'function') {
@@ -697,16 +665,6 @@ const ModalAsignacionNeuDesdeDesasignacion: React.FC<ModalAsignacionNeuDesdeDesa
                                 />
                                 {/* DropZones */}
                                 <Box sx={{ position: 'absolute', top: '65px', left: '272px', zIndex: 2 }}>
-                                    {(() => {
-                                        const pos01Neu = assignedNeumaticos.POS01;
-                                        console.log('[Render POS01] Estado actual:', {
-                                            existe: !!pos01Neu,
-                                            codigo: pos01Neu ? (pos01Neu.CODIGO_NEU || pos01Neu.CODIGO) : 'null',
-                                            posicion: pos01Neu ? (pos01Neu.POSICION || pos01Neu.POSICION_NEU) : 'null',
-                                            tipo: pos01Neu ? pos01Neu.TIPO_MOVIMIENTO : 'null'
-                                        });
-                                        return null;
-                                    })()}
                                     <DropZone
                                         position="POS01"
                                         onDrop={(neumatico) => handleDrop('POS01', neumatico)}

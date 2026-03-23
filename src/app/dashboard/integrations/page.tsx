@@ -175,13 +175,7 @@ export default function Page(): React.JSX.Element {
           .map((n: any) => Number(n.Odometro ?? n.ODOMETRO ?? n.KILOMETRO ?? n.KILOMETRAJE))
           .filter((v: number) => !isNaN(v) && v > 0);
 
-        console.log({ vehiculoDataMain: vehiculoData })
-
-
         const ultimoKmReal = odometros.length > 0 ? Math.max(...odometros) : Number(vehiculoData.KILOMETRO ?? vehiculoData.KILOMETRAJE ?? 0);
-
-        console.log({ waaaik: ultimoKmReal })
-
 
         animateKilometraje(0, ultimoKmReal);
 
@@ -242,7 +236,6 @@ export default function Page(): React.JSX.Element {
           }
         });
 
-        console.log({ arrayFromsdahkjw: Array.from(neumaticosPorPosicion.values()) })
 
         // Pasar los neumáticos agrupados (solo el más reciente por posición)
         // setAssignedNeumaticos(Array.from(neumaticosPorPosicion.values()));
@@ -383,17 +376,6 @@ export default function Page(): React.JSX.Element {
           REMANENTE_ORIGINAL: n.REMANENTE_ORIGINAL // Preservar REMANENTE_ORIGINAL del backend
         }));
 
-        // Log para debugging - ver qué valores de ESTADO están llegando desde la API
-        console.log(`\n[page.tsx] useEffect vehiculo - Neumáticos recibidos de API: ${asignados.length}`);
-        console.log(`[page.tsx] Neumáticos activos después de filtrar: ${neumaticosActivos.length}`);
-        console.log(`[page.tsx] Neumáticos finales después de agrupar: ${neumaticosActuales.length}`);
-        neumaticosActuales.forEach((n, idx) => {
-          console.log(`  [${idx}] CODIGO: ${n.CODIGO}, POSICION: ${n.POSICION || n.POSICION_NEU}`);
-          console.log(`         ESTADO (desde backend): ${n.ESTADO} (tipo: ${typeof n.ESTADO})`);
-          console.log(`         REMANENTE: ${n.REMANENTE}, REMANENTE_ORIGINAL: ${n.REMANENTE_ORIGINAL || 'NULL'}`);
-          console.log(`         ---`);
-        });
-
         setNeumaticosAsignados(neumaticosActuales);
       })
       .catch((err) => {
@@ -493,8 +475,6 @@ export default function Page(): React.JSX.Element {
 
       if (codigosPendientes.length === 0) return;
 
-      console.log('[page.tsx] Cargando fechas para:', codigosPendientes.length, 'neumáticos');
-
       // Para evitar spam, procesamos uno por uno o en paralelo controlado
       for (const codigo of codigosPendientes) {
         try {
@@ -569,7 +549,6 @@ export default function Page(): React.JSX.Element {
       return Math.max(...odometros);
     }
     // Fallback: usar el del vehículo
-    console.log({ kaja: Number(vehiculo?.KILOMETRO ?? vehiculo?.KILOMETRAJE ?? 0) })
     return Number(vehiculo?.KILOMETRO ?? vehiculo?.KILOMETRAJE ?? 0);
   }, [movimientosHistoricos, vehiculo]);
 
@@ -607,7 +586,6 @@ export default function Page(): React.JSX.Element {
 
   // --- Función para recibir asignaciones temporales ---
   const handleTemporaryAssign = (asignaciones: any[]) => {
-    console.log('[page.tsx] Asignaciones temporales recibidas:', asignaciones);
     setAsignacionesTemporales(asignaciones);
     setOpenModalAsignacionDesdeDesasignacion(false);
   };
@@ -688,14 +666,12 @@ export default function Page(): React.JSX.Element {
 
       // Buscar inspecciones usando la API correcta
       try {
-        console.log('[Reubicacion] Consultando última inspección para placa:', vehiculo.PLACA);
 
         // const fechasVehiculo = await getUltimaFechaInspeccionPorPlaca(vehiculo.PLACA);
         const fechasInspeccion = await getFechasInspeccionVehicularPorPlaca(vehiculo.PLACA);
         const fechasVehiculo = fechasInspeccion[0];
 
         if (fechasInspeccion.length === 0) {
-          console.log('[Reubicacion] No hay inspección previa, abriendo modal inspeccion obligatoria');
           setOpenModalInspeccionObligatoria(true);
           return;
         }
@@ -707,13 +683,7 @@ export default function Page(): React.JSX.Element {
         hoy.setHours(0, 0, 0, 0);
 
 
-        console.log({
-          dateeessagga: {
-            fechaObj,
-            hoy,
-            fecharegistro: fechasVehiculo?.FECHA_REGISTRO
-          }
-        })
+
 
         const diffDias = Math.floor((hoy.getTime() - fechaObj.getTime()) / (1000 * 60 * 60 * 24));
 
@@ -722,7 +692,6 @@ export default function Page(): React.JSX.Element {
 
         // Validar si es >= 4 días (fuera del rango: hoy + 3 días anteriores)
         if (diffDias >= 4) {
-          console.log('[Reubicacion] Inspección antigua (>4 días), abriendo modal inspeccion obligatoria');
           // Si quieres mostrar mensaje específico de >4 días de antigüedad,
           // el modal obligatorio suele ser "No existe", pero aquí aplica igual.
           // O usar el de advertencia:
@@ -737,7 +706,6 @@ export default function Page(): React.JSX.Element {
         }
 
         // SI PASA TODAS LAS VALIDACIONES, ABRIR MODAL DIRECTAMENTE
-        console.log('[Reubicacion] Validaciones pasadas, abriendo modal de mantenimiento');
         setModoMantenimiento('REUBICAR');
         setOpenMantenimientoModal(true);
 

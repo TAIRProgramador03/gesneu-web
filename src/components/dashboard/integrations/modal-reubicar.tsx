@@ -37,7 +37,6 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = memo(({
   user,
   onAbrirInspeccion,
 }) => {
-  // console.log('[ModalReubicar] Abriendo modal con props:', { open, placa, neumaticosAsignados: neumaticosAsignados.length });
 
   const [neumaticosAsignadosState, setNeumaticosAsignadosState] = useState<Neumatico[]>([]);
   const [initialAssignedMap, setInitialAssignedMap] = useState<Record<string, Neumatico>>({});
@@ -67,7 +66,6 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = memo(({
   // Inicializar state cuando se abre el modal
   useEffect(() => {
     if (open && neumaticosAsignados && neumaticosAsignados.length > 0) {
-      console.log('[ModalReubicar] Inicializando con neumaticosAsignados:', neumaticosAsignados);
 
       // Limpiar duplicados - usar Map para mejor control
       const neumaticosMap = new Map<string, Neumatico>();
@@ -103,8 +101,6 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = memo(({
       // Agregar neumáticos de posiciones limpias
       posicionesMap.forEach(neu => neumaticosFinales.push(neu));
 
-      console.log('[ModalReubicar] Neumáticos limpios (sin duplicados):', neumaticosFinales.map(n => `${n.CODIGO_NEU || n.CODIGO}:${n.POSICION}`));
-      console.log('[ModalReubicar] Posiciones ocupadas:', Array.from(posicionesMap.keys()));
 
       // Usar setNeumaticosAsignadosState directamente aquí porque es la inicialización
       setNeumaticosAsignadosState(neumaticosFinales);
@@ -117,14 +113,12 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = memo(({
         }
       });
       setInitialAssignedMap(mapa);
-      console.log('[ModalReubicar] Mapa inicial creado:', mapa);
 
       // Inicializar posicionesOcupadas con Map (incluye POS y RES)
       const mapaOcupadas = new Map<string, Neumatico>();
       Object.entries(mapa).forEach(([pos, neu]) => {
         mapaOcupadas.set(pos, neu);
       });
-      console.log('[ModalReubicar] 🎯 Mapa ocupadas inicial:', Array.from(mapaOcupadas.keys()));
       setPosicionesOcupadas(mapaOcupadas);
 
       // Inicializar diagramaData con datos del mapa
@@ -134,7 +128,6 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = memo(({
         POSICION_NEU: pos,
       }));
       setDiagramaData(initialDiagramaData);
-      console.log('[ModalReubicar] 🎯 DiagramaData inicial:', initialDiagramaData.map(n => `${n.CODIGO_NEU || n.CODIGO}→${n.POSICION}`));
 
       // Limpiar zona temporal y observación cuando se abre el modal
       setNeumaticoEnZonaTemporal(null);
@@ -165,8 +158,6 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = memo(({
 
     setDiagramaData(arrayFromMap);
     setRefreshKey(prev => prev + 1);
-    console.log('[ModalReubicar] 🔄 SINCRONIZACIÓN FORZADA');
-    console.log('[ModalReubicar] 🎯 DiagramaData actualizado:', arrayFromMap.map(n => `${n.CODIGO_NEU || n.CODIGO}→${n.POSICION}`).join(', '));
   }, [posicionesOcupadas]);
 
   // Verificar bloqueo de reubicación
@@ -208,19 +199,14 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = memo(({
     });
     setPosicionesOcupadas(nuevoPosicionesMap);
 
-    console.log('[actualizarEstados] 🚀 Estados sincronizados:', Array.from(nuevoPosicionesMap.keys()));
-    console.log('[actualizarEstados] 📦 Neumáticos totales:', nuevosNeumaticos.length, '| En posiciones:', nuevoPosicionesMap.size);
   };
 
   // Handler para drop de neumático
   const handleDropNeumatico = (neumatico: Neumatico, posicion: string) => {
-    console.log('[handleDropNeumatico] Neumatico:', neumatico.CODIGO_NEU || neumatico.CODIGO, 'Posicion actual:', neumatico.POSICION, 'Destino:', posicion);
-    console.log('[handleDropNeumatico] Zona temporal ocupada:', neumaticoEnZonaTemporal ? (neumaticoEnZonaTemporal.CODIGO_NEU || neumaticoEnZonaTemporal.CODIGO) : 'vacía');
 
     if (posicion === '') {
       // Moviendo a zona temporal - solo permitir si no hay otro neumático
       if (neumaticoEnZonaTemporal) {
-        console.log('[handleDropNeumatico] Rechazando: zona temporal ya ocupada');
         toast.warning('Solo puede haber un neumático en la zona de reubicación a la vez.');
         return;
       }
@@ -235,8 +221,6 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = memo(({
         );
         actualizarEstados(nuevosNeumaticos);
 
-        console.log(`[handleDropNeumatico] ✅ Neumático ${neumatico.CODIGO_NEU || neumatico.CODIGO} movido a zona temporal, posición ${neumatico.POSICION} liberada`);
-        console.log(`[handleDropNeumatico] 📊 NUEVO ESTADO:`, nuevosNeumaticos.map(n => `${n.CODIGO_NEU || n.CODIGO}:${n.POSICION}`));
       }
     }
   };
@@ -246,7 +230,6 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = memo(({
     const { active, over } = event;
 
     if (!over) {
-      console.log('[handleDragEnd] No hay destino válido');
       return;
     }
 
@@ -254,10 +237,6 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = memo(({
     const overId = over.id as string;
     const activeData = active.data.current as Neumatico & { from?: string } | undefined;
 
-    console.log('[handleDragEnd] 🎯 DRAG DEBUG - activeId:', activeId, 'overId:', overId);
-    console.log('[handleDragEnd] 🎯 DRAG DEBUG - active.data:', activeData);
-    console.log('[handleDragEnd] Estado zona temporal:', neumaticoEnZonaTemporal ? (neumaticoEnZonaTemporal.CODIGO_NEU || neumaticoEnZonaTemporal.CODIGO) : 'vacía');
-    console.log('[handleDragEnd] Neumáticos en estado:', neumaticosAsignadosState.map(n => `${n.CODIGO_NEU || n.CODIGO}:${n.POSICION}`));
 
     // CASO 1: Movimiento desde zona temporal a una posición  
     const codigoZonaTemporal = neumaticoEnZonaTemporal ? (neumaticoEnZonaTemporal.CODIGO_NEU || neumaticoEnZonaTemporal.CODIGO) : null;
@@ -270,21 +249,11 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = memo(({
       (activeData?.CODIGO_NEU || activeData?.CODIGO) === codigoZonaTemporal
     );
 
-    console.log('[handleDragEnd] 🔍 VERIFICACIÓN ZONA TEMPORAL:');
-    console.log('  - Código en zona temporal:', codigoZonaTemporal);
-    console.log('  - ActiveId recibido:', activeId);
-    console.log('  - Active.data.POSICION:', activeData?.POSICION);
-    console.log('  - ¿Es desde zona temporal?:', esDesdeZonaTemporal);
-
     if (esDesdeZonaTemporal) {
-      console.log(`[handleDragEnd] 🔵 CASO 1: Movimiento desde zona temporal - ${activeId} hacia ${overId}`);
-      console.log(`[handleDragEnd] 🔵 Verificación zona temporal: código=${neumaticoEnZonaTemporal.CODIGO_NEU || neumaticoEnZonaTemporal.CODIGO}, activeId=${activeId}`);
-      console.log('[handleDragEnd] 🔵 Neumático en zona temporal:', neumaticoEnZonaTemporal);
 
       if (overId.startsWith('POS') || overId.startsWith('RES')) {
         // Verificar si la posición de destino está ocupada
         const neumaticoEnDestino = neumaticosAsignadosState.find(n => n.POSICION === overId);
-        console.log(`[handleDragEnd] Verificando posición ${overId}, ocupada por:`, neumaticoEnDestino ? (neumaticoEnDestino.CODIGO_NEU || neumaticoEnDestino.CODIGO) : 'nadie');
 
         if (neumaticoEnDestino) {
           toast.warning(`La posición ${overId} ya está ocupada por ${neumaticoEnDestino.CODIGO_NEU || neumaticoEnDestino.CODIGO}`)
@@ -297,32 +266,21 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = memo(({
           { ...neumaticoEnZonaTemporal, POSICION: overId }
         ];
 
-        console.log('[handleDragEnd] 🔵 Moviendo desde zona temporal:', {
-          neumatico: { ...neumaticoEnZonaTemporal, POSICION: overId },
-          estadoAnterior: neumaticosAsignadosState.length,
-          estadoNuevo: nuevosNeumaticos.length
-        });
-
         actualizarEstados(nuevosNeumaticos);
         setNeumaticoEnZonaTemporal(null);
 
-        console.log(`[handleDragEnd] ✅ Neumático ${neumaticoEnZonaTemporal.CODIGO_NEU || neumaticoEnZonaTemporal.CODIGO} movido desde zona temporal a ${overId}`);
-        console.log(`[handleDragEnd] 📊 NUEVO ESTADO:`, nuevosNeumaticos.map(n => `${n.CODIGO_NEU || n.CODIGO}:${n.POSICION}`));
         return;
       }
-      console.log(`[handleDragEnd] ⚠️ Destino ${overId} no es una posición válida para zona temporal`);
       return;
     }
 
     // CASO 2: Movimiento desde posición a zona temporal
     if (overId === 'neumaticos-por-rotar') {
-      console.log(`[handleDragEnd] 🟡 CASO 2: Movimiento desde posición a zona temporal - ${activeId}`);
 
       // Intentar obtener el neumático desde active.data.current primero (viene del diagrama)
       let neumatico: Neumatico | undefined;
       if (activeData) {
         neumatico = activeData as Neumatico;
-        console.log(`[handleDragEnd] 🟡 Neumático obtenido desde active.data.current:`, neumatico.CODIGO_NEU || neumatico.CODIGO);
       } else {
         // Fallback: buscar en el estado por código o posición
         neumatico = neumaticosAsignadosState.find(n =>
@@ -330,42 +288,34 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = memo(({
           n.POSICION === activeId ||
           (n.CODIGO_NEU || n.CODIGO || n.POSICION) === activeId
         );
-        console.log(`[handleDragEnd] 🟡 Neumático obtenido desde estado:`, neumatico ? (neumatico.CODIGO_NEU || neumatico.CODIGO) : 'no encontrado');
       }
 
       if (neumatico) {
         handleDropNeumatico(neumatico, '');
-      } else {
-        console.log(`[handleDragEnd] ⚠️ No se encontró neumático ${activeId} en el estado ni en active.data`);
       }
       return;
     }
 
     // CASO 3: Movimiento directo entre posiciones (sin zona temporal)
     if (overId.startsWith('POS') || overId.startsWith('RES')) {
-      console.log(`[handleDragEnd] 🟢 CASO 3: Movimiento directo entre posiciones - ${activeId} hacia ${overId}`);
 
       // Intentar obtener el neumático desde active.data.current primero (viene del diagrama)
       let neumatico: Neumatico | undefined;
       if (activeData) {
         neumatico = activeData as Neumatico;
-        console.log(`[handleDragEnd] 🟢 Neumático obtenido desde active.data.current:`, neumatico.CODIGO_NEU || neumatico.CODIGO);
       } else {
         // Fallback: buscar en el estado por código o posición
         neumatico = neumaticosAsignadosState.find(n =>
           (n.CODIGO_NEU || n.CODIGO) === activeId ||
           n.POSICION === activeId
         );
-        console.log(`[handleDragEnd] 🟢 Neumático obtenido desde estado:`, neumatico ? (neumatico.CODIGO_NEU || neumatico.CODIGO) : 'no encontrado');
       }
 
       if (!neumatico) {
-        console.log('[handleDragEnd] ⚠️ Neumático no encontrado para movimiento directo');
         return;
       }
 
       const codigoNeumatico = neumatico.CODIGO_NEU || neumatico.CODIGO;
-      console.log(`[handleDragEnd] Neumático encontrado: ${codigoNeumatico} en posición ${neumatico.POSICION}`);
 
       // Verificar si la posición de destino está ocupada por OTRO neumático
       const neumaticoEnDestino = neumaticosAsignadosState.find(n =>
@@ -373,7 +323,6 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = memo(({
       );
 
       if (neumaticoEnDestino) {
-        console.log(`[handleDragEnd] ⚠️ Posición ${overId} ocupada por ${neumaticoEnDestino.CODIGO_NEU || neumaticoEnDestino.CODIGO}`);
         toast.warning(`La posición ${overId} ya está ocupada por ${neumaticoEnDestino.CODIGO_NEU || neumaticoEnDestino.CODIGO}`)
         return;
       }
@@ -382,19 +331,15 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = memo(({
       const nuevosNeumaticos = neumaticosAsignadosState.map(n => {
         const codigoN = n.CODIGO_NEU || n.CODIGO;
         if (codigoN === codigoNeumatico) {
-          console.log(`[handleDragEnd] Actualizando ${codigoNeumatico}: ${n.POSICION} -> ${overId}`);
           return { ...n, POSICION: overId };
         }
         return n;
       });
 
       actualizarEstados(nuevosNeumaticos);
-      console.log(`[handleDragEnd] ✅ Movimiento directo completado: ${codigoNeumatico} de ${neumatico.POSICION} a ${overId}`);
-      console.log(`[handleDragEnd] 📊 NUEVO ESTADO:`, nuevosNeumaticos.map(n => `${n.CODIGO_NEU || n.CODIGO}:${n.POSICION}`));
       return;
     }
 
-    console.log(`[handleDragEnd] ⚠️ Destino ${overId} no manejado`);
   };
 
   // Handler para guardar reubicación
@@ -484,8 +429,6 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = memo(({
       toast.info('No hay cambios de posición para registrar.');
       return;
     }
-
-    console.log('[handleGuardarReubicacion] Movimientos a registrar:', movimientos);
 
     try {
       const normalizedPayloadArray = movimientos.map(normalizePayload);
@@ -597,9 +540,9 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = memo(({
     <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
       <DialogContent>
         <DndContext
-          onDragStart={(event: DragStartEvent) => {
-            console.log('[DndContext] 🚀 DRAG START - activeId:', event.active.id, 'data:', event.active.data.current);
-          }}
+          // onDragStart={(event: DragStartEvent) => {
+          //   console.log('[DndContext] 🚀 DRAG START - activeId:', event.active.id, 'data:', event.active.data.current);
+          // }}
           onDragEnd={handleDragEnd}
         >
           <Stack direction="row" spacing={2}>
@@ -779,8 +722,6 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = memo(({
                       ...n,
                       _forceRender: Date.now() + idx // Garantizar nueva referencia
                     }));
-
-                    console.log('[DiagramaVehiculo] 🚀 DATOS SINCRONIZADOS ENVIADOS:', dataWithForce.map(n => `${n.CODIGO_NEU || n.CODIGO}:${n.POSICION || 'SIN_POS'}`));
                     return dataWithForce;
                   })() as any}
                   layout="modal"
@@ -917,12 +858,6 @@ export const DropNeumaticosPorRotar: React.FC<{
 }> = memo(({ onDropNeumatico, children }) => {
   const { setNodeRef, isOver, active } = useDroppable({ id: 'neumaticos-por-rotar' });
 
-  React.useEffect(() => {
-    if (isOver && active) {
-      console.log('[DropNeumaticosPorRotar] 🎯 DROPZONE ACTIVO - isOver:', isOver, 'activeId:', active.id);
-    }
-  }, [isOver, active]);
-
   return (
     <Box
       ref={setNodeRef}
@@ -987,7 +922,6 @@ async function obtenerYSetearUltimaInspeccionPorPlaca(placa: string): Promise<st
   if (!placa) return null;
   try {
     const fecha = await getUltimaFechaInspeccionPorPlaca(placa);
-    console.log('[DEBUG] Última inspección recibida para placa', placa, ':', fecha?.fecha_registro);
     return fecha?.fecha_registro || null;
   } catch (error) {
     console.error('Error obteniendo la última inspección por placa:', error);

@@ -54,7 +54,6 @@ export function calcularKmRecorrido(historial: MovimientoNeumatico[], posicionAc
             }
             kmRecorridoTotal = kmBase;
             // Nunca sumar inspecciones en RES01
-            //console.log(`Km recorrido total en RES01:`, kmRecorridoTotal);
             return;
         }
         // Para posiciones activas, sumar solo entre inspecciones en esa posición, partiendo del kmBase
@@ -70,7 +69,6 @@ export function calcularKmRecorrido(historial: MovimientoNeumatico[], posicionAc
             }
         }
         kmRecorridoTotal = kmBase + sumaPos;
-        //console.log(`Km recorrido total en ${posicion}:`, kmRecorridoTotal);
     });
     return kmRecorridoTotal;
 }

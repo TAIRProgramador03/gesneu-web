@@ -51,10 +51,8 @@ export function SignInForm(): React.JSX.Element {
   const onSubmit = React.useCallback(
     async (values: Values): Promise<void> => {
       setIsPending(true);
-      console.log('[SignInForm] onSubmit: valores enviados', values);
       try {
         const loginResp = await loginApi({ usuario: values.usuario, password: values.password });
-        console.log('[SignInForm] loginApi OK', loginResp);
       } catch (err: any) {
         console.error('[SignInForm] Error en loginApi', err);
         setError('root', { type: 'server', message: err?.response?.data?.error || 'Error de autenticación' });
@@ -63,9 +61,7 @@ export function SignInForm(): React.JSX.Element {
       }
       // Refresh the auth state
       try {
-        console.log('[SignInForm] Llamando a checkSession');
         await checkSession?.();
-        console.log('[SignInForm] checkSession OK');
         router.push('/dashboard');
         setIsPending(false);
       } catch (err) {

@@ -26,20 +26,10 @@ const ModalConfirmarInspeccion: React.FC<ModalConfirmarInspeccionProps> = memo((
     onContinuarReubicacion,
 }) => {
     // Log de depuración para confirmar render y props
-    if (open) {
-        console.log('[ModalConfirmarInspeccion] Renderizado con:', {
-            open,
-            fechaUltimaInspeccion,
-            diasDiferencia
-        });
-    }
     // Lógica adaptada
     const esMuyAntigua = diasDiferencia > 4;
     const esReciente = diasDiferencia >= 1 && diasDiferencia <= 4;
     const esHoy = diasDiferencia === 0;
-
-    console.log({ gaaaHoytaiiue: esHoy })
-
 
     // Título
     let titulo = 'CONFIRMAR INSPECCIÓN';

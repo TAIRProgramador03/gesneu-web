@@ -53,13 +53,6 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
   onReceiveTemporaryAssignments,
   asignacionesTemporalesExternas = [],
 }) => {
-  // Solo log cuando se abre realmente
-  if (open) {
-    console.log('[ModalDesasignar] Abriendo modal con props:', { placa, neumaticosAsignados: neumaticosAsignados.length });
-  }
-
-
-  console.log({ asignadr12xr: neumaticosAsignados })
 
 
   const [neumaticosAsignadosState, setNeumaticosAsignadosState] = useState<NeumaticoExtendido[]>([]);
@@ -88,15 +81,6 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
     const modalSeAbrio = open && !prevOpenRef.current;
 
     if (open && neumaticosAsignados && (modalSeAbrio || neumaticosCambiaron)) {
-      console.log('[ModalDesasignar] Inicializando con:', {
-        placa,
-        totalNeumaticos: neumaticosAsignados.length,
-        neumaticos: neumaticosAsignados.map(n => ({
-          codigo: n.CODIGO_NEU || n.CODIGO,
-          posicion: n.POSICION || n.POSICION_NEU,
-          idMovimiento: n.ID_MOVIMIENTO
-        }))
-      });
 
       // Obtener los códigos de los neumáticos que están actualmente en el área de desasignación
       const codigosEnAreaDesasignacion = new Set<string>();
@@ -123,11 +107,6 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
             enAreaDesasignacion: yaEstabaEnArea || (estadoAnterior?.enAreaDesasignacion ?? false)
           };
         });
-        console.log('[ModalDesasignar] Neumáticos con estado:', neumaticosConEstado.map(n => ({
-          codigo: n.CODIGO_NEU || n.CODIGO,
-          posicion: n.POSICION || n.POSICION_NEU,
-          enArea: n.enAreaDesasignacion
-        })));
         return neumaticosConEstado;
       });
 
@@ -152,14 +131,8 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
         mapa[pos] = neu;
       });
 
-      console.log('[ModalDesasignar] Mapa inicial creado:', Object.keys(mapa).map(pos => ({
-        posicion: pos,
-        codigo: mapa[pos].CODIGO_NEU || mapa[pos].CODIGO,
-        idMovimiento: mapa[pos].ID_MOVIMIENTO
-      })));
 
       setInitialAssignedMap(mapa);
-      console.log('[ModalDesasignar] Mapa de posiciones:', mapa);
 
       // Actualizar referencias
       prevNeumaticosAsignadosRef.current = neumaticosAsignados;
@@ -188,7 +161,6 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
   // Sincronizar asignaciones temporales externas con estado interno
   useEffect(() => {
     if (asignacionesTemporalesExternas && asignacionesTemporalesExternas.length > 0) {
-      console.log('[ModalDesasignar] Recibiendo asignaciones temporales externas:', asignacionesTemporalesExternas);
       setAsignacionesTemporales(asignacionesTemporalesExternas);
 
       // Actualizar diagrama para mostrar asignaciones temporales visualmente
@@ -225,7 +197,6 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
           }
         });
 
-        console.log('[ModalDesasignar] Diagrama actualizado con asignaciones temporales');
         return nuevoEstado;
       });
     }
@@ -283,14 +254,12 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
 
   // Handler para drop de neumático - simplificado ya que handleDragEnd maneja la lógica principal
   const handleDropNeumatico = (neumatico: Neumatico, posicion: string) => {
-    console.log('[handleDropNeumatico] Neumatico:', neumatico.CODIGO_NEU || neumatico.CODIGO, 'Posicion:', posicion);
     // La lógica principal se maneja en handleDragEnd
   };
 
   // Handler para click en neumático del área de desasignación para resaltar su posición original
   const handleClickNeumaticoArea = (neumatico: Neumatico) => {
     const posicionOriginal = neumatico.POSICION || neumatico.POSICION_NEU || '';
-    console.log('[handleClickNeumaticoArea] Resaltando posición:', posicionOriginal, 'para neumático:', neumatico.CODIGO_NEU || neumatico.CODIGO);
 
     // Resaltar la posición por 3 segundos
     setPosicionResaltada(posicionOriginal);
@@ -317,7 +286,6 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
     const { active, over } = event;
 
     if (!over) {
-      console.log('[handleDragEnd] No hay destino válido');
       return;
     }
 
@@ -325,15 +293,12 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
     const overId = over.id as string;
     const activeData = active.data.current as NeumaticoExtendido & { from?: string } | undefined;
 
-    console.log('[handleDragEnd] Moviendo desde:', activeId, 'hacia:', overId);
-    console.log('[handleDragEnd] Active data:', activeData);
 
     // Encontrar el neumático que se está moviendo
     // Primero intentar desde active.data.current (viene del diagrama)
     let neumatico: NeumaticoExtendido | undefined;
     if (activeData) {
       neumatico = activeData as NeumaticoExtendido;
-      console.log('[handleDragEnd] Neumático obtenido desde active.data.current:', neumatico.CODIGO_NEU || neumatico.CODIGO);
     } else {
       // Fallback: buscar en el estado por código o posición
       neumatico = neumaticosAsignadosState.find(n =>
@@ -341,11 +306,9 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
         n.POSICION === activeId ||
         (n.CODIGO_NEU || n.CODIGO || n.POSICION) === activeId
       );
-      console.log('[handleDragEnd] Neumático obtenido desde estado:', neumatico ? (neumatico.CODIGO_NEU || neumatico.CODIGO) : 'no encontrado');
     }
 
     if (!neumatico) {
-      console.log('[handleDragEnd] Neumático no encontrado');
       return;
     }
 
@@ -383,25 +346,15 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
           prev.map((n: NeumaticoExtendido) => {
             const esEsteNeumatico = (n.CODIGO_NEU || n.CODIGO) === codigoNeumatico;
             const nuevoEstado = esEsteNeumatico ? { ...n, enAreaDesasignacion: true } : n;
-
-            if (esEsteNeumatico && (n.POSICION === 'POS04' || n.POSICION_NEU === 'POS04')) {
-              console.log(`[handleDragEnd] POS04 actualizado - antes: ${n.enAreaDesasignacion}, después: ${nuevoEstado.enAreaDesasignacion}`);
-            }
-
             return nuevoEstado;
           })
         );
 
-        console.log('[handleDragEnd] ✅ Neumático agregado al área:', codigoNeumatico);
-      } else {
-        const razon = yaSeleccionado ? 'ya está en lista' : 'ya está marcado en área';
-        console.log('[handleDragEnd] ❌ Neumático NO agregado -', codigoNeumatico, ':', razon);
       }
     } else if (overId.startsWith('POS') || overId === 'RES01') {
       // Si se suelta en una posición del vehículo (POS01-POS04 o RES01), remover del área de desasignación
       const codigoNeumatico = neumatico.CODIGO_NEU || neumatico.CODIGO;
       const posicionOriginal = neumatico.POSICION || neumatico.POSICION_NEU || '';
-      console.log('[handleDragEnd] 🔄 Devolviendo neumático:', codigoNeumatico, 'hacia:', overId, 'posición original:', posicionOriginal);
 
       // Bloquear si la posición destino tiene un neumático TEMPORAL (recién asignado)
       // Esto aplica incluso si es la posición original del neumático arrastrado
@@ -424,7 +377,6 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
       );
 
       if (posicionReservadaEnArea) {
-        console.log(`[handleDragEnd] ⚠️ Posición ${overId} reservada por neumático en área de desasignación`);
         toast.warning(`La posición ${overId} está reservada (neumático pendiente de desasignación)`)
         return;
       }
@@ -442,15 +394,8 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
 
       // Si hay un neumático en destino que NO está en área de desasignación Y no es la posición original, bloquear
       if (neumaticoEnDestino && !esPosicionOriginal) {
-        console.log(`[handleDragEnd] ⚠️ Posición ${overId} ocupada por ${neumaticoEnDestino.CODIGO_NEU || neumaticoEnDestino.CODIGO}`);
         toast.info(`La posición ${overId} ya está ocupada por ${neumaticoEnDestino.CODIGO_NEU || neumaticoEnDestino.CODIGO}`)
         return;
-      }
-
-      if (esPosicionOriginal) {
-        console.log(`[handleDragEnd] ✅ Devolviendo a posición original ${overId}`);
-      } else {
-        console.log(`[handleDragEnd] ✅ Devolviendo a posición ${overId} (nueva posición)`);
       }
 
       // Desmarcar como en área de desasignación y actualizar posición
@@ -461,10 +406,6 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
             ? { ...n, enAreaDesasignacion: false, POSICION: overId, POSICION_NEU: overId }
             : n;
 
-          if (esEsteNeumatico && (n.POSICION === 'POS04' || n.POSICION_NEU === 'POS04')) {
-            console.log(`[handleDragEnd] POS04 devuelto - antes: ${n.enAreaDesasignacion}, después: ${nuevoEstado.enAreaDesasignacion}`);
-          }
-
           return nuevoEstado;
         })
       );
@@ -472,7 +413,6 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
       // Remover de la lista de seleccionados
       setNeumaticoSeleccionados(prev => {
         const nuevaLista = prev.filter(n => (n.CODIGO_NEU || n.CODIGO) !== codigoNeumatico);
-        console.log('[handleDragEnd] Lista actualizada - antes:', prev.length, 'después:', nuevaLista.length);
         return nuevaLista;
       });
     }
@@ -529,16 +469,6 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
     // Encontrar las posiciones que quedarán vacías
     const posicionesVacias = posicionesRequeridas.filter(pos => !posicionesOcupadas.has(pos));
 
-    console.log('[detectarPosicionesVacias] Posiciones requeridas:', posicionesRequeridas);
-    console.log('[detectarPosicionesVacias] Códigos en área desasignación:', Array.from(codigosEnAreaDesasignacion));
-    console.log('[detectarPosicionesVacias] Neumáticos por posición:', Array.from(neumaticosPorPosicion.entries()).map(([pos, neus]) => ({
-      posicion: pos,
-      neumaticos: neus.map(n => ({ codigo: n.codigo, enArea: n.enArea }))
-    })));
-    console.log('[detectarPosicionesVacias] Posiciones ocupadas:', Array.from(posicionesOcupadas));
-    console.log('[detectarPosicionesVacias] Posiciones vacías:', posicionesVacias);
-    console.log('[detectarPosicionesVacias] Usando:', neumaticosAsignadosState.length > 0 ? 'neumaticosAsignadosState' : 'neumaticosAsignados prop', 'Total:', neumaticosParaProcesar.length);
-
     return posicionesVacias;
   };
 
@@ -580,16 +510,6 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
     }
 
     try {
-      console.log('[DEBUG] Enviando desasignaciones con:', {
-        placa,
-        neumaticosSeleccionados: neumaticosSeleccionados.length,
-        accion,
-        tipoAccion,
-        observacion,
-        fechaUltimaInspeccion,
-        asignacionesTemporales: asignacionesTemporales.length
-      });
-
       // Asignaciones temporales son OBLIGATORIAS para guardar la desasignación
       if (asignacionesTemporales.length === 0) {
         toast.error('Debes asignar neumáticos de reemplazo antes de guardar la desasignación. Usa el botón "Asignar Neumáticos".', {
@@ -600,7 +520,6 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
 
       // **FLUJO ÚNICO**: Usar endpoint /api/desasignar-con-reemplazo
       if (asignacionesTemporales.length > 0) {
-        console.log('[handleGuardarDesasignacion] Usando endpoint desasignar-con-reemplazo');
 
         // Preparar desasignaciones
 
@@ -620,7 +539,6 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
           }
 
           if (!posicionInicial || (!/^POS\d{2}$/.test(posicionInicial) && posicionInicial !== 'RES01')) {
-            console.log('[DEBUG] Neumático sin posición válida:', neumaticoSeleccionado.CODIGO_NEU || neumaticoSeleccionado.CODIGO);
             continue;
           }
 
@@ -650,12 +568,8 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
           asignaciones: asignacionesTempo
         };
 
-        console.log('[handleGuardarDesasignacion] Payload completo:', payload);
         const data = await desasignarConReemplazo(payload);
 
-        // if()
-
-        console.log({ dasldwifwa: data })
 
         toast.success(`${neumaticosSeleccionados.length} desasignación(es) y ${asignacionesTempo.length} asignación(es) registradas correctamente.`, {
           position: 'top-right',
@@ -977,11 +891,6 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
                           POSICION_NEU: pos
                         };
                       });
-                      console.log('[Button Asignar] Posiciones vacías:', posicionesVaciasActuales);
-                      console.log('[Button Asignar] Neumáticos actuales:', neumaticosActuales.map(n => ({
-                        codigo: n.CODIGO_NEU || n.CODIGO,
-                        posicion: n.POSICION || n.POSICION_NEU
-                      })));
                       onAbrirAsignacion({
                         cachedNeumaticosAsignados: neumaticosActuales,
                         posicionesVacias: posicionesVaciasActuales
@@ -1108,7 +1017,6 @@ async function obtenerYSetearUltimaInspeccionPorPlaca(placa: string): Promise<st
   if (!placa) return null;
   try {
     const fecha = await getUltimaFechaInspeccionPorPlaca(placa);
-    console.log('[DEBUG] Última inspección recibida para placa', placa, ':', fecha);
     return fecha?.fecha_registro || null;
   } catch (error) {
     console.error('Error obteniendo la última inspección por placa:', error);
