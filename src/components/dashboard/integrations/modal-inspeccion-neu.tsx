@@ -76,6 +76,7 @@ interface Vehiculo {
   cod_supervisor?: string,
   id_operacion?: number,
   tipo_terreno: string
+  reten: string
 }
 
 interface ModalInpeccionNeuProps {
@@ -770,7 +771,8 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
         COD_SUPERVISOR: vehiculo?.cod_supervisor,
         ID_OPERACION: vehiculo?.id_operacion,
         FECHA_INSPECCION: formatDate(fechaInspeccionGlobal) || null,
-        TIPO_TERRENO: vehiculo?.tipo_terreno
+        TIPO_TERRENO: vehiculo?.tipo_terreno,
+        RETEN: vehiculo?.reten
       };
       return obj;
     });
@@ -1010,6 +1012,13 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
                         <Box>
                           <Typography variant="caption" color="text.secondary">Tipo de terreno</Typography>
                           <Typography variant="body2" sx={{ fontWeight: 'bold' }}>{vehiculo.tipo_terreno}</Typography>
+                        </Box>
+                      )}
+
+                      {vehiculo?.reten !== undefined && (
+                        <Box>
+                          <Typography variant="caption" color="text.secondary">Retén</Typography>
+                          <Typography variant="body2" sx={{ fontWeight: 'bold' }}>{vehiculo.reten}</Typography>
                         </Box>
                       )}
 

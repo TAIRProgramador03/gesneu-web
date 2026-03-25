@@ -104,6 +104,7 @@ export default function Page(): React.JSX.Element {
     ID_OPERACION: number;
     ID_SUPERVISOR: string;
     TIPO_TERRENO: string
+    RETEN: string
   }
 
   const handleSearchChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -1171,7 +1172,8 @@ export default function Page(): React.JSX.Element {
               id_operacion: vehiculo.ID_OPERACION,
               kilometro: vehiculo.KILOMETRO,
               cod_supervisor: vehiculo.ID_SUPERVISOR,
-              tipo_terreno: vehiculo.TIPO_TERRENO
+              tipo_terreno: vehiculo.TIPO_TERRENO,
+              reten: vehiculo.RETEN
             } : undefined}
             kilometroRealActual={ultimoKilometroReal}
             onSeleccionarNeumatico={() => { }}
