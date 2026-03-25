@@ -1,21 +1,20 @@
 'use client'
 
-import { Card, Dialog, DialogContent, DialogTitle, Typography, Box, Chip } from '@mui/material';
-import { Stack } from '@mui/system';
-import React, { useMemo, useRef, useState } from 'react'
-import DialogActions from '@mui/material/DialogActions';
 import { Button as ButtonCustom } from '@/components/ui/button';
+import { Card, Dialog, DialogContent, DialogTitle, Typography, Box } from '@mui/material';
+import { ChevronsLeft, ChevronsRight, CircleChevronRight, RotateCw, SquareCheck } from 'lucide-react';
 import { EsRecuperadoBadge } from '@/components/ui/EsRecuperadoBadge';
+import { Field } from '@/components/ui/field';
+import { Input } from '@/components/ui/input';
 import { LinearProgressItem } from '@/components/ui/LinearProgress';
-import { TipoMovimientoBadge } from '@/components/ui/TipoMovimientoBadge';
-import { ArrowBigRightDash, CheckCircle2, ChevronsLeft, ChevronsRight, CircleChevronRight, RotateCw, SquareCheck } from 'lucide-react';
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useQuery } from '@tanstack/react-query';
 import { listarNeumaticosParaReubicar, listarProyectos, reubicarNeumaticosPorProyecto } from '@/api/Neumaticos';
 import { LoadingButton2 } from '@/components/ui/loading-button2';
-import { Field, FieldDescription, FieldLabel } from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Stack } from '@mui/system';
 import { toast } from 'sonner';
+import { useQuery } from '@tanstack/react-query';
+import DialogActions from '@mui/material/DialogActions';
+import React, { useMemo, useRef, useState } from 'react'
 
 interface Neumatico {
   id: string;
@@ -53,6 +52,7 @@ export const ModalReubicarNeumatico = ({ open, onClose, onSuccess }: ModalReubic
   const { data: neumaticosParaReubicar = [], refetch: refetchNeumaticosParaUbicar } = useQuery({
     queryKey: ['neumaticos-recuperados-para-reubicar', { proyectoOrigen }],
     queryFn: () => listarNeumaticosParaReubicar(proyectoOrigen, codigoNeuRef.current),
+    staleTime: 0,
     enabled: proyectoOrigen.length !== 0
   })
 
