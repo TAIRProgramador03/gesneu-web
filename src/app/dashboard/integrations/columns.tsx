@@ -13,6 +13,8 @@ import { TipoMovimientoBadge } from "@/components/ui/TipoMovimientoBadge"
 import { NeuAsignadoTable, NeuAsignarTable, NeuDisponibleTable, NeuInspeccionTable, NeuTemporalTable } from "@/types/neumatico"
 import { InspeccionTable } from "@/types/inspecciones"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
+import { TipoTerrenoBadge } from "@/components/ui/TipoTerrenoBadge"
+import { TipoRetenBadge } from "@/components/ui/TipoRetenBadge"
 
 
 export const columnsNeuDisponible: ColumnDef<NeuDisponibleTable>[] = [
@@ -292,11 +294,21 @@ export const columnsInspecciones = (
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            Kilometraje (km)
+            Km
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         )
       },
+    },
+    {
+      accessorKey: "TIPO_TERRENO",
+      header: 'Terreno',
+      cell: ({ row }) => <TipoTerrenoBadge tipo={row.original.TIPO_TERRENO} />
+    },
+    {
+      accessorKey: "RETEN",
+      header: 'Retén',
+      cell: ({ row }) => <TipoRetenBadge tipo={row.original.RETEN} />
     },
     {
       accessorKey: "FECHA_TIEMPO",

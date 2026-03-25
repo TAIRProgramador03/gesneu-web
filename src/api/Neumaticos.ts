@@ -1,5 +1,6 @@
 import { Customer } from "@/components/dashboard/customer/customers-table";
 import { NeumaticoFetch } from "@/components/dashboard/padron/modal-reubicar-neumatico";
+import { InspeccionTable } from "@/types/inspecciones";
 import { Neumatico } from "@/types/types";
 import axios, { AxiosError } from "axios";
 
@@ -377,7 +378,7 @@ export const getFechasInspeccionVehicularPorPlaca = async (placa: string) => {
 
 export const getInspeccionesPorPlaca = async (placa: string) => {
   try {
-    const response = await axios.get(`/api/inspecciones-por-placa`, {
+    const response = await axios.get<InspeccionTable[]>(`/api/inspecciones-por-placa`, {
       params: { placa },
       withCredentials: true,
     });
