@@ -23,124 +23,48 @@ export const CustomersFilters = memo(({ projectCount, disponiblesCount, asignado
     <Card sx={{ p: 2 }}>
       <Grid container spacing={2} justifyContent="center" alignItems="center" wrap="wrap" sx={{ flexWrap: { xs: 'wrap', sm: 'nowrap' } }}>
         <Grid item xs={12} sm={2} md={2} lg={2}>
-          <Box
-            sx={{
-              width: '100%',
-              minWidth: 120,
-              height: 80,
-              bgcolor: '#e3f2fd',
-              borderRadius: '17px',
-              border: '5px solid #90caf9',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: 32,
-              fontWeight: 'bold',
-              color: '#333',
-              position: 'relative',
-            }}
+          <div
+            className='w-full min-w-30 h-20 mb-2 flex items-center justify-center text-4xl font-bold text-slate-800 relative bg-sky-100 border-4 border-sky-600 rounded-xl'
           >
-            <div>
-              <CountUp end={projectCount ?? 0} />
-            </div>
-            {/* <Image src="/assets/llantas.png" alt="llantas" width={36} height={36} style={{ position: 'absolute', right: 8, bottom: 8, width: 36, height: 36 }} /> */}
-          </Box>
+            <CountUp end={projectCount ?? 0} />
+          </div>
           <Typography align="center" variant="body2" color="text.secondary">
             Total neumáticos
           </Typography>
         </Grid>
         <Grid item xs={12} sm={2} md={2} lg={2}>
-          <Box
-            sx={{
-              width: '100%',
-              minWidth: 120,
-              height: 80,
-              bgcolor: '#e8f5e9',
-              borderRadius: '17px',
-              border: '5px solid #81c784',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: 32,
-              fontWeight: 'bold',
-              color: '#333',
-            }}
+          <div
+            className='w-full min-w-30 h-20 mb-2 flex items-center justify-center text-4xl font-bold text-slate-800 relative bg-green-100 border-4 border-green-600 rounded-xl'
           >
-            <div>
-              <CountUp end={disponiblesCount ?? 0} />
-            </div>
-          </Box>
+            <CountUp end={disponiblesCount ?? 0} />
+          </div>
           <Typography align="center" variant="body2" color="text.secondary">
             Disponibles
           </Typography>
         </Grid>
         <Grid item xs={12} sm={2} md={2} lg={2}>
-          <Box
-            sx={{
-              width: '100%',
-              minWidth: 120,
-              height: 80,
-              bgcolor: '#fff3e0',
-              borderRadius: '17px',
-              border: '5px solid #ffb74d',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: 32,
-              fontWeight: 'bold',
-              color: '#333',
-            }}
+          <div
+            className='w-full min-w-30 h-20 mb-2 flex items-center justify-center text-4xl font-bold text-slate-800 relative bg-yellow-100 border-4 border-yellow-600 rounded-xl'
           >
-            <div>
-              <CountUp end={asignadosCount ?? 0} />
-            </div>
-          </Box>
+            <CountUp end={asignadosCount ?? 0} />
+          </div>
           <Typography align="center" variant="body2" color="text.secondary">
             Asignados
           </Typography>
         </Grid>
         <Grid item xs={12} sm={2} md={2} lg={2}>
-          <Box
-            sx={{
-              width: '100%',
-              minWidth: 120,
-              height: 80,
-              bgcolor: '#e3f2fd',
-              borderRadius: '17px',
-              border: '5px solid #90caf9',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: 32,
-              fontWeight: 'bold',
-              color: '#333',
-            }}
+          <div
+            className='w-full min-w-30 h-20 mb-2 flex items-center justify-center text-4xl font-bold text-slate-800 relative bg-stone-100 border-4 border-stone-600 rounded-xl'
           >
-            <div>
-              <CountUp end={autosDisponiblesCount ?? 0} />
-            </div>
-          </Box>
+            <CountUp end={autosDisponiblesCount ?? 0} />
+          </div>
           <Typography align="center" variant="body2" color="text.secondary">
             Vehiculos Disponibles
           </Typography>
         </Grid>
         <Grid item xs={12} sm={2} md={2} lg={2}>
-          <Box
-            sx={{
-              width: '100%',
-              minWidth: 120,
-              height: 80,
-              bgcolor: '#ffebee',
-              borderRadius: '17px',
-              border: '5px solid #ff6b35',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: 24,
-              fontWeight: 'bold',
-              color: '#333',
-              position: 'relative',
-            }}
+          <div
+            className='w-full min-w-30 h-20 mb-2 flex items-center justify-center text-4xl font-bold text-slate-800 relative bg-red-100 border-4 border-red-600 rounded-xl'
           >
             <span style={{ marginRight: 4, fontSize: 20 }}>
               <WarningAmberIcon />
@@ -148,28 +72,14 @@ export const CustomersFilters = memo(({ projectCount, disponiblesCount, asignado
             <div>
               <CountUp end={bajaDefinitivaCount ?? 0} />
             </div>
-          </Box>
+          </div>
           <Typography align="center" variant="body2" color="text.secondary">
             Baja Definitiva
           </Typography>
         </Grid>
         <Grid item xs={12} sm={2} md={2} lg={2}>
-          <Box
-            sx={{
-              width: '100%',
-              minWidth: 120,
-              height: 80,
-              bgcolor: '#e1f5fe',
-              borderRadius: '17px',
-              border: '5px solid #3b82f6',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: 24,
-              fontWeight: 'bold',
-              color: '#333',
-              position: 'relative',
-            }}
+          <div
+            className='w-full min-w-30 h-20 mb-2 flex items-center justify-center text-4xl font-bold text-slate-800 relative bg-lime-100 border-4 border-lime-600 rounded-xl'
           >
             <span style={{ marginRight: 4, fontSize: 20 }}>
               <RecyclingIcon />
@@ -177,7 +87,7 @@ export const CustomersFilters = memo(({ projectCount, disponiblesCount, asignado
             <div>
               <CountUp end={recuperadosCount ?? 0} />
             </div>
-          </Box>
+          </div>
           <Typography align="center" variant="body2" color="text.secondary">
             Recuperados
           </Typography>
