@@ -1,5 +1,5 @@
 "use client"
-import React from "react"
+import React, { useState } from "react"
 import { DataTablePagination } from "./data-table-pagination"
 import {
   ColumnDef,
@@ -48,18 +48,20 @@ export function DataTableNeumaticos<TData, TValue>({
   withExport = false
 }: DataTableProps<TData, TValue>) {
 
-  const [sorting, setSorting] = React.useState<SortingState>([])
+  const [sorting, setSorting] = useState<SortingState>([])
 
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 
-  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({
+  const [globalFilter, setGlobalFilter] = useState<string>('')
+
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
     CARGA: false,
     VELOCIDAD: false,
     RQ: false,
     COSTO: false
   })
 
-  const [rowSelection, setRowSelection] = React.useState({})
+  const [rowSelection, setRowSelection] = useState({})
 
   const table = useReactTable({
     data,
@@ -72,12 +74,15 @@ export function DataTableNeumaticos<TData, TValue>({
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
+    globalFilterFn: 'includesString',
     state: {
       sorting,
       columnFilters,
       columnVisibility,
       rowSelection,
+      globalFilter
     },
+    onGlobalFilterChange: setGlobalFilter
   })
 
   const handleExportExcel = () => {
@@ -117,11 +122,9 @@ export function DataTableNeumaticos<TData, TValue>({
             {
               filters && (
                 <Input
-                  placeholder="Buscar neumático"
-                  value={table.getColumn("CODIGO")?.getFilterValue() as string}
-                  onChange={(event) =>
-                    table.getColumn("CODIGO")?.setFilterValue(event.target.value)
-                  }
+                  placeholder="Buscar..."
+                  value={globalFilter ?? ''}
+                  onChange={e => setGlobalFilter(String(e.target.value))}
                   className="max-w-sm"
                 />
               )

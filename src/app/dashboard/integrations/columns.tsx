@@ -307,7 +307,7 @@ export const columnsInspecciones = (
     },
     {
       accessorKey: "RETEN",
-      header: 'Retén',
+      header: 'Condición',
       cell: ({ row }) => <TipoRetenBadge tipo={row.original.RETEN} />
     },
     {
