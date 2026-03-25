@@ -32,6 +32,8 @@ import { DataTableNeumaticos } from '@/components/ui/data-table/data-table';
 import { columnsNeuParaAsignar } from '@/app/dashboard/integrations/columns';
 import { LoadingButton2 } from '@/components/ui/loading-button2';
 import { ClipboardCheck, ClipboardList } from 'lucide-react';
+import ModalInputsNeuDesasignacion from './modal-inputs-neu-desasignacion';
+import { getUltimaFechaInspeccionPorPlaca } from '@/api/Neumaticos';
 
 const ItemType = {
     NEUMATICO: 'neumatico',
@@ -109,6 +111,7 @@ interface DropZoneProps {
     kilometro: number;
     esPosicionVacia: boolean; // Nueva prop: indica si esta posición debe ser llenada
     posicionesVacias: string[]; // Lista de posiciones vacías requeridas
+    fechaInspeccion: string
 }
 
 const DropZone: React.FC<DropZoneProps> = memo(({
@@ -120,6 +123,7 @@ const DropZone: React.FC<DropZoneProps> = memo(({
     kilometro,
     esPosicionVacia,
     posicionesVacias,
+    fechaInspeccion
 }) => {
     const [menuAnchor, setMenuAnchor] = React.useState<null | HTMLElement>(null);
     const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
@@ -287,7 +291,7 @@ const DropZone: React.FC<DropZoneProps> = memo(({
                 onConfirm={handleConfirmRemove}
                 message={`¿Deseas quitar el neumático asignado en la posición ${position}?`}
             />
-            <ModalInputsNeu
+            <ModalInputsNeuDesasignacion
                 open={inputsModalOpen}
                 onClose={() => setInputsModalOpen(false)}
                 onSubmit={handleInputsModalSubmit}
@@ -299,6 +303,7 @@ const DropZone: React.FC<DropZoneProps> = memo(({
                 fechaRegistroNeumatico={assignedNeumaticos[position]?.FECHA_REGISTRO || ''}
                 esRecuperado={assignedNeumaticos[position]?.RECUPERADO || false}
                 fechaRecuperado={assignedNeumaticos[position]?.FECHA_RECUPERADO || null}
+                fechaInspeccion={fechaInspeccion}
             />
         </div>
     );
@@ -315,6 +320,18 @@ const ModalAsignacionNeuDesdeDesasignacion: React.FC<ModalAsignacionNeuDesdeDesa
     onAssignedUpdate,
     onTemporaryAssign
 }) => {
+
+    const [fechaUltimaInspeccion, setFechaUltimaInspeccion] = useState('')
+
+    useEffect(() => {
+        if (open && placa) {
+            obtenerYSetearUltimaInspeccionPorPlaca(placa).then(fecha => {
+                if (fecha) {
+                    setFechaUltimaInspeccion(fecha);
+                }
+            });
+        }
+    }, [open, placa]);
 
     // Inicializar con mapa vacío, se llenará en el useEffect cuando el modal se abra
     const [assignedNeumaticos, setAssignedNeumaticos] = useState<Record<string, Neumatico | null>>({
@@ -674,6 +691,7 @@ const ModalAsignacionNeuDesdeDesasignacion: React.FC<ModalAsignacionNeuDesdeDesa
                                         kilometro={kilometro}
                                         esPosicionVacia={posicionesVacias.includes('POS01')}
                                         posicionesVacias={posicionesVacias}
+                                        fechaInspeccion={fechaUltimaInspeccion}
                                     />
                                     {assignedNeumaticos.POS01 && assignedNeumaticos.POS01.TIPO_MOVIMIENTO !== 'BAJA DEFINITIVA' && assignedNeumaticos.POS01.TIPO_MOVIMIENTO !== 'RECUPERADO' ? (
                                         <span style={{
@@ -701,6 +719,7 @@ const ModalAsignacionNeuDesdeDesasignacion: React.FC<ModalAsignacionNeuDesdeDesa
                                         kilometro={kilometro}
                                         esPosicionVacia={posicionesVacias.includes('POS02')}
                                         posicionesVacias={posicionesVacias}
+                                        fechaInspeccion={fechaUltimaInspeccion}
                                     />
                                     {assignedNeumaticos.POS02 && assignedNeumaticos.POS02.TIPO_MOVIMIENTO !== 'BAJA DEFINITIVA' && assignedNeumaticos.POS02.TIPO_MOVIMIENTO !== 'RECUPERADO' ? (
                                         <span style={{
@@ -728,6 +747,7 @@ const ModalAsignacionNeuDesdeDesasignacion: React.FC<ModalAsignacionNeuDesdeDesa
                                         kilometro={kilometro}
                                         esPosicionVacia={posicionesVacias.includes('POS03')}
                                         posicionesVacias={posicionesVacias}
+                                        fechaInspeccion={fechaUltimaInspeccion}
                                     />
                                     {assignedNeumaticos.POS03 && assignedNeumaticos.POS03.TIPO_MOVIMIENTO !== 'BAJA DEFINITIVA' && assignedNeumaticos.POS03.TIPO_MOVIMIENTO !== 'RECUPERADO' ? (
                                         <span style={{
@@ -755,6 +775,7 @@ const ModalAsignacionNeuDesdeDesasignacion: React.FC<ModalAsignacionNeuDesdeDesa
                                         kilometro={kilometro}
                                         esPosicionVacia={posicionesVacias.includes('POS04')}
                                         posicionesVacias={posicionesVacias}
+                                        fechaInspeccion={fechaUltimaInspeccion}
                                     />
                                     {assignedNeumaticos.POS04 && assignedNeumaticos.POS04.TIPO_MOVIMIENTO !== 'BAJA DEFINITIVA' && assignedNeumaticos.POS04.TIPO_MOVIMIENTO !== 'RECUPERADO' ? (
                                         <span style={{
@@ -782,6 +803,7 @@ const ModalAsignacionNeuDesdeDesasignacion: React.FC<ModalAsignacionNeuDesdeDesa
                                         kilometro={kilometro}
                                         esPosicionVacia={posicionesVacias.includes('RES01')}
                                         posicionesVacias={posicionesVacias}
+                                        fechaInspeccion={fechaUltimaInspeccion}
                                     />
                                     {assignedNeumaticos.RES01 && assignedNeumaticos.RES01.TIPO_MOVIMIENTO !== 'BAJA DEFINITIVA' && assignedNeumaticos.RES01.TIPO_MOVIMIENTO !== 'RECUPERADO' ? (
                                         <span style={{
@@ -891,3 +913,13 @@ const ModalAsignacionNeuDesdeDesasignacion: React.FC<ModalAsignacionNeuDesdeDesa
 
 export default ModalAsignacionNeuDesdeDesasignacion;
 
+async function obtenerYSetearUltimaInspeccionPorPlaca(placa: string): Promise<string | null> {
+    if (!placa) return null;
+    try {
+        const fecha = await getUltimaFechaInspeccionPorPlaca(placa);
+        return fecha?.fecha_registro || null;
+    } catch (error) {
+        console.error('Error obteniendo la última inspección por placa:', error);
+        return null;
+    }
+}

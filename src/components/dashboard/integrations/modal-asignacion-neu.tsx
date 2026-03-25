@@ -2,6 +2,8 @@ import React, { useState, useMemo, useEffect, memo } from 'react';
 import {
     Box,
     Card,
+    Chip,
+    DialogTitle,
     Stack,
     TextField,
     useTheme,
@@ -25,7 +27,7 @@ import { columnsNeuParaAsignar, columnsNeuTemporales } from '@/app/dashboard/int
 import { NeuTemporalTable } from '@/types/neumatico';
 import { LoadingButton } from '@/components/ui/loading-button';
 import { LoadingButton2 } from '@/components/ui/loading-button2';
-import { CloudCheck } from 'lucide-react';
+import { ClipboardList, CloudCheck } from 'lucide-react';
 
 const ItemType = {
     NEUMATICO: 'neumatico',
@@ -512,13 +514,43 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
                     '& .MuiDialog-paper': {
                         maxWidth: '1500px',
                         width: '100%',
+                        overflowY: 'hidden'
                     },
                 }}
             >
+
+                <DialogTitle sx={{ pb: 1.5, pt: 2, display: 'flex', alignItems: 'center', gap: 1.5, borderBottom: '1px solid', borderColor: 'divider' }}>
+                    <Box sx={{
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        width: 40, height: 40, borderRadius: 2,
+                        background: 'linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%)',
+                        flexShrink: 0,
+                    }}>
+                        <ClipboardList size={20} className="text-blue-600" />
+                    </Box>
+                    <Box sx={{ flex: 1 }}>
+                        <Typography variant="h6" fontWeight={700} lineHeight={1.2}>
+                            Asignación de Neumáticos
+                        </Typography>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.4, flexWrap: 'wrap' }}>
+                            <Typography variant="body2" color="text.secondary">Vehículo:</Typography>
+                            <Chip
+                                label={placa}
+                                size="small"
+                                sx={{ fontWeight: 700, fontSize: 12, bgcolor: '#f1f5f9', color: '#334155', letterSpacing: 0.5 }}
+                            />
+                        </Box>
+                        <Typography variant="caption" className='text-amber-600' sx={{ display: 'block', mt: 1, fontStyle: 'italic' }}>
+                            <span className='font-bold'>Nota: </span>
+                            Arrastra un neumático a una posición disponible. Al soltar, se solicitarán los datos de instalación.
+                        </Typography>
+                    </Box>
+                </DialogTitle>
+
                 <DialogContent>
                     <Stack direction="row" spacing={2}>
                         {/* Panel Izquierdo: Diagrama y tabla de instalados */}
-                        <Card sx={{ flex: 0.5, p: 2, position: 'relative', boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)' }}>
+                        <Card sx={{ flex: 0.5, p: 2, position: 'relative', boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)', marginTop: '10px' }}>
                             <div className='flex justify-between h-32.5'>
                                 <div>
                                     <TextField
@@ -778,7 +810,7 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
 
                         </Card>
                         {/* Panel Derecho: Neumáticos nuevos disponibles */}
-                        <Stack direction="column" spacing={2} sx={{ flex: 0.5, width: '100%', height: '100%' }}>
+                        <Stack direction="column" spacing={2} sx={{ flex: 0.5, width: '100%', height: '100%', marginTop: '10px' }}>
                             <Card sx={{ p: 2, boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)', height: '100%', display: 'flex', flexDirection: 'column' }}>
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                                     <div></div>

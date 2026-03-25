@@ -1017,7 +1017,7 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
 
                       {vehiculo?.reten !== undefined && (
                         <Box>
-                          <Typography variant="caption" color="text.secondary">Retén</Typography>
+                          <Typography variant="caption" color="text.secondary">Condición</Typography>
                           <Typography variant="body2" sx={{ fontWeight: 'bold' }}>{vehiculo.reten}</Typography>
                         </Box>
                       )}

@@ -10,6 +10,7 @@ import {
 } from '@mui/material';
 import { asignarNeumatico } from "@/api/Neumaticos";
 import Image from 'next/image';
+import { Button as ButtonCustom } from '@/components/ui/button';
 
 
 interface ModalAvertAsigNeuProps {
@@ -66,12 +67,20 @@ const ModalAvertAsigNeu: React.FC<ModalAvertAsigNeuProps> = ({ open, onClose, on
                 </DialogContentText>
             </DialogContent>
             <DialogActions sx={{ justifyContent: 'center' }}>
-                <Button onClick={onClose} variant="outlined" color="secondary">
+
+                <ButtonCustom
+                    onClick={onClose}
+                >
                     Cancelar
-                </Button>
-                <Button onClick={onConfirm} variant="contained" color="error" ref={confirmRef}>
+                </ButtonCustom>
+
+                <ButtonCustom
+                    onClick={onConfirm}
+                    variant={'teal'}
+                    ref={confirmRef}
+                >
                     Confirmar
-                </Button>
+                </ButtonCustom>
             </DialogActions>
         </Dialog>
     );

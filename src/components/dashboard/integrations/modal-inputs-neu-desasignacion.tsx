@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { Dialog, DialogContent, TextField, Button, Stack, DialogTitle, Typography } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 import { convertToDateHuman } from '@/lib/utils';
 import { Button as ButtonCustom } from '@/components/ui/button';
+import { TriangleAlert } from 'lucide-react';
 
 interface ModalInputsNeuProps {
     open: boolean;
@@ -17,9 +18,10 @@ interface ModalInputsNeuProps {
     fechaRegistroNeumatico: string; // Fecha de registro del neumático (YYYY-MM-DD)
     esRecuperado?: boolean
     fechaRecuperado?: string | null
+    fechaInspeccion: string
 }
 
-const ModalInputsNeu: React.FC<ModalInputsNeuProps> = ({ open, onClose, onSubmit, initialRemanente = 0, initialOdometro = 0, initialPresionAire = 0, initialTorqueAplicado = 0, initialFechaAsignacion = '', fechaRegistroNeumatico, esRecuperado, fechaRecuperado = null }) => {
+const ModalInputsNeuDesasignacion: React.FC<ModalInputsNeuProps> = ({ open, onClose, onSubmit, initialRemanente = 0, initialOdometro = 0, initialPresionAire = 0, initialTorqueAplicado = 0, initialFechaAsignacion = '', fechaRegistroNeumatico, esRecuperado, fechaRecuperado = null, fechaInspeccion = '' }) => {
 
     const [Odometro, setOdometro] = React.useState<number>(initialOdometro);
     const [Remanente, setRemanente] = React.useState<number>(initialRemanente);
@@ -43,31 +45,9 @@ const ModalInputsNeu: React.FC<ModalInputsNeuProps> = ({ open, onClose, onSubmit
         return new Date(now.getTime() - tzOffset).toISOString().slice(0, 10);
     }, []);
 
-    const fechaLimiteMin = React.useMemo(() => {
-        const d = new Date();
-        d.setDate(d.getDate() - 3);
-        const tzOffset = d.getTimezoneOffset() * 60000;
-        return new Date(d.getTime() - tzOffset).toISOString().slice(0, 10);
-    }, []);
 
-    // Fecha mínima efectiva:
-    // - si esRecuperado: max(hoy-3, fechaRecuperado)
-    // - sino: max(hoy-3, fechaRegistroNeumatico)
-
-    const fechaMinEfectiva = React.useMemo(() => {
-        let min = fechaLimiteMin;
-        if (esRecuperado && fechaRecuperado) {
-            const fechaRec = new Date(fechaRecuperado).toISOString().slice(0, 10);
-            if (fechaRec > min) min = fechaRec;
-        } else if (fechaRegistroNeumatico) {
-            const fechaReg = fechaRegistroNeumatico;
-            if (fechaReg > min) min = fechaReg;
-        }
-        return min;
-    }, [fechaLimiteMin, fechaRegistroNeumatico, esRecuperado, fechaRecuperado]);
-
-    // Validar fecha de asignación según reglas de negocio
-    const validarFechaAsignacion = React.useCallback((value: string): string | null => {
+    // la fecha q se envia es la fecha de la ultima inspección
+    const validarFechaAsignacion = useCallback((value: string): string | null => {
         if (!value) return null;
 
         if (value > hoy) {
@@ -77,23 +57,16 @@ const ModalInputsNeu: React.FC<ModalInputsNeuProps> = ({ open, onClose, onSubmit
         if (esRecuperado && fechaRecuperado) {
             const fechaRec = new Date(fechaRecuperado).toISOString().slice(0, 10);
             if (value < fechaRec) {
-                return `Debe ser mayor o igual a la fecha de recupero: ${convertToDateHuman(fechaRec)}`;
-            }
-            if (value < fechaLimiteMin) {
-                return `No puede ser anterior a ${convertToDateHuman(fechaLimiteMin)} (intervalo de 4 días)`;
+                return `Fecha inspección debe ser mayor o igual a la fecha de recupero.`;
             }
         } else {
-            const fechaReg = fechaRegistroNeumatico ? fechaRegistroNeumatico : null;
-            if (value < fechaLimiteMin) {
-                return `No puede ser anterior a ${convertToDateHuman(fechaLimiteMin)} (intervalo de 4 días)`;
-            }
-            if (fechaReg && value < fechaReg) {
-                return `Debe ser mayor o igual a la fecha de registro: ${convertToDateHuman(fechaReg)}`;
+            if (fechaRegistroNeumatico && value < fechaRegistroNeumatico) {
+                return `Fecha de inspección debe ser mayor o igual a la fecha de envio.`;
             }
         }
 
         return null;
-    }, [hoy, fechaLimiteMin, fechaRegistroNeumatico, esRecuperado, fechaRecuperado]);
+    }, [hoy, fechaRegistroNeumatico, esRecuperado, fechaRecuperado]);
 
     React.useEffect(() => {
         if (open) {
@@ -138,31 +111,16 @@ const ModalInputsNeu: React.FC<ModalInputsNeuProps> = ({ open, onClose, onSubmit
             return;
         }
 
-        if (fechaAsignacion.trim() === '') {
-            setFechaError('Debe seleccionar una fecha de asignación');
-            return;
-        }
-
-        // Validación de formato de fecha
-        if (!validarFormatoFecha(fechaAsignacion)) {
-            setFechaFormatoError(true);
-            return;
-        }
-        setFechaFormatoError(false);
-
-        // Safety-net: validar reglas de fecha antes de enviar
-        const errorFecha = validarFechaAsignacion(fechaAsignacion);
+        const errorFecha = validarFechaAsignacion(fechaInspeccion);
         if (errorFecha) {
             setFechaError(errorFecha);
             return;
         }
 
         setFechaError(null);
-        onSubmit({ Odometro, Remanente, PresionAire, TorqueAplicado, FechaAsignacion: fechaAsignacion });
+        onSubmit({ Odometro, Remanente, PresionAire, TorqueAplicado, FechaAsignacion: fechaInspeccion });
         onClose();
     };
-
-    const esRecuperadoTexto = 0;
 
     return (
         <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth fullScreen={fullScreen}>
@@ -279,45 +237,44 @@ const ModalInputsNeu: React.FC<ModalInputsNeuProps> = ({ open, onClose, onSubmit
                                 },
                             }}
                         />
-                        <div className='flex flex-col w-100'>
-                            <TextField
-                                label="Fecha de Asignación"
-                                type="date"
-                                value={fechaAsignacion}
-                                onChange={e => {
-                                    const value = e.target.value;
-                                    setFechaAsignacion(value);
-                                    setFechaFormatoError(value ? !validarFormatoFecha(value) : false);
-                                    setFechaError(validarFechaAsignacion(value));
-                                }}
-                                fullWidth
-                                InputLabelProps={{ shrink: true }}
-                                inputProps={{
-                                    min: fechaMinEfectiva,
-                                    max: hoy,
-                                }}
-                                error={!!fechaError || fechaFormatoError}
-                                helperText={
-                                    fechaFormatoError
-                                        ? 'Formato inválido (YYYY-MM-DD)'
-                                        : fechaError
-                                            ? fechaError
-                                            : `Rango válido: ${convertToDateHuman(fechaMinEfectiva)} a ${convertToDateHuman(hoy)}`
-                                }
-                            />
+                    </Stack>
+
+                    {fechaError && (
+                        <div className='rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-xs text-red-700 flex items-center gap-2'>
+                            <TriangleAlert className='h-3.5 w-3.5 shrink-0' />
+                            {fechaError}
+                        </div>
+                    )}
+
+                    <div className='rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-800'>
+                        <p className='font-semibold mb-1.5 flex items-center gap-1.5'>
+                            <TriangleAlert className='h-3.5 w-3.5 shrink-0' />
+                            Nota importante
+                        </p>
+                        <ul className='list-disc list-inside space-y-1 text-amber-700'>
+                            <li>La <b>fecha de asignación</b> se tomará de la última inspección registrada.</li>
+                            <li>Para usar otra fecha, realice una nueva inspección antes de continuar.</li>
+                            <li>Si es un neumático recién enviado, la inspección debe ser igual o posterior a la del envio.</li>
+                            <li>Si asigna un neumático recuperado, la inspección debe ser igual o posterior a su fecha de recupero.</li>
+                        </ul>
+                        <div className='mt-2.5 pt-2 border-t border-amber-200 flex flex-wrap gap-x-4 gap-y-1'>
+                            <span className='text-amber-800'>
+                                Última inspección: <span className='font-semibold'>{convertToDateHuman(fechaInspeccion)}</span>
+                            </span>
                             {
                                 esRecuperado ? (
-                                    <span className='text-sky-600 ml-3.5 font-normal italic text-xs mt-0.75'>
-                                        {`F. Recuperación: ${convertToDateHuman(fechaRecuperado ?? '')}`}
+                                    <span className='text-sky-700'>
+                                        F. Recuperación: <span className='font-semibold'>{convertToDateHuman(fechaRecuperado ?? '')}</span>
                                     </span>
                                 ) : (
-                                    <span className='text-teal-600 ml-3.5 font-normal italic text-xs mt-0.75'>
-                                        {`F. Envio: ${convertToDateHuman(fechaRegistroNeumatico ?? '')}`}
+                                    <span className='text-teal-700'>
+                                        F. Envío: <span className='font-semibold'>{convertToDateHuman(fechaRegistroNeumatico ?? '')}</span>
                                     </span>
                                 )
                             }
                         </div>
-                    </Stack>
+                    </div>
+
                     <ButtonCustom
                         onClick={handleSubmit}
                         variant={'primary'}
@@ -330,4 +287,4 @@ const ModalInputsNeu: React.FC<ModalInputsNeuProps> = ({ open, onClose, onSubmit
     );
 };
 
-export default ModalInputsNeu;
+export default ModalInputsNeuDesasignacion;

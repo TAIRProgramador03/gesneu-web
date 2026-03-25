@@ -4,9 +4,9 @@ import React from "react"
 import { EsRecuperadoBadge } from "@/components/ui/EsRecuperadoBadge"
 import { ColumnDef } from "@tanstack/react-table"
 import { LinearProgressItem } from "@/components/ui/LinearProgress"
-import { convertDateAndHour, convertToDateHuman } from "@/lib/utils"
+import { convertToDateHuman } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { ArrowBigRightDash, ArrowUpDown, Info, InfoIcon } from "lucide-react"
+import { ArrowBigRightDash, ArrowUpDown } from "lucide-react"
 import { DraggableNeumatico } from "@/components/dashboard/integrations/modal-asignacion-neu"
 import type { Neumatico } from "@/types/types"
 import { TipoMovimientoBadge } from "@/components/ui/TipoMovimientoBadge"
@@ -312,8 +312,8 @@ export const columnsInspecciones = (
     },
     {
       accessorKey: "FECHA_TIEMPO",
-      header: 'Fecha Registro',
-      cell: ({ row }) => convertDateAndHour(row.original.FECHA_TIEMPO)
+      header: 'F. Registro',
+      cell: ({ row }) => convertToDateHuman(row.original.FECHA_TIEMPO)
     },
     {
       id: "actions",

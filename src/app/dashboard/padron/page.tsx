@@ -21,7 +21,7 @@ import Stack from '@mui/material/Stack';
 import styled from '@emotion/styled';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { LoadingButton2 } from '@/components/ui/loading-button2';
-import { TrendingUpDown } from 'lucide-react';
+import { RefreshCw, TrendingUpDown } from 'lucide-react';
 import { ModalReubicarNeumatico } from '@/components/dashboard/padron/modal-reubicar-neumatico';
 
 export default function Page(): React.JSX.Element {
@@ -166,7 +166,7 @@ export default function Page(): React.JSX.Element {
             </LoadingButton2>
             <LoadingButton2
               variant={'life'}
-              icon={<RefreshIcon />}
+              icon={<RefreshCw />}
               onClick={handleRefresh}
               disabled={loading}
             >
