@@ -14,6 +14,7 @@ import { LocalizationProvider } from '@/components/core/localization-provider';
 import { ThemeProvider } from '@/components/core/theme-provider/theme-provider';
 import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
+import { ChatWidget } from '@/components/ChatWidget';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -37,6 +38,7 @@ export default function Layout({ children }: LayoutProps): React.JSX.Element {
         <title>Gesneu</title>
       </head>
       <body>
+        <ChatWidget />
         <QueryClientProvider client={queryClient}>
           <LocalizationProvider>
             <UserProvider>
