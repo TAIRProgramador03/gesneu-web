@@ -35,7 +35,7 @@ export default function Page(): React.JSX.Element {
   const [modalImportarVisible, setModalImportarVisible] = useState(false);
   const [modalReubicarVisible, setModalReubicarVisible] = useState(false);
 
-  const { data: customers = [], refetch: customersRefetch } = useQuery({
+  const { data: customers = [], refetch: customersRefetch, isLoading: isLoadingCustomers } = useQuery({
     queryKey: ['customers'],
     queryFn: Neumaticos
   })
@@ -191,6 +191,7 @@ export default function Page(): React.JSX.Element {
             type='pagination'
             filters={true}
             withExport={true}
+            isLoading={isLoadingCustomers}
             exportConfig={{
               title: 'GESNEU: PADRÓN DE NEUMÁTICOS',
               username: user?.usuario
