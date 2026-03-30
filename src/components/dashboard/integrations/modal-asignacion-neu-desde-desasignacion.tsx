@@ -685,6 +685,9 @@ const ModalAsignacionNeuDesdeDesasignacion: React.FC<ModalAsignacionNeuDesdeDesa
                                             zIndex: 3,
                                         }}>{assignedNeumaticos.POS01.CODIGO_NEU || assignedNeumaticos.POS01.CODIGO}</span>
                                     ) : null}
+                                    <span className='bg-slate-50 text-slate-600 p-1 rounded-md border-slate-200 border text-xs font-bold shadow-lg absolute left-[38px] top-[36px]'>
+                                        POS01
+                                    </span>
                                 </Box>
                                 <Box sx={{ position: 'absolute', top: '65px', left: '172px', zIndex: 2 }}>
                                     <DropZone
@@ -713,6 +716,9 @@ const ModalAsignacionNeuDesdeDesasignacion: React.FC<ModalAsignacionNeuDesdeDesa
                                             zIndex: 3,
                                         }}>{assignedNeumaticos.POS02.CODIGO_NEU || assignedNeumaticos.POS02.CODIGO}</span>
                                     ) : null}
+                                    <span className='bg-slate-50 text-slate-600 p-1 rounded-md border-slate-200 border text-xs font-bold shadow-lg absolute right-[38px] top-[36px]'>
+                                        POS02
+                                    </span>
                                 </Box>
                                 <Box sx={{ position: 'absolute', top: '230px', left: '272px', zIndex: 2 }}>
                                     <DropZone
@@ -741,6 +747,9 @@ const ModalAsignacionNeuDesdeDesasignacion: React.FC<ModalAsignacionNeuDesdeDesa
                                             zIndex: 3,
                                         }}>{assignedNeumaticos.POS03.CODIGO_NEU || assignedNeumaticos.POS03.CODIGO}</span>
                                     ) : null}
+                                    <span className='bg-slate-50 text-slate-600 p-1 rounded-md border-slate-200 border text-xs font-bold shadow-lg absolute left-[38px] top-[36px]'>
+                                        POS03
+                                    </span>
                                 </Box>
                                 <Box sx={{ position: 'absolute', top: '230px', left: '172px', zIndex: 2 }}>
                                     <DropZone
@@ -769,6 +778,9 @@ const ModalAsignacionNeuDesdeDesasignacion: React.FC<ModalAsignacionNeuDesdeDesa
                                             zIndex: 3,
                                         }}>{assignedNeumaticos.POS04.CODIGO_NEU || assignedNeumaticos.POS04.CODIGO}</span>
                                     ) : null}
+                                    <span className='bg-slate-50 text-slate-600 p-1 rounded-md border-slate-200 border text-xs font-bold shadow-lg absolute right-[38px] top-[36px]'>
+                                        POS04
+                                    </span>
                                 </Box>
                                 <Box sx={{ position: 'absolute', top: '299px', left: '206px', zIndex: 2 }}>
                                     <DropZone
@@ -798,6 +810,9 @@ const ModalAsignacionNeuDesdeDesasignacion: React.FC<ModalAsignacionNeuDesdeDesa
                                             zIndex: 3,
                                         }}>{assignedNeumaticos.RES01.CODIGO_NEU || assignedNeumaticos.RES01.CODIGO}</span>
                                     ) : null}
+                                    <span className='bg-slate-50 text-slate-600 p-1 rounded-md border-slate-200 border text-xs font-bold shadow-lg absolute right-[10px] top-[64px]'>
+                                        RES01
+                                    </span>
                                 </Box>
                             </div>
 
