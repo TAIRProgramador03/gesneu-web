@@ -173,7 +173,17 @@ export const columnsNeuParaAsignar: ColumnDef<NeuAsignarTable>[] = [
   },
   {
     accessorKey: "CODIGO",
-    header: "Código",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Código
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
   },
   {
     accessorKey: "MARCA",
@@ -185,7 +195,17 @@ export const columnsNeuParaAsignar: ColumnDef<NeuAsignarTable>[] = [
   },
   {
     accessorKey: "REMANENTE",
-    header: "Remanente",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Remanente
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
   },
   {
     accessorKey: "MEDIDA",
@@ -215,7 +235,103 @@ export const columnsNeuParaAsignar: ColumnDef<NeuAsignarTable>[] = [
         </Button>
       )
     },
-    cell: ({ row }) => <LinearProgressItem estado={row.original.ESTADO ?? 0} />
+    cell: ({ row }) => <LinearProgressItem estado={row.original.ESTADO ?? 0} width="100px" />
+  },
+]
+
+export const columnsNeuParaAsignarDesdeDesasignar: ColumnDef<NeuAsignarTable>[] = [
+  {
+    accessorKey: "DRAWABLE",
+    header: "Neumático",
+    cell: ({ row }) => {
+      return (
+        <DraggableNeumatico
+          neumatico={row.original as unknown as Neumatico}
+          disabled={false}
+        />
+      )
+    },
+  },
+  {
+    accessorKey: "CODIGO",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Código
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
+  },
+  {
+    accessorKey: "MARCA",
+    header: "Marca",
+  },
+  {
+    accessorKey: "DISEÑO",
+    header: "Diseño",
+  },
+  {
+    accessorKey: "REMANENTE",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Rm
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
+  },
+  {
+    accessorKey: "MEDIDA",
+    header: "Medida",
+  },
+  {
+    accessorKey: "FECHA_REGISTRO",
+    header: "Envio",
+    cell: ({ row }) => convertToDateHuman(row.original.FECHA_REGISTRO)
+  },
+  {
+    accessorKey: "RECUPERADO",
+    header: "Recuperado",
+    cell: ({ row }) => <EsRecuperadoBadge esRecuperado={row.original.RECUPERADO ?? false} />,
+  },
+  {
+    accessorKey: "TIPO_MOVIMIENTO",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Situación
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
+    cell: ({ row }) => <TipoMovimientoBadge tipoMovimiento={row.original.TIPO_MOVIMIENTO ?? ''} />,
+  },
+  {
+    accessorKey: "ESTADO",
+    // header: "Estado",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Estado
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
+    cell: ({ row }) => <LinearProgressItem estado={row.original.ESTADO ?? 0} width="100px" />
   },
 ]
 

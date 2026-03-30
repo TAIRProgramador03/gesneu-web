@@ -90,9 +90,13 @@ export const obtenerNeumaticosAsignadosPorPlaca = async (placa: string) => {
 };
 
 // Obtener la lista de neumáticos disponibles x usuario
-export const obtenerNeumaticosDisponibles = async () => {
+export const obtenerNeumaticosDisponibles = async (type = 'asignacion') => {
   try {
-    const response = await axios.get(`/api/po-neumaticos-disponibles/`);
+
+    const response = await axios.get(`/api/po-neumaticos-disponibles/`, {
+      params: { type }
+    });
+
     return response.data;
   } catch (error) {
     console.error('Error en obtenerNeumaticosDisponibles:', error);

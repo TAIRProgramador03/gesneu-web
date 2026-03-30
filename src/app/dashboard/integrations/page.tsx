@@ -87,7 +87,7 @@ export default function Page(): React.JSX.Element {
 
   const { data: neumaticosDisponiblesUseQuery = [], refetch: neumaticosDispobilesRefetch } = useQuery({
     queryKey: ['neumaticos-disponibles'],
-    queryFn: obtenerNeumaticosDisponibles
+    queryFn: () => obtenerNeumaticosDisponibles()
   })
 
   interface Vehiculo {
@@ -954,35 +954,27 @@ export default function Page(): React.JSX.Element {
           maxHeight: '700px', // Ajusta este valor según lo que necesites
           overflow: 'auto'
         }}>
-          <Typography variant="h6" sx={{ mb: 2 }}>
-            Neumáticos instalados en esta unidad:
-          </Typography>
+
+
+          <div className='flex'>
+            <Typography sx={{ mb: 2 }} className='border border-amber-400 bg-amber-50 text-amber-600 inline p-2 mt-2 mb-2 rounded-lg'>
+              Neumáticos instalados en esta unidad:
+            </Typography>
+          </div>
 
           <DataTableNeumaticos columns={columnsNeuAsignado} data={neumaticosAsignadosUnicos} />
 
           {/* Neúmaticos Disponibles */}
-          <Stack direction="row" alignItems="center" spacing={2} className='mb-3 mt-3' >
-            <Box
-              sx={{
-                backgroundColor: '#e0f7fa',
-                borderRadius: '8px',
-                padding: '8px 16px',
-                fontWeight: 'bold',
-                color: 'black',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
-              }}
-            >
-              <span>
+          <div className='flex'>
+            <Typography sx={{ mb: 2, mt: 2 }} className='border border-green-400 bg-green-50 text-green-600 inline p-2 mt-2 mb-2 rounded-lg'>
+              <span className='font-bold'>
                 Disponibles:
-                <span className='font-normal'> &nbsp;
-                  {`${neumaticosDisponiblesUseQuery.length.toLocaleString()} Neumáticos`}
-                </span>
               </span>
-            </Box>
-          </Stack>
+              <span className='font-normal'> &nbsp;
+                {`${neumaticosDisponiblesUseQuery.length.toLocaleString()} Neumáticos`}
+              </span>
+            </Typography>
+          </div>
 
           <DataTableNeumaticos columns={columnsNeuDisponible} data={neumaticosDisponiblesUseQuery} type='pagination' />
 

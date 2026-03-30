@@ -29,11 +29,12 @@ import Image from 'next/image';
 import { convertToDateHuman } from '@/lib/utils';
 import { TipoMovimientoBadge } from '@/components/ui/TipoMovimientoBadge';
 import { DataTableNeumaticos } from '@/components/ui/data-table/data-table';
-import { columnsNeuParaAsignar } from '@/app/dashboard/integrations/columns';
+import { columnsNeuParaAsignar, columnsNeuParaAsignarDesdeDesasignar } from '@/app/dashboard/integrations/columns';
 import { LoadingButton2 } from '@/components/ui/loading-button2';
 import { ClipboardCheck, ClipboardList } from 'lucide-react';
 import ModalInputsNeuDesasignacion from './modal-inputs-neu-desasignacion';
-import { getUltimaFechaInspeccionPorPlaca } from '@/api/Neumaticos';
+import { getUltimaFechaInspeccionPorPlaca, obtenerNeumaticosDisponibles } from '@/api/Neumaticos';
+import { useQuery } from '@tanstack/react-query';
 
 const ItemType = {
     NEUMATICO: 'neumatico',
@@ -312,7 +313,6 @@ const DropZone: React.FC<DropZoneProps> = memo(({
 const ModalAsignacionNeuDesdeDesasignacion: React.FC<ModalAsignacionNeuDesdeDesasignacionProps> = memo(({
     open,
     onClose,
-    data,
     cachedNeumaticosAsignados,
     posicionesVacias,
     placa,
@@ -320,6 +320,13 @@ const ModalAsignacionNeuDesdeDesasignacion: React.FC<ModalAsignacionNeuDesdeDesa
     onAssignedUpdate,
     onTemporaryAssign
 }) => {
+
+
+    const { data: neumaticosDisponiblesConBajas = [] } = useQuery({
+        queryKey: ['neumaticos-disponibles-con-bajas'],
+        queryFn: () => obtenerNeumaticosDisponibles('desasignacion'),
+        staleTime: 0
+    })
 
     const [fechaUltimaInspeccion, setFechaUltimaInspeccion] = useState('')
 
@@ -394,34 +401,11 @@ const ModalAsignacionNeuDesdeDesasignacion: React.FC<ModalAsignacionNeuDesdeDesa
 
     const theme = useTheme();
 
-    const assignedCodes = useMemo(
-        () =>
-            new Set(
-                Object.values(assignedNeumaticos)
-                    .filter((n): n is Neumatico => n !== null)
-                    .map((n) => n.CODIGO ?? (n as any).CODIGO_NEU)
-            ),
-        [assignedNeumaticos]
-    );
-
-    const [page, setPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(8);
-    const [searchTerm, setSearchTerm] = useState('');
-
-    const handleChangePage = (event: unknown, newPage: number) => {
-        setPage(newPage);
-    };
-
     const handleDialogClose = () => {
         onClose();
         setTimeout(() => {
             document.body.focus();
         }, 0);
-    };
-
-    const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setRowsPerPage(parseInt(event.target.value, 10));
-        setPage(0);
     };
 
     const handleDrop = (position: string, neumatico: Neumatico) => {
@@ -447,22 +431,15 @@ const ModalAsignacionNeuDesdeDesasignacion: React.FC<ModalAsignacionNeuDesdeDesa
         }));
     };
 
-    const hasAssignedNeumaticos = Object.values(assignedNeumaticos).some((neumatico) => neumatico !== null);
+    // const filteredData = useMemo(() => {
+    //     return data.filter(
+    //         (neumatico) =>
+    //             neumatico.TIPO_MOVIMIENTO === 'DISPONIBLE' &&
+    //             (neumatico.CODIGO.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    //                 neumatico.MARCA.toLowerCase().includes(searchTerm.toLowerCase()))
+    //     );
+    // }, [data, searchTerm]);
 
-    const filteredData = useMemo(() => {
-        return data.filter(
-            (neumatico) =>
-                neumatico.TIPO_MOVIMIENTO === 'DISPONIBLE' &&
-                (neumatico.CODIGO.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                    neumatico.MARCA.toLowerCase().includes(searchTerm.toLowerCase()))
-        );
-    }, [data, searchTerm]);
-
-
-
-    const paginatedData = useMemo(() => {
-        return filteredData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
-    }, [filteredData, page, rowsPerPage]);
 
     const handleConfirm = async () => {
         // Validar que todas las posiciones vacías estén llenas
@@ -585,7 +562,7 @@ const ModalAsignacionNeuDesdeDesasignacion: React.FC<ModalAsignacionNeuDesdeDesa
                 disableAutoFocus
                 sx={{
                     '& .MuiDialog-paper': {
-                        maxWidth: '1500px',
+                        maxWidth: '1650px',
                         width: '100%',
                         overflowY: 'hidden'
                     },
@@ -887,7 +864,7 @@ const ModalAsignacionNeuDesdeDesasignacion: React.FC<ModalAsignacionNeuDesdeDesa
                                     <div></div>
                                     <Box sx={{ ml: 2, display: 'flex', alignItems: 'center', minWidth: 110 }}>
                                         <Typography variant="body2" sx={{ fontWeight: 600, color: '#1976d2', fontSize: '1rem', background: '#e3f2fd', borderRadius: 2, px: 1.5, py: 0.5, border: '1px solid #1976d2' }}>
-                                            Neu. Disponibles: {filteredData.length}
+                                            Neumáticos: {neumaticosDisponiblesConBajas.length}
                                         </Typography>
                                     </Box>
                                     <LoadingButton2
@@ -900,7 +877,7 @@ const ModalAsignacionNeuDesdeDesasignacion: React.FC<ModalAsignacionNeuDesdeDesa
                                     </LoadingButton2>
                                 </Box>
                                 <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-                                    <DataTableNeumaticos columns={columnsNeuParaAsignar} data={filteredData} type='pagination' filters={true} />
+                                    <DataTableNeumaticos columns={columnsNeuParaAsignarDesdeDesasignar} data={neumaticosDisponiblesConBajas} type='pagination' filters={true} />
                                 </Box>
                             </Card>
                         </Stack>

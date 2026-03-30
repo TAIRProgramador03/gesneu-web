@@ -3,9 +3,9 @@ import Box from '@mui/material/Box';
 import { LinearProgress, Typography } from '@mui/material';
 
 
-export const LinearProgressItem = ({ estado }: { estado: number }) => {
+export const LinearProgressItem = ({ estado, width = '180px' }: { estado: number, width?: string }) => {
   return (
-    <Box sx={{ position: 'relative', width: '180px' }}>
+    <Box sx={{ position: 'relative', width }}>
       <LinearProgress
         variant="determinate"
         value={estado}

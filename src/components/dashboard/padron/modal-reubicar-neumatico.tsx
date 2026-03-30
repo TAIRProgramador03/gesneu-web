@@ -15,6 +15,7 @@ import { toast } from 'sonner';
 import { useQuery } from '@tanstack/react-query';
 import DialogActions from '@mui/material/DialogActions';
 import React, { useMemo, useRef, useState } from 'react'
+import { TipoMovimientoBadge } from '@/components/ui/TipoMovimientoBadge';
 
 interface Neumatico {
   id: string;
@@ -154,6 +155,12 @@ export const ModalReubicarNeumatico = ({ open, onClose, onSuccess }: ModalReubic
           <Typography variant="body2" color="text.secondary">
             Mueve neumáticos de un proyecto origen a un proyecto destino
           </Typography>
+
+          <Typography variant="caption" className='text-amber-600' sx={{ display: 'block', mt: 1, fontStyle: 'italic' }}>
+            <span className='font-bold'>Nota: </span>
+            Solo puedes visualizar los neumáticos disponibles que se encuentren recuperados o de baja.
+          </Typography>
+
         </Box>
       </DialogTitle>
 
@@ -171,7 +178,7 @@ export const ModalReubicarNeumatico = ({ open, onClose, onSuccess }: ModalReubic
             {
               <ButtonCustom
                 size={'icon'}
-                className='absolute right-5 rounded-full'
+                className='absolute right-5 rounded-full cursor-pointer'
                 variant={'life'}
                 disabled={neumaticoSeleccionados?.length <= 0}
                 onClick={handleTrasladarNeumaticos}
@@ -217,10 +224,11 @@ export const ModalReubicarNeumatico = ({ open, onClose, onSuccess }: ModalReubic
             </Field>
 
             {/* Header de columnas */}
-            <div className="grid grid-cols-[1fr_auto_auto_auto] items-center gap-x-4 px-3 mt-3 mb-1">
+            <div className="grid grid-cols-[1fr_auto_auto_auto_auto] items-center gap-x-4 px-3 mt-3 mb-1">
               <span className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Código</span>
               <span className="text-xs font-semibold text-slate-400 uppercase tracking-wide text-center">Proy.</span>
               <span className="text-xs font-semibold text-slate-400 uppercase tracking-wide text-center">Recup.</span>
+              <span className="text-xs font-semibold text-slate-400 uppercase tracking-wide text-center">Situación</span>
               <span className="text-xs font-semibold text-slate-400 uppercase tracking-wide text-center">Vida útil</span>
             </div>
 
@@ -244,7 +252,7 @@ export const ModalReubicarNeumatico = ({ open, onClose, onSuccess }: ModalReubic
                         onClick={() => handleClickOnNeumatico({ neumatico: neu })}
                         onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && handleClickOnNeumatico({ neumatico: neu })}
                         className={`
-                      relative grid grid-cols-[1fr_auto_auto_auto] items-center gap-x-4
+                      relative grid grid-cols-[1fr_auto_auto_auto_auto] items-center gap-x-4
                       rounded-xl px-3 py-2.5 cursor-pointer border-2 transition-all duration-150
                       ${isSelected
                             ? 'border-blue-500 bg-blue-50 shadow-sm'
@@ -261,7 +269,9 @@ export const ModalReubicarNeumatico = ({ open, onClose, onSuccess }: ModalReubic
 
                         {/* Proyecto */}
                         <div className="flex flex-col items-center">
-                          <span className="font-light italic text-sm  text-slate-700  truncate">{neu.PROYECTO_ACTUAL}</span>
+                          <span className="font-light italic text-xs text-slate-700  truncate">
+                            {neu.PROYECTO_ACTUAL}
+                          </span>
                         </div>
 
                         {/* Recuperado */}
@@ -269,9 +279,14 @@ export const ModalReubicarNeumatico = ({ open, onClose, onSuccess }: ModalReubic
                           <EsRecuperadoBadge esRecuperado={neu.RECUPERADO} />
                         </div>
 
+                        {/* Disponibilidad */}
+                        <div className="flex items-center justify-center">
+                          <TipoMovimientoBadge tipoMovimiento={neu.CODIGO_INTERNO} />
+                        </div>
+
                         {/* Vida útil */}
                         <div className="flex items-center justify-center">
-                          <LinearProgressItem estado={neu.PORCENTAJE_VIDA} />
+                          <LinearProgressItem estado={neu.PORCENTAJE_VIDA} width='75px' />
                         </div>
                       </div>
                     );
@@ -309,7 +324,7 @@ export const ModalReubicarNeumatico = ({ open, onClose, onSuccess }: ModalReubic
               {
                 <ButtonCustom
                   size={'icon'}
-                  className='mb-6 rounded-full'
+                  className='mb-6 rounded-full cursor-pointer'
                   variant={'warning'}
                   disabled={neumaticoSeleccionadosTrasladados.length <= 0}
                   onClick={handleTrasladarNeumaticosTemp}
@@ -345,10 +360,11 @@ export const ModalReubicarNeumatico = ({ open, onClose, onSuccess }: ModalReubic
               </SelectContent>
             </Select>
 
-            <div className="grid grid-cols-[1fr_auto_auto_auto] items-center gap-x-4 px-3 mt-3 mb-1">
+            <div className="grid grid-cols-[1fr_auto_auto_auto_auto] items-center gap-x-4 px-3 mt-3 mb-1">
               <span className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Código</span>
               <span className="text-xs font-semibold text-slate-400 uppercase tracking-wide text-center">Proy.</span>
               <span className="text-xs font-semibold text-slate-400 uppercase tracking-wide text-center">Recup.</span>
+              <span className="text-xs font-semibold text-slate-400 uppercase tracking-wide text-center">Situación</span>
               <span className="text-xs font-semibold text-slate-400 uppercase tracking-wide text-center">Vida útil</span>
             </div>
 
@@ -382,7 +398,7 @@ export const ModalReubicarNeumatico = ({ open, onClose, onSuccess }: ModalReubic
                         onClick={() => handleClickOnNeumaticoTrasladado({ neumatico: neu })}
                         onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && handleClickOnNeumaticoTrasladado({ neumatico: neu })}
                         className={`
-                      relative grid grid-cols-[1fr_auto_auto_auto] items-center gap-x-4
+                      relative grid grid-cols-[1fr_auto_auto_auto_auto] items-center gap-x-4
                       rounded-xl px-3 py-2.5 cursor-pointer border-2 transition-all duration-150
                       ${isSelected
                             ? 'border-yellow-500 bg-yellow-50 shadow-sm'
@@ -397,7 +413,7 @@ export const ModalReubicarNeumatico = ({ open, onClose, onSuccess }: ModalReubic
                         </div>
 
                         <div className="flex flex-col items-center">
-                          <span className="font-light italic text-sm  text-slate-700  truncate">{neu.proyecto}</span>
+                          <span className="font-light italic text-xs  text-slate-700  truncate">{neu.proyecto}</span>
                         </div>
 
                         <div className="flex items-center justify-center">
@@ -405,7 +421,11 @@ export const ModalReubicarNeumatico = ({ open, onClose, onSuccess }: ModalReubic
                         </div>
 
                         <div className="flex items-center justify-center">
-                          <LinearProgressItem estado={neu.vida} />
+                          <TipoMovimientoBadge tipoMovimiento={neu.tipoMovimiento} />
+                        </div>
+
+                        <div className="flex items-center justify-center">
+                          <LinearProgressItem estado={neu.vida} width='75px' />
                         </div>
                       </div>
                     );

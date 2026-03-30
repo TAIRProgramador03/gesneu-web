@@ -9,7 +9,7 @@ import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
 import Skeleton from '@mui/material/Skeleton';
 import Typography from '@mui/material/Typography';
-import { ChevronRight, ClipboardList, Tally1 } from 'lucide-react';
+import { ChevronRight, ClipboardList, RefreshCw, Tally1 } from 'lucide-react';
 import { getInspeccionesPorPlaca, getNeumaticosPorInspeccion } from '@/api/Neumaticos';
 import { useQuery } from '@tanstack/react-query';
 import { Card, Stack } from '@mui/material';
@@ -46,10 +46,9 @@ export const ModalVerInspecciones = ({ open, onClose, placa }: ModalVerInspeccio
     setInspeccion({ PLACA: row.PLACA, FECHA_INSPECCION: row.FECHA_INSPECCION });
   });
 
-  const { data: inspeccionesPorPlaca = [], isLoading: loadingInspecciones } = useQuery({
+  const { data: inspeccionesPorPlaca = [], isLoading: loadingInspecciones, refetch: refetchInspeccionesPorPlaca } = useQuery({
     queryKey: ['inspecciones-placa', { placa }],
     queryFn: () => getInspeccionesPorPlaca(placa),
-    staleTime: 0
   })
 
   const { data: neumaticosPorInspeccion = [], isLoading: loadingNeumaticos } = useQuery({
@@ -113,6 +112,16 @@ export const ModalVerInspecciones = ({ open, onClose, placa }: ModalVerInspeccio
                 <span className="text-xs text-slate-400">{inspeccionesPorPlaca.length} total</span>
               )}
             </Box>
+
+            <div className='flex mb-3 justify-end'>
+              <ButtonCustom
+                size="icon"
+                variant={'life'}
+                onClick={() => refetchInspeccionesPorPlaca()}
+              >
+                <RefreshCw />
+              </ButtonCustom>
+            </div>
 
             {loadingInspecciones
               ? <SkeletonTable />
