@@ -349,6 +349,7 @@ const PosicionNeumatico: React.FC<{
             userSelect: 'none',
             outline: neumatico && isDragging ? '2px solid #388e3c' : 'none',
         };
+
     return (
         <>
             <Box
@@ -359,7 +360,7 @@ const PosicionNeumatico: React.FC<{
                 {...(neumatico ? listeners : {})}
                 sx={boxStyles}
                 onClick={() => onPosicionClick && onPosicionClick(neumatico ? { ...neumatico, POSICION: keyPos } : undefined)}
-                title={keyPos + (neumatico ? ` - ${neumatico.CODIGO_NEU || neumatico.CODIGO || ''}` : '')}
+                title={keyPos + (neumatico ? ` - ${neumatico.CODIGO_NEU + ` - ${neumatico.REMANENTE}mm` || neumatico.CODIGO + ` - ${neumatico.REMANENTE}mm` || ` - `}` : '')}
             >
                 <span style={{ fontWeight: 'bold', fontSize: isReserva ? '15px' : '13px', color: `#fff`, pointerEvents: 'none' }}>
                     {isReserva ? 'RES' : keyPos.replace('POS', '')}

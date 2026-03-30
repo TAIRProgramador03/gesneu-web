@@ -58,8 +58,8 @@ export function Layout({ children }: LayoutProps): React.JSX.Element {
             <Image
               alt="Widgets"
               src="/assets/gemini-login2.png"
-              height={500}
-              width={500}
+              height={300}
+              width={300}
               style={{
                 height: 'auto',
                 width: '100%',

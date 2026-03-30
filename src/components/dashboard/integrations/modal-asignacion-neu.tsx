@@ -685,6 +685,9 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
                                             zIndex: 3,
                                         }}>{assignedNeumaticos.POS01.CODIGO}</span>
                                     ) : null}
+                                    <span className='bg-slate-50  p-1 rounded-md border-slate-200 border text-xs font-bold shadow-lg absolute left-[38px] top-[36px]'>
+                                        POS01
+                                    </span>
                                 </Box>
                                 {/* POS02: DropZone y número a la izquierda */}
                                 <Box sx={{ position: 'absolute', top: '65px', left: '172px', zIndex: 2 }}>
@@ -711,6 +714,9 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
                                             zIndex: 3,
                                         }}>{assignedNeumaticos.POS02.CODIGO}</span>
                                     ) : null}
+                                    <span className='bg-slate-50  p-1 rounded-md border-slate-200 border text-xs font-bold shadow-lg absolute right-[38px] top-[36px]'>
+                                        POS02
+                                    </span>
                                 </Box>
                                 {/* POS03: DropZone y número a la derecha */}
                                 <Box sx={{ position: 'absolute', top: '230px', left: '272px', zIndex: 2 }}>
@@ -737,6 +743,9 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
                                             zIndex: 3,
                                         }}>{assignedNeumaticos.POS03.CODIGO}</span>
                                     ) : null}
+                                    <span className='bg-slate-50  p-1 rounded-md border-slate-200 border text-xs font-bold shadow-lg absolute left-[38px] top-[36px]'>
+                                        POS03
+                                    </span>
                                 </Box>
                                 {/* POS04: DropZone y número a la izquierda */}
                                 <Box sx={{ position: 'absolute', top: '230px', left: '172px', zIndex: 2 }}>
@@ -763,6 +772,9 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
                                             zIndex: 3,
                                         }}>{assignedNeumaticos.POS04.CODIGO}</span>
                                     ) : null}
+                                    <span className='bg-slate-50  p-1 rounded-md border-slate-200 border text-xs font-bold shadow-lg absolute right-[38px] top-[36px]'>
+                                        POS04
+                                    </span>
                                 </Box>
                                 {/* RES01: DropZone y número abajo */}
                                 <Box sx={{ position: 'absolute', top: '299px', left: '206px', zIndex: 2 }}>
@@ -790,6 +802,9 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
                                             zIndex: 3,
                                         }}>{assignedNeumaticos.RES01.CODIGO}</span>
                                     ) : null}
+                                    <span className='bg-slate-50  p-1 rounded-md border-slate-200 border text-xs font-bold shadow-lg absolute right-[10px] top-[64px]'>
+                                        RES01
+                                    </span>
                                 </Box>
                             </div>
 
