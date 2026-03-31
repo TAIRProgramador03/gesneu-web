@@ -517,7 +517,11 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
                         overflowY: 'hidden'
                     },
                 }}
+                PaperProps={{
+                    sx: { borderRadius: 3 }
+                }}
             >
+                <Box sx={{ height: 4, background: 'linear-gradient(90deg, #3b82f6 0%, #6366f1 100%)' }} />
 
                 <DialogTitle sx={{ pb: 1.5, pt: 2, display: 'flex', alignItems: 'center', gap: 1.5, borderBottom: '1px solid', borderColor: 'divider' }}>
                     <Box sx={{
@@ -542,7 +546,7 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
                         </Box>
                         <Typography variant="caption" className='text-amber-600' sx={{ display: 'block', mt: 1, fontStyle: 'italic' }}>
                             <span className='font-bold'>Nota: </span>
-                            Arrastra un neumático a una posición disponible. Al soltar, se solicitarán los datos de instalación.
+                            Arrastra un neumático a una posición disponible. Al soltar, se solicitarán los datos de instalación. <b>Las 5 posiciones son obligatorias</b>.
                         </Typography>
                     </Box>
                 </DialogTitle>

@@ -147,7 +147,7 @@ export default function Page(): React.JSX.Element {
           spacing={2}
           sx={{ width: '100%' }}
         >
-          <Box sx={{ display: 'flex', gap: 2, mt: { xs: 2, md: 0 } }}>
+          <Box sx={{ display: 'flex', gap: 2, justifyContent: 'space-between', mt: { xs: 2, md: 0 } }} >
             <LoadingButton2
               variant={'indigo'}
               icon={<TrendingUpDown />}

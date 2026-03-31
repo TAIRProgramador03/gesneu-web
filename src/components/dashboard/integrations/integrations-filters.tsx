@@ -165,6 +165,7 @@ export const CompaniesFilters = memo(({ onSearchChange, operationName, autosDisp
         <Box
           sx={{
             display: 'flex',
+            flexWrap: 'wrap',
             alignItems: 'center',
             gap: 3,
             padding: '10px 16px',
@@ -172,7 +173,7 @@ export const CompaniesFilters = memo(({ onSearchChange, operationName, autosDisp
             borderRadius: '8px',
             backgroundColor: 'rgba(0, 0, 0, 0.02)',
             boxShadow: '0px 1px 3px rgba(0, 0, 0, 0.1)',
-            flex: '0 0 auto',
+            // flex: '0 0 auto',
             ml: 'auto'
           }}
         >
@@ -205,7 +206,7 @@ export const CompaniesFilters = memo(({ onSearchChange, operationName, autosDisp
             component="div"
             sx={{
               width: 170,
-              ml: 1,
+              // ml: 1,
               display: 'block',
             }}
           >

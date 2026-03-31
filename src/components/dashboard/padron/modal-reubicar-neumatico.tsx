@@ -153,7 +153,7 @@ export const ModalReubicarNeumatico = ({ open, onClose, onSuccess }: ModalReubic
             Reubicar Neumáticos
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Mueve neumáticos de un proyecto origen a un proyecto destino
+            Mueve neumáticos de un taller origen a un taller destino
           </Typography>
 
           <Typography variant="caption" className='text-amber-600' sx={{ display: 'block', mt: 1, fontStyle: 'italic' }}>
@@ -189,11 +189,11 @@ export const ModalReubicarNeumatico = ({ open, onClose, onSuccess }: ModalReubic
 
             <Select value={proyectoOrigen} onValueChange={setProyectoOrigen} >
               <SelectTrigger className="w-full max-w-64">
-                <SelectValue placeholder="Selecciona un proyecto origen" />
+                <SelectValue placeholder="Selecciona un taller origen" />
               </SelectTrigger>
               <SelectContent className="max-h-60 overflow-y-auto">
                 <SelectGroup>
-                  <SelectLabel>Proyectos</SelectLabel>
+                  <SelectLabel>Talleres</SelectLabel>
                   {
                     proyectosEnTotal.map(proyecto => (
                       <SelectItem key={proyecto.ID} value={proyecto.DESCRIPCION}> {proyecto.DESCRIPCION} </SelectItem>
@@ -226,7 +226,7 @@ export const ModalReubicarNeumatico = ({ open, onClose, onSuccess }: ModalReubic
             {/* Header de columnas */}
             <div className="grid grid-cols-[1fr_auto_auto_auto_auto] items-center gap-x-4 px-3 mt-3 mb-1">
               <span className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Código</span>
-              <span className="text-xs font-semibold text-slate-400 uppercase tracking-wide text-center">Proy.</span>
+              <span className="text-xs font-semibold text-slate-400 uppercase tracking-wide text-center">Taller</span>
               <span className="text-xs font-semibold text-slate-400 uppercase tracking-wide text-center">Recup.</span>
               <span className="text-xs font-semibold text-slate-400 uppercase tracking-wide text-center">Situación</span>
               <span className="text-xs font-semibold text-slate-400 uppercase tracking-wide text-center">Vida útil</span>
@@ -267,7 +267,7 @@ export const ModalReubicarNeumatico = ({ open, onClose, onSuccess }: ModalReubic
                           </span>
                         </div>
 
-                        {/* Proyecto */}
+                        {/* Taller */}
                         <div className="flex flex-col items-center">
                           <span className="font-light italic text-xs text-slate-700  truncate">
                             {neu.PROYECTO_ACTUAL}
@@ -339,16 +339,16 @@ export const ModalReubicarNeumatico = ({ open, onClose, onSuccess }: ModalReubic
 
 
             <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 0.5 }}>
-              Proyecto destino:
+              Taller destino:
             </Typography>
 
             <Select value={proyectoDestino} onValueChange={setProyectoDestino} disabled={neumaticosTrasladados.length === 0}>
               <SelectTrigger className="w-full max-w-60">
-                <SelectValue placeholder="Selecciona un nuevo Proyecto" />
+                <SelectValue placeholder="Selecciona un nuevo taller" />
               </SelectTrigger>
               <SelectContent className="max-h-60 overflow-y-auto">
                 <SelectGroup>
-                  <SelectLabel>Proyectos</SelectLabel>
+                  <SelectLabel>Talleres</SelectLabel>
                   {
                     proyectosNoSeleccionados.map(proyecto => {
                       return (
@@ -362,7 +362,7 @@ export const ModalReubicarNeumatico = ({ open, onClose, onSuccess }: ModalReubic
 
             <div className="grid grid-cols-[1fr_auto_auto_auto_auto] items-center gap-x-4 px-3 mt-3 mb-1">
               <span className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Código</span>
-              <span className="text-xs font-semibold text-slate-400 uppercase tracking-wide text-center">Proy.</span>
+              <span className="text-xs font-semibold text-slate-400 uppercase tracking-wide text-center">Taller</span>
               <span className="text-xs font-semibold text-slate-400 uppercase tracking-wide text-center">Recup.</span>
               <span className="text-xs font-semibold text-slate-400 uppercase tracking-wide text-center">Situación</span>
               <span className="text-xs font-semibold text-slate-400 uppercase tracking-wide text-center">Vida útil</span>

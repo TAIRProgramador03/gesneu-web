@@ -966,7 +966,7 @@ export default function Page(): React.JSX.Element {
 
           {/* Neúmaticos Disponibles */}
           <div className='flex'>
-            <Typography sx={{ mb: 2, mt: 2 }} className='border border-green-400 bg-green-50 text-green-600 inline p-2 mt-2 mb-2 rounded-lg'>
+            <Typography sx={{ mt: 2 }} className='border border-green-400 bg-green-50 text-green-600 inline p-2 mt-2 mb-2 rounded-lg'>
               <span className='font-bold'>
                 Disponibles:
               </span>
@@ -976,7 +976,7 @@ export default function Page(): React.JSX.Element {
             </Typography>
           </div>
 
-          <DataTableNeumaticos columns={columnsNeuDisponible} data={neumaticosDisponiblesUseQuery} type='pagination' />
+          <DataTableNeumaticos columns={columnsNeuDisponible} data={neumaticosDisponiblesUseQuery} type='pagination' filters={true} />
 
         </Card>
 

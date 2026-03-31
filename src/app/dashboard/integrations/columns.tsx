@@ -501,6 +501,6 @@ export const columnsNeuInspeccion: ColumnDef<NeuInspeccionTable>[] = [
   {
     accessorKey: "PORCENTAJE_VIDA",
     header: "Estado (%)",
-    cell: ({ row }) => <LinearProgressItem estado={row.original.PORCENTAJE_VIDA ?? 0} />
+    cell: ({ row }) => <LinearProgressItem estado={row.original.PORCENTAJE_VIDA ?? 0} width="120px" />
   },
 ]

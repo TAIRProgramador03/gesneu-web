@@ -98,11 +98,11 @@ export const ModalVerInspecciones = ({ open, onClose, placa }: ModalVerInspeccio
         </Box>
       </DialogTitle>
 
-      <DialogContent sx={{ pt: 2.5, bgcolor: '#f8fafc' }}>
+      <DialogContent sx={{ pt: 2, bgcolor: '#f8fafc' }}>
         <Stack direction="row" spacing={3}>
 
           {/* Panel izquierdo */}
-          <Card sx={{ flex: 1, p: 2.5, minWidth: 320, maxWidth: 580, borderRadius: 2.5, border: '1px solid #e2e8f0', marginTop: '10px' }} elevation={0}>
+          <Card sx={{ flex: 1, p: 2.5, borderRadius: 2.5, border: '1px solid #e2e8f0', marginTop: '10px' }} elevation={0}>
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
               <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-semibold">
                 <Tally1 size={12} />

@@ -105,14 +105,14 @@ export const columnsPadron: ColumnDef<PadronExcel>[] = [
   },
   {
     accessorKey: "PROYECTO",
-    meta: { exportLabel: "Proyecto" },
+    meta: { exportLabel: "Taller" },
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Proyecto
+          Taller
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       )

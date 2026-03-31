@@ -567,7 +567,12 @@ const ModalAsignacionNeuDesdeDesasignacion: React.FC<ModalAsignacionNeuDesdeDesa
                         overflowY: 'hidden'
                     },
                 }}
+                PaperProps={{
+                    sx: { borderRadius: 3 }
+                }}
             >
+                <Box sx={{ height: 4, background: 'linear-gradient(90deg, #3b82f6 0%, #6366f1 100%)' }} />
+
                 <DialogTitle sx={{ pb: 1.5, pt: 2, display: 'flex', alignItems: 'center', gap: 1.5, borderBottom: '1px solid', borderColor: 'divider' }}>
                     <Box sx={{
                         display: 'flex', alignItems: 'center', justifyContent: 'center',

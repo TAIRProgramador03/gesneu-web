@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useMemo, memo } from 'react';
 import {
-  Dialog, DialogContent, Typography, Button, Stack, Box, Card, TextField
+  Dialog, DialogContent, Typography, Button, Stack, Box, Card, TextField,
+  DialogTitle,
+  Chip
 } from '@mui/material';
 import { DndContext, DragEndEvent, DragStartEvent, useDraggable, useDroppable } from '@dnd-kit/core';
 import DiagramaVehiculo from '../../../styles/theme/components/DiagramaVehiculo';
@@ -15,6 +17,7 @@ import { convertToDateHuman } from '@/lib/utils';
 import { LoadingButton } from '@/components/ui/loading-button';
 import { Button as ButtonCustom } from '@/components/ui/button';
 import { LoadingButton2 } from '@/components/ui/loading-button2';
+import { ClipboardList } from 'lucide-react';
 
 interface ModalReubicarProps {
   open: boolean;
@@ -454,9 +457,9 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = memo(({
       handleClose();
     } catch (error) {
       if (error instanceof Error) {
-        toast.error('Error al registrar la reubicación: ' + error.message);
+        toast.error(error.message);
       } else {
-        toast.error('Error al registrar la reubicación: ' + String(error));
+        toast.error(String(error));
       }
     }
   };
@@ -537,7 +540,41 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = memo(({
   };
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
+    <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth
+      PaperProps={{
+        sx: { borderRadius: 3, overflow: 'hidden' }
+      }}
+    >
+
+      <Box sx={{ height: 4, background: 'linear-gradient(90deg, #3b82f6 0%, #6366f1 100%)' }} />
+
+      <DialogTitle sx={{ pb: 1.5, pt: 2, display: 'flex', alignItems: 'center', gap: 1.5, borderBottom: '1px solid', borderColor: 'divider' }}>
+        <Box sx={{
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          width: 40, height: 40, borderRadius: 2,
+          background: 'linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%)',
+          flexShrink: 0,
+        }}>
+          <ClipboardList size={20} className="text-blue-600" />
+        </Box>
+        <Box sx={{ flex: 1 }}>
+          <Typography variant="h6" fontWeight={700} lineHeight={1.2}>
+            Registrar Reubicación de Neumáticos
+          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.4 }}>
+            <Typography variant="body2" color="text.secondary">Vehículo:</Typography>
+            <Chip
+              label={placa}
+              size="small"
+              sx={{ fontWeight: 700, fontSize: 12, bgcolor: '#f1f5f9', color: '#334155', letterSpacing: 0.5 }}
+            />
+          </Box>
+          <Typography variant="caption" className='text-amber-600' sx={{ display: 'block', mt: 1, fontStyle: 'italic' }}>
+            <span className='font-bold'>Nota: </span>
+            Arrastra un neumático reubicable y mueve a placer las demás posiciones. <b>No se puede dejar posiciones vacías</b>.
+          </Typography>
+        </Box>
+      </DialogTitle>
       <DialogContent>
         <DndContext
           // onDragStart={(event: DragStartEvent) => {
@@ -548,7 +585,8 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = memo(({
           <Stack direction="row" spacing={2}>
             <Stack direction="column" spacing={2} sx={{
               flex: 1, width: '350px',
-              maxWidth: 400, minWidth: 320
+              maxWidth: 400, minWidth: 320,
+              marginTop: '10px'
             }}>
               {/* Card de información del vehículo */}
               <Card sx={{
@@ -557,7 +595,7 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = memo(({
               }}>
                 <Box>
                   <Typography variant="h6" fontWeight="bold" gutterBottom>
-                    Reubicar Neumáticos
+                    Datos del Vehículo
                   </Typography>
                   {vehiculo ? (
                     <Stack direction="row" spacing={4} alignItems="flex-start" sx={{ mb: 1 }}>
@@ -589,15 +627,13 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = memo(({
                   )}
                 </Box>
               </Card>
-
+              {/* Error al registrar la reubicación: Error al registrar la reubicación: No se puede guardar: las posiciones RES01 quedarían vacías. Asigna neumáticos a estas posiciones antes de guardar. */}
               {/* Card para REUBICAR */}
               <Card sx={{
                 p: 2, boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)',
                 maxWidth: 400, minWidth: 320, width: '100%'
               }}>
                 <Box sx={{ display: 'flex', alignItems: 'flex-end', mb: 1, gap: 2 }}>
-                  <Typography variant="h6" sx={{ mt: 1, mb: 0 }}>REUBICAR</Typography>
-                  <Box sx={{ flex: 1 }} />
                   <Box>
                     <Typography variant="caption" color="text.secondary">Fecha última inspección:</Typography>
                     <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
@@ -712,6 +748,7 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = memo(({
               flex: 0.5, p: 2, position: 'relative',
               boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)',
               maxWidth: 400, minWidth: 320, width: '100%',
+              marginTop: '10px'
             }}>
               <Box sx={{ position: 'relative', width: '370px', height: '430px' }}>
                 <DiagramaVehiculo
@@ -730,17 +767,6 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = memo(({
                   fromMantenimientoModal={true}
                   placa={placa}
                 />
-
-                {/* Imagen de placa */}
-                {/* <img
-                  src="/assets/placa.png"
-                  alt="Placa"
-                  style={{
-                    width: '130px', height: '60px', objectFit: 'contain',
-                    position: 'absolute', top: '10px', right: '55px',
-                    zIndex: 2, pointerEvents: 'none',
-                  }}
-                /> */}
 
                 <Image src='/assets/placa.png' alt='Placa' width={130} height={60} style={{
                   objectFit: 'contain',
