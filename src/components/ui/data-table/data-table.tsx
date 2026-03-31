@@ -121,7 +121,7 @@ export function DataTableNeumaticos<TData, TValue>({
 
       {
         filters || withExport ? (
-          <div className="flex items-center py-4 justify-between">
+          <div className="flex items-center py-4 gap-6 justify-between">
             {
               filters && (
                 <Input
