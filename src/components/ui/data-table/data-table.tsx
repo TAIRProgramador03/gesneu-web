@@ -156,7 +156,7 @@ export function DataTableNeumaticos<TData, TValue>({
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead key={header.id} className="font-bold">
+                    <TableHead key={header.id} className="font-bold text-center">
                       {header.isPlaceholder
                         ? null
                         : flexRender(
@@ -177,7 +177,7 @@ export function DataTableNeumaticos<TData, TValue>({
                   data-state={row.getIsSelected() && "selected"}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell key={cell.id} className="text-center">
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}

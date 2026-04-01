@@ -184,7 +184,7 @@ export const CompaniesFilters = memo(({ onSearchChange, operationName, autosDisp
                 {/* <MapPin size={18} weight="bold" style={{ color: 'rgba(0, 0, 0, 0.7)' }} /> */}
                 <MapPinCheckInside />
                 <Typography variant="body2" >
-                  <Box component="span" sx={{ fontWeight: 'bold' }}>Operación:</Box> {operationName}
+                  <Box component="span" sx={{ fontWeight: 'bold' }}>Operación: </Box> {operationName}
                 </Typography>
               </Box>
             )}
@@ -192,7 +192,7 @@ export const CompaniesFilters = memo(({ onSearchChange, operationName, autosDisp
               {/* <Car size={18} weight="bold" style={{ color: 'rgba(0, 0, 0, 0.7)' }} /> */}
               <CarFront />
               <Typography variant="body2" >
-                <Box component="span" sx={{ fontWeight: 'bold' }}>Vehiculos:</Box> {autosDisponiblesCount}
+                <Box component="span" sx={{ fontWeight: 'bold' }}>Vehiculos: </Box> {autosDisponiblesCount}
               </Typography>
             </Box>
           </div>
