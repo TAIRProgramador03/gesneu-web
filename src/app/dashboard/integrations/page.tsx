@@ -787,21 +787,28 @@ export default function Page(): React.JSX.Element {
                 {/* Kilometraje */}
                 <Box
                   sx={{
-                    backgroundColor: '#e0f7fa',
-                    borderRadius: '8px',
-                    padding: '8px 16px',
-                    fontWeight: 'bold',
-                    color: 'black',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
-                    whiteSpace: 'nowrap',
+                    // backgroundColor: '#e0f7fa',
+                    // borderRadius: '8px',
+                    // padding: '8px 16px',
+                    // fontWeight: 'bold',
+                    // color: 'black',
+                    // display: 'flex',
+                    // alignItems: 'center',
+                    // justifyContent: 'center',
+                    // boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
+                    // whiteSpace: 'nowrap',
                     marginRight: '8px',
                   }}
                 >
-                  {`${animatedKilometraje.toLocaleString()} km`}
+                  <div className='bg-linear-to-r from-cyan-200 to-teal-200 rounded-lg py-2 px-4  font-bold'>
+                    {`${animatedKilometraje.toLocaleString()} km`}
+                  </div>
                 </Box>
+
+                {/* <div className=''>
+                  {`${animatedKilometraje.toLocaleString()} km`}
+                </div> */}
+
                 {/* Opciones */}
                 <LoadingButton2
                   variant="teal"
