@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_API_GESNEU_URL;
+const CF_ACCESS_CLIENT_ID = process.env.CF_ACCESS_CLIENT_ID!;
+const CF_ACCESS_CLIENT_SECRET = process.env.CF_ACCESS_CLIENT_SECRET!;
 
 export const runtime = 'edge';
 
@@ -10,7 +12,11 @@ export async function GET(request: NextRequest) {
   const url = `${BACKEND_URL}/api${path}${searchParams ? `?${searchParams}` : ''}`;
 
   try {
-    const headers: HeadersInit = {};
+
+    const headers: HeadersInit = {
+      'CF-Access-Client-Id': CF_ACCESS_CLIENT_ID,
+      'CF-Access-Client-Secret': CF_ACCESS_CLIENT_SECRET,
+    };
 
     const cookieHeader = request.headers.get('cookie');
     if (cookieHeader) {
@@ -54,6 +60,10 @@ export async function POST(request: NextRequest) {
         headers[key] = value;
       }
     });
+
+    headers['CF-Access-Client-Id'] = CF_ACCESS_CLIENT_ID;
+    headers['CF-Access-Client-Secret'] = CF_ACCESS_CLIENT_SECRET;
+
     const bodyBuffer = await request.arrayBuffer();
     const response = await fetch(url, {
       method: 'POST',
@@ -73,6 +83,8 @@ export async function POST(request: NextRequest) {
       const body = await request.json();
       const headers: HeadersInit = {
         'Content-Type': 'application/json',
+        'CF-Access-Client-Id': CF_ACCESS_CLIENT_ID,
+        'CF-Access-Client-Secret': CF_ACCESS_CLIENT_SECRET,
       };
       const cookieHeader = request.headers.get('cookie');
       if (cookieHeader) {
