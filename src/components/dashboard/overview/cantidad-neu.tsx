@@ -25,7 +25,7 @@ export function Budget({ diff, trend, sx, value }: BudgetProps): React.JSX.Eleme
                 Cantidad de Neumáticos
               </Typography>
               <Typography variant="h4">
-                <CountUp end={value} />
+                <CountUp end={value} duration={.8} />
               </Typography>
             </Stack>
             <Stack sx={{ width: 115, objectFit: 'cover' }}>

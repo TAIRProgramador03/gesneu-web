@@ -9,6 +9,7 @@ import { calcularKmRecorrido, MovimientoNeumatico } from './calculo-km-recorrido
 import { obtenerInfoDesgaste } from '../../../utils/tire-utils';
 import axios from 'axios';
 import { Customer } from '@/components/dashboard/customer/customers-table';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface Neumatico {
     POSICION: string;
@@ -352,20 +353,38 @@ const PosicionNeumatico: React.FC<{
 
     return (
         <>
-            <Box
-                ref={combinedRef}
-                key={keyPos}
-                aria-label={neumatico ? `Arrastrar neumático ${neumatico.CODIGO_NEU || neumatico.CODIGO}` : undefined}
-                {...attributes}
-                {...(neumatico ? listeners : {})}
-                sx={boxStyles}
-                onClick={() => onPosicionClick && onPosicionClick(neumatico ? { ...neumatico, POSICION: keyPos } : undefined)}
-                title={keyPos + (neumatico ? ` - ${neumatico.CODIGO_NEU + ` - ${neumatico.REMANENTE}mm` || neumatico.CODIGO + ` - ${neumatico.REMANENTE}mm` || ` - `}` : '')}
-            >
-                <span style={{ fontWeight: 'bold', fontSize: isReserva ? '15px' : '13px', color: `#fff`, pointerEvents: 'none' }}>
-                    {isReserva ? 'RES' : keyPos.replace('POS', '')}
-                </span>
-            </Box>
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <Box
+                        ref={combinedRef}
+                        key={keyPos}
+                        aria-label={neumatico ? `Arrastrar neumático ${neumatico.CODIGO_NEU || neumatico.CODIGO}` : undefined}
+                        {...attributes}
+                        {...(neumatico ? listeners : {})}
+                        sx={boxStyles}
+                        onClick={() => onPosicionClick && onPosicionClick(neumatico ? { ...neumatico, POSICION: keyPos } : undefined)}
+                    >
+                        <span style={{ fontWeight: 'bold', fontSize: isReserva ? '15px' : '13px', color: `#fff`, pointerEvents: 'none' }}>
+                            {isReserva ? 'RES' : keyPos.replace('POS', '')}
+                        </span>
+                    </Box>
+
+                </TooltipTrigger>
+                <TooltipContent>
+                    <ul>
+                        <li>Posición: {keyPos}</li>
+                        {
+                            neumatico && (
+                                <>
+                                    <li>Neumático: {neumatico.CODIGO_NEU || neumatico.CODIGO}</li>
+                                    <li>Remanente: {neumatico.REMANENTE}mm</li>
+                                    <li>Estado: {neumatico.ESTADO}%</li>
+                                </>
+                            )
+                        }
+                    </ul>
+                </TooltipContent>
+            </Tooltip>
             {/* Mostrar presión de aire en dashboard y en modal de mantenimiento */}
             {(layout === 'dashboard' || (layout === 'modal' && tipoModal === 'mantenimiento')) && neumatico && neumatico.PRESION_AIRE !== undefined && neumatico.PRESION_AIRE !== null && neumatico.PRESION_AIRE !== '' && (
                 keyPos === 'RES01' ? (

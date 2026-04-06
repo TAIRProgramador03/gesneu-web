@@ -130,6 +130,7 @@ export const columnsPadron: ColumnDef<PadronExcel>[] = [
   },
   {
     accessorKey: "FECHA_FABRICACION_COD",
+    cell: ({ row }) => row.original.FECHA_FABRICACION_COD ?? '-',
     meta: { exportLabel: "Fecha Fabricación" },
     header: "Fecha fabricación",
   },

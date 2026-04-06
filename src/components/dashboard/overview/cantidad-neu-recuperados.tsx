@@ -43,7 +43,7 @@ export function Recuperados({ diff, trend, sx, value }: RecuperadosProps): React
               </Tooltip>
 
               <Typography variant="h4" sx={{ color: '#2196f3' }}>
-                <CountUp end={value} />
+                <CountUp end={value} duration={.8} />
               </Typography>
             </Stack>
             <Stack sx={{ position: 'relative', width: 75, height: 75 }}>

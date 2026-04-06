@@ -26,7 +26,7 @@ export function TotalCustomers({ diff, trend, sx, value }: TotalCustomersProps):
                 Neumáticos disponibles
               </Typography>
               <Typography variant="h4">
-                <CountUp end={value} />
+                <CountUp end={value} duration={.8} />
               </Typography>
             </Stack>
 

@@ -45,7 +45,7 @@ export function Layout({ children }: LayoutProps): React.JSX.Element {
         <Stack spacing={3}>
           <Stack spacing={1}>
             <Typography color="inherit" sx={{ fontSize: '24px', lineHeight: '32px', textAlign: 'center' }} variant="h1">
-              Bienvenidos al Sistema de {' '}
+              Bienvenidos al Sistema {' '}
               <Box component="span" sx={{ color: '#0dcaf0' }}>
                 Gestor de Neumáticos
               </Box>

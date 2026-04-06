@@ -23,7 +23,7 @@ export function TasksProgress({ value, sx }: TasksProgressProps): React.JSX.Elem
                 neumáticos asignados
               </Typography>
               <Typography variant="h4">
-                <CountUp end={value} />
+                <CountUp end={value} duration={.8} />
               </Typography>
             </Stack>
             <Stack sx={{ width: 115, objectFit: 'cover' }}>
