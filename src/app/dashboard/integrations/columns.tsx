@@ -352,13 +352,11 @@ export const columnsNeuTemporales: ColumnDef<NeuTemporalTable>[] = [
   },
   {
     accessorKey: "CODIGO",
-    header: "Código",
-    cell: ({ row }) => convertToDateHuman(row.original.CODIGO ?? '-')
+    header: "Código"
   },
   {
     accessorKey: "MARCA",
-    header: "Marca",
-    cell: ({ row }) => convertToDateHuman(row.original.MARCA ?? '-'),
+    header: "Marca"
   },
   {
     accessorKey: "FECHA_ASIGNACION",
