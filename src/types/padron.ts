@@ -29,6 +29,7 @@ export interface PadronExcel {
   CARGA: number
   RQ: number
   OC: number
+  LEASING?: string,
   VELOCIDAD: string
   PROYECTO: string
   COSTO: number

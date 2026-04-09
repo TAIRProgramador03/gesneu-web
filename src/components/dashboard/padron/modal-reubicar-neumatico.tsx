@@ -16,6 +16,7 @@ import { useQuery } from '@tanstack/react-query';
 import DialogActions from '@mui/material/DialogActions';
 import React, { useMemo, useRef, useState } from 'react'
 import { TipoMovimientoBadge } from '@/components/ui/TipoMovimientoBadge';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface Neumatico {
   id: string;
@@ -48,11 +49,11 @@ export const ModalReubicarNeumatico = ({ open, onClose, onSuccess }: ModalReubic
   const [neumaticoSeleccionadosTrasladados, setNeumaticosSeleccionadosTrasladados] = useState<Neumatico[]>([]);
   const [proyectoOrigen, setProyectoOrigen] = useState<string>('');
   const [proyectoDestino, setProyectoDestino] = useState<string>('');
-  const codigoNeuRef = useRef('')
+  const codigoNeuRef = useRef<HTMLInputElement>(null)
 
   const { data: neumaticosParaReubicar = [], refetch: refetchNeumaticosParaUbicar } = useQuery({
     queryKey: ['neumaticos-recuperados-para-reubicar', { proyectoOrigen }],
-    queryFn: () => listarNeumaticosParaReubicar(proyectoOrigen, codigoNeuRef.current),
+    queryFn: () => listarNeumaticosParaReubicar(proyectoOrigen, codigoNeuRef.current?.value ?? ''),
     staleTime: 0,
     enabled: proyectoOrigen.length !== 0
   })
@@ -125,7 +126,7 @@ export const ModalReubicarNeumatico = ({ open, onClose, onSuccess }: ModalReubic
     setNeumaticosSeleccionadosTrasladados([])
     setNeumaticosTrasladados([])
     setNeumaticosSeleccionados([])
-    codigoNeuRef.current = ''
+    if (codigoNeuRef.current !== null) codigoNeuRef.current.value = ''
   }
 
   const proyectosNoSeleccionados = useMemo(() => {
@@ -187,7 +188,10 @@ export const ModalReubicarNeumatico = ({ open, onClose, onSuccess }: ModalReubic
               </ButtonCustom>
             }
 
-            <Select value={proyectoOrigen} onValueChange={setProyectoOrigen} >
+            <Select value={proyectoOrigen} onValueChange={(e) => {
+              if (codigoNeuRef.current !== null) codigoNeuRef.current.value = ''
+              setProyectoOrigen(e)
+            }} >
               <SelectTrigger className="w-full max-w-64">
                 <SelectValue placeholder="Selecciona un taller origen" />
               </SelectTrigger>
@@ -213,14 +217,22 @@ export const ModalReubicarNeumatico = ({ open, onClose, onSuccess }: ModalReubic
             </Typography>
 
             <Field className='mt-2 mb-2 w-50'>
-              <Input className='size-8 text-xs' id="input-codigo-neu" type="text" placeholder="Buscar por código"
-                onChange={(e) => {
-                  const newValue = e.target.value.trim()
-                  codigoNeuRef.current = e.target.value.trim()
-                  if (newValue.length === 0) refetchNeumaticosParaUbicar()
-                }}
-                onKeyDown={(e) => e.key === 'Enter' && refetchNeumaticosParaUbicar()}
-              />
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Input ref={codigoNeuRef} className='size-8 text-xs' id="input-codigo-neu" type="text" placeholder="Buscar por código"
+                    onChange={(e) => {
+                      if (codigoNeuRef.current === null) return
+                      const newValue = e.target.value.trim()
+                      codigoNeuRef.current.value = newValue
+                      if (newValue.length === 0) refetchNeumaticosParaUbicar()
+                    }}
+                    onKeyDown={(e) => e.key === 'Enter' && refetchNeumaticosParaUbicar()}
+                  />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Pulse Enter para realizar la búsqueda</p>
+                </TooltipContent>
+              </Tooltip>
             </Field>
 
             {/* Header de columnas */}

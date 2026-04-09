@@ -54,8 +54,8 @@ export function DataTableNeumaticos<TData, TValue>({
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
     CARGA: false,
     VELOCIDAD: false,
-    RQ: false,
-    COSTO: false
+    // RQ: false,
+    // COSTO: false
   })
 
   const [rowSelection, setRowSelection] = useState({})

@@ -97,11 +97,19 @@ export const columnsPadron: ColumnDef<PadronExcel>[] = [
     accessorKey: "RQ",
     meta: { exportLabel: "RQ" },
     header: "RQ",
+    cell: ({ row }) => row.original.RQ ? row.original.RQ : '-',
   },
   {
     accessorKey: "OC",
     meta: { exportLabel: "OC" },
     header: "OC",
+    cell: ({ row }) => row.original.OC ? row.original.OC : '-',
+  },
+  {
+    accessorKey: "LEASING",
+    meta: { exportLabel: "Leasing" },
+    header: "Leasing",
+    cell: ({ row }) => row.original.LEASING ? row.original.LEASING : '-',
   },
   {
     accessorKey: "PROYECTO",
@@ -121,7 +129,7 @@ export const columnsPadron: ColumnDef<PadronExcel>[] = [
   {
     accessorKey: "COSTO",
     meta: { exportLabel: "Costo" },
-    header: "Costo",
+    header: "Costo ($)",
   },
   {
     accessorKey: "PROVEEDOR",
@@ -130,7 +138,7 @@ export const columnsPadron: ColumnDef<PadronExcel>[] = [
   },
   {
     accessorKey: "FECHA_FABRICACION_COD",
-    cell: ({ row }) => row.original.FECHA_FABRICACION_COD ?? '-',
+    cell: ({ row }) => row.original.FECHA_FABRICACION_COD ? row.original.FECHA_FABRICACION_COD : '-',
     meta: { exportLabel: "Fecha Fabricación" },
     header: "Fecha fabricación",
   },

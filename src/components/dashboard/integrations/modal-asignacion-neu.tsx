@@ -561,6 +561,8 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
                                         label="Kilometraje"
                                         type="number"
                                         value={Odometro}
+                                        className={(!hasAssignedNeumaticos || !allPositionsAssigned) ? 'opacity-50' : ''}
+                                        disabled={!hasAssignedNeumaticos || !allPositionsAssigned}
                                         onChange={(e) => {
                                             const value = e.target.value;
                                             const numValue = Number(value);
