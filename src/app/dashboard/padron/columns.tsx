@@ -96,14 +96,34 @@ export const columnsPadron: ColumnDef<PadronExcel>[] = [
   {
     accessorKey: "RQ",
     meta: { exportLabel: "RQ" },
-    header: "RQ",
     cell: ({ row }) => row.original.RQ ? row.original.RQ : '-',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          RQ
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
   },
   {
     accessorKey: "OC",
     meta: { exportLabel: "OC" },
-    header: "OC",
     cell: ({ row }) => row.original.OC ? row.original.OC : '-',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          OC
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
   },
   {
     accessorKey: "LEASING",

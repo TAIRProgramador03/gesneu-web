@@ -61,11 +61,22 @@ export const columnsNeuDisponible: ColumnDef<NeuDisponibleTable>[] = [
   {
     accessorKey: "FECHA_FABRICACION_COD",
     header: "Fecha",
+    cell: ({ row }) => row.original.FECHA_FABRICACION_COD ?? '-',
   },
   {
     accessorKey: "RECUPERADO",
-    header: "Recuperado",
     cell: ({ row }) => <EsRecuperadoBadge esRecuperado={row.original.RECUPERADO ?? false} />,
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Recuperado
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
   },
   {
     accessorKey: "ESTADO",
@@ -218,12 +229,21 @@ export const columnsNeuParaAsignar: ColumnDef<NeuAsignarTable>[] = [
   },
   {
     accessorKey: "RECUPERADO",
-    header: "Recuperado",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Recuperado
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
     cell: ({ row }) => <EsRecuperadoBadge esRecuperado={row.original.RECUPERADO ?? false} />,
   },
   {
     accessorKey: "ESTADO",
-    // header: "Estado",
     header: ({ column }) => {
       return (
         <Button
@@ -299,8 +319,18 @@ export const columnsNeuParaAsignarDesdeDesasignar: ColumnDef<NeuAsignarTable>[] 
   },
   {
     accessorKey: "RECUPERADO",
-    header: "Recuperado",
     cell: ({ row }) => <EsRecuperadoBadge esRecuperado={row.original.RECUPERADO ?? false} />,
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Recuperado
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
   },
   {
     accessorKey: "TIPO_MOVIMIENTO",

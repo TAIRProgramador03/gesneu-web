@@ -442,7 +442,7 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
         }
         try {
             const payloadArray = toAssign.map(([pos, neu]) => {
-                const codigo = Number(neu!.CODIGO ?? neu!.CODIGO_NEU);
+                const codigo = neu!.CODIGO ?? neu!.CODIGO_NEU;
                 const remanente = typeof neu!.REMANENTE === 'string' ? parseFloat(neu!.REMANENTE) : (neu!.REMANENTE ?? 0);
                 const presionAire = typeof neu!.PRESION_AIRE === 'string' ? parseFloat(neu!.PRESION_AIRE) : (neu!.PRESION_AIRE ?? 0);
                 const torqueAplicado = typeof neu!.TORQUE_APLICADO === 'string' ? parseFloat(neu!.TORQUE_APLICADO) : (neu!.TORQUE_APLICADO ?? 0);
