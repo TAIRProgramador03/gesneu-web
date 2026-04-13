@@ -49,3 +49,13 @@ export interface NeuInspeccionTable {
   OBS: string
   PORCENTAJE_VIDA: number
 }
+
+export interface NeumaticoPorAsignar {
+  Posicion: string
+  CodigoNeumatico: string
+  Marca: string
+  Remanente: number
+  PresionAire: number
+  TorqueAplicado: number
+  FechaAsignacion: string
+}

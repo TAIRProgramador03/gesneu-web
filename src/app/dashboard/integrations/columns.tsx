@@ -10,7 +10,7 @@ import { ArrowBigRightDash, ArrowUpDown } from "lucide-react"
 import { DraggableNeumatico } from "@/components/dashboard/integrations/modal-asignacion-neu"
 import type { Neumatico } from "@/types/types"
 import { TipoMovimientoBadge } from "@/components/ui/TipoMovimientoBadge"
-import { NeuAsignadoTable, NeuAsignarTable, NeuDisponibleTable, NeuInspeccionTable, NeuTemporalTable } from "@/types/neumatico"
+import { NeuAsignadoTable, NeuAsignarTable, NeuDisponibleTable, NeuInspeccionTable, NeumaticoPorAsignar, NeuTemporalTable } from "@/types/neumatico"
 import { InspeccionTable } from "@/types/inspecciones"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { TipoTerrenoBadge } from "@/components/ui/TipoTerrenoBadge"
@@ -382,11 +382,13 @@ export const columnsNeuTemporales: ColumnDef<NeuTemporalTable>[] = [
   },
   {
     accessorKey: "CODIGO",
-    header: "Código"
+    header: "Código",
+    cell: ({ row }) => row.original.CODIGO ?? '-'
   },
   {
     accessorKey: "MARCA",
-    header: "Marca"
+    header: "Marca",
+    cell: ({ row }) => row.original.MARCA ?? '-'
   },
   {
     accessorKey: "FECHA_ASIGNACION",
@@ -531,4 +533,58 @@ export const columnsNeuInspeccion: ColumnDef<NeuInspeccionTable>[] = [
     header: "Estado (%)",
     cell: ({ row }) => <LinearProgressItem estado={row.original.PORCENTAJE_VIDA ?? 0} width="120px" />
   },
+]
+
+
+export const columnsNeuPorAsignar: ColumnDef<NeumaticoPorAsignar>[] = [
+  {
+    accessorKey: "Posicion",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Posición
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
+  },
+  {
+    accessorKey: "CodigoNeumatico",
+    header: "Código",
+  },
+  {
+    accessorKey: "Marca",
+    header: "Marca",
+  },
+  {
+    accessorKey: "Remanente",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Remanente
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
+  },
+  {
+    accessorKey: "PresionAire",
+    header: "Presión",
+  },
+  {
+    accessorKey: "TorqueAplicado",
+    header: "Torque",
+  },
+  {
+    accessorKey: "FechaAsignacion",
+    header: "Fecha de asignación",
+    cell: ({ row }) => convertToDateHuman(row.original.FechaAsignacion)
+  },
+
 ]

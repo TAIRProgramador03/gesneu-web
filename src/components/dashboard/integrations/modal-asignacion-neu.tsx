@@ -27,7 +27,8 @@ import { columnsNeuParaAsignar, columnsNeuTemporales } from '@/app/dashboard/int
 import { NeuTemporalTable } from '@/types/neumatico';
 import { LoadingButton } from '@/components/ui/loading-button';
 import { LoadingButton2 } from '@/components/ui/loading-button2';
-import { ClipboardList, CloudCheck } from 'lucide-react';
+import { BadgeAlert, ClipboardList, CloudCheck } from 'lucide-react';
+import { ModalInformacionAsignacion } from './modal-informacion-asignacion';
 
 const ItemType = {
     NEUMATICO: 'neumatico',
@@ -330,6 +331,7 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
 
     // TODO
     const [assignedNeumaticos, setAssignedNeumaticos] = useState(initialAssignedMap);
+    const [openDialog, setOpenDialog] = useState(false)
 
     // Efecto: cada vez que el modal se abre o cambian los datos asignados, sincroniza los asignados con los props
     useEffect(() => {
@@ -440,6 +442,9 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
                 }
             }
         }
+
+        setOpenDialog(false)
+
         try {
             const payloadArray = toAssign.map(([pos, neu]) => {
                 const codigo = neu!.CODIGO ?? neu!.CODIGO_NEU;
@@ -470,7 +475,7 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
                 };
             });
 
-            await asignarNeumatico(payloadArray); // axios ya envía Content-Type: application/json
+            await asignarNeumatico(payloadArray);
             toast.success('Neumático(s) asignado(s) y kilometraje actualizado.', {
                 position: 'top-right',
                 duration: 6000
@@ -512,7 +517,7 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
                 disableAutoFocus
                 sx={{
                     '& .MuiDialog-paper': {
-                        maxWidth: '1500px',
+                        maxWidth: '1650px',
                         width: '100%',
                         overflowY: 'hidden'
                     },
@@ -842,12 +847,44 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
                                     </Box>
                                     <LoadingButton2
                                         variant="primary"
-                                        icon={<CloudCheck />}
+                                        icon={<BadgeAlert />}
                                         disabled={!hasAssignedNeumaticos || !allPositionsAssigned || kmError || Odometro === '' || isNaN(Number(Odometro))}
-                                        onClick={handleConfirm}
+                                        onClick={() => {
+                                            setOpenDialog(true)
+                                        }}
                                     >
                                         Confirmar Asignación
                                     </LoadingButton2>
+
+                                    {
+                                        openDialog && (
+                                            <ModalInformacionAsignacion
+                                                placa={placa}
+                                                kilometraje={Odometro}
+                                                neumaticos={
+                                                    Object.entries(assignedNeumaticos).map(([pos, neu]) => {
+                                                        const codigo = neu!.CODIGO ?? neu!.CODIGO_NEU;
+                                                        const remanente = typeof neu!.REMANENTE === 'string' ? parseFloat(neu!.REMANENTE) : (neu!.REMANENTE ?? 0);
+                                                        const presionAire = typeof neu!.PRESION_AIRE === 'string' ? parseFloat(neu!.PRESION_AIRE) : (neu!.PRESION_AIRE ?? 0);
+                                                        const torqueAplicado = typeof neu!.TORQUE_APLICADO === 'string' ? parseFloat(neu!.TORQUE_APLICADO) : (neu!.TORQUE_APLICADO ?? 0);
+                                                        const fechaRegistro = neu!.FECHA_ASIGNACION || neu!.FECHA_REGISTRO || new Date().toISOString().slice(0, 10);
+                                                        return {
+                                                            Posicion: pos,
+                                                            CodigoNeumatico: codigo,
+                                                            Marca: neu!.MARCA ?? '-',
+                                                            FechaAsignacion: fechaRegistro,
+                                                            Remanente: remanente,
+                                                            PresionAire: presionAire,
+                                                            TorqueAplicado: torqueAplicado
+                                                        };
+                                                    })
+                                                }
+                                                open={openDialog}
+                                                onSuccessInspeccion={handleConfirm}
+                                                onClose={() => setOpenDialog(false)} />
+                                        )
+                                    }
+
                                 </Box>
                                 <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
                                     <DataTableNeumaticos columns={columnsNeuParaAsignar} data={filteredData} type='pagination' filters={true} />
