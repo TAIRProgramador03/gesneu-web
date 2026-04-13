@@ -9,7 +9,7 @@ import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
 import Skeleton from '@mui/material/Skeleton';
 import Typography from '@mui/material/Typography';
-import { ChevronRight, ClipboardList, Tally1 } from 'lucide-react';
+import { ChevronRight, ClipboardList, RefreshCw, Tally1 } from 'lucide-react';
 import { getInspeccionesPorPlaca, getNeumaticosPorInspeccion } from '@/api/Neumaticos';
 import { useQuery } from '@tanstack/react-query';
 import { Card, Stack } from '@mui/material';
@@ -46,10 +46,9 @@ export const ModalVerInspecciones = ({ open, onClose, placa }: ModalVerInspeccio
     setInspeccion({ PLACA: row.PLACA, FECHA_INSPECCION: row.FECHA_INSPECCION });
   });
 
-  const { data: inspeccionesPorPlaca = [], isLoading: loadingInspecciones } = useQuery({
+  const { data: inspeccionesPorPlaca = [], isLoading: loadingInspecciones, refetch: refetchInspeccionesPorPlaca } = useQuery({
     queryKey: ['inspecciones-placa', { placa }],
     queryFn: () => getInspeccionesPorPlaca(placa),
-    staleTime: 0
   })
 
   const { data: neumaticosPorInspeccion = [], isLoading: loadingNeumaticos } = useQuery({
@@ -99,11 +98,11 @@ export const ModalVerInspecciones = ({ open, onClose, placa }: ModalVerInspeccio
         </Box>
       </DialogTitle>
 
-      <DialogContent sx={{ pt: 2.5, bgcolor: '#f8fafc' }}>
+      <DialogContent sx={{ pt: 2, bgcolor: '#f8fafc' }}>
         <Stack direction="row" spacing={3}>
 
           {/* Panel izquierdo */}
-          <Card sx={{ flex: 1, p: 2.5, minWidth: 320, maxWidth: 580, borderRadius: 2.5, border: '1px solid #e2e8f0', marginTop: '10px' }} elevation={0}>
+          <Card sx={{ flex: 1, p: 2.5, borderRadius: 2.5, border: '1px solid #e2e8f0', marginTop: '10px' }} elevation={0}>
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
               <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-semibold">
                 <Tally1 size={12} />
@@ -113,6 +112,16 @@ export const ModalVerInspecciones = ({ open, onClose, placa }: ModalVerInspeccio
                 <span className="text-xs text-slate-400">{inspeccionesPorPlaca.length} total</span>
               )}
             </Box>
+
+            <div className='flex mb-3 justify-end'>
+              <ButtonCustom
+                size="icon"
+                variant={'life'}
+                onClick={() => refetchInspeccionesPorPlaca()}
+              >
+                <RefreshCw />
+              </ButtonCustom>
+            </div>
 
             {loadingInspecciones
               ? <SkeletonTable />

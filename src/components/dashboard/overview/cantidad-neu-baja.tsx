@@ -26,7 +26,7 @@ export function BajaDefinitiva({ diff, trend, sx, value }: BajaDefinitivaProps):
                 Baja Definitiva
               </Typography>
               <Typography variant="h4" sx={{ color: '#f57c00' }}>
-                <CountUp end={value} />
+                <CountUp end={value} duration={.8} />
               </Typography>
             </Stack>
             <Stack sx={{ position: 'relative', width: 75, height: 75 }}>

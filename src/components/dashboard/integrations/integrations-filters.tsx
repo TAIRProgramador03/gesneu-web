@@ -14,6 +14,7 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import ModalTodasPlacas from './modal-todas-placas';
 import Image from 'next/image';
+import { CarFront, MapPinCheckInside } from 'lucide-react';
 
 interface CompaniesFiltersProps {
   onSearchChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
@@ -165,47 +166,43 @@ export const CompaniesFilters = memo(({ onSearchChange, operationName, autosDisp
         <Box
           sx={{
             display: 'flex',
+            flexWrap: 'wrap',
             alignItems: 'center',
-            gap: 3,
-            padding: '10px 16px',
-            border: '1px solid rgba(0, 0, 0, 0.12)',
-            borderRadius: '8px',
-            backgroundColor: 'rgba(0, 0, 0, 0.02)',
-            boxShadow: '0px 1px 3px rgba(0, 0, 0, 0.1)',
-            flex: '0 0 auto',
+            // gap: 3,
+            // padding: '10px 16px',
+            // border: '1px solid rgba(0, 0, 0, 0.12)',
+            // borderRadius: '8px',
+            // backgroundColor: 'rgba(0, 0, 0, 0.02)',
+            // boxShadow: '0px 1px 3px rgba(0, 0, 0, 0.1)',
+            // flex: '0 0 auto',
             ml: 'auto'
           }}
         >
-          {/* Ubicación - Proyecto */}
-          {/* <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <MapPin size={18} weight="bold" style={{ color: 'rgba(0, 0, 0, 0.7)' }} />
-            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-              <Box component="span" sx={{ fontWeight: 'bold' }}>Ubicación:</Box> {projectName}
-            </Typography>
-          </Box> */}
-          {/* Operación */}
-          {operationName && operationName !== '—' && (
+          <div className='flex bg-linear-to-r from-gray-700 to-gray-600 p-3 gap-2 rounded-lg text-white flex-wrap'>
+            {operationName && operationName !== '—' && (
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                {/* <MapPin size={18} weight="bold" style={{ color: 'rgba(0, 0, 0, 0.7)' }} /> */}
+                <MapPinCheckInside />
+                <Typography variant="body2" >
+                  <Box component="span" sx={{ fontWeight: 'bold' }}>Operación: </Box> {operationName}
+                </Typography>
+              </Box>
+            )}
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <MapPin size={18} weight="bold" style={{ color: 'rgba(0, 0, 0, 0.7)' }} />
-              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                <Box component="span" sx={{ fontWeight: 'bold' }}>Operación:</Box> {operationName}
+              {/* <Car size={18} weight="bold" style={{ color: 'rgba(0, 0, 0, 0.7)' }} /> */}
+              <CarFront />
+              <Typography variant="body2" >
+                <Box component="span" sx={{ fontWeight: 'bold' }}>Vehiculos: </Box> {autosDisponiblesCount}
               </Typography>
             </Box>
-          )}
-          {/* Vehículos disponibles */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Car size={18} weight="bold" style={{ color: 'rgba(0, 0, 0, 0.7)' }} />
-            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-              <Box component="span" sx={{ fontWeight: 'bold' }}>Vehiculos:</Box> {autosDisponiblesCount}
-            </Typography>
-          </Box>
+          </div>
         </Box>
         <Box sx={{ position: 'relative', display: 'inline-block' }}>
           <Box
             component="div"
             sx={{
               width: 170,
-              ml: 1,
+              // ml: 1,
               display: 'block',
             }}
           >

@@ -17,10 +17,12 @@ import ModalAsignacionNeu from './modal-asignacion-neu';
 import { toast } from 'sonner';
 import Image from 'next/image';
 import { convertToDateHuman } from '@/lib/utils';
-import { CheckCircle } from 'lucide-react';
+import { CheckCircle, CircleCheckBig, ClipboardList, ListChecks } from 'lucide-react';
 import { LoadingButton } from '@/components/ui/loading-button';
 import { Button as ButtonCustom } from '@/components/ui/button';
 import { LoadingButton2 } from '@/components/ui/loading-button2';
+import { Chip, DialogTitle } from '@mui/material';
+import { Textarea } from '@/components/ui/textarea';
 
 // --- Declaraciones de tipos fuera del componente ---
 interface FormValues {
@@ -123,10 +125,6 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
   const [remanenteAsignacion, setRemanenteAsignacion] = useState<number | null>(null);
   const [remanenteUltimoMovimiento, setRemanenteUltimoMovimiento] = useState<number | null>(null);
   const [remanenteAsignacionReal, setRemanenteAsignacionReal] = useState<number | null>(null);
-  // const initialOdometro = React.useMemo(() => {
-  //   const num = Number(formValues.kilometro);
-  //   return isNaN(num) ? 0 : num;
-  // }, [formValues.kilometro]);
 
   const initialOdometro = kilometroRealActual ?? 0
 
@@ -137,8 +135,6 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
 
   // Estado para todos los po_neumaticos (debe estar definido)
   const [poNeumaticos, setPoNeumaticos] = useState<any[]>([]);
-  // Estado para el po_neumatico seleccionado (debe estar definido)
-  const [poNeumaticoSeleccionado, setPoNeumaticoSeleccionado] = useState<any | null>(null);
 
   // Estado para mostrar modal de inspección ya realizada
   const [bloquearFormulario, setBloquearFormulario] = useState(false);
@@ -464,19 +460,10 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
   }, [open, neuAsignados, bloquearFormulario]);
 
   // Manejar cambios en los inputs
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormValues((prev) => ({ ...prev, [name]: value }));
   };
-
-  // Inicializar el kilometro al abrir el modal si hay vehículo
-  // React.useEffect(() => {
-  //   if (open && vehiculo?.kilometro !== undefined) {
-  //     setFormValues((prev) => ({ ...prev, kilometro: vehiculo.kilometro?.toString() ?? '' }));
-  //     // setMinKilometro(vehiculo.kilometro);
-  //   }
-  // }, [open, vehiculo?.kilometro]);
-
 
   // ERROR DE PORQUERIA
   // Sincronizar Odometro con el valor inicial al abrir modal o cambiar neumático
@@ -515,11 +502,6 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
 
   // Calcular el porcentaje de remanente respecto a la última ASIGNACIÓN REAL
   const valorReferenciaRemanente = remanenteAsignacionReal !== null ? remanenteAsignacionReal : (remanenteAsignacion ?? Number(neumaticoSeleccionado?.REMANENTE));
-  const valorActualRemanente = Number(formValues.remanente);
-  const porcentajeRemanente =
-    valorReferenciaRemanente > 0 && !isNaN(valorActualRemanente)
-      ? ((valorActualRemanente * 100) / valorReferenciaRemanente).toFixed(0) + '%'
-      : '';
 
   // Cuando se selecciona un neumático, guardar el estado inicial del formulario
   useEffect(() => {
@@ -957,11 +939,47 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
           setAdvertenciaPosiciones({ open: false, faltan: 0 });
         }}
       />
-      <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth>
+      <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth
+        PaperProps={{
+          sx: { borderRadius: 3, overflow: 'hidden' }
+        }}
+      >
         {/* <DialogTitle sx={{ fontWeight: 'bold', color: '#388e3c' }}>Inspección de Neumáticos</DialogTitle> */}
+
+        <Box sx={{ height: 4, background: 'linear-gradient(90deg, #3b82f6 0%, #6366f1 100%)' }} />
+
+        <DialogTitle sx={{ pb: 1.5, pt: 2, display: 'flex', alignItems: 'center', gap: 1.5, borderBottom: '1px solid', borderColor: 'divider' }}>
+          <Box sx={{
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            width: 40, height: 40, borderRadius: 2,
+            background: 'linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%)',
+            flexShrink: 0,
+          }}>
+            <ClipboardList size={20} className="text-blue-600" />
+          </Box>
+          <Box sx={{ flex: 1 }}>
+            <Typography variant="h6" fontWeight={700} lineHeight={1.2}>
+              Registrar Inspección de Neumáticos
+            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.4 }}>
+              <Typography variant="body2" color="text.secondary">Vehículo:</Typography>
+              <Chip
+                label={placa}
+                size="small"
+                sx={{ fontWeight: 700, fontSize: 12, bgcolor: '#f1f5f9', color: '#334155', letterSpacing: 0.5 }}
+              />
+            </Box>
+            <Typography variant="caption" className='text-amber-600' sx={{ display: 'block', mt: 1, fontStyle: 'italic' }}>
+              <span className='font-bold'>Nota: </span>
+              Para guardar temporalmente la inspección de cada neumático, debes darle click al boton <b>siguiente posición</b>.
+            </Typography>
+          </Box>
+        </DialogTitle>
+
+
         <DialogContent>
           <Stack direction="row" spacing={2}>
-            <Stack direction="column" spacing={2} sx={{ flex: 1, width: '1px' }}>
+            <Stack direction="column" spacing={2} sx={{ flex: 1, width: '1px', marginTop: '10px' }}>
               <Card sx={{ p: 2, boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)' }}>
                 <Box>
                   <Typography variant="h6" fontWeight="bold" gutterBottom>Datos del vehículo</Typography>
@@ -1112,15 +1130,14 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
                     }}
                     disabled={bloquearFormulario || esRES01}
                   />
-                  <TextField
+                  {/* <TextField
                     label="Tipo Movimiento"
                     name="tipo_movimiento"
                     size="small"
                     value="INSPECCION"
                     InputProps={{ readOnly: true, style: { minWidth: `${'INSPECCION'.length + 3}ch` } }}
                     disabled
-                  />
-                  {/* <TextField label="Estado" name="estado" size="small" value={porcentajeRemanente} inputProps={{ readOnly: true, style: { minWidth: `${porcentajeRemanente.length + 3}ch` } }} disabled /> */}
+                  /> */}
                   <TextField label="Observación" name="observacion" size="small" multiline minRows={2} value={formValues.observacion} onChange={esRES01 ? undefined : handleInputChange} sx={{ gridColumn: 'span 2' }} disabled={bloquearFormulario || esRES01} />
                 </Box>
               </Card>
@@ -1137,7 +1154,8 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              gap: 2
+              gap: 2,
+              marginTop: '10px'
             }}>
               {/* Contenedor horizontal: barra de botones a la izquierda y diagrama a la derecha */}
               <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'center', width: '100%' }}>
@@ -1245,7 +1263,7 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', paddingX: '30px', paddingY: '10px' }}>
 
             <TextField
               label="Fecha de inspección"
@@ -1345,25 +1363,15 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
 
             <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 1 }}>
 
-              {/* <Button
-                color="info"
-                variant="outlined"
-                onClick={handleGuardarInspeccionLocal}
-                disabled={
-                  !hayCambiosFormulario || bloquearFormulario || kmError || !camposRequeridosLlenos || inspeccionesPendientes.length >= 5
-                }
-              >
-                Siguiente posición
-              </Button> */}
-
-
               <ButtonCustom
                 variant={'teal'}
                 onClick={handleGuardarInspeccionLocal}
                 disabled={
                   !hayCambiosFormulario || bloquearFormulario || kmError || !camposRequeridosLlenos || inspeccionesPendientes.length >= 5
                 }
+
               >
+                <CircleCheckBig />
                 Siguiente posición
               </ButtonCustom>
 
@@ -1371,6 +1379,7 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
                 variant="primary"
                 onClick={handleEnviarYGuardar}
                 disabled={inspeccionesPendientes.length !== 5 || bloquearFormulario || kmError}
+                icon={<ListChecks />}
               >
                 Registrar Inspección
               </LoadingButton2>

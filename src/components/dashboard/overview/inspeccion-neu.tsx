@@ -325,27 +325,147 @@ export const Sales = React.memo(({ sx }: SalesProps): React.JSX.Element => {
   return (
     <Card sx={sx}>
       {isRefreshing && <LinearProgress sx={{ height: 2, borderRadius: '4px 4px 0 0' }} />}
-      <CardHeader
-        action={
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            {/* Botón exportar PNG */}
-            {/* {!isLoading && !isError && !isEmpty && (
+
+      <div style={{ display: 'flex', alignItems: '', justifyContent: 'space-between', flexWrap: 'wrap' }} className='m-8 gap-6'>
+
+        <div>
+          <h3 className='font-semibold text-xl'>
+            Inspecciónes por Vehículo
+          </h3>
+        </div>
+
+        {/* Botón exportar PNG */}
+        {/* {!isLoading && !isError && !isEmpty && (
               <Tooltip title="Exportar como PNG">
                 <IconButton size="small" onClick={handleExportPng}>
                   <DownloadIcon fontSize="small" />
                 </IconButton>
               </Tooltip>
             )} */}
+        {/* <div>
+              <h4>
+                Inspecciones por Vehículo
+              </h4>
+            </div> */}
+
+        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="es">
+          <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }} className='gap-6'>
+            <DatePicker
+              label="Inicio"
+              value={startDate}
+              onChange={setStartDate}
+              disabled={isFetching}
+              slotProps={{ textField: { size: 'small', variant: 'outlined' } }}
+              className='min-w-[190px] w-[200px]'
+            />
+            <DatePicker
+              label="Fin"
+              value={endDate}
+              onChange={setEndDate}
+              disabled={isFetching}
+              minDate={startDate ?? undefined}
+              slotProps={{ textField: { size: 'small', variant: 'outlined' } }}
+              className='min-w-[190px] w-[200px]'
+            />
+          </div>
+        </LocalizationProvider>
+      </div>
+
+      <div style={{ width: 300, display: 'flex', flexDirection: 'column', gap: 8, flexShrink: 0 }} className='mx-8 mt-8 gap-6'>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Typography variant="caption" color="text.secondary">
+            {selectedSeries.length} de {allPlacas.length} seleccionadas
+          </Typography>
+          <div style={{ display: 'flex', gap: 4 }}>
+            <Button size="small" variant="text" sx={{ minWidth: 0, px: 1, fontSize: 11 }} onClick={handleSelectAll}>
+              Todas
+            </Button>
+            <Button size="small" variant="text" sx={{ minWidth: 0, px: 1, fontSize: 11 }} onClick={handleSelectNone}>
+              Ninguna
+            </Button>
+          </div>
+        </div>
+
+        <Autocomplete
+          multiple
+          limitTags={10}
+          options={allPlacas}
+          value={selectedSeries}
+          onChange={handlePlacasChange}
+          renderTags={(value, getTagProps) =>
+            value.map((option, index) => {
+              const estado = placaEstadoMap.get(option) ?? 'good';
+              return (
+                <Chip
+                  {...getTagProps({ index })}
+                  key={option}
+                  label={option}
+                  size="small"
+                  sx={{ borderLeft: `3px solid ${ESTADO_COLORS[estado]}`, fontWeight: 600 }}
+                />
+              );
+            })
+          }
+          renderOption={(props, option) => {
+            const estado = placaEstadoMap.get(option) ?? 'good';
+            const summary = placaEstadoSummary.get(option);
+            return (
+              <li {...props} key={option} style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%' }}>
+                {/* Punto de peor estado */}
+                <span style={{
+                  width: 10, height: 10, borderRadius: '50%',
+                  backgroundColor: ESTADO_COLORS[estado],
+                  flexShrink: 0, display: 'inline-block',
+                }} />
+                {/* Nombre de placa */}
+                <span style={{ flex: 1, fontSize: 13 }}>{option}</span>
+                {/* Resumen de neumáticos: ■3 ■1 ■1 */}
+                {summary && (
+                  <span style={{ display: 'flex', gap: 5, alignItems: 'center', fontSize: 11 }}>
+                    {summary.good > 0 && (
+                      <span style={{ display: 'flex', alignItems: 'center', gap: 2, color: ESTADO_COLORS.good }}>
+                        <span style={{ width: 8, height: 8, borderRadius: 2, backgroundColor: ESTADO_COLORS.good, display: 'inline-block' }} />
+                        {summary.good}
+                      </span>
+                    )}
+                    {summary.warning > 0 && (
+                      <span style={{ display: 'flex', alignItems: 'center', gap: 2, color: ESTADO_COLORS.warning }}>
+                        <span style={{ width: 8, height: 8, borderRadius: 2, backgroundColor: ESTADO_COLORS.warning, display: 'inline-block' }} />
+                        {summary.warning}
+                      </span>
+                    )}
+                    {summary.critical > 0 && (
+                      <span style={{ display: 'flex', alignItems: 'center', gap: 2, color: ESTADO_COLORS.critical }}>
+                        <span style={{ width: 8, height: 8, borderRadius: 2, backgroundColor: ESTADO_COLORS.critical, display: 'inline-block' }} />
+                        {summary.critical}
+                      </span>
+                    )}
+                  </span>
+                )}
+              </li>
+            );
+          }}
+          renderInput={(params) => (
+            <TextField {...params} variant="outlined" label="Placas" placeholder="Buscar..." />
+          )}
+        />
+      </div>
+
+      {/* ----------------------------- */}
+
+      {/* <CardHeader
+        action={
+          <div style={{ display: 'flex', alignItems: '', justifyContent: 'space-around', gap: 8 }}>
             <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="es">
-              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
                 <DatePicker
                   label="Inicio"
                   value={startDate}
                   onChange={setStartDate}
                   disabled={isFetching}
                   slotProps={{ textField: { size: 'small', variant: 'outlined' } }}
+                  className='w-[160px]'
                 />
-                <span style={{ alignSelf: 'center' }}>-</span>
                 <DatePicker
                   label="Fin"
                   value={endDate}
@@ -353,101 +473,23 @@ export const Sales = React.memo(({ sx }: SalesProps): React.JSX.Element => {
                   disabled={isFetching}
                   minDate={startDate ?? undefined}
                   slotProps={{ textField: { size: 'small', variant: 'outlined' } }}
+                  className='w-[160px]'
                 />
               </div>
             </LocalizationProvider>
           </div>
         }
-        title="Inspecciones por Vehiculo"
-      />
-      <CardContent sx={{ display: 'flex', flexDirection: 'row', gap: 2 }}>
+      /> */}
+      <CardContent sx={{ display: 'flex', flexDirection: 'row', gap: 2, flexWrap: 'wrap' }}>
         <div style={{ flexGrow: 1, minWidth: 0 }}>
           {renderChartArea()}
         </div>
 
         {/* Panel lateral */}
-        <div style={{ width: 300, display: 'flex', flexDirection: 'column', gap: 8, flexShrink: 0 }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <Typography variant="caption" color="text.secondary">
-              {selectedSeries.length} de {allPlacas.length} seleccionadas
-            </Typography>
-            <div style={{ display: 'flex', gap: 4 }}>
-              <Button size="small" variant="text" sx={{ minWidth: 0, px: 1, fontSize: 11 }} onClick={handleSelectAll}>
-                Todas
-              </Button>
-              <Button size="small" variant="text" sx={{ minWidth: 0, px: 1, fontSize: 11 }} onClick={handleSelectNone}>
-                Ninguna
-              </Button>
-            </div>
-          </div>
 
-          <Autocomplete
-            multiple
-            limitTags={10}
-            options={allPlacas}
-            value={selectedSeries}
-            onChange={handlePlacasChange}
-            renderTags={(value, getTagProps) =>
-              value.map((option, index) => {
-                const estado = placaEstadoMap.get(option) ?? 'good';
-                return (
-                  <Chip
-                    {...getTagProps({ index })}
-                    key={option}
-                    label={option}
-                    size="small"
-                    sx={{ borderLeft: `3px solid ${ESTADO_COLORS[estado]}`, fontWeight: 600 }}
-                  />
-                );
-              })
-            }
-            renderOption={(props, option) => {
-              const estado = placaEstadoMap.get(option) ?? 'good';
-              const summary = placaEstadoSummary.get(option);
-              return (
-                <li {...props} key={option} style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%' }}>
-                  {/* Punto de peor estado */}
-                  <span style={{
-                    width: 10, height: 10, borderRadius: '50%',
-                    backgroundColor: ESTADO_COLORS[estado],
-                    flexShrink: 0, display: 'inline-block',
-                  }} />
-                  {/* Nombre de placa */}
-                  <span style={{ flex: 1, fontSize: 13 }}>{option}</span>
-                  {/* Resumen de neumáticos: ■3 ■1 ■1 */}
-                  {summary && (
-                    <span style={{ display: 'flex', gap: 5, alignItems: 'center', fontSize: 11 }}>
-                      {summary.good > 0 && (
-                        <span style={{ display: 'flex', alignItems: 'center', gap: 2, color: ESTADO_COLORS.good }}>
-                          <span style={{ width: 8, height: 8, borderRadius: 2, backgroundColor: ESTADO_COLORS.good, display: 'inline-block' }} />
-                          {summary.good}
-                        </span>
-                      )}
-                      {summary.warning > 0 && (
-                        <span style={{ display: 'flex', alignItems: 'center', gap: 2, color: ESTADO_COLORS.warning }}>
-                          <span style={{ width: 8, height: 8, borderRadius: 2, backgroundColor: ESTADO_COLORS.warning, display: 'inline-block' }} />
-                          {summary.warning}
-                        </span>
-                      )}
-                      {summary.critical > 0 && (
-                        <span style={{ display: 'flex', alignItems: 'center', gap: 2, color: ESTADO_COLORS.critical }}>
-                          <span style={{ width: 8, height: 8, borderRadius: 2, backgroundColor: ESTADO_COLORS.critical, display: 'inline-block' }} />
-                          {summary.critical}
-                        </span>
-                      )}
-                    </span>
-                  )}
-                </li>
-              );
-            }}
-            renderInput={(params) => (
-              <TextField {...params} variant="outlined" label="Placas" placeholder="Buscar..." />
-            )}
-          />
-        </div>
       </CardContent>
       <Divider />
-    </Card>
+    </Card >
   );
 });
 

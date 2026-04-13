@@ -75,7 +75,7 @@ export function SideNav({ collapsed, setCollapsed }: SideNavProps): React.JSX.El
           {/* <img src="/logo-tair.png" alt="Logo" style={{ width: 40, height: 40 }} /> */}
           {!collapsed && (
             <Typography variant="h6" sx={{ ml: 1, color: '#fff', fontSize: '1.6em' }}>
-              Gestión de Neumáticos
+              Gestor de Neumáticos
             </Typography>
           )}
         </Box>

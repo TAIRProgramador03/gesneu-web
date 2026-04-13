@@ -20,6 +20,7 @@ export interface Customer {
   VELOCIDAD: string;
   RQ: number;
   OC: number;
+  LEASING?: string;
   PROYECTO: string;
   COSTO: number;
   PROVEEDOR: string;

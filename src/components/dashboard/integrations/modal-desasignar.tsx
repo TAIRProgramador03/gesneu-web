@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useMemo, useRef, memo } from 'react';
 import {
   Dialog, DialogContent, Typography, Button, Stack, Box, Card, TextField, MenuItem,
-  DialogActions
+  DialogActions,
+  DialogTitle,
+  Chip
 } from '@mui/material';
 import { DndContext, DragEndEvent, useDraggable, useDroppable } from '@dnd-kit/core';
 import DiagramaVehiculo from '../../../styles/theme/components/DiagramaVehiculo';
@@ -16,7 +18,7 @@ import {
   getUltimaFechaInspeccionPorPlaca,
   desasignarConReemplazo
 } from '../../../api/Neumaticos';
-import { CheckCircle, RotateCcw, TriangleAlertIcon } from 'lucide-react';
+import { CheckCircle, ClipboardList, RotateCcw, TriangleAlertIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import Image from 'next/image';
 import { convertToDateHuman } from '@/lib/utils';
@@ -617,16 +619,52 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
     posicionesVaciasActuales.every(pos => asignacionesTemporales.some((a: any) => a.Posicion === pos));
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth
+      PaperProps={{
+        sx: { borderRadius: 3, overflow: 'hidden' }
+      }}
+    >
+
+      <Box sx={{ height: 4, background: 'linear-gradient(90deg, #3b82f6 0%, #6366f1 100%)' }} />
+
+      <DialogTitle sx={{ pb: 1.5, pt: 2, display: 'flex', alignItems: 'center', gap: 1.5, borderBottom: '1px solid', borderColor: 'divider' }}>
+        <Box sx={{
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          width: 40, height: 40, borderRadius: 2,
+          background: 'linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%)',
+          flexShrink: 0,
+        }}>
+          <ClipboardList size={20} className="text-blue-600" />
+        </Box>
+        <Box sx={{ flex: 1 }}>
+          <Typography variant="h6" fontWeight={700} lineHeight={1.2}>
+            Desasignación de Neumáticos
+          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.4 }}>
+            <Typography variant="body2" color="text.secondary">Vehículo:</Typography>
+            <Chip
+              label={placa}
+              size="small"
+              sx={{ fontWeight: 700, fontSize: 12, bgcolor: '#f1f5f9', color: '#334155', letterSpacing: 0.5 }}
+            />
+          </Box>
+          <Typography variant="caption" className='text-amber-600' sx={{ display: 'block', mt: 1, fontStyle: 'italic' }}>
+            <span className='font-bold'>Nota: </span>
+            Arrastra los neumáticos a desasignar. Luego, deberás asignarle nuevos neumáticos; <b>las posiciones no pueden quedar vacías</b>.
+          </Typography>
+        </Box>
+      </DialogTitle>
+
+
       <DialogContent>
         <DndContext onDragEnd={handleDragEnd}>
           <Stack direction="row" spacing={2}>
-            <Stack direction="column" spacing={2} sx={{ flex: 1, width: '1px' }}>
+            <Stack direction="column" spacing={2} sx={{ flex: 1, width: '1px', marginTop: '10px' }}>
               {/* Card de información del vehículo */}
               <Card sx={{ p: 2, boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)' }}>
                 <Box>
                   <Typography variant="h6" fontWeight="bold" gutterBottom>
-                    DESASIGNAR Neumáticos
+                    Datos del Vehículo
                   </Typography>
                   {vehiculo ? (
                     <Stack direction="row" spacing={4} alignItems="flex-start" sx={{ mb: 1 }}>
@@ -659,7 +697,6 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
                 </Box>
               </Card>
 
-              {/* Card para DESASIGNAR */}
               <Card sx={{ p: 2, boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)' }}>
                 <ButtonCustom
                   variant={'warning'}
@@ -670,8 +707,6 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
                   <RotateCcw />
                 </ButtonCustom>
                 <Box sx={{ display: 'flex', alignItems: 'flex-end', mb: 1, gap: 2 }}>
-                  <Typography variant="h6" sx={{ mt: 1, mb: 0 }}>DESASIGNAR</Typography>
-                  <Box sx={{ flex: 1 }} />
                   <Box>
                     <Typography variant="caption" color="text.secondary">Fecha última inspección</Typography>
                     <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
@@ -800,6 +835,7 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
               flex: 0.5, p: 2, position: 'relative',
               boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)',
               maxWidth: 400, minWidth: 420, width: '100%',
+              marginTop: '10px'
             }}>
               <Box sx={{ position: 'relative', width: '370px', height: '430px' }}>
                 <DiagramaVehiculo

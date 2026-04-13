@@ -27,7 +27,8 @@ import { columnsNeuParaAsignar, columnsNeuTemporales } from '@/app/dashboard/int
 import { NeuTemporalTable } from '@/types/neumatico';
 import { LoadingButton } from '@/components/ui/loading-button';
 import { LoadingButton2 } from '@/components/ui/loading-button2';
-import { ClipboardList, CloudCheck } from 'lucide-react';
+import { BadgeAlert, ClipboardList, CloudCheck } from 'lucide-react';
+import { ModalInformacionAsignacion } from './modal-informacion-asignacion';
 
 const ItemType = {
     NEUMATICO: 'neumatico',
@@ -330,6 +331,7 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
 
     // TODO
     const [assignedNeumaticos, setAssignedNeumaticos] = useState(initialAssignedMap);
+    const [openDialog, setOpenDialog] = useState(false)
 
     // Efecto: cada vez que el modal se abre o cambian los datos asignados, sincroniza los asignados con los props
     useEffect(() => {
@@ -440,9 +442,12 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
                 }
             }
         }
+
+        setOpenDialog(false)
+
         try {
             const payloadArray = toAssign.map(([pos, neu]) => {
-                const codigo = Number(neu!.CODIGO ?? neu!.CODIGO_NEU);
+                const codigo = neu!.CODIGO ?? neu!.CODIGO_NEU;
                 const remanente = typeof neu!.REMANENTE === 'string' ? parseFloat(neu!.REMANENTE) : (neu!.REMANENTE ?? 0);
                 const presionAire = typeof neu!.PRESION_AIRE === 'string' ? parseFloat(neu!.PRESION_AIRE) : (neu!.PRESION_AIRE ?? 0);
                 const torqueAplicado = typeof neu!.TORQUE_APLICADO === 'string' ? parseFloat(neu!.TORQUE_APLICADO) : (neu!.TORQUE_APLICADO ?? 0);
@@ -470,7 +475,7 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
                 };
             });
 
-            await asignarNeumatico(payloadArray); // axios ya envía Content-Type: application/json
+            await asignarNeumatico(payloadArray);
             toast.success('Neumático(s) asignado(s) y kilometraje actualizado.', {
                 position: 'top-right',
                 duration: 6000
@@ -512,12 +517,16 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
                 disableAutoFocus
                 sx={{
                     '& .MuiDialog-paper': {
-                        maxWidth: '1500px',
+                        maxWidth: '1650px',
                         width: '100%',
                         overflowY: 'hidden'
                     },
                 }}
+                PaperProps={{
+                    sx: { borderRadius: 3 }
+                }}
             >
+                <Box sx={{ height: 4, background: 'linear-gradient(90deg, #3b82f6 0%, #6366f1 100%)' }} />
 
                 <DialogTitle sx={{ pb: 1.5, pt: 2, display: 'flex', alignItems: 'center', gap: 1.5, borderBottom: '1px solid', borderColor: 'divider' }}>
                     <Box sx={{
@@ -542,7 +551,7 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
                         </Box>
                         <Typography variant="caption" className='text-amber-600' sx={{ display: 'block', mt: 1, fontStyle: 'italic' }}>
                             <span className='font-bold'>Nota: </span>
-                            Arrastra un neumático a una posición disponible. Al soltar, se solicitarán los datos de instalación.
+                            Arrastra un neumático a una posición disponible. Al soltar, se solicitarán los datos de instalación. <b>Las 5 posiciones son obligatorias</b>.
                         </Typography>
                     </Box>
                 </DialogTitle>
@@ -557,6 +566,8 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
                                         label="Kilometraje"
                                         type="number"
                                         value={Odometro}
+                                        className={(!hasAssignedNeumaticos || !allPositionsAssigned) ? 'opacity-50' : ''}
+                                        disabled={!hasAssignedNeumaticos || !allPositionsAssigned}
                                         onChange={(e) => {
                                             const value = e.target.value;
                                             const numValue = Number(value);
@@ -685,6 +696,9 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
                                             zIndex: 3,
                                         }}>{assignedNeumaticos.POS01.CODIGO}</span>
                                     ) : null}
+                                    <span className='bg-slate-50 text-slate-600 p-1 rounded-md border-slate-200 border text-xs font-bold shadow-lg absolute left-[38px] top-[36px]'>
+                                        POS01
+                                    </span>
                                 </Box>
                                 {/* POS02: DropZone y número a la izquierda */}
                                 <Box sx={{ position: 'absolute', top: '65px', left: '172px', zIndex: 2 }}>
@@ -711,6 +725,9 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
                                             zIndex: 3,
                                         }}>{assignedNeumaticos.POS02.CODIGO}</span>
                                     ) : null}
+                                    <span className='bg-slate-50 text-slate-600 p-1 rounded-md border-slate-200 border text-xs font-bold shadow-lg absolute right-[38px] top-[36px]'>
+                                        POS02
+                                    </span>
                                 </Box>
                                 {/* POS03: DropZone y número a la derecha */}
                                 <Box sx={{ position: 'absolute', top: '230px', left: '272px', zIndex: 2 }}>
@@ -737,6 +754,9 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
                                             zIndex: 3,
                                         }}>{assignedNeumaticos.POS03.CODIGO}</span>
                                     ) : null}
+                                    <span className='bg-slate-50 text-slate-600 p-1 rounded-md border-slate-200 border text-xs font-bold shadow-lg absolute left-[38px] top-[36px]'>
+                                        POS03
+                                    </span>
                                 </Box>
                                 {/* POS04: DropZone y número a la izquierda */}
                                 <Box sx={{ position: 'absolute', top: '230px', left: '172px', zIndex: 2 }}>
@@ -763,6 +783,9 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
                                             zIndex: 3,
                                         }}>{assignedNeumaticos.POS04.CODIGO}</span>
                                     ) : null}
+                                    <span className='bg-slate-50 text-slate-600 p-1 rounded-md border-slate-200 border text-xs font-bold shadow-lg absolute right-[38px] top-[36px]'>
+                                        POS04
+                                    </span>
                                 </Box>
                                 {/* RES01: DropZone y número abajo */}
                                 <Box sx={{ position: 'absolute', top: '299px', left: '206px', zIndex: 2 }}>
@@ -790,6 +813,9 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
                                             zIndex: 3,
                                         }}>{assignedNeumaticos.RES01.CODIGO}</span>
                                     ) : null}
+                                    <span className='bg-slate-50 text-slate-600 p-1 rounded-md border-slate-200 border text-xs font-bold shadow-lg absolute right-[10px] top-[64px]'>
+                                        RES01
+                                    </span>
                                 </Box>
                             </div>
 
@@ -821,12 +847,44 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
                                     </Box>
                                     <LoadingButton2
                                         variant="primary"
-                                        icon={<CloudCheck />}
+                                        icon={<BadgeAlert />}
                                         disabled={!hasAssignedNeumaticos || !allPositionsAssigned || kmError || Odometro === '' || isNaN(Number(Odometro))}
-                                        onClick={handleConfirm}
+                                        onClick={() => {
+                                            setOpenDialog(true)
+                                        }}
                                     >
                                         Confirmar Asignación
                                     </LoadingButton2>
+
+                                    {
+                                        openDialog && (
+                                            <ModalInformacionAsignacion
+                                                placa={placa}
+                                                kilometraje={Odometro}
+                                                neumaticos={
+                                                    Object.entries(assignedNeumaticos).map(([pos, neu]) => {
+                                                        const codigo = neu!.CODIGO ?? neu!.CODIGO_NEU;
+                                                        const remanente = typeof neu!.REMANENTE === 'string' ? parseFloat(neu!.REMANENTE) : (neu!.REMANENTE ?? 0);
+                                                        const presionAire = typeof neu!.PRESION_AIRE === 'string' ? parseFloat(neu!.PRESION_AIRE) : (neu!.PRESION_AIRE ?? 0);
+                                                        const torqueAplicado = typeof neu!.TORQUE_APLICADO === 'string' ? parseFloat(neu!.TORQUE_APLICADO) : (neu!.TORQUE_APLICADO ?? 0);
+                                                        const fechaRegistro = neu!.FECHA_ASIGNACION || neu!.FECHA_REGISTRO || new Date().toISOString().slice(0, 10);
+                                                        return {
+                                                            Posicion: pos,
+                                                            CodigoNeumatico: codigo,
+                                                            Marca: neu!.MARCA ?? '-',
+                                                            FechaAsignacion: fechaRegistro,
+                                                            Remanente: remanente,
+                                                            PresionAire: presionAire,
+                                                            TorqueAplicado: torqueAplicado
+                                                        };
+                                                    })
+                                                }
+                                                open={openDialog}
+                                                onSuccessInspeccion={handleConfirm}
+                                                onClose={() => setOpenDialog(false)} />
+                                        )
+                                    }
+
                                 </Box>
                                 <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
                                     <DataTableNeumaticos columns={columnsNeuParaAsignar} data={filteredData} type='pagination' filters={true} />

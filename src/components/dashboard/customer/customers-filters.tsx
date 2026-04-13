@@ -26,7 +26,7 @@ export const CustomersFilters = memo(({ projectCount, disponiblesCount, asignado
           <div
             className='w-full min-w-30 h-20 mb-2 flex items-center justify-center text-4xl font-bold text-slate-800 relative bg-sky-100 border-4 border-sky-600 rounded-xl'
           >
-            <CountUp end={projectCount ?? 0} />
+            <CountUp end={projectCount ?? 0} duration={.8} />
           </div>
           <Typography align="center" variant="body2" color="text.secondary">
             Total neumáticos
@@ -36,7 +36,7 @@ export const CustomersFilters = memo(({ projectCount, disponiblesCount, asignado
           <div
             className='w-full min-w-30 h-20 mb-2 flex items-center justify-center text-4xl font-bold text-slate-800 relative bg-green-100 border-4 border-green-600 rounded-xl'
           >
-            <CountUp end={disponiblesCount ?? 0} />
+            <CountUp end={disponiblesCount ?? 0} duration={.8} />
           </div>
           <Typography align="center" variant="body2" color="text.secondary">
             Disponibles
@@ -46,7 +46,7 @@ export const CustomersFilters = memo(({ projectCount, disponiblesCount, asignado
           <div
             className='w-full min-w-30 h-20 mb-2 flex items-center justify-center text-4xl font-bold text-slate-800 relative bg-yellow-100 border-4 border-yellow-600 rounded-xl'
           >
-            <CountUp end={asignadosCount ?? 0} />
+            <CountUp end={asignadosCount ?? 0} duration={.8} />
           </div>
           <Typography align="center" variant="body2" color="text.secondary">
             Asignados
@@ -56,7 +56,7 @@ export const CustomersFilters = memo(({ projectCount, disponiblesCount, asignado
           <div
             className='w-full min-w-30 h-20 mb-2 flex items-center justify-center text-4xl font-bold text-slate-800 relative bg-stone-100 border-4 border-stone-600 rounded-xl'
           >
-            <CountUp end={autosDisponiblesCount ?? 0} />
+            <CountUp end={autosDisponiblesCount ?? 0} duration={.8} />
           </div>
           <Typography align="center" variant="body2" color="text.secondary">
             Vehiculos Disponibles
@@ -70,7 +70,7 @@ export const CustomersFilters = memo(({ projectCount, disponiblesCount, asignado
               <WarningAmberIcon />
             </span>
             <div>
-              <CountUp end={bajaDefinitivaCount ?? 0} />
+              <CountUp end={bajaDefinitivaCount ?? 0} duration={.8} />
             </div>
           </div>
           <Typography align="center" variant="body2" color="text.secondary">
@@ -85,7 +85,7 @@ export const CustomersFilters = memo(({ projectCount, disponiblesCount, asignado
               <RecyclingIcon />
             </span>
             <div>
-              <CountUp end={recuperadosCount ?? 0} />
+              <CountUp end={recuperadosCount ?? 0} duration={.8} />
             </div>
           </div>
           <Typography align="center" variant="body2" color="text.secondary">

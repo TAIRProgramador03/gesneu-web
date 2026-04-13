@@ -1,10 +1,9 @@
 "use client"
-import React, { useState } from "react"
+import React, { useMemo, useState } from "react"
 import { DataTablePagination } from "./data-table-pagination"
 import {
   ColumnDef,
   SortingState,
-  ColumnFiltersState,
   flexRender,
   getCoreRowModel,
   getPaginationRowModel,
@@ -22,7 +21,6 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Input } from "@/components/ui/input"
-import ButtonMateria from '@mui/material/Button';
 import { Upload as UploadIcon } from '@phosphor-icons/react/dist/ssr/Upload';
 import { exportToExcel } from "@/utils/export-to-excel"
 import { LoadingButton2 } from "../loading-button2"
@@ -32,6 +30,7 @@ interface DataTableProps<TData, TValue> {
   data: TData[],
   type?: string,
   filters?: boolean,
+  isLoading?: boolean,
   exportConfig?: {
     title?: string
     username?: string
@@ -44,45 +43,49 @@ export function DataTableNeumaticos<TData, TValue>({
   data,
   type = 'simple',
   filters = false,
+  isLoading = false,
   exportConfig,
   withExport = false
 }: DataTableProps<TData, TValue>) {
 
   const [sorting, setSorting] = useState<SortingState>([])
-
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
-
-  const [globalFilter, setGlobalFilter] = useState<string>('')
+  const [searchValue, setSearchValue] = useState<string>('')
 
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
     CARGA: false,
     VELOCIDAD: false,
-    RQ: false,
-    COSTO: false
+    // RQ: false,
+    // COSTO: false
   })
 
   const [rowSelection, setRowSelection] = useState({})
 
+  const filteredData = useMemo(() => {
+    if (!searchValue) return data
+    const lower = searchValue.toLowerCase()
+    return (data as Record<string, unknown>[]).filter((row) =>
+      Object.values(row).some((val) =>
+        val !== null && val !== undefined && String(val).toLowerCase().includes(lower)
+      )
+    ) as TData[]
+  }, [data, searchValue])
+
   const table = useReactTable({
-    data,
+    data: filteredData,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
-    onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
-    globalFilterFn: 'includesString',
+    autoResetPageIndex: true,
     state: {
       sorting,
-      columnFilters,
       columnVisibility,
       rowSelection,
-      globalFilter
     },
-    onGlobalFilterChange: setGlobalFilter
   })
 
   const handleExportExcel = () => {
@@ -118,13 +121,14 @@ export function DataTableNeumaticos<TData, TValue>({
 
       {
         filters || withExport ? (
-          <div className="flex items-center py-4 justify-between">
+          <div className="flex items-center py-4 gap-6 justify-between">
             {
               filters && (
                 <Input
-                  placeholder="Buscar..."
-                  value={globalFilter ?? ''}
-                  onChange={e => setGlobalFilter(String(e.target.value))}
+                  placeholder={isLoading ? 'Cargando datos...' : 'Buscar...'}
+                  disabled={isLoading}
+                  value={searchValue}
+                  onChange={e => setSearchValue(e.target.value)}
                   className="max-w-sm"
                 />
               )
@@ -152,7 +156,7 @@ export function DataTableNeumaticos<TData, TValue>({
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead key={header.id} className="font-bold">
+                    <TableHead key={header.id} className="font-bold text-center">
                       {header.isPlaceholder
                         ? null
                         : flexRender(
@@ -173,7 +177,7 @@ export function DataTableNeumaticos<TData, TValue>({
                   data-state={row.getIsSelected() && "selected"}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell key={cell.id} className="text-center">
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}

@@ -96,23 +96,51 @@ export const columnsPadron: ColumnDef<PadronExcel>[] = [
   {
     accessorKey: "RQ",
     meta: { exportLabel: "RQ" },
-    header: "RQ",
-  },
-  {
-    accessorKey: "OC",
-    meta: { exportLabel: "OC" },
-    header: "OC",
-  },
-  {
-    accessorKey: "PROYECTO",
-    meta: { exportLabel: "Proyecto" },
+    cell: ({ row }) => row.original.RQ ? row.original.RQ : '-',
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Proyecto
+          RQ
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
+  },
+  {
+    accessorKey: "OC",
+    meta: { exportLabel: "OC" },
+    cell: ({ row }) => row.original.OC ? row.original.OC : '-',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          OC
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
+  },
+  {
+    accessorKey: "LEASING",
+    meta: { exportLabel: "Leasing" },
+    header: "Leasing",
+    cell: ({ row }) => row.original.LEASING ? row.original.LEASING : '-',
+  },
+  {
+    accessorKey: "PROYECTO",
+    meta: { exportLabel: "Taller" },
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Taller
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       )
@@ -121,7 +149,7 @@ export const columnsPadron: ColumnDef<PadronExcel>[] = [
   {
     accessorKey: "COSTO",
     meta: { exportLabel: "Costo" },
-    header: "Costo",
+    header: "Costo ($)",
   },
   {
     accessorKey: "PROVEEDOR",
@@ -130,6 +158,7 @@ export const columnsPadron: ColumnDef<PadronExcel>[] = [
   },
   {
     accessorKey: "FECHA_FABRICACION_COD",
+    cell: ({ row }) => row.original.FECHA_FABRICACION_COD ? row.original.FECHA_FABRICACION_COD : '-',
     meta: { exportLabel: "Fecha Fabricación" },
     header: "Fecha fabricación",
   },

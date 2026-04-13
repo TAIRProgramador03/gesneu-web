@@ -8,17 +8,13 @@ import { Customer } from '@/components/dashboard/customer/customers-table';
 import { DataTableNeumaticos } from '@/components/ui/data-table/data-table';
 import { Neumatico } from '@/types/types';
 import { Neumaticos, obtenerNeumaticosAsignadosPorPlaca, buscarVehiculoPorPlaca, obtenerCantidadAutosDisponibles, obtenerUltimosMovimientosPorPlaca, obtenerUltimosMovimientosPorCodigo, getUltimaFechaInspeccionPorPlaca, obtenerNeumaticosDisponibles, getFechasInspeccionVehicularPorPlaca } from '@/api/Neumaticos';
-import { Plus } from '@phosphor-icons/react/dist/ssr/Plus';
 import { toast } from 'sonner';
 import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useUser } from '@/hooks/use-user';
-import { Wrench } from '@phosphor-icons/react/dist/ssr/Wrench';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import DiagramaVehiculo from '@/styles/theme/components/DiagramaVehiculo';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
 import ModalAdvertenciaDesasignacion from '@/components/core/theme-provider/modal-desasignar/modal-advertencia-desasignar';
 import ModalAdvertenciaReubicacion from '@/components/core/theme-provider/modal-reubicar/modal-advertencia-reubicacion';
 import ModalAsignacionNeu from '@/components/dashboard/integrations/modal-asignacion-neu';
@@ -41,14 +37,10 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
-import { LoadingButton } from '@/components/ui/loading-button';
-import { ArchiveIcon, ArrowLeftIcon, ArrowLeftRightIcon, BookMarked, CalendarPlusIcon, ClockIcon, Eye, EyeClosed, EyeIcon, ListFilterIcon, MailCheckIcon, MoreHorizontalIcon, Replace, TagIcon, Trash2Icon } from 'lucide-react';
+import { ArrowLeftRightIcon, BookMarked, EyeIcon, Replace } from 'lucide-react';
 import { ModalVerInspecciones } from '@/components/dashboard/integrations/modal-ver-inspecciones';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { ButtonGroup } from '@/components/ui/button-group';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuSeparator, DropdownMenuShortcut, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Button as ButtonCustom } from '@/components/ui/button';
-import { Button } from '@mui/material';
 import { LoadingButton2 } from '@/components/ui/loading-button2';
 
 
@@ -83,11 +75,16 @@ export default function Page(): React.JSX.Element {
   const [openMantenimientoModal, setOpenMantenimientoModal] = React.useState(false);
   const [modoMantenimiento, setModoMantenimiento] = React.useState<'REUBICAR' | 'DESASIGNAR' | null>(null);
   // const [loading, setLoading] = React.useState(false);
-  const [autosDisponiblesCount, setAutosDisponiblesCount] = useState<number>(0);
+  // const [autosDisponiblesCount, setAutosDisponiblesCount] = useState<number>(0);
 
   const { data: neumaticosDisponiblesUseQuery = [], refetch: neumaticosDispobilesRefetch } = useQuery({
     queryKey: ['neumaticos-disponibles'],
-    queryFn: obtenerNeumaticosDisponibles
+    queryFn: () => obtenerNeumaticosDisponibles()
+  })
+
+  const { data: autosDisponiblesCount = 0 } = useQuery({
+    queryKey: ['avaibleQtyAuto'],
+    queryFn: obtenerCantidadAutosDisponibles
   })
 
   interface Vehiculo {
@@ -385,11 +382,7 @@ export default function Page(): React.JSX.Element {
       });
   }, [vehiculo]);
 
-  useEffect(() => {
-    obtenerCantidadAutosDisponibles()
-      .then(setAutosDisponiblesCount)
-      .catch(console.error);
-  }, []);
+
 
 
   // 1. Función simple para refrescar asignados
@@ -787,21 +780,28 @@ export default function Page(): React.JSX.Element {
                 {/* Kilometraje */}
                 <Box
                   sx={{
-                    backgroundColor: '#e0f7fa',
-                    borderRadius: '8px',
-                    padding: '8px 16px',
-                    fontWeight: 'bold',
-                    color: 'black',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
-                    whiteSpace: 'nowrap',
+                    // backgroundColor: '#e0f7fa',
+                    // borderRadius: '8px',
+                    // padding: '8px 16px',
+                    // fontWeight: 'bold',
+                    // color: 'black',
+                    // display: 'flex',
+                    // alignItems: 'center',
+                    // justifyContent: 'center',
+                    // boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
+                    // whiteSpace: 'nowrap',
                     marginRight: '8px',
                   }}
                 >
-                  {`${animatedKilometraje.toLocaleString()} km`}
+                  <div className='bg-linear-to-r from-cyan-200 to-teal-200 rounded-lg py-2 px-4  font-bold'>
+                    {`${animatedKilometraje.toLocaleString()} km`}
+                  </div>
                 </Box>
+
+                {/* <div className=''>
+                  {`${animatedKilometraje.toLocaleString()} km`}
+                </div> */}
+
                 {/* Opciones */}
                 <LoadingButton2
                   variant="teal"
@@ -954,37 +954,29 @@ export default function Page(): React.JSX.Element {
           maxHeight: '700px', // Ajusta este valor según lo que necesites
           overflow: 'auto'
         }}>
-          <Typography variant="h6" sx={{ mb: 2 }}>
-            Neumáticos instalados en esta unidad:
-          </Typography>
+
+
+          <div className='flex'>
+            <Typography sx={{ mb: 2 }} className='border border-amber-400 bg-amber-50 text-amber-600 inline p-2 mt-2 mb-2 rounded-lg'>
+              Neumáticos instalados en esta unidad:
+            </Typography>
+          </div>
 
           <DataTableNeumaticos columns={columnsNeuAsignado} data={neumaticosAsignadosUnicos} />
 
           {/* Neúmaticos Disponibles */}
-          <Stack direction="row" alignItems="center" spacing={2} className='mb-3 mt-3' >
-            <Box
-              sx={{
-                backgroundColor: '#e0f7fa',
-                borderRadius: '8px',
-                padding: '8px 16px',
-                fontWeight: 'bold',
-                color: 'black',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
-              }}
-            >
-              <span>
+          <div className='flex'>
+            <Typography sx={{ mt: 2 }} className='border border-green-400 bg-green-50 text-green-600 inline p-2 mt-2 mb-2 rounded-lg'>
+              <span className='font-bold'>
                 Disponibles:
-                <span className='font-normal'> &nbsp;
-                  {`${neumaticosDisponiblesUseQuery.length.toLocaleString()} Neumáticos`}
-                </span>
               </span>
-            </Box>
-          </Stack>
+              <span className='font-normal'> &nbsp;
+                {`${neumaticosDisponiblesUseQuery.length.toLocaleString()} Neumáticos`}
+              </span>
+            </Typography>
+          </div>
 
-          <DataTableNeumaticos columns={columnsNeuDisponible} data={neumaticosDisponiblesUseQuery} type='pagination' />
+          <DataTableNeumaticos columns={columnsNeuDisponible} data={neumaticosDisponiblesUseQuery} type='pagination' filters={true} />
 
         </Card>
 

@@ -23,7 +23,7 @@ export function TotalProfit({ value, sx }: TotalProfitProps): React.JSX.Element 
             </Typography>
             <Typography variant="h4">
               $
-              <CountUp end={value} />
+              <CountUp end={value} duration={.8} />
             </Typography>
           </Stack>
           <Stack sx={{ width: 115, objectFit: 'contain' }}>

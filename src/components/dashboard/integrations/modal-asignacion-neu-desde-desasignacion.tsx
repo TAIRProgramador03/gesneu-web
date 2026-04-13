@@ -29,11 +29,12 @@ import Image from 'next/image';
 import { convertToDateHuman } from '@/lib/utils';
 import { TipoMovimientoBadge } from '@/components/ui/TipoMovimientoBadge';
 import { DataTableNeumaticos } from '@/components/ui/data-table/data-table';
-import { columnsNeuParaAsignar } from '@/app/dashboard/integrations/columns';
+import { columnsNeuParaAsignar, columnsNeuParaAsignarDesdeDesasignar } from '@/app/dashboard/integrations/columns';
 import { LoadingButton2 } from '@/components/ui/loading-button2';
 import { ClipboardCheck, ClipboardList } from 'lucide-react';
 import ModalInputsNeuDesasignacion from './modal-inputs-neu-desasignacion';
-import { getUltimaFechaInspeccionPorPlaca } from '@/api/Neumaticos';
+import { getUltimaFechaInspeccionPorPlaca, obtenerNeumaticosDisponibles } from '@/api/Neumaticos';
+import { useQuery } from '@tanstack/react-query';
 
 const ItemType = {
     NEUMATICO: 'neumatico',
@@ -312,7 +313,6 @@ const DropZone: React.FC<DropZoneProps> = memo(({
 const ModalAsignacionNeuDesdeDesasignacion: React.FC<ModalAsignacionNeuDesdeDesasignacionProps> = memo(({
     open,
     onClose,
-    data,
     cachedNeumaticosAsignados,
     posicionesVacias,
     placa,
@@ -320,6 +320,13 @@ const ModalAsignacionNeuDesdeDesasignacion: React.FC<ModalAsignacionNeuDesdeDesa
     onAssignedUpdate,
     onTemporaryAssign
 }) => {
+
+
+    const { data: neumaticosDisponiblesConBajas = [] } = useQuery({
+        queryKey: ['neumaticos-disponibles-con-bajas'],
+        queryFn: () => obtenerNeumaticosDisponibles('desasignacion'),
+        staleTime: 0
+    })
 
     const [fechaUltimaInspeccion, setFechaUltimaInspeccion] = useState('')
 
@@ -394,34 +401,11 @@ const ModalAsignacionNeuDesdeDesasignacion: React.FC<ModalAsignacionNeuDesdeDesa
 
     const theme = useTheme();
 
-    const assignedCodes = useMemo(
-        () =>
-            new Set(
-                Object.values(assignedNeumaticos)
-                    .filter((n): n is Neumatico => n !== null)
-                    .map((n) => n.CODIGO ?? (n as any).CODIGO_NEU)
-            ),
-        [assignedNeumaticos]
-    );
-
-    const [page, setPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(8);
-    const [searchTerm, setSearchTerm] = useState('');
-
-    const handleChangePage = (event: unknown, newPage: number) => {
-        setPage(newPage);
-    };
-
     const handleDialogClose = () => {
         onClose();
         setTimeout(() => {
             document.body.focus();
         }, 0);
-    };
-
-    const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setRowsPerPage(parseInt(event.target.value, 10));
-        setPage(0);
     };
 
     const handleDrop = (position: string, neumatico: Neumatico) => {
@@ -447,22 +431,15 @@ const ModalAsignacionNeuDesdeDesasignacion: React.FC<ModalAsignacionNeuDesdeDesa
         }));
     };
 
-    const hasAssignedNeumaticos = Object.values(assignedNeumaticos).some((neumatico) => neumatico !== null);
+    // const filteredData = useMemo(() => {
+    //     return data.filter(
+    //         (neumatico) =>
+    //             neumatico.TIPO_MOVIMIENTO === 'DISPONIBLE' &&
+    //             (neumatico.CODIGO.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    //                 neumatico.MARCA.toLowerCase().includes(searchTerm.toLowerCase()))
+    //     );
+    // }, [data, searchTerm]);
 
-    const filteredData = useMemo(() => {
-        return data.filter(
-            (neumatico) =>
-                neumatico.TIPO_MOVIMIENTO === 'DISPONIBLE' &&
-                (neumatico.CODIGO.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                    neumatico.MARCA.toLowerCase().includes(searchTerm.toLowerCase()))
-        );
-    }, [data, searchTerm]);
-
-
-
-    const paginatedData = useMemo(() => {
-        return filteredData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
-    }, [filteredData, page, rowsPerPage]);
 
     const handleConfirm = async () => {
         // Validar que todas las posiciones vacías estén llenas
@@ -513,7 +490,7 @@ const ModalAsignacionNeuDesdeDesasignacion: React.FC<ModalAsignacionNeuDesdeDesa
 
         try {
             const payloadArray = toAssign.map(([pos, neu]) => {
-                const codigo = Number(neu!.CODIGO ?? neu!.CODIGO_NEU);
+                const codigo = neu!.CODIGO ?? neu!.CODIGO_NEU;
                 const remanente = typeof neu!.REMANENTE === 'string' ? parseFloat(neu!.REMANENTE) : (neu!.REMANENTE ?? 0);
                 const presionAire = typeof neu!.PRESION_AIRE === 'string' ? parseFloat(neu!.PRESION_AIRE) : (neu!.PRESION_AIRE ?? 0);
                 const torqueAplicado = typeof neu!.TORQUE_APLICADO === 'string' ? parseFloat(neu!.TORQUE_APLICADO) : (neu!.TORQUE_APLICADO ?? 0);
@@ -585,12 +562,17 @@ const ModalAsignacionNeuDesdeDesasignacion: React.FC<ModalAsignacionNeuDesdeDesa
                 disableAutoFocus
                 sx={{
                     '& .MuiDialog-paper': {
-                        maxWidth: '1500px',
+                        maxWidth: '1650px',
                         width: '100%',
                         overflowY: 'hidden'
                     },
                 }}
+                PaperProps={{
+                    sx: { borderRadius: 3 }
+                }}
             >
+                <Box sx={{ height: 4, background: 'linear-gradient(90deg, #3b82f6 0%, #6366f1 100%)' }} />
+
                 <DialogTitle sx={{ pb: 1.5, pt: 2, display: 'flex', alignItems: 'center', gap: 1.5, borderBottom: '1px solid', borderColor: 'divider' }}>
                     <Box sx={{
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -708,6 +690,9 @@ const ModalAsignacionNeuDesdeDesasignacion: React.FC<ModalAsignacionNeuDesdeDesa
                                             zIndex: 3,
                                         }}>{assignedNeumaticos.POS01.CODIGO_NEU || assignedNeumaticos.POS01.CODIGO}</span>
                                     ) : null}
+                                    <span className='bg-slate-50 text-slate-600 p-1 rounded-md border-slate-200 border text-xs font-bold shadow-lg absolute left-[38px] top-[36px]'>
+                                        POS01
+                                    </span>
                                 </Box>
                                 <Box sx={{ position: 'absolute', top: '65px', left: '172px', zIndex: 2 }}>
                                     <DropZone
@@ -736,6 +721,9 @@ const ModalAsignacionNeuDesdeDesasignacion: React.FC<ModalAsignacionNeuDesdeDesa
                                             zIndex: 3,
                                         }}>{assignedNeumaticos.POS02.CODIGO_NEU || assignedNeumaticos.POS02.CODIGO}</span>
                                     ) : null}
+                                    <span className='bg-slate-50 text-slate-600 p-1 rounded-md border-slate-200 border text-xs font-bold shadow-lg absolute right-[38px] top-[36px]'>
+                                        POS02
+                                    </span>
                                 </Box>
                                 <Box sx={{ position: 'absolute', top: '230px', left: '272px', zIndex: 2 }}>
                                     <DropZone
@@ -764,6 +752,9 @@ const ModalAsignacionNeuDesdeDesasignacion: React.FC<ModalAsignacionNeuDesdeDesa
                                             zIndex: 3,
                                         }}>{assignedNeumaticos.POS03.CODIGO_NEU || assignedNeumaticos.POS03.CODIGO}</span>
                                     ) : null}
+                                    <span className='bg-slate-50 text-slate-600 p-1 rounded-md border-slate-200 border text-xs font-bold shadow-lg absolute left-[38px] top-[36px]'>
+                                        POS03
+                                    </span>
                                 </Box>
                                 <Box sx={{ position: 'absolute', top: '230px', left: '172px', zIndex: 2 }}>
                                     <DropZone
@@ -792,6 +783,9 @@ const ModalAsignacionNeuDesdeDesasignacion: React.FC<ModalAsignacionNeuDesdeDesa
                                             zIndex: 3,
                                         }}>{assignedNeumaticos.POS04.CODIGO_NEU || assignedNeumaticos.POS04.CODIGO}</span>
                                     ) : null}
+                                    <span className='bg-slate-50 text-slate-600 p-1 rounded-md border-slate-200 border text-xs font-bold shadow-lg absolute right-[38px] top-[36px]'>
+                                        POS04
+                                    </span>
                                 </Box>
                                 <Box sx={{ position: 'absolute', top: '299px', left: '206px', zIndex: 2 }}>
                                     <DropZone
@@ -821,6 +815,9 @@ const ModalAsignacionNeuDesdeDesasignacion: React.FC<ModalAsignacionNeuDesdeDesa
                                             zIndex: 3,
                                         }}>{assignedNeumaticos.RES01.CODIGO_NEU || assignedNeumaticos.RES01.CODIGO}</span>
                                     ) : null}
+                                    <span className='bg-slate-50 text-slate-600 p-1 rounded-md border-slate-200 border text-xs font-bold shadow-lg absolute right-[10px] top-[64px]'>
+                                        RES01
+                                    </span>
                                 </Box>
                             </div>
 
@@ -887,7 +884,7 @@ const ModalAsignacionNeuDesdeDesasignacion: React.FC<ModalAsignacionNeuDesdeDesa
                                     <div></div>
                                     <Box sx={{ ml: 2, display: 'flex', alignItems: 'center', minWidth: 110 }}>
                                         <Typography variant="body2" sx={{ fontWeight: 600, color: '#1976d2', fontSize: '1rem', background: '#e3f2fd', borderRadius: 2, px: 1.5, py: 0.5, border: '1px solid #1976d2' }}>
-                                            Neu. Disponibles: {filteredData.length}
+                                            Neumáticos: {neumaticosDisponiblesConBajas.length}
                                         </Typography>
                                     </Box>
                                     <LoadingButton2
@@ -900,7 +897,7 @@ const ModalAsignacionNeuDesdeDesasignacion: React.FC<ModalAsignacionNeuDesdeDesa
                                     </LoadingButton2>
                                 </Box>
                                 <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-                                    <DataTableNeumaticos columns={columnsNeuParaAsignar} data={filteredData} type='pagination' filters={true} />
+                                    <DataTableNeumaticos columns={columnsNeuParaAsignarDesdeDesasignar} data={neumaticosDisponiblesConBajas} type='pagination' filters={true} />
                                 </Box>
                             </Card>
                         </Stack>
