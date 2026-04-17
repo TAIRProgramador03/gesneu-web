@@ -37,11 +37,12 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
-import { ArrowLeftRightIcon, BookMarked, EyeIcon, Replace } from 'lucide-react';
+import { ArrowLeftRightIcon, BookMarked, EyeIcon, ListRestart, Replace } from 'lucide-react';
 import { ModalVerInspecciones } from '@/components/dashboard/integrations/modal-ver-inspecciones';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Button as ButtonCustom } from '@/components/ui/button';
 import { LoadingButton2 } from '@/components/ui/loading-button2';
+import { ModalActualizarKilometraje } from '@/components/dashboard/integrations/modal-actualizar-kilometraje';
 
 
 export default function Page(): React.JSX.Element {
@@ -58,6 +59,7 @@ export default function Page(): React.JSX.Element {
   const [animatedKilometraje, setAnimatedKilometraje] = useState(0);
   const [animatedTotalNeumaticos, setAnimatedTotalNeumaticos] = useState(0);
   const [openModalDesasignar, setOpenModalDesasignar] = useState(false);
+  const [openActualizarKilometrajeModal, setOpenActualizarKilometrajeModal] = useState(false);
   const [neumaticos, setNeumaticos] = React.useState<Customer[]>([]);
   const [neumaticosFiltrados, setNeumaticosFiltrados] = React.useState<Customer[]>([]);
   const [neumaticosAsignados, setNeumaticosAsignados] = React.useState<any[]>([]);
@@ -867,6 +869,18 @@ export default function Page(): React.JSX.Element {
                     </DropdownMenuGroup>
                   </DropdownMenuContent>
                 </DropdownMenu>
+
+                {
+                  user?.usuario?.trim() === 'EGAMBOA' &&
+                  (<LoadingButton2
+                    onClick={() => setOpenActualizarKilometrajeModal(true)}
+                    disabled={user?.usuario?.trim() !== 'EGAMBOA'}
+                    icon={<ListRestart />}
+                  >
+                    Actualizar Kilometraje
+                  </LoadingButton2>)
+                }
+
               </div>
             )}
           </Stack>
@@ -1175,6 +1189,17 @@ export default function Page(): React.JSX.Element {
         )
       }
 
+      {/* Modal para poder actualizar el Kilometraje de un vehiculo */}
+
+      {
+        openActualizarKilometrajeModal && (
+          <ModalActualizarKilometraje
+            open={openActualizarKilometrajeModal}
+            onClose={() => setOpenActualizarKilometrajeModal(false)}
+            placa={vehiculo?.PLACA ?? ''}
+          />
+        )
+      }
 
       {/* Nuevo modal para ver inspecciones */}
 
