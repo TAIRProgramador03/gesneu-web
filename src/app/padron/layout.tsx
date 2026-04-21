@@ -3,10 +3,10 @@ import { Metadata } from 'next'
 import { config } from '@/config';
 
 export const metadata: Metadata = {
-  title: `Dashboard | ${config.site.name}`,
+  title: `Padrón | ${config.site.name}`,
 }
 
-export default function DashboardLayout({
+export default function PadronLayout({
   children,
 }: {
   children: React.ReactNode

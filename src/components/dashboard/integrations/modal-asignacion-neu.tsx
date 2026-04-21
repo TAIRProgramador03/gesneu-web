@@ -23,7 +23,7 @@ import { asignarNeumatico } from '../../../api/Neumaticos';
 import { toast } from 'sonner';
 import Image from 'next/image';
 import { DataTableNeumaticos } from '@/components/ui/data-table/data-table';
-import { columnsNeuParaAsignar, columnsNeuTemporales } from '@/app/dashboard/integrations/columns';
+import { columnsNeuParaAsignar, columnsNeuTemporales } from '@/app/integrations/columns';
 import { NeuTemporalTable } from '@/types/neumatico';
 import { LoadingButton } from '@/components/ui/loading-button';
 import { LoadingButton2 } from '@/components/ui/loading-button2';

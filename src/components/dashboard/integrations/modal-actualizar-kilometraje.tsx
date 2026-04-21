@@ -1,31 +1,17 @@
-'use client';
 
-import React, { useState } from 'react';
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
-import DialogActions from '@mui/material/DialogActions';
-import Box from '@mui/material/Box';
-import Chip from '@mui/material/Chip';
-import Typography from '@mui/material/Typography';
-import { CloudCheck, ShieldCheck, Tally1 } from 'lucide-react';
-import { Card } from '@mui/material';
+import { Box, Card, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typography } from '@mui/material';
+import { ClipboardList, CloudBackup, CloudCheck, RefreshCw, ShieldCheck, Tally1 } from 'lucide-react';
+import React from 'react'
 import { Button as ButtonCustom } from '@/components/ui/button';
 import { LoadingButton2 } from '@/components/ui/loading-button2';
-import { DataTableNeumaticos } from '@/components/ui/data-table/data-table';
-import { columnsNeuPorAsignar } from '@/app/integrations/columns';
-import { NeumaticoPorAsignar } from '@/types/neumatico';
 
-interface ModalVerInspeccionesProps {
-  open: boolean;
-  kilometraje: string
-  neumaticos: NeumaticoPorAsignar[]
+interface ModalActualizarKilometraje {
+  open: boolean
   onClose: () => void;
-  onSuccessInspeccion: () => Promise<void>
-  placa: string;
+  placa: string
 }
 
-export const ModalInformacionAsignacion = ({ open, kilometraje, neumaticos = [], onClose, onSuccessInspeccion, placa }: ModalVerInspeccionesProps) => {
+export const ModalActualizarKilometraje = ({ open, onClose, placa }: ModalActualizarKilometraje) => {
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth
@@ -43,11 +29,11 @@ export const ModalInformacionAsignacion = ({ open, kilometraje, neumaticos = [],
           background: 'linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%)',
           flexShrink: 0,
         }}>
-          <ShieldCheck size={20} className="text-blue-600" />
+          <CloudBackup size={20} className="text-blue-600" />
         </Box>
         <Box sx={{ flex: 1 }}>
           <Typography variant="h6" fontWeight={700} lineHeight={1.2}>
-            Confirmar Asignación
+            Actualizar Kilometraje
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.4 }}>
             <Typography variant="body2" color="text.secondary">Vehículo:</Typography>
@@ -59,9 +45,9 @@ export const ModalInformacionAsignacion = ({ open, kilometraje, neumaticos = [],
           </Box>
           <Typography variant="caption" className='text-amber-600' sx={{ display: 'block', mt: 1, fontStyle: 'italic' }}>
             <span className='font-bold'>Nota: </span>
-            Aquí podrás visualizar los datos para tu asignación vehicular. Confirmar que la información mostrada es la correcta.
+            Aquí podrás actualizar el kilometraje asignado al primer montaje o en su defecto a la última inspección.
             <br />
-            Para guardar la asignación: <b>Registrar Asignación</b>
+            Para guardar: <b>Actualizar Kilometraje</b>
           </Typography>
         </Box>
       </DialogTitle>
@@ -70,14 +56,18 @@ export const ModalInformacionAsignacion = ({ open, kilometraje, neumaticos = [],
 
         <Card sx={{ flex: 1, p: 2.5, borderRadius: 2.5, border: '1px solid #e2e8f0', marginTop: '10px' }} elevation={0}>
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-yellow-100 text-yellow-600 text-sm font-normal">
-              <Tally1 size={16} />
-              Kilometraje:
-              <b>{kilometraje} km</b>
-            </span>
+            <h4>Hola a todos!</h4>
           </Box>
-          <DataTableNeumaticos columns={columnsNeuPorAsignar} data={neumaticos} />
+
+          {/* <DataTableNeumaticos columns={columnsNeuPorAsignar} data={neumaticos} /> */}
+
+          <span>
+            {placa}
+          </span>
+
+
+
+
         </Card>
       </DialogContent>
 
@@ -85,9 +75,9 @@ export const ModalInformacionAsignacion = ({ open, kilometraje, neumaticos = [],
         <LoadingButton2
           variant="primary"
           icon={<CloudCheck />}
-          onClick={() => onSuccessInspeccion()}
+        // onClick={() => onSuccessInspeccion()}
         >
-          Registrar Asignación
+          Actualizar Kilometraje
         </LoadingButton2>
         <ButtonCustom onClick={onClose} >
           Cerrar
@@ -95,4 +85,5 @@ export const ModalInformacionAsignacion = ({ open, kilometraje, neumaticos = [],
       </DialogActions>
     </Dialog>
   );
-};
+}
+

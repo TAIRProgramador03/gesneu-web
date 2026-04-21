@@ -9,6 +9,7 @@ import { EsRecuperadoBadge } from "@/components/ui/EsRecuperadoBadge";
 import { TipoMovimientoBadge } from "@/components/ui/TipoMovimientoBadge";
 import { LinearProgressItem } from "@/components/ui/LinearProgress";
 import { PadronExcel } from "@/types/padron";
+import Link from "next/link";
 
 export const columnsPadron: ColumnDef<PadronExcel>[] = [
   {
@@ -47,6 +48,7 @@ export const columnsPadron: ColumnDef<PadronExcel>[] = [
         </Button>
       )
     },
+    cell: ({ row }) => <Link href={`/padron/neumatico/${row.original.CODIGO}`}>{row.original.CODIGO}</Link>,
   },
   {
     accessorKey: "MARCA",

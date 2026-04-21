@@ -29,7 +29,7 @@ import Image from 'next/image';
 import { convertToDateHuman } from '@/lib/utils';
 import { TipoMovimientoBadge } from '@/components/ui/TipoMovimientoBadge';
 import { DataTableNeumaticos } from '@/components/ui/data-table/data-table';
-import { columnsNeuParaAsignar, columnsNeuParaAsignarDesdeDesasignar } from '@/app/dashboard/integrations/columns';
+import { columnsNeuParaAsignar, columnsNeuParaAsignarDesdeDesasignar } from '@/app/integrations/columns';
 import { LoadingButton2 } from '@/components/ui/loading-button2';
 import { ClipboardCheck, ClipboardList } from 'lucide-react';
 import ModalInputsNeuDesasignacion from './modal-inputs-neu-desasignacion';
