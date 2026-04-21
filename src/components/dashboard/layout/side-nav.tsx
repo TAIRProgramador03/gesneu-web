@@ -8,19 +8,15 @@ import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import { ArrowSquareUpRight as ArrowSquareUpRightIcon } from '@phosphor-icons/react/dist/ssr/ArrowSquareUpRight';
 import { CaretLeft, CaretRight } from '@phosphor-icons/react';
 
 import type { NavItemConfig } from '@/types/nav';
-import { paths } from '@/paths';
 import { isNavItemActive } from '@/lib/is-nav-item-active';
 
 import { useUser } from '@/hooks/use-user';
 
 import { navItems } from './config';
 import { navIcons } from './nav-icons';
-import { Car, LayoutDashboardIcon, UserCircle } from 'lucide-react';
-import { TyreIcon } from '@/components/icons/Tyre';
 
 interface SideNavProps {
   collapsed: boolean;

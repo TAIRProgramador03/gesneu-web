@@ -66,17 +66,19 @@ export const ModalActualizarKilometraje = ({ open, onClose, placa }: ModalActual
           </span>
 
 
+
+
         </Card>
       </DialogContent>
 
       <DialogActions sx={{ px: 3, py: 1.5, borderTop: '1px solid', borderColor: 'divider' }}>
-        {/* <LoadingButton2
+        <LoadingButton2
           variant="primary"
           icon={<CloudCheck />}
         // onClick={() => onSuccessInspeccion()}
         >
-          Registrar Asignación
-        </LoadingButton2> */}
+          Actualizar Kilometraje
+        </LoadingButton2>
         <ButtonCustom onClick={onClose} >
           Cerrar
         </ButtonCustom>

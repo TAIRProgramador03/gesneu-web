@@ -870,16 +870,16 @@ export default function Page(): React.JSX.Element {
                   </DropdownMenuContent>
                 </DropdownMenu>
 
-                {
+                {/* {
                   user?.usuario?.trim() === 'EGAMBOA' &&
                   (<LoadingButton2
                     onClick={() => setOpenActualizarKilometrajeModal(true)}
-                    disabled={user?.usuario?.trim() !== 'EGAMBOA'}
+                    disabled={user?.usuario?.trim() !== 'EGAMBOA' || neumaticosAsignadosUnicos.length === 0}
                     icon={<ListRestart />}
                   >
                     Actualizar Kilometraje
                   </LoadingButton2>)
-                }
+                } */}
 
               </div>
             )}

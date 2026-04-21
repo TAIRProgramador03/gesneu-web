@@ -14,7 +14,7 @@ import { getInspeccionesPorPlaca, getNeumaticosPorInspeccion } from '@/api/Neuma
 import { useQuery } from '@tanstack/react-query';
 import { Card, Stack } from '@mui/material';
 import { DataTableNeumaticos } from '@/components/ui/data-table/data-table';
-import { columnsInspecciones, columnsNeuInspeccion } from '@/app/dashboard/integrations/columns';
+import { columnsInspecciones, columnsNeuInspeccion } from '@/app/integrations/columns';
 import { convertToDateHuman } from '@/lib/utils';
 import { Button as ButtonCustom } from '@/components/ui/button';
 

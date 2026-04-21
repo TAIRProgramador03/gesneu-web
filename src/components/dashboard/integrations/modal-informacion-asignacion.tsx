@@ -13,7 +13,7 @@ import { Card } from '@mui/material';
 import { Button as ButtonCustom } from '@/components/ui/button';
 import { LoadingButton2 } from '@/components/ui/loading-button2';
 import { DataTableNeumaticos } from '@/components/ui/data-table/data-table';
-import { columnsNeuPorAsignar } from '@/app/dashboard/integrations/columns';
+import { columnsNeuPorAsignar } from '@/app/integrations/columns';
 import { NeumaticoPorAsignar } from '@/types/neumatico';
 
 interface ModalVerInspeccionesProps {

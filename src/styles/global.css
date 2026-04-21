@@ -57,3 +57,8 @@ span:hover > .tooltip-mantenimiento,
 span:hover > .tooltip-eliminar {
   opacity: 1 !important;
 }
+
+a{
+  text-decoration: underline;
+  color: #167bd9;
+}
