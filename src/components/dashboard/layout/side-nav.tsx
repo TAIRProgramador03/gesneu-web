@@ -13,20 +13,18 @@ import { CaretLeft, CaretRight } from '@phosphor-icons/react';
 import type { NavItemConfig } from '@/types/nav';
 import { isNavItemActive } from '@/lib/is-nav-item-active';
 
-import { useUser } from '@/hooks/use-user';
 
 import { navItems } from './config';
 import { navIcons } from './nav-icons';
 
 interface SideNavProps {
   collapsed: boolean;
-  setCollapsed: React.Dispatch<React.SetStateAction<boolean>>;
+  setCollapsed: (value: boolean) => void;
 }
 
 export function SideNav({ collapsed, setCollapsed }: SideNavProps): React.JSX.Element {
   const pathname = usePathname();
   const navRef = React.useRef<HTMLDivElement>(null);
-  const { user } = useUser();
 
   React.useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -76,7 +74,7 @@ export function SideNav({ collapsed, setCollapsed }: SideNavProps): React.JSX.El
           )}
         </Box>
         <Button
-          onClick={() => setCollapsed((prev) => !prev)}
+          onClick={() => setCollapsed(!collapsed)}
           sx={{
             minWidth: 0,
             width: 32,
