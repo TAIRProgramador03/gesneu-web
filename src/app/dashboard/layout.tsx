@@ -1,6 +1,7 @@
-import React from 'react'
-import { Metadata } from 'next'
+import * as React from 'react';
+import { SideBarMain } from '@/components/navegation/SideBarMain';
 import { config } from '@/config';
+import { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: `Dashboard | ${config.site.name}`,
@@ -11,5 +12,9 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode
 }) {
-  return <>{children}</>
+  return (
+    <SideBarMain>
+      {children}
+    </SideBarMain>
+  )
 }
