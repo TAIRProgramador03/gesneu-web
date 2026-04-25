@@ -6,7 +6,11 @@ import axios, { AxiosError } from "axios";
 
 export const obtenerHistorialMovimientosPorCodigo = async (codigo: string) => {
   try {
-    const response = await axios.get(`/api/po-movimiento/historial-codigo/${codigo}`);
+    const response = await axios.get(`/api/po-movimiento/historial-codigo`, {
+      params: {
+        codigo
+      }
+    });
     return response.data;
   } catch (error) {
     console.error('Error en obtenerHistorialMovimientosPorCodigo:', error);
@@ -434,3 +438,53 @@ export const desasignarConReemplazo = async (payload: any) => {
     throw error;
   }
 };
+
+// New
+
+export interface NeumaticoBuscado {
+  ID_NEUMATICO: number
+  CODIGO_NEUMATICO: string,
+  MARCA_NEUMATICO: string,
+  MEDIDA_NEUMATICO: string,
+  DISENO_NEUMATICO: string,
+  PR_NEUMATICO: string,
+  RQ_NEUMATICO: string,
+  OC_NEUMATICO: string,
+  LEASING_NEUMATICO: string,
+  TALLER_INICIAL: string,
+  TALLER_ACTUAL: string,
+  COSTO_NEUMATICO: number,
+  PROVEEDOR_NEUMATICO: string,
+  RUC_PROVEEDOR_NEUMATICO: string,
+  FECHA_FABRIACACION: string,
+  RECUPERADO_NEUMATICO: boolean,
+  SITUACION_NEUMATICO: string,
+  PLACA_ACTUAL: string,
+  REMANENTE_ACTUAL: number,
+  REMANENTE_MONTADO: number,
+  REMANENTE_ORIGINAL: number,
+  PORCENTAJE_VIDA: number,
+}
+
+export type NeumaticosBuscados = NeumaticoBuscado[]
+
+export interface VerificarNeumaticoResponse {
+  status: boolean,
+  data: NeumaticosBuscados
+}
+
+export const verificarNeumatico = async (codigo: string) => {
+  try {
+
+    const response = await axios.get<VerificarNeumaticoResponse>(`/api/po-neumaticos/verificar-existencia`, {
+      params: { codigo },
+      withCredentials: true,
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error('Error en verificarNeumatico:', error);
+    throw error;
+  }
+};
+
