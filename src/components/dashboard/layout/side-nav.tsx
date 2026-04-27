@@ -10,6 +10,7 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import { CaretLeft, CaretRight } from '@phosphor-icons/react';
 
+import Tooltip from '@mui/material/Tooltip';
 import type { NavItemConfig } from '@/types/nav';
 import { isNavItemActive } from '@/lib/is-nav-item-active';
 
@@ -24,17 +25,6 @@ interface SideNavProps {
 
 export function SideNav({ collapsed, setCollapsed }: SideNavProps): React.JSX.Element {
   const pathname = usePathname();
-  const navRef = React.useRef<HTMLDivElement>(null);
-
-  React.useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (navRef.current && !navRef.current.contains(event.target as Node)) {
-        setCollapsed(true);
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [setCollapsed]);
 
   return (
     <Box
@@ -52,7 +42,6 @@ export function SideNav({ collapsed, setCollapsed }: SideNavProps): React.JSX.El
         flexDirection: 'column',
         zIndex: 1200,
       }}
-      ref={navRef}
     >
       {/* Logo y botón */}
       <Box
@@ -146,6 +135,7 @@ function NavItem({
   const Icon = icon ? navIcons[icon] : null;
 
   return (
+    <Tooltip title={collapsed ? title : ''} placement="right" arrow>
     <li>
       <Box
         {...(href
@@ -201,6 +191,7 @@ function NavItem({
           </Box>
         )}
       </Box>
-    </li >
+    </li>
+    </Tooltip>
   );
 }

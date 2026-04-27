@@ -10,11 +10,20 @@ import { AuthGuard } from '@/components/auth/auth-guard';
 import { MainNav } from '@/components/dashboard/layout/main-nav';
 import { SideNav } from '@/components/dashboard/layout/side-nav';
 import { MobileNav } from '@/components/dashboard/layout/mobile-nav';
-import { useSideBar } from '@/hooks/use-side-bar';
 
 export const SideBarMain = ({ children }: { children: React.ReactNode }) => {
+  const [collapsed, setCollapsed] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('sidebar-collapsed') === 'true';
+    }
+    return false;
+  });
 
-  const { mobileOpen, collapsed, handleChangeMobileOpen, handleChangeCollapsed } = useSideBar()
+  const handleSetCollapsed = (value: boolean) => {
+    setCollapsed(value);
+    localStorage.setItem('sidebar-collapsed', String(value));
+  };
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
     <AuthGuard>
@@ -30,7 +39,6 @@ export const SideBarMain = ({ children }: { children: React.ReactNode }) => {
           },
         }}
       />
-      {/* #FFF8E1  */}
       <Box
         sx={{
           bgcolor: '#f5f5f5',
@@ -43,12 +51,12 @@ export const SideBarMain = ({ children }: { children: React.ReactNode }) => {
       >
         {/* SideNav solo visible en escritorio */}
         <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-          <SideNav collapsed={collapsed} setCollapsed={handleChangeCollapsed} />
+          <SideNav collapsed={collapsed} setCollapsed={handleSetCollapsed} />
         </Box>
 
         {/* Botón hamburguesa solo en móvil */}
         <IconButton
-          onClick={() => handleChangeMobileOpen(true)}
+          onClick={() => setMobileOpen(true)}
           sx={{
             position: 'fixed',
             top: 16,
@@ -63,9 +71,8 @@ export const SideBarMain = ({ children }: { children: React.ReactNode }) => {
         </IconButton>
 
         {/* Drawer móvil */}
-        <MobileNav open={mobileOpen} onClose={() => handleChangeMobileOpen(false)} />
+        <MobileNav open={mobileOpen} onClose={() => setMobileOpen(false)} />
 
-        {/* ...resto del layout... */}
         <Box
           sx={{
             display: 'flex',

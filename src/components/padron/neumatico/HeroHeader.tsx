@@ -15,7 +15,7 @@ export const HeroHeader = ({ neu }: { neu: NeumaticoBuscado }) => {
             </h1>
             <TipoMovimientoBadge tipoMovimiento={neu.SITUACION_NEUMATICO ?? ""} />
             <span className="text-gray-500 text-sm">
-              {<TextoRecuperadoBadge esRecuperado={neu.RECUPERADO_NEUMATICO} />}
+              <TextoRecuperadoBadge esRecuperado={neu.RECUPERADO_NEUMATICO} />
             </span>
           </div>
           <p className="text-gray-500 text-sm">

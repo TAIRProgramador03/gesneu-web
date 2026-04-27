@@ -9,12 +9,12 @@ import {
 import '@/styles/global.css';
 
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import NextTopLoader from 'nextjs-toploader';
 import { UserProvider } from '@/contexts/user-context';
 import { LocalizationProvider } from '@/components/core/localization-provider';
 import { ThemeProvider } from '@/components/core/theme-provider/theme-provider';
 import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
-import { SideBarProvider } from '@/contexts/side-bar.context';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -38,14 +38,13 @@ export default function Layout({ children }: LayoutProps): React.JSX.Element {
         <title>Gesneu</title>
       </head>
       <body>
+        <NextTopLoader color="#167bd9" showSpinner={false} />
         <QueryClientProvider client={queryClient}>
           <LocalizationProvider>
             <UserProvider>
               <ThemeProvider>
                 <TooltipProvider>
-                  <SideBarProvider>
-                    {children}
-                  </SideBarProvider>
+                  {children}
                 </TooltipProvider>
               </ThemeProvider>
             </UserProvider>

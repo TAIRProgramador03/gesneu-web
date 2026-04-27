@@ -7,9 +7,8 @@ import axios, { AxiosError } from "axios";
 export const obtenerHistorialMovimientosPorCodigo = async (codigo: string) => {
   try {
     const response = await axios.get(`/api/po-movimiento/historial-codigo`, {
-      params: {
-        codigo
-      }
+      params: { codigo },
+      withCredentials: true,
     });
     return response.data;
   } catch (error) {
@@ -463,6 +462,8 @@ export interface NeumaticoBuscado {
   REMANENTE_ACTUAL: number,
   REMANENTE_MONTADO: number,
   REMANENTE_ORIGINAL: number,
+  PRESION_ACTUAL: number,
+  TORQUE_ACTUAL: number,
   PORCENTAJE_VIDA: number,
 }
 
@@ -488,3 +489,83 @@ export const verificarNeumatico = async (codigo: string) => {
   }
 };
 
+interface CantidadNeumaticosVidaUtil {
+  NEUMATICOS_CRITICO: number;
+  NEUMATICOS_REGULAR: number;
+  NEUMATICOS_BUENO: number;
+  NEUMATICOS_TOTALES: number;
+}
+
+export const obtenerCantidadNeumaticosVidaUtil = async () => {
+  try {
+    const response = await axios.get<CantidadNeumaticosVidaUtil>(`/api/po-neumaticos/cantidad-de-estados`, {
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error en obtenerCantidadNeumaticosVidaUtil:', error);
+    throw error;
+  }
+}
+
+export interface NeumaticoEnCritico {
+  ID_NEUMATICO: number
+  CODIGO_NEUMATICO: string
+  MARCA_NEUMATICO: string
+  MEDIDA_NEUMATICO: string
+  DISENO_NEUMATICO: string
+  PLACA_VEHICULO: string
+  PRESION_NEUMATICO: number
+  TORQUE_NEUMATICO: number
+  REMANENTE_NEUMATICO: number
+  PORCENTAJE_VIDA: number
+}
+
+export const obtenerNeumaticosEnCritico = async () => {
+  try {
+    const response = await axios.get<NeumaticoEnCritico[]>(`/api/po-neumaticos/estado-critico`, {
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error en obtenerNeumaticosEnCritico:', error);
+    throw error;
+  }
+}
+
+export interface MarcaNeumaticoCantidad {
+  MARCA_NEUMATICO: string
+  CANTIDAD_NEUMATICOS: number
+}
+
+export const obtenerCantidadPorMarca = async () => {
+  try {
+    const response = await axios.get<MarcaNeumaticoCantidad[]>(`/api/po-neumaticos/cantidad-por-marca`, {
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error en obtenerCantidadPorMarca:', error);
+    throw error;
+  }
+}
+
+export interface MedidaNeumaticoCantidad {
+  MEDIDA_NEUMATICO: string
+  MEDIDA_DISPONIBLE: number
+  MEDIDA_ASIGNADA: number
+  MEDIDA_BAJA: number
+  CANTIDAD_NEUMATICOS: number
+}
+
+export const obtenerCantidadPorMedida = async () => {
+  try {
+    const response = await axios.get<MedidaNeumaticoCantidad[]>(`/api/po-neumaticos/cantidad-por-medida`, {
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error en obtenerCantidadPorMedida:', error);
+    throw error;
+  }
+}

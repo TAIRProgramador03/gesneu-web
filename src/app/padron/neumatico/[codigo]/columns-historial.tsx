@@ -34,7 +34,7 @@ export const columnsHistorial: ColumnDef<MovimientoHistorial>[] = [
     header: 'Remanente',
     cell: ({ row }) => {
       const val = row.getValue<number>('REMANENTE_MEDIDO_MM')
-      return val != null ? `${val} mm` : '—'
+      return val !== null ? `${val} mm` : '—'
     },
   },
   {
@@ -42,7 +42,7 @@ export const columnsHistorial: ColumnDef<MovimientoHistorial>[] = [
     header: 'Km recorridos',
     cell: ({ row }) => {
       const val = row.getValue<number>('KM_RECORRIDOS_EN_ETAPA')
-      return val != null ? val.toLocaleString('es-PE') : '—'
+      return val !== null ? val.toLocaleString('es-PE') : '—'
     },
   },
   {

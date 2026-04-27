@@ -1,12 +1,8 @@
 import * as React from 'react';
 import { memo } from 'react';
-import Card from '@mui/material/Card';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import Grid from '@mui/material/Grid';
-import WarningAmberIcon from '@mui/icons-material/WarningAmber';
-import RecyclingIcon from '@mui/icons-material/Recycling';
-import CountUp from 'react-countup';
+import Grid from '@mui/material/Unstable_Grid2';
+import { Gauge, PackageCheck, Truck, Car, XCircle, RefreshCcw } from 'lucide-react';
+import { KpiCard } from '@/components/dashboard/overview/KpiCard';
 
 export interface CustomersFiltersProps {
   projectCount: number;
@@ -15,84 +11,86 @@ export interface CustomersFiltersProps {
   autosDisponiblesCount?: number;
   bajaDefinitivaCount: number;
   recuperadosCount: number;
+  isLoading?: boolean;
 }
 
-export const CustomersFilters = memo(({ projectCount, disponiblesCount, asignadosCount, autosDisponiblesCount, bajaDefinitivaCount, recuperadosCount }: CustomersFiltersProps): React.JSX.Element => {
-
+export const CustomersFilters = memo(({
+  projectCount,
+  disponiblesCount,
+  asignadosCount,
+  autosDisponiblesCount,
+  bajaDefinitivaCount,
+  recuperadosCount,
+  isLoading = false,
+}: CustomersFiltersProps): React.JSX.Element => {
   return (
-    <Card sx={{ p: 2 }}>
-      <Grid container spacing={2} justifyContent="center" alignItems="center" wrap="wrap" sx={{ flexWrap: { xs: 'wrap', sm: 'nowrap' } }}>
-        <Grid item xs={12} sm={2} md={2} lg={2}>
-          <div
-            className='w-full min-w-30 h-20 mb-2 flex items-center justify-center text-4xl font-bold text-slate-800 relative bg-sky-100 border-4 border-sky-600 rounded-xl'
-          >
-            <CountUp end={projectCount ?? 0} duration={.8} />
-          </div>
-          <Typography align="center" variant="body2" color="text.secondary">
-            Total neumáticos
-          </Typography>
-        </Grid>
-        <Grid item xs={12} sm={2} md={2} lg={2}>
-          <div
-            className='w-full min-w-30 h-20 mb-2 flex items-center justify-center text-4xl font-bold text-slate-800 relative bg-green-100 border-4 border-green-600 rounded-xl'
-          >
-            <CountUp end={disponiblesCount ?? 0} duration={.8} />
-          </div>
-          <Typography align="center" variant="body2" color="text.secondary">
-            Disponibles
-          </Typography>
-        </Grid>
-        <Grid item xs={12} sm={2} md={2} lg={2}>
-          <div
-            className='w-full min-w-30 h-20 mb-2 flex items-center justify-center text-4xl font-bold text-slate-800 relative bg-yellow-100 border-4 border-yellow-600 rounded-xl'
-          >
-            <CountUp end={asignadosCount ?? 0} duration={.8} />
-          </div>
-          <Typography align="center" variant="body2" color="text.secondary">
-            Asignados
-          </Typography>
-        </Grid>
-        <Grid item xs={12} sm={2} md={2} lg={2}>
-          <div
-            className='w-full min-w-30 h-20 mb-2 flex items-center justify-center text-4xl font-bold text-slate-800 relative bg-stone-100 border-4 border-stone-600 rounded-xl'
-          >
-            <CountUp end={autosDisponiblesCount ?? 0} duration={.8} />
-          </div>
-          <Typography align="center" variant="body2" color="text.secondary">
-            Vehiculos Disponibles
-          </Typography>
-        </Grid>
-        <Grid item xs={12} sm={2} md={2} lg={2}>
-          <div
-            className='w-full min-w-30 h-20 mb-2 flex items-center justify-center text-4xl font-bold text-slate-800 relative bg-red-100 border-4 border-red-600 rounded-xl'
-          >
-            <span style={{ marginRight: 4, fontSize: 20 }}>
-              <WarningAmberIcon />
-            </span>
-            <div>
-              <CountUp end={bajaDefinitivaCount ?? 0} duration={.8} />
-            </div>
-          </div>
-          <Typography align="center" variant="body2" color="text.secondary">
-            Baja Definitiva
-          </Typography>
-        </Grid>
-        <Grid item xs={12} sm={2} md={2} lg={2}>
-          <div
-            className='w-full min-w-30 h-20 mb-2 flex items-center justify-center text-4xl font-bold text-slate-800 relative bg-lime-100 border-4 border-lime-600 rounded-xl'
-          >
-            <span style={{ marginRight: 4, fontSize: 20 }}>
-              <RecyclingIcon />
-            </span>
-            <div>
-              <CountUp end={recuperadosCount ?? 0} duration={.8} />
-            </div>
-          </div>
-          <Typography align="center" variant="body2" color="text.secondary">
-            Recuperados
-          </Typography>
-        </Grid>
+    <Grid container spacing={2} alignItems="flex-start">
+      <Grid lg={3} sm={6} xs={6}>
+        <KpiCard
+          label="Total Neumáticos"
+          value={projectCount ?? 0}
+          icon={<Gauge size={22} />}
+          color="sky"
+          description="En el taller actual"
+          loading={isLoading}
+          sx={{ height: '100%' }}
+        />
       </Grid>
-    </Card>
+      <Grid lg={3} sm={6} xs={6}>
+        <KpiCard
+          label="Disponibles"
+          value={disponiblesCount ?? 0}
+          icon={<PackageCheck size={22} />}
+          color="green"
+          description="En almacén"
+          loading={isLoading}
+          sx={{ height: '100%' }}
+        />
+      </Grid>
+      <Grid lg={3} sm={6} xs={6}>
+        <KpiCard
+          label="Asignados"
+          value={asignadosCount ?? 0}
+          icon={<Truck size={22} />}
+          color="yellow"
+          description="Montados en vehículos"
+          loading={isLoading}
+          sx={{ height: '100%' }}
+        />
+      </Grid>
+      <Grid lg={3} sm={6} xs={6}>
+        <KpiCard
+          label="Vehículos Disponibles"
+          value={autosDisponiblesCount ?? 0}
+          icon={<Car size={22} />}
+          color="stone"
+          description="Sin neumático asignado"
+          loading={isLoading}
+          sx={{ height: '100%' }}
+        />
+      </Grid>
+      <Grid lg={6} sm={6} xs={6}>
+        <KpiCard
+          label="Baja Definitiva"
+          value={bajaDefinitivaCount ?? 0}
+          icon={<XCircle size={22} />}
+          color="red"
+          description="Retirados del servicio"
+          loading={isLoading}
+          sx={{ height: '100%' }}
+        />
+      </Grid>
+      <Grid lg={6} sm={6} xs={6}>
+        <KpiCard
+          label="Recuperados"
+          value={recuperadosCount ?? 0}
+          icon={<RefreshCcw size={22} />}
+          color="lime"
+          description="Reacondicionados"
+          loading={isLoading}
+          sx={{ height: '100%' }}
+        />
+      </Grid>
+    </Grid>
   );
-})
+});

@@ -23,6 +23,8 @@ export const useNeuStats = () => {
     ]
   })
 
+  const isLoading = [allQtyNeu, avaibleQtyNeu, assignedQtyNeu, dropQtyNeu, recoverQtyNeu, assignedCostNeu].some(q => q.isLoading);
+
   return {
     allQtyNeu,
     avaibleQtyNeu,
@@ -30,7 +32,8 @@ export const useNeuStats = () => {
     dropQtyNeu,
     recoverQtyNeu,
     avaibleQtyAuto,
-    assignedCostNeu
+    assignedCostNeu,
+    isLoading,
   }
 
 }

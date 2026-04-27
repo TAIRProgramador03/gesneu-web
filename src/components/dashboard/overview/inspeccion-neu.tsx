@@ -18,6 +18,7 @@ import type { SxProps } from '@mui/material/styles';
 import type { ApexOptions } from 'apexcharts';
 import dayjs from 'dayjs';
 import 'dayjs/locale/es';
+import { ChevronDown } from 'lucide-react';
 
 import { Chart } from '@/components/core/chart';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
@@ -218,6 +219,8 @@ function processInspeccionData(data: any[]) {
 const CHART_ID = 'inspeccion-neu-chart';
 
 export const Sales = React.memo(({ sx }: SalesProps): React.JSX.Element => {
+  const theme = useTheme();
+  const [open, setOpen] = React.useState(true);
   const { user } = useUser();
   const [startDate, setStartDate] = React.useState<dayjs.Dayjs | null>(dayjs().subtract(2, 'day'));
   const [endDate, setEndDate] = React.useState<dayjs.Dayjs | null>(dayjs());
@@ -329,9 +332,25 @@ export const Sales = React.memo(({ sx }: SalesProps): React.JSX.Element => {
       <div style={{ display: 'flex', alignItems: '', justifyContent: 'space-between', flexWrap: 'wrap' }} className='m-8 gap-6'>
 
         <div>
-          <h3 className='font-semibold text-xl'>
-            Inspecciónes por Vehículo
-          </h3>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <button
+              type="button"
+              onClick={() => setOpen(v => !v)}
+              style={{
+                background: 'transparent', border: 'none', cursor: 'pointer',
+                padding: 4, display: 'flex', alignItems: 'center',
+                color: theme.palette.text.secondary as string,
+              }}
+            >
+              <ChevronDown
+                size={16}
+                style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.28s ease' }}
+              />
+            </button>
+            <h3 className='font-semibold text-xl'>
+              Inspecciónes por Vehículo
+            </h3>
+          </div>
         </div>
 
         {/* Botón exportar PNG */}
@@ -371,6 +390,8 @@ export const Sales = React.memo(({ sx }: SalesProps): React.JSX.Element => {
         </LocalizationProvider>
       </div>
 
+      <div style={{ display: 'grid', gridTemplateRows: open ? '1fr' : '0fr', transition: 'grid-template-rows 0.3s ease' }}>
+      <div style={{ overflow: 'hidden' }}>
       <div style={{ width: 300, display: 'flex', flexDirection: 'column', gap: 8, flexShrink: 0 }} className='mx-8 mt-8 gap-6'>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Typography variant="caption" color="text.secondary">
@@ -489,6 +510,8 @@ export const Sales = React.memo(({ sx }: SalesProps): React.JSX.Element => {
 
       </CardContent>
       <Divider />
+      </div>
+      </div>
     </Card >
   );
 });

@@ -4,11 +4,9 @@ import * as React from 'react';
 import { ArrowClockwise as RefreshIcon } from '@phosphor-icons/react/dist/ssr/ArrowClockwise';
 import { Card } from '@mui/material';
 import { columnsPadron } from './columns';
-import { CustomersFilters } from '@/components/dashboard/customer/customers-filters';
 import { DataTableNeumaticos } from '@/components/ui/data-table/data-table';
 import { Download as DownloadIcon } from '@phosphor-icons/react/dist/ssr/Download';
 import { Neumaticos } from '@/api/Neumaticos';
-import { useNeuStats } from '@/hooks/use-neu-stats';
 import { useQuery } from '@tanstack/react-query';
 import { useState } from "react";
 import { useTheme } from '@mui/material/styles';
@@ -23,6 +21,9 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { LoadingButton2 } from '@/components/ui/loading-button2';
 import { RefreshCw, TrendingUpDown } from 'lucide-react';
 import { ModalReubicarNeumatico } from '@/components/dashboard/padron/modal-reubicar-neumatico';
+import { TableFilterChips } from '@/components/ui/TableFilterChips';
+import { useTableFilter, type FilterChipDef } from '@/hooks/use-table-filter';
+import { PadronExcel } from '@/types/padron';
 
 export default function Page(): React.JSX.Element {
 
@@ -37,10 +38,17 @@ export default function Page(): React.JSX.Element {
 
   const { data: customers = [], refetch: customersRefetch, isLoading: isLoadingCustomers } = useQuery({
     queryKey: ['customers'],
-    queryFn: Neumaticos
+    queryFn: Neumaticos,
+    placeholderData: []
   })
 
-  const { allQtyNeu, avaibleQtyNeu, assignedQtyNeu, dropQtyNeu, recoverQtyNeu, avaibleQtyAuto } = useNeuStats();
+  const PADRON_CHIPS: FilterChipDef<PadronExcel>[] = React.useMemo(() => [
+    { key: 'DISPONIBLE', label: 'Disponibles', color: 'green', filter: c => c.TIPO_MOVIMIENTO === 'DISPONIBLE' },
+    { key: 'ASIGNADO', label: 'Asignados', color: 'yellow', filter: c => c.TIPO_MOVIMIENTO === 'ASIGNADO' },
+    { key: 'BAJA', label: 'Baja Definitiva', color: 'red', filter: c => c.TIPO_MOVIMIENTO === 'BAJA' },
+  ], []);
+
+  const { active: activeFilter, setActive: setActiveFilter, counts: filterCounts, filteredData: filteredCustomers } = useTableFilter(customers, PADRON_CHIPS);
 
   const ModalOverlay = styled.div`
   position: fixed;
@@ -110,13 +118,7 @@ export default function Page(): React.JSX.Element {
 
   const handleRefresh = () => {
     try {
-      customersRefetch()
-      allQtyNeu.refetch()
-      avaibleQtyNeu.refetch()
-      assignedQtyNeu.refetch()
-      dropQtyNeu.refetch()
-      recoverQtyNeu.refetch()
-      avaibleQtyAuto.refetch()
+      customersRefetch();
     } catch (error) {
       console.error('Error al refrescar los datos');
     }
@@ -175,19 +177,18 @@ export default function Page(): React.JSX.Element {
           </Box>
         </Stack>
 
-        <CustomersFilters
-          projectCount={allQtyNeu.data}
-          disponiblesCount={avaibleQtyNeu.data}
-          asignadosCount={assignedQtyNeu.data}
-          autosDisponiblesCount={avaibleQtyAuto.data}
-          bajaDefinitivaCount={dropQtyNeu.data}
-          recuperadosCount={recoverQtyNeu.data}
+        <TableFilterChips
+          chips={PADRON_CHIPS}
+          counts={filterCounts}
+          active={activeFilter}
+          onChange={setActiveFilter}
+          isLoading={isLoadingCustomers}
         />
 
         <Card className='p-5'>
           <DataTableNeumaticos
             columns={columnsPadron}
-            data={customers}
+            data={filteredCustomers}
             type='pagination'
             filters={true}
             withExport={true}
