@@ -8,6 +8,7 @@ import {
 } from 'recharts';
 import { useQuery } from '@tanstack/react-query';
 import { obtenerCantidadPorMedida } from '@/api/Neumaticos';
+import { BadgeCheck } from 'lucide-react';
 
 const COLOR_ASIG = '#0084d1';
 const COLOR_BAJ = '#e7000b';
@@ -89,45 +90,59 @@ export const MedidasChart = (): React.JSX.Element => {
 
   return (
     <div style={{ padding: '20px' }}>
-      {/* Mini leyenda */}
-      <div style={{ display: 'flex', gap: 14, justifyContent: 'flex-end', marginBottom: 8 }}>
-        {[{ color: COLOR_DISP, label: 'Disponibles' }, { color: COLOR_ASIG, label: 'Asignados' }, { color: COLOR_BAJ, label: 'Bajas' }].map(({ color, label }) => (
-          <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-            <div style={{ width: 10, height: 10, borderRadius: 2, background: color }} />
-            <span style={{ fontSize: 12, color: theme.palette.text.secondary }}>{label}</span>
+      {
+        TOTAL_FLOTA === 0 && (
+          <div className='flex gap-1 flex-wrap justify-center items-center bg-indigo-50 text-blue-700 border-2 border-blue-700 p-2 rounded-lg'>
+            <BadgeCheck width={12} />
+            <span className='italic text-xs'>Almacén Vacío.</span>
           </div>
-        ))}
-      </div>
+        )
+      }
+      {
+        TOTAL_FLOTA >= 1 && (
+          <>
+            {/* Mini leyenda */}
+            <div style={{ display: 'flex', gap: 14, justifyContent: 'flex-end', marginBottom: 8 }}>
+              {[{ color: COLOR_DISP, label: 'Disponibles' }, { color: COLOR_ASIG, label: 'Asignados' }, { color: COLOR_BAJ, label: 'Bajas' }].map(({ color, label }) => (
+                <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                  <div style={{ width: 10, height: 10, borderRadius: 2, background: color }} />
+                  <span style={{ fontSize: 12, color: theme.palette.text.secondary }}>{label}</span>
+                </div>
+              ))}
+            </div>
 
-      <ResponsiveContainer width="100%" height={268}>
-        <BarChart
-          layout="vertical"
-          data={medidasPorNeumaticos}
-          barSize={16}
-          margin={{ top: 0, right: 58, bottom: 0, left: 0 }}
-        >
-          <XAxis
-            type="number"
-            tick={{ fontSize: 10, fill: theme.palette.text.secondary as string }}
-            axisLine={false}
-            tickLine={false}
-          />
-          <YAxis
-            type="category"
-            dataKey="medida"
-            width={104}
-            tick={{ fontSize: 11, fill: theme.palette.text.primary as string, fontWeight: 600, fontFamily: 'monospace' }}
-            axisLine={false}
-            tickLine={false}
-          />
-          <Tooltip content={<MedidasTooltip />} cursor={{ fill: 'rgba(0,0,0,0.04)' }} />
-          <Bar dataKey="disponibles" name="Disponibles" stackId="a" fill={COLOR_DISP} radius={[3, 0, 0, 3]} />
-          <Bar dataKey="asignados" name="Asignados" stackId="a" fill={COLOR_ASIG} radius={[0, 0, 0, 0]} />
-          <Bar dataKey="baja" name="Bajas" stackId="a" fill={COLOR_BAJ} radius={[0, 3, 3, 0]}>
-            <LabelList content={<TotalLabel />} />
-          </Bar>
-        </BarChart>
-      </ResponsiveContainer>
+            <ResponsiveContainer width="100%" height={130}>
+              <BarChart
+                layout="vertical"
+                data={medidasPorNeumaticos}
+                barSize={16}
+                margin={{ top: 0, right: 58, bottom: 0, left: 0 }}
+              >
+                <XAxis
+                  type="number"
+                  tick={{ fontSize: 10, fill: theme.palette.text.secondary as string }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <YAxis
+                  type="category"
+                  dataKey="medida"
+                  width={104}
+                  tick={{ fontSize: 11, fill: theme.palette.text.primary as string, fontWeight: 600, fontFamily: 'monospace' }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <Tooltip content={<MedidasTooltip />} cursor={{ fill: 'rgba(0,0,0,0.04)' }} />
+                <Bar dataKey="disponibles" name="Disponibles" stackId="a" fill={COLOR_DISP} radius={[3, 0, 0, 3]} />
+                <Bar dataKey="asignados" name="Asignados" stackId="a" fill={COLOR_ASIG} radius={[0, 0, 0, 0]} />
+                <Bar dataKey="baja" name="Bajas" stackId="a" fill={COLOR_BAJ} radius={[0, 3, 3, 0]}>
+                  <LabelList content={<TotalLabel />} />
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </>
+        )
+      }
     </div>
   );
 }

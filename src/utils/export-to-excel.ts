@@ -4,7 +4,8 @@ import XLSXStyle from 'xlsx-js-style';
 interface ExportExcelParams {
   data: ListPadronMapped
   username: string,
-  title?: string
+  title?: string,
+  fileName?: string
 }
 
 const thinBorder = {
@@ -14,7 +15,7 @@ const thinBorder = {
   right: { style: 'thin', color: { rgb: 'BBBBBB' } },
 };
 
-export const exportToExcel = ({ data, username, title = 'Default title' }: ExportExcelParams) => {
+export const exportToExcel = ({ data, username, title = 'Default title', fileName = 'GESNEU_PADRON-NEUMATICOS' }: ExportExcelParams) => {
   const wb = XLSXStyle.utils.book_new();
   const ws: XLSXStyle.WorkSheet = {};
 
@@ -80,5 +81,5 @@ export const exportToExcel = ({ data, username, title = 'Default title' }: Expor
   ws['!freeze'] = { xSplit: 0, ySplit: 2, topLeftCell: 'A3', state: 'frozen' };
 
   XLSXStyle.utils.book_append_sheet(wb, ws, 'Padrón');
-  XLSXStyle.writeFile(wb, `GESNEU_PADRON-NEUMATICOS_${username.trim()}.xlsx`);
+  XLSXStyle.writeFile(wb, `${fileName}_${username.trim()}.xlsx`);
 };

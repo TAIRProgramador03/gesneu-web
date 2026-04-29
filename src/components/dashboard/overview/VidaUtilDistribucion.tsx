@@ -14,6 +14,7 @@ import {
 } from 'recharts';
 import { useQuery } from '@tanstack/react-query';
 import { obtenerCantidadNeumaticosVidaUtil } from '@/api/Neumaticos';
+import { BadgeCheck } from 'lucide-react';
 
 function VidaTooltip({ active, payload, total }: any) {
 
@@ -83,7 +84,12 @@ function TopLabel({ x, y, width, value, index, total, items }: any) {
 export const VidaUtilDistribucion = (): React.JSX.Element => {
   const theme = useTheme();
 
-  const { data } = useQuery({
+  const { data = {
+    NEUMATICOS_CRITICO: 0,
+    NEUMATICOS_REGULAR: 0,
+    NEUMATICOS_BUENO: 0,
+    NEUMATICOS_TOTALES: 0
+  } } = useQuery({
     queryKey: ['vida-util-neumaticos'],
     queryFn: () => obtenerCantidadNeumaticosVidaUtil()
   })
@@ -96,52 +102,68 @@ export const VidaUtilDistribucion = (): React.JSX.Element => {
 
   return (
     <div style={{ padding: '20px' }}>
-      <ResponsiveContainer width="100%" height={230}>
-        <BarChart
-          data={MOCK_VIDA_UTIL}
-          barSize={80}
-          margin={{ top: 40, right: 12, bottom: 0, left: -24 }}
-        >
-          <XAxis
-            dataKey="rango"
-            tick={{ fontSize: 12, fill: theme.palette.text.secondary as string, fontWeight: 600 }}
-            axisLine={{ stroke: theme.palette.divider }}
-            tickLine={false}
-          />
-          <YAxis
-            tick={{ fontSize: 11, fill: theme.palette.text.secondary as string }}
-            axisLine={false}
-            tickLine={false}
-          />
-          <Tooltip content={<VidaTooltip total={data?.NEUMATICOS_TOTALES ?? 0} />} cursor={{ fill: 'rgba(0,0,0,0.04)', radius: 6 } as any} />
-          <Bar dataKey="cantidad" radius={[6, 6, 0, 0]}>
-            {MOCK_VIDA_UTIL.map((entry) => (
-              <Cell key={entry.rango} fill={entry.color} fillOpacity={0.82} />
-            ))}
-            <LabelList dataKey="cantidad" content={<TopLabel total={data?.NEUMATICOS_TOTALES ?? 0} items={MOCK_VIDA_UTIL} />} />
-          </Bar>
-        </BarChart>
-      </ResponsiveContainer>
 
-      {/* Badges de rango */}
-      <div style={{ display: 'flex', justifyContent: 'space-around', marginTop: 14 }}>
-        {MOCK_VIDA_UTIL.map((item) => (
-          <div key={item.rango} style={{ textAlign: 'center' }}>
-            <span style={{
-              display: 'inline-block',
-              fontSize: 11,
-              fontWeight: 600,
-              color: item.color,
-              background: `${item.color}18`,
-              border: `1px solid ${item.color}50`,
-              borderRadius: 20,
-              padding: '2px 10px',
-            }}>
-              {item.desc}
-            </span>
+      {
+        data?.NEUMATICOS_TOTALES === 0 && (
+          <div className='flex gap-1 flex-wrap justify-center items-center bg-orange-50 text-orange-700 border-2 border-orange-700 p-2 rounded-lg'>
+            <BadgeCheck width={12} />
+            <span className='italic text-xs'>Almacén Vacío.</span>
           </div>
-        ))}
-      </div>
+        )
+      }
+
+      {
+        data?.NEUMATICOS_TOTALES >= 1 && (
+          <>
+            <ResponsiveContainer width="100%" height={230}>
+              <BarChart
+                data={MOCK_VIDA_UTIL}
+                barSize={80}
+                margin={{ top: 40, right: 12, bottom: 0, left: -24 }}
+              >
+                <XAxis
+                  dataKey="rango"
+                  tick={{ fontSize: 12, fill: theme.palette.text.secondary as string, fontWeight: 600 }}
+                  axisLine={{ stroke: theme.palette.divider }}
+                  tickLine={false}
+                />
+                <YAxis
+                  tick={{ fontSize: 11, fill: theme.palette.text.secondary as string }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <Tooltip content={<VidaTooltip total={data?.NEUMATICOS_TOTALES ?? 0} />} cursor={{ fill: 'rgba(0,0,0,0.04)', radius: 6 } as any} />
+                <Bar dataKey="cantidad" radius={[6, 6, 0, 0]}>
+                  {MOCK_VIDA_UTIL.map((entry) => (
+                    <Cell key={entry.rango} fill={entry.color} fillOpacity={0.82} />
+                  ))}
+                  <LabelList dataKey="cantidad" content={<TopLabel total={data?.NEUMATICOS_TOTALES ?? 0} items={MOCK_VIDA_UTIL} />} />
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+
+            {/* Badges de rango */}
+            <div style={{ display: 'flex', justifyContent: 'space-around', marginTop: 14 }}>
+              {MOCK_VIDA_UTIL.map((item) => (
+                <div key={item.rango} style={{ textAlign: 'center' }}>
+                  <span style={{
+                    display: 'inline-block',
+                    fontSize: 11,
+                    fontWeight: 600,
+                    color: item.color,
+                    background: `${item.color}18`,
+                    border: `1px solid ${item.color}50`,
+                    borderRadius: 20,
+                    padding: '2px 10px',
+                  }}>
+                    {item.desc}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </>
+        )
+      }
     </div>
   );
 }

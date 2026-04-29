@@ -85,7 +85,7 @@ function DesgasteTooltip({ active, payload }: any) {
   );
 }
 
-export function DesgasteVehiculos(): React.JSX.Element {
+export const DesgasteVehiculos = (): React.JSX.Element => {
   const theme = useTheme();
 
   // eslint-disable-next-line react/no-unstable-nested-components

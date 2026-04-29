@@ -32,7 +32,8 @@ interface DataTableProps<TData, TValue> {
   filters?: boolean,
   isLoading?: boolean,
   exportConfig?: {
-    title?: string
+    title?: string,
+    fileName?: string
     username?: string
   }
   withExport?: boolean
@@ -112,6 +113,7 @@ export function DataTableNeumaticos<TData, TValue>({
     exportToExcel({
       data: exportData as any,
       username: exportConfig?.username ?? '',
+      fileName: exportConfig?.fileName,
       title: exportConfig?.title ?? 'Exportar',
     })
   }

@@ -6,6 +6,7 @@ import {
   Gauge, PackageCheck, Truck, CircleDollarSign,
   XCircle, RefreshCcw, PieChart, BarChart2,
   AlertTriangle, Clock, Award, Ruler, TrendingUp, Activity,
+  Component,
 } from 'lucide-react';
 
 import { useNeuStats } from '@/hooks/use-neu-stats';
@@ -20,6 +21,8 @@ import { MarcasDonut } from '@/components/dashboard/overview/MarcasDonut';
 import { MedidasChart } from '@/components/dashboard/overview/MedidasChart';
 import { DesgasteVehiculos } from '@/components/dashboard/overview/DesgasteVehiculos';
 import { ActividadReciente } from '@/components/dashboard/overview/ActividadReciente';
+import { DisenosDonut } from '@/components/dashboard/overview/DisenosDonut';
+import { DesgasteNeumaticos } from '@/components/dashboard/overview/DesgasteNeumaticos';
 
 export default function Page(): React.JSX.Element {
   const { allQtyNeu, avaibleQtyNeu, assignedQtyNeu, dropQtyNeu, recoverQtyNeu, assignedCostNeu, isLoading } = useNeuStats();
@@ -27,7 +30,7 @@ export default function Page(): React.JSX.Element {
   return (
     <Grid container spacing={3} alignItems="flex-start">
       {/* Fila 1 — KPIs (4 por fila en desktop, 2 en tablet/móvil) */}
-      <Grid lg={3} sm={6} xs={6}>
+      <Grid lg={3} sm={6} xs={12}>
         <KpiCard
           label="Total Neumáticos"
           value={allQtyNeu.data ?? 0}
@@ -38,7 +41,7 @@ export default function Page(): React.JSX.Element {
           sx={{ height: '100%' }}
         />
       </Grid>
-      <Grid lg={3} sm={6} xs={6}>
+      <Grid lg={3} sm={6} xs={12}>
         <KpiCard
           label="Disponibles"
           value={avaibleQtyNeu.data ?? 0}
@@ -49,7 +52,7 @@ export default function Page(): React.JSX.Element {
           sx={{ height: '100%' }}
         />
       </Grid>
-      <Grid lg={3} sm={6} xs={6}>
+      <Grid lg={3} sm={6} xs={12}>
         <KpiCard
           label="Asignados"
           value={Number(assignedQtyNeu.data ?? 0)}
@@ -60,7 +63,7 @@ export default function Page(): React.JSX.Element {
           sx={{ height: '100%' }}
         />
       </Grid>
-      <Grid lg={3} sm={6} xs={6}>
+      <Grid lg={3} sm={6} xs={12}>
         <KpiCard
           label="Costo Asignado"
           value={assignedCostNeu.data ?? 0}
@@ -72,7 +75,7 @@ export default function Page(): React.JSX.Element {
           sx={{ height: '100%' }}
         />
       </Grid>
-      <Grid lg={6} sm={6} xs={6}>
+      <Grid lg={6} sm={6} xs={12}>
         <KpiCard
           label="Baja Definitiva"
           value={dropQtyNeu.data ?? 0}
@@ -83,7 +86,7 @@ export default function Page(): React.JSX.Element {
           sx={{ height: '100%' }}
         />
       </Grid>
-      <Grid lg={6} sm={6} xs={6}>
+      <Grid lg={6} sm={6} xs={12}>
         <KpiCard
           label="Recuperados"
           value={recoverQtyNeu.data ?? 0}
@@ -143,13 +146,13 @@ export default function Page(): React.JSX.Element {
       <Grid lg={4} md={5} xs={12}>
         <CollapsibleCard
           loading={isLoading}
-          title="Próximos a Vencer"
-          subtitle="Por días estimados restantes"
-          icon={<Clock size={16} />}
-          iconColor="#F59E0B"
+          title="Distribución por Diseño"
+          subtitle="Composición del taller"
+          icon={<Component size={16} />}
+          iconColor="#5caef6"
           sx={{ height: '100%' }}
         >
-          <ProximosVencer />
+          <DisenosDonut />
         </CollapsibleCard>
       </Grid>
 
@@ -183,13 +186,13 @@ export default function Page(): React.JSX.Element {
       <Grid lg={7} md={7} xs={12}>
         <CollapsibleCard
           loading={isLoading}
-          title="Tasa de Desgaste por Vehículo"
+          title="Tasa de Desgaste por Neumático"
           subtitle="mm desgastados por cada 1,000 km"
           icon={<TrendingUp size={16} />}
           iconColor="#EF4444"
           sx={{ height: '100%' }}
         >
-          <DesgasteVehiculos />
+          <DesgasteNeumaticos />
         </CollapsibleCard>
       </Grid>
       <Grid lg={5} md={5} xs={12}>
@@ -206,9 +209,9 @@ export default function Page(): React.JSX.Element {
       </Grid>
 
       {/* Fila 6 — Inspecciones por vehículo */}
-      {/* <Grid lg={12} xs={12}>
+      <Grid lg={12} xs={12}>
         <Sales sx={{ height: '100%' }} />
-      </Grid> */}
+      </Grid>
     </Grid>
   );
 }

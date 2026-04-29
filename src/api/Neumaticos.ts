@@ -3,6 +3,7 @@ import { NeumaticoFetch } from "@/components/dashboard/padron/modal-reubicar-neu
 import { InspeccionTable } from "@/types/inspecciones";
 import { Neumatico } from "@/types/types";
 import axios, { AxiosError } from "axios";
+import { MultiValue } from "react-select";
 
 export const obtenerHistorialMovimientosPorCodigo = async (codigo: string) => {
   try {
@@ -550,6 +551,23 @@ export const obtenerCantidadPorMarca = async () => {
   }
 }
 
+export interface DisenoNeumaticoCantidad {
+  DISENO_NEUMATICO: string
+  CANTIDAD_NEUMATICOS: number
+}
+
+export const obtenerCantidadPorDiseno = async () => {
+  try {
+    const response = await axios.get<DisenoNeumaticoCantidad[]>(`/api/po-neumaticos/cantidad-por-diseno`, {
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error en obtenerCantidadPorDiseno:', error);
+    throw error;
+  }
+}
+
 export interface MedidaNeumaticoCantidad {
   MEDIDA_NEUMATICO: string
   MEDIDA_DISPONIBLE: number
@@ -566,6 +584,66 @@ export const obtenerCantidadPorMedida = async () => {
     return response.data;
   } catch (error) {
     console.error('Error en obtenerCantidadPorMedida:', error);
+    throw error;
+  }
+}
+
+
+export interface DesgasteNeumatico {
+  ID_NEUMATICO: number
+  CODIGO_NEUMATICO: string
+  MARCA_NEUMATICO: string
+  PLACA_VEHICULO: string
+  POSICION_NEUMATICO: string
+  KM_TOTAL_VIDA_NEUMATICO: number
+  REMANENTE_INCIAL: number
+  REMANENTE_MONTADO: number
+  REMANENTE_ACTUAL: number
+  DESGASTE_POR_1000KM: number
+  COSTO_POR_KM: number,
+  COSTO_NEUMATICO: number
+  KM_POR_REMAMENTE: number
+}
+
+export const obtenerDesgastePorMilKms = async (values: MultiValue<{
+  value: number;
+  label: string;
+}>) => {
+
+  const valuesToSend = values.length >= 1 ? values.map((value) => value.value) : []
+
+  console.log({ valuesToSend })
+
+
+  try {
+    const response = await axios.post<DesgasteNeumatico[]>(
+      `/api/po-neumaticos/desgaste-por-mil-kms`,
+      { valuesToSend },
+      {
+        withCredentials: true,
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error en obtenerDesgastePorMilKms:', error);
+    throw error;
+  }
+}
+
+interface CodigoNeumatico {
+  ID_NEUMATICO: number,
+  CODIGO_NEUMATICO: string
+  DESGASTE_POR_1000KM: number
+}
+
+export const obtenerCodigosNeumaticosDesgastadosPorMilKms = async (): Promise<CodigoNeumatico[]> => {
+  try {
+    const response = await axios.get<CodigoNeumatico[]>(`/api/po-neumaticos/codigo-neumaticos-desgaste-por-mil-kms`, {
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error en obtenerCodigosNeumaticosDesgastadosPorMilKms:', error);
     throw error;
   }
 }

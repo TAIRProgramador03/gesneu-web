@@ -4,30 +4,30 @@ import * as React from 'react';
 import { useTheme } from '@mui/material/styles';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 import { useQuery } from '@tanstack/react-query';
-import { obtenerCantidadPorMarca } from '@/api/Neumaticos';
+import { obtenerCantidadPorDiseno } from '@/api/Neumaticos';
 import { BadgeCheck } from 'lucide-react';
 
 const VIBRANT_COLORS = [
+  '#4f46e5',
+  '#65a30d',
+  '#ea580c',
+  '#0d9488',
+  '#d946ef',
+  '#dc2626',
   '#0891b2',
+  '#ec4899',
   '#16a34a',
   '#d97706',
-  '#0d9488',
-  '#65a30d',
-  '#dc2626',
-  '#0284c7',
   '#059669',
-  '#ea580c',
-  '#4f46e5',
-  '#ec4899',
   '#a855f7',
   '#ca8a04',
+  '#0284c7',
   '#2563eb',
   '#e11d48',
   '#7c3aed',
-  '#d946ef',
 ];
 
-function MarcasTooltip({ active, payload, total }: any) {
+function DisenosTooltip({ active, payload, total }: any) {
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
 
@@ -55,17 +55,17 @@ function MarcasTooltip({ active, payload, total }: any) {
   );
 }
 
-export const MarcasDonut = (): React.JSX.Element => {
+export const DisenosDonut = (): React.JSX.Element => {
   const theme = useTheme();
 
   const { data = [] } = useQuery({
-    queryKey: ['cantidad-de-neumaticos-por-marca'],
-    queryFn: obtenerCantidadPorMarca
+    queryKey: ['cantidad-de-neumaticos-por-diseno'],
+    queryFn: obtenerCantidadPorDiseno
   })
 
   const cantidadesPorMarca = data.map((neu, index) => {
     return {
-      name: neu.MARCA_NEUMATICO,
+      name: neu.DISENO_NEUMATICO,
       value: neu.CANTIDAD_NEUMATICOS,
       color: VIBRANT_COLORS[index % VIBRANT_COLORS.length]
     }
@@ -78,7 +78,7 @@ export const MarcasDonut = (): React.JSX.Element => {
 
       {
         total === 0 && (
-          <div className='flex gap-1 flex-wrap justify-center items-center bg-indigo-50 text-indigo-700 border-2 border-indigo-700 p-2 rounded-lg'>
+          <div className='flex gap-1 flex-wrap justify-center items-center bg-cyan-50 text-cyan-700 border-2 border-cyan-700 p-2 rounded-lg'>
             <BadgeCheck width={12} />
             <span className='italic text-xs'>Almacén Vacío.</span>
           </div>
@@ -108,7 +108,7 @@ export const MarcasDonut = (): React.JSX.Element => {
                       <Cell key={entry.name} fill={entry.color} />
                     ))}
                   </Pie>
-                  <Tooltip content={<MarcasTooltip total={total} />} wrapperStyle={{ zIndex: 100 }} />
+                  <Tooltip content={<DisenosTooltip total={total} />} wrapperStyle={{ zIndex: 100 }} />
                 </PieChart>
               </ResponsiveContainer>
 
@@ -124,7 +124,7 @@ export const MarcasDonut = (): React.JSX.Element => {
                   {cantidadesPorMarca.length}
                 </div>
                 <div style={{ fontSize: 10, color: theme.palette.text.secondary, marginTop: 4, letterSpacing: '0.06em' }}>
-                  MARCAS
+                  DISEÑOS
                 </div>
               </div>
             </div>
