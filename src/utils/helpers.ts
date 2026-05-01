@@ -4,6 +4,12 @@ export function vidaColor(pct: number) {
   return "text-green-500"
 }
 
+export function borderColor(pct: number) {
+  if (pct < 39) return "border-red-500"
+  if (pct < 79) return "border-yellow-500"
+  return "border-green-500"
+}
+
 export function vidaBgBar(pct: number) {
   if (pct < 39) return "bg-red-500"
   if (pct < 79) return "bg-yellow-500"

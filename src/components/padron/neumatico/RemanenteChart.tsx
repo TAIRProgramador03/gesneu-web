@@ -7,6 +7,7 @@ import { BarChart3 } from 'lucide-react';
 import { AreaChart, CartesianGrid, ResponsiveContainer, XAxis, YAxis, Tooltip as RechartsTooltip, ReferenceLine, Area } from 'recharts';
 
 interface ChartDataPoint {
+  id: number
   fecha: string
   remanente: number
   tipo: string
@@ -29,22 +30,17 @@ export const RemanenteChart = ({ historial, neu }: { historial: MovimientoHistor
 
   const chartData = useMemo<ChartDataPoint[]>(() => {
     return [...historial]
-      .filter((m) => m.REMANENTE_MEDIDO_MM !== null && m.REMANENTE_MEDIDO_MM > 0 && (m.FECHA_INSPECCION || m.FECHA_REGISTRO_MOVIMIENTO))
-      .reverse()
       .map((m) => {
-        const raw = m.FECHA_ASIGNACION_A_PLACA || m.FECHA_INSPECCION || m.FECHA_REGISTRO_MOVIMIENTO
+        const raw = m.FECHA_MOVIMIENTO
         return {
+          id: m.ID_MOVIMIENTO,
           fecha: convertToDateHuman(raw),
           remanente: m.REMANENTE_MEDIDO_MM,
-          tipo: m.ACCION_REALIZADA,
-          label: `${convertToDateHuman(raw)} — ${m.ACCION_REALIZADA}`,
+          tipo: `${m.ACCION_REALIZADA.charAt(0).toUpperCase()}${m.ACCION_REALIZADA.slice(1).toLowerCase()}`,
+          label: `${convertToDateHuman(raw)}`,
         }
       })
   }, [historial])
-
-
-  console.log({ chartData })
-
 
   if (chartData.length < 2) return null
 
@@ -56,7 +52,7 @@ export const RemanenteChart = ({ historial, neu }: { historial: MovimientoHistor
   const fillColor = pct >= 60 ? "#14b8a6" : pct >= 30 ? "#eab308" : "#ef4444"
 
   return (
-    <CollapsibleSection title="Evolución del Remanente" icon={<BarChart3 className="size-4" />}>
+    <CollapsibleSection title="Evolución del Remanente" icon={<BarChart3 className="size-4" />} border='border-sky-500' >
       <div className="h-70 w-full">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={chartData} margin={{ top: 8, right: 8, bottom: 0, left: -16 }}>
@@ -68,7 +64,8 @@ export const RemanenteChart = ({ historial, neu }: { historial: MovimientoHistor
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
             <XAxis
-              dataKey="fecha"
+              dataKey="id"
+              tickFormatter={(id) => chartData.find((d) => d.id === id)?.fecha ?? String(id)}
               tick={{ fontSize: 10, fill: "#9ca3af" }}
               tickLine={false}
               axisLine={{ stroke: "#e5e7eb" }}
@@ -102,7 +99,7 @@ export const RemanenteChart = ({ historial, neu }: { historial: MovimientoHistor
                 strokeDasharray="4 4"
                 strokeWidth={1}
                 label={{
-                  value: `Original ${original} mm`,
+                  value: `Montado ${original} mm`,
                   position: "insideTopRight",
                   fontSize: 10,
                   fill: "#94a3b8",

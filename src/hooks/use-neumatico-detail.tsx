@@ -4,9 +4,11 @@ import { verificarNeumatico, obtenerHistorialMovimientosPorCodigo } from '@/api/
 import { useQueries } from '@tanstack/react-query'
 
 export interface MovimientoHistorial {
+  ID_MOVIMIENTO: number
   CODIGO_NEUMATICO: string
   PLACA_VEHICULO: string
   TALLER_ASIGNADO: string
+  ID_ACCION_REALIZADA: number
   ACCION_REALIZADA: string
   POSICION_ANTERIOR_EN_VEHICULO: string
   POSICION_NUEVA_EN_VEHICULO: string
@@ -17,9 +19,7 @@ export interface MovimientoHistorial {
   PORCENTAJE_VIDA_UTIL: number
   OBSERVACION: string
   USUARIO_REGISTRADOR: string
-  FECHA_ASIGNACION_A_PLACA: any
-  FECHA_INSPECCION: string
-  FECHA_MANTENIMIENTO: any
+  FECHA_MOVIMIENTO: string
   FECHA_REGISTRO_MOVIMIENTO: string
 }
 

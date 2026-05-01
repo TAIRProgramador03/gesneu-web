@@ -8,22 +8,27 @@ export const CollapsibleSection = ({
   defaultOpen = true,
   headerRight,
   children,
+  border = "border-grey-500",
+  bgHeader = "bg-white"
 }: {
   title: string
   icon: React.ReactNode
   defaultOpen?: boolean
   headerRight?: React.ReactNode
   children: React.ReactNode
+  border?: string
+  bgHeader?: string
 }) => {
   const [open, setOpen] = useState(defaultOpen)
 
   return (
-    <div className="rounded-2xl bg-white shadow-sm border">
+    <div className={cn("rounded-2xl bg-white shadow-sm border-t-4", border)}>
       <button
         type="button"
         onClick={() => setOpen(!open)}
         className={cn(
-          "w-full flex items-center justify-between p-5 transition-colors",
+          "w-full flex items-center justify-between p-5 transition-colors rounded-tl-xl rounded-tr-xl bg-linear-to-r",
+          bgHeader,
           open ? "hover:bg-gray-50/50" : "hover:bg-gray-50/50 rounded-2xl"
         )}
       >

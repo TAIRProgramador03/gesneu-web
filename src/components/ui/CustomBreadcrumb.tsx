@@ -11,7 +11,7 @@ export const CustomBreadcrumb = ({ codigo }: { codigo: string }) => {
         </BreadcrumbItem>
         <BreadcrumbSeparator />
         <BreadcrumbItem>
-          <Link href={`/padron/neumatico/${codigo}`}>Neumático</Link>
+          <BreadcrumbPage>Neumático</BreadcrumbPage>
         </BreadcrumbItem>
         <BreadcrumbSeparator />
         <BreadcrumbItem>

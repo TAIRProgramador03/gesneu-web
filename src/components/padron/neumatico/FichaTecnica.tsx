@@ -54,13 +54,13 @@ export const FichaTecnica = ({ neu }: { neu: NeumaticoBuscado }) => {
     },
   ]
   return (
-    <CollapsibleSection title="Ficha Técnica" icon={<FileText className="size-4" />}>
-      <div className="space-y-6">
+    <CollapsibleSection title="Ficha Técnica" icon={<FileText className="size-4" />} border='border-sky-500'>
+      <div className="space-y-6 bg-linear-to-br from-sky-100 to-gray-100 p-4 rounded-2xl">
         {sections.map((section) => (
           <div key={section.title}>
             <div className="flex items-center gap-2 mb-3">
               <div className="h-px flex-1 bg-gray-100" />
-              <h3 className="text-[10px] font-bold uppercase tracking-widest text-gray-400 px-2">
+              <h3 className="text-[10px] font-bold uppercase tracking-widest text-gray-600 px-2">
                 {section.title}
               </h3>
               <div className="h-px flex-1 bg-gray-100" />

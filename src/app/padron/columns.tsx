@@ -66,21 +66,6 @@ export const columnsPadron: ColumnDef<PadronExcel>[] = [
     header: "Diseño",
   },
   {
-    accessorKey: "REMANENTE",
-    meta: { exportLabel: "Remanente" },
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Remanente
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      )
-    },
-  },
-  {
     accessorKey: "PR",
     meta: { exportLabel: "PR" },
     header: "PR",
@@ -199,7 +184,10 @@ export const columnsPadron: ColumnDef<PadronExcel>[] = [
   {
     accessorKey: "PLACA",
     meta: { exportLabel: "Placa" },
-    cell: ({ row }) => row.original.PLACA ?? '-',
+    cell: ({ row }) => {
+      if (!row.original.PLACA) return '-'
+      return <Link href={`/padron/placa/${row.original.PLACA}`}>{row.original.PLACA}</Link>
+    },
     header: ({ column }) => {
       return (
         <Button
@@ -207,6 +195,21 @@ export const columnsPadron: ColumnDef<PadronExcel>[] = [
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
           Placa
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
+  },
+  {
+    accessorKey: "REMANENTE",
+    meta: { exportLabel: "Remanente" },
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Remanente
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       )

@@ -71,7 +71,12 @@ export const exportToExcel = ({ data, username, title = 'Default title', fileNam
 
   const colWidths = headers.map((header) => {
     if (header === 'Proveedor') return { wch: 30 };
+    if (header === 'Fecha Movimiento') return { wch: 25 };
+    if (header === 'Movimiento') return { wch: 30 };
+    if (header === 'Taller') return { wch: 25 };
     if (header === 'Porcentaje de Vida (%)') return { wch: 25 };
+    if (header === 'Posición anterior') return { wch: 25 };
+    if (header === 'Nueva posición') return { wch: 25 };
     return { wch: 14 };
   });
 

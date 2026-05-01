@@ -1,14 +1,14 @@
 import { NeumaticoBuscado } from '@/api/Neumaticos';
 import { CollapsibleSection } from '@/components/ui/CollapsibleSection';
 import { MovimientoHistorial } from '@/hooks/use-neumatico-detail';
-import { Activity, Calendar, Clock, Route, TrendingDown, Zap } from 'lucide-react';
+import { Activity, Calendar, ChartCandlestick, CircleDollarSign, Clock, ParkingMeter, Route, TrendingDown, Zap } from 'lucide-react';
 import React, { useMemo } from 'react'
 import { SemiGauge } from './SemiGauge';
 import { MiniKpi } from './MiniKpi';
 import { cn } from '@/lib/utils';
 import { ComparisonBar } from './ComparisonBar';
 import { Sparkline } from './Sparkline';
-import { vidaColor } from '@/utils/helpers';
+import { borderColor, vidaBgGradient, vidaColor } from '@/utils/helpers';
 
 export const VidaUtilCard = ({ neu, historial }: { neu: NeumaticoBuscado; historial: MovimientoHistorial[] }) => {
 
@@ -16,9 +16,6 @@ export const VidaUtilCard = ({ neu, historial }: { neu: NeumaticoBuscado; histor
   const original = neu.REMANENTE_ORIGINAL ?? 0
   const montado = neu.REMANENTE_MONTADO ?? 0
   const actual = neu.REMANENTE_ACTUAL ?? 0
-
-  console.log({ historial })
-
 
   const stats = useMemo(() => {
 
@@ -30,15 +27,13 @@ export const VidaUtilCard = ({ neu, historial }: { neu: NeumaticoBuscado; histor
     let diasServicio = 0
     if (historial.length > 0) {
       const latest = Date.now()
-      const earliest = Date.parse(historial[historial.length - 1].FECHA_ASIGNACION_A_PLACA)
+      const earliest = Date.parse(historial[historial.length - 1].FECHA_MOVIMIENTO)
       diasServicio = Math.max(0, Math.round((latest - earliest) / (1000 * 60 * 60 * 24)))
     }
 
     const remanenteSeries = [...historial]
-      .filter((m) => m.REMANENTE_MEDIDO_MM !== null && m.REMANENTE_MEDIDO_MM > 0)
-      .reverse()
       .map((m) => m.REMANENTE_MEDIDO_MM)
-    const qtyInspecciones = [...historial].filter((m) => m.ACCION_REALIZADA === "INSPECCION RUTINARIA").length
+    const qtyInspecciones = [...historial].filter((m) => m.ID_ACCION_REALIZADA === 7).length
 
     const REMANENTE_MINIMO = 3
     const mmRestantes = Math.max(0, actual - REMANENTE_MINIMO)
@@ -49,14 +44,19 @@ export const VidaUtilCard = ({ neu, historial }: { neu: NeumaticoBuscado; histor
       ? new Date(Date.now() + diasRestantes * 24 * 60 * 60 * 1000)
       : null
 
+    const costoPorkM = kmTotal >= 1 ? neu.COSTO_NEUMATICO / kmTotal : 0
+    const costoPorMm = kmTotal >= 1 ? neu.COSTO_NEUMATICO / mmDesgastados : 0
+    const kmPorMm = kmTotal ? kmTotal / mmDesgastados : 0
+
     return {
       kmTotal, tasaDesgaste, diasServicio, remanenteSeries, mmDesgastados,
-      kmRestantes, diasRestantes, fechaEstimada, mmRestantes, REMANENTE_MINIMO, qtyInspecciones
+      kmRestantes, diasRestantes, fechaEstimada, mmRestantes, REMANENTE_MINIMO, qtyInspecciones,
+      costoPorkM, costoPorMm, kmPorMm
     }
   }, [historial, original, actual])
 
   return (
-    <CollapsibleSection title="Vida Útil" icon={<Activity className="size-4" />}>
+    <CollapsibleSection title="Vida Útil" icon={<Activity className="size-4" />} border={borderColor(pct)} >
       <div className="space-y-5">
 
         {/* Semicircular gauge */}
@@ -89,6 +89,27 @@ export const VidaUtilCard = ({ neu, historial }: { neu: NeumaticoBuscado; histor
             value={stats.diasServicio > 0 ? `${stats.diasServicio}` : "—"}
             sub={stats.diasServicio > 0 ? `≈ ${Math.round(stats.diasServicio / 30)} meses` : "sin datos"}
             color="bg-indigo-50 text-indigo-600"
+          />
+          <MiniKpi
+            icon={<CircleDollarSign className="size-3.5" />}
+            label="Costo * Km."
+            value={stats.costoPorkM > 0 ? `${stats.costoPorkM.toFixed(5)}` : "—"}
+            sub={stats.costoPorkM > 0 ? `$${neu.COSTO_NEUMATICO} / ${stats.kmTotal}km.` : "sin datos"}
+            color="bg-pink-50 text-pink-600"
+          />
+          <MiniKpi
+            icon={<ChartCandlestick className="size-3.5" />}
+            label="Costo * mm"
+            value={stats.costoPorMm > 0 ? `${stats.costoPorMm.toFixed(5)}` : "—"}
+            sub={stats.costoPorMm > 0 ? `$${neu.COSTO_NEUMATICO} / ${stats.mmDesgastados}mm` : "sin datos"}
+            color="bg-purple-50 text-purple-600"
+          />
+          <MiniKpi
+            icon={<ParkingMeter className="size-3.5" />}
+            label="Km. * mm"
+            value={stats.kmPorMm > 0 ? `${stats.kmPorMm.toFixed(2)}` : "—"}
+            sub={stats.kmPorMm > 0 ? `${stats.kmTotal}km. / ${stats.mmDesgastados}mm` : "sin datos"}
+            color="bg-orange-50 text-orange-600"
           />
         </div>
 
