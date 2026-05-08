@@ -21,6 +21,7 @@ import { MarcasDonut } from '@/components/dashboard/overview/MarcasDonut';
 import { MedidasChart } from '@/components/dashboard/overview/MedidasChart';
 import { DisenosDonut } from '@/components/dashboard/overview/DisenosDonut';
 import { DesgasteNeumaticos } from '@/components/dashboard/overview/DesgasteNeumaticos';
+import { PlacasSinNeumaticosCard } from '@/components/dashboard/overview/PlacasSinNeumaticosCard';
 
 export default function Page(): React.JSX.Element {
   const { allQtyNeu, avaibleQtyNeu, assignedQtyNeu, dropQtyNeu, recoverQtyNeu, assignedCostNeu, isLoading } = useNeuStats();
@@ -68,12 +69,12 @@ export default function Page(): React.JSX.Element {
           icon={<CircleDollarSign size={22} />}
           color="amber"
           format="currency"
-          description="Valor de neumáticos activos"
+          description="Valor de neumáticos asignados"
           loading={isLoading}
           sx={{ height: '100%' }}
         />
       </Grid>
-      <Grid lg={6} sm={6} xs={12}>
+      <Grid lg={4} sm={6} xs={12}>
         <KpiCard
           label="Baja Definitiva"
           value={dropQtyNeu.data ?? 0}
@@ -84,7 +85,7 @@ export default function Page(): React.JSX.Element {
           sx={{ height: '100%' }}
         />
       </Grid>
-      <Grid lg={6} sm={6} xs={12}>
+      <Grid lg={4} sm={6} xs={12}>
         <KpiCard
           label="Recuperados"
           value={recoverQtyNeu.data ?? 0}
@@ -94,6 +95,9 @@ export default function Page(): React.JSX.Element {
           loading={isLoading}
           sx={{ height: '100%' }}
         />
+      </Grid>
+      <Grid lg={4} sm={6} xs={12}>
+        <PlacasSinNeumaticosCard sx={{ height: '100%' }} />
       </Grid>
 
       {/* Fila 2 — Distribución de flota */}

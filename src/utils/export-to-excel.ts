@@ -77,6 +77,7 @@ export const exportToExcel = ({ data, username, title = 'Default title', fileNam
     if (header === 'Porcentaje de Vida (%)') return { wch: 25 };
     if (header === 'Posición anterior') return { wch: 25 };
     if (header === 'Nueva posición') return { wch: 25 };
+    if (header === 'Cantidad de Neumáticos') return { wch: 80 };
     return { wch: 14 };
   });
 

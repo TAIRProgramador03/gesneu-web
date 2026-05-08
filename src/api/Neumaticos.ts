@@ -686,3 +686,20 @@ export const obtenerTodasLasMarcas = async () => {
     throw error;
   }
 }
+
+export interface PlacasConNeumaticos {
+  PLACA: string,
+  CANTIDAD_NEUMATICOS_INSTALADOS: number
+}
+
+export const obtenerPlacasConNeumaticos = async () => {
+  try {
+    const response = await axios.get<PlacasConNeumaticos[]>(`/api/po-neumaticos/neumaticos-por-vehiculo`, {
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error en obtenerPlacasConNeumaticos:', error);
+    throw error;
+  }
+}
