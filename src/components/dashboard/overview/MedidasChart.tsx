@@ -52,7 +52,7 @@ function MedidasTooltip({ active, payload, label }: any) {
 export const MedidasChart = (): React.JSX.Element => {
   const theme = useTheme();
 
-  const { data = [] } = useQuery({
+  const { data = [], isLoading } = useQuery({
     queryKey: ['cantidad-de-neumaticos-por-medida'],
     queryFn: obtenerCantidadPorMedida
   })
@@ -88,10 +88,12 @@ export const MedidasChart = (): React.JSX.Element => {
     );
   }
 
+  const chartHeight = Math.max(160, medidasPorNeumaticos.length * 50)
+
   return (
     <div style={{ padding: '20px' }}>
       {
-        TOTAL_FLOTA === 0 && (
+        TOTAL_FLOTA === 0 && !isLoading && (
           <div className='flex gap-1 flex-wrap justify-center items-center bg-indigo-50 text-blue-700 border-2 border-blue-700 p-2 rounded-lg'>
             <BadgeCheck width={12} />
             <span className='italic text-xs'>Almacén Vacío.</span>
@@ -111,7 +113,7 @@ export const MedidasChart = (): React.JSX.Element => {
               ))}
             </div>
 
-            <ResponsiveContainer width="100%" height={130}>
+            <ResponsiveContainer width="100%" height={chartHeight}>
               <BarChart
                 layout="vertical"
                 data={medidasPorNeumaticos}

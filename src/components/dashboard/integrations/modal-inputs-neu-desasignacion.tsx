@@ -19,9 +19,10 @@ interface ModalInputsNeuProps {
     esRecuperado?: boolean
     fechaRecuperado?: string | null
     fechaInspeccion: string
+    position?: string | null
 }
 
-const ModalInputsNeuDesasignacion: React.FC<ModalInputsNeuProps> = ({ open, onClose, onSubmit, initialRemanente = 0, initialOdometro = 0, initialPresionAire = 0, initialTorqueAplicado = 0, initialFechaAsignacion = '', fechaRegistroNeumatico, esRecuperado, fechaRecuperado = null, fechaInspeccion = '' }) => {
+const ModalInputsNeuDesasignacion: React.FC<ModalInputsNeuProps> = ({ open, onClose, onSubmit, initialRemanente = 0, initialOdometro = 0, initialPresionAire = 0, initialTorqueAplicado = 0, initialFechaAsignacion = '', fechaRegistroNeumatico, esRecuperado, fechaRecuperado = null, fechaInspeccion = '', position = null }) => {
 
     const [Odometro, setOdometro] = React.useState<number>(initialOdometro);
     const [Remanente, setRemanente] = React.useState<number>(initialRemanente);
@@ -106,9 +107,12 @@ const ModalInputsNeuDesasignacion: React.FC<ModalInputsNeuProps> = ({ open, onCl
             setPresionError(true);
             return;
         }
-        if (TorqueAplicado < 110 || TorqueAplicado > 150) {
-            setTorqueError(true);
-            return;
+
+        if (position !== 'RES01') {
+            if (TorqueAplicado < 110 || TorqueAplicado > 150) {
+                setTorqueError(true);
+                return;
+            }
         }
 
         const errorFecha = validarFechaAsignacion(fechaInspeccion);
@@ -208,35 +212,45 @@ const ModalInputsNeuDesasignacion: React.FC<ModalInputsNeuProps> = ({ open, onCl
                         />
                     </Stack>
                     <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-                        <TextField
-                            label="Torque"
-                            type="number"
-                            value={TorqueAplicado === 0 ? '' : TorqueAplicado}
-                            onChange={(e) => {
-                                const value = Number(e.target.value);
-                                setTorqueAplicado(value);
-                                if (value < 110 || value > 150) {
-                                    setTorqueError(true);
-                                } else {
-                                    setTorqueError(false);
-                                }
-                            }}
-                            fullWidth
-                            error={torqueError}
-                            helperText={torqueError ? 'Debe estar entre 110 y 150 Nm' : 'Recomendado: 110-150 Nm'}
-                            InputProps={{
-                                inputProps: { min: 110, max: 150 },
-                                sx: {
-                                    'input[type=number]::-webkit-outer-spin-button, input[type=number]::-webkit-inner-spin-button': {
-                                        WebkitAppearance: 'none',
-                                        margin: 0,
+                        <div className='flex flex-col w-100'>
+                            <TextField
+                                label="Torque"
+                                type="number"
+                                disabled={position === 'RES01'}
+                                value={TorqueAplicado === 0 ? '' : TorqueAplicado}
+                                onChange={(e) => {
+                                    const value = Number(e.target.value);
+                                    setTorqueAplicado(value);
+                                    if (value < 110 || value > 150) {
+                                        setTorqueError(true);
+                                    } else {
+                                        setTorqueError(false);
+                                    }
+                                }}
+                                fullWidth
+                                error={torqueError}
+                                helperText={torqueError ? 'Debe estar entre 110 y 150 Nm' : 'Recomendado: 110-150 Nm'}
+                                InputProps={{
+                                    inputProps: { min: 110, max: 150 },
+                                    sx: {
+                                        'input[type=number]::-webkit-outer-spin-button, input[type=number]::-webkit-inner-spin-button': {
+                                            WebkitAppearance: 'none',
+                                            margin: 0,
+                                        },
+                                        'input[type=number]': {
+                                            MozAppearance: 'textfield',
+                                        },
                                     },
-                                    'input[type=number]': {
-                                        MozAppearance: 'textfield',
-                                    },
-                                },
-                            }}
-                        />
+                                }}
+                            />
+                            {
+                                position === 'RES01' && (
+                                    <span className='text-amber-600 ml-3.5 font-normal italic text-xs mt-0.75'>
+                                        No se aplica torque al neumático de respuesto.
+                                    </span>
+                                )
+                            }
+                        </div>
                     </Stack>
 
                     {fechaError && (

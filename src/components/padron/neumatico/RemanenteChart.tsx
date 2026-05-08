@@ -48,8 +48,8 @@ export const RemanenteChart = ({ historial, neu }: { historial: MovimientoHistor
   const original = neu.REMANENTE_MONTADO ?? 0
   const maxY = Math.max(original, ...chartData.map((d) => d.remanente)) + 2
   const pct = neu.PORCENTAJE_VIDA ?? 0
-  const strokeColor = pct >= 60 ? "#14b8a6" : pct >= 30 ? "#eab308" : "#ef4444"
-  const fillColor = pct >= 60 ? "#14b8a6" : pct >= 30 ? "#eab308" : "#ef4444"
+  const strokeColor = pct < 39 ? "#ef4444" : pct < 79 ? "#eab308" : "#14b8a6"
+  const fillColor = pct < 39 ? "#ef4444" : pct < 79 ? "#eab308" : "#14b8a6"
 
   return (
     <CollapsibleSection title="Evolución del Remanente" icon={<BarChart3 className="size-4" />} border='border-sky-500' >

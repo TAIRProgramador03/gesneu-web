@@ -21,7 +21,7 @@ export const columnsNeuCriticos: ColumnDef<NeumaticoEnCritico>[] = [
         </Button>
       )
     },
-    cell: ({ row }) => <Link href={`/padron/neumatico/${row.original.CODIGO_NEUMATICO}`}>{row.original.CODIGO_NEUMATICO}</Link>
+    cell: ({ row }) => <Link href={`/padron/neumatico/${row.original.CODIGO_NEUMATICO}`} target="_blank">{row.original.CODIGO_NEUMATICO}</Link>
   },
   {
     accessorKey: "MARCA_NEUMATICO",
@@ -52,6 +52,7 @@ export const columnsNeuCriticos: ColumnDef<NeumaticoEnCritico>[] = [
     accessorKey: "PLACA_VEHICULO",
     meta: { exportLabel: "Placa" },
     header: "Placa",
+    cell: ({ row }) => <Link href={`/padron/placa/${row.original.PLACA_VEHICULO}`} target="_blank">{row.original.PLACA_VEHICULO}</Link>
   },
   {
     accessorKey: "REMANENTE_NEUMATICO",
@@ -82,6 +83,6 @@ export const columnsNeuCriticos: ColumnDef<NeumaticoEnCritico>[] = [
         </Button>
       )
     },
-    cell: ({ row }) => <LinearProgressItem estado={row.original.PORCENTAJE_VIDA ?? 0} />
+    cell: ({ row }) => <LinearProgressItem estado={row.original.PORCENTAJE_VIDA ?? 0} width="120px" />
   },
 ]

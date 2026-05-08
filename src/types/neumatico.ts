@@ -59,3 +59,20 @@ export interface NeumaticoPorAsignar {
   TorqueAplicado: number
   FechaAsignacion: string
 }
+
+export interface NeumaticoPorInspeccionar extends NeumaticoPorAsignar {
+  RemanenteReferencia: number
+  Medida: string
+}
+
+
+export interface NeumaticoReubicar {
+  CodigoNeumatico: string
+  PosicionOrigen: string
+  PosicionDestino: string
+  Marca: string
+  Medida: string
+  Remanente: number
+  TorqueAplicado: number
+  PresionAire: number
+}

@@ -272,6 +272,42 @@ const ModalInsertExcel: React.FC<ModalInsertExcelProps> = ({ open, onClose, onSu
                 {resultadoCarga.mensaje}
               </p>
             )}
+
+            {/* Muestra  */}
+
+            {resultadoCarga?.muestra && resultadoCarga.muestra.length > 0 && (
+              <div className="mt-3">
+                <p className="text-xs font-semibold text-center text-muted-foreground mb-2 uppercase tracking-wide">
+                  Códigos importados
+                </p>
+                <div className="flex items-center gap-1.5 flex-wrap mt-3">
+                  {resultadoCarga.muestra.length >= 4 ? (
+                    <>
+                      <span className="inline-flex items-center rounded-md bg-cyan-50 px-2.5 py-1 text-xs font-mono font-medium text-cyan-700 ring-1 ring-inset ring-cyan-200">
+                        {resultadoCarga.muestra[0]}
+                      </span>
+                      <span className="inline-flex items-center rounded-md bg-cyan-50 px-2.5 py-1 text-xs font-mono font-medium text-cyan-700 ring-1 ring-inset ring-cyan-200">
+                        {resultadoCarga.muestra[1]}
+                      </span>
+                      <span className="text-muted-foreground text-sm font-medium px-1">•••</span>
+                      <span className="inline-flex items-center rounded-md bg-cyan-50 px-2.5 py-1 text-xs font-mono font-medium text-cyan-700 ring-1 ring-inset ring-cyan-200">
+                        {resultadoCarga.muestra[resultadoCarga.muestra.length - 2]}
+                      </span>
+                      <span className="inline-flex items-center rounded-md bg-cyan-50 px-2.5 py-1 text-xs font-mono font-medium text-cyan-700 ring-1 ring-inset ring-cyan-200">
+                        {resultadoCarga.muestra[resultadoCarga.muestra.length - 1]}
+                      </span>
+                    </>
+                  ) : (
+                    resultadoCarga.muestra.map((codigo: string) => (
+                      <span key={codigo} className="inline-flex items-center rounded-md bg-cyan-50 px-2.5 py-1 text-xs font-mono font-medium text-cyan-700 ring-1 ring-inset ring-cyan-200">
+                        {codigo}
+                      </span>
+                    ))
+                  )}
+                </div>
+              </div>
+            )}
+
             {resultadoCarga?.errores && resultadoCarga.errores.length > 0 && (
               <>
                 <p style={{ marginTop: 18, fontWeight: 600, color: '#c62828' }}>Errores detectados:</p>

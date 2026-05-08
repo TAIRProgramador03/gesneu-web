@@ -17,24 +17,27 @@ export const ComparisonBar = ({ neu }: { neu: NeumaticoBuscado }) => {
 
   return (
     <div className="space-y-2.5">
-      {items.map((item) => (
-        <div key={item.label} className="flex items-center gap-3">
-          <span className="text-[10px] font-semibold uppercase tracking-wider text-gray-400 w-16 shrink-0 text-right">
-            {item.label}
-          </span>
-          <div className="flex-1 relative">
-            <div className="h-3 rounded-full bg-gray-100 overflow-hidden">
-              <div
-                className={cn("h-full rounded-full transition-all duration-700", item.barClass)}
-                style={{ width: `${Math.min(item.pct, 100)}%` }}
-              />
+      {items.map((item) => {
+        if (item.value === 0) return null
+        return ((
+          <div key={item.label} className="flex items-center gap-3">
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-gray-400 w-16 shrink-0 text-right">
+              {item.label}
+            </span>
+            <div className="flex-1 relative">
+              <div className="h-3 rounded-full bg-gray-100 overflow-hidden">
+                <div
+                  className={cn("h-full rounded-full transition-all duration-700", item.barClass)}
+                  style={{ width: `${Math.min(item.pct, 100)}%` }}
+                />
+              </div>
             </div>
+            <span className="text-xs font-bold text-gray-700 w-14 text-right tabular-nums">
+              {item.value} mm
+            </span>
           </div>
-          <span className="text-xs font-bold text-gray-700 w-14 text-right tabular-nums">
-            {item.value} mm
-          </span>
-        </div>
-      ))}
+        ))
+      })}
     </div>
   )
 }

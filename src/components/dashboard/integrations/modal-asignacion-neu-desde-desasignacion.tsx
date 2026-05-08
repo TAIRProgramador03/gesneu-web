@@ -305,6 +305,7 @@ const DropZone: React.FC<DropZoneProps> = memo(({
                 esRecuperado={assignedNeumaticos[position]?.RECUPERADO || false}
                 fechaRecuperado={assignedNeumaticos[position]?.FECHA_RECUPERADO || null}
                 fechaInspeccion={fechaInspeccion}
+                position={position}
             />
         </div>
     );
@@ -449,17 +450,6 @@ const ModalAsignacionNeuDesdeDesasignacion: React.FC<ModalAsignacionNeuDesdeDesa
             return;
         }
 
-        const fechasTemporales = Object.values(assignedNeumaticos)
-            .filter((neu): neu is Neumatico => neu !== null && (neu as any).TIPO_MOVIMIENTO === 'TEMPORAL')
-            .map((neu) => neu.FECHA_ASIGNACION ?? '');
-        const todasIguales = fechasTemporales.length === 0 || fechasTemporales.every((f) => f === fechasTemporales[0]);
-        if (!todasIguales) {
-            toast.info('Todos los neumáticos temporales deben tener la misma fecha de asignación.', {
-                duration: 6000
-            });
-            return;
-        }
-
 
         // Solo asignar a las posiciones que estaban vacías (nuevas asignaciones)
         const toAssign = posicionesVacias
@@ -482,10 +472,22 @@ const ModalAsignacionNeuDesdeDesasignacion: React.FC<ModalAsignacionNeuDesdeDesa
                     return;
                 }
                 if (campo !== 'FECHA_ASIGNACION' && typeof valor === 'number' && valor === 0) {
+                    if (pos === 'RES01' && campo === 'TORQUE_APLICADO') continue;
                     toast.error(`El campo "${campo}" no puede ser 0 en la posición ${pos}.`);
                     return;
                 }
             }
+        }
+
+        const fechasTemporales = Object.values(assignedNeumaticos)
+            .filter((neu): neu is Neumatico => neu !== null && (neu as any).TIPO_MOVIMIENTO === 'TEMPORAL')
+            .map((neu) => neu.FECHA_ASIGNACION ?? '');
+        const todasIguales = fechasTemporales.length === 0 || fechasTemporales.every((f) => f === fechasTemporales[0]);
+        if (!todasIguales) {
+            toast.info('Todos los neumáticos temporales deben tener la misma fecha de asignación.', {
+                duration: 6000
+            });
+            return;
         }
 
         try {

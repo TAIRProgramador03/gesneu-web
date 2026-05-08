@@ -12,7 +12,6 @@ import { obtenerCodigosNeumaticosDesgastadosPorMilKms, obtenerDesgastePorMilKms 
 import { Divider, Skeleton } from '@mui/material';
 import { BadgeCheck } from 'lucide-react';
 import SelectBetter, { MultiValue } from 'react-select'
-import Select from 'react-select/dist/declarations/src/Select';
 
 function getTasaColor(desgasteMilKms: number): string {
   if (desgasteMilKms > 2.5) return '#EF4444';
@@ -30,7 +29,7 @@ function DesgasteTooltip({ active, payload, fleetAvg }: any) {
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
   if (!active || !payload?.length) return null;
-  const { codNeumatico, desgasteMilKms, remanenteMontado, remanenteActual, costoPorKm, kmTotales, costo, marca, placa, posicion, kmRemanente } = payload[0].payload;
+  const { codNeumatico, desgasteMilKms, remanenteMontado, remanenteActual, costoPorKm, kmTotales, costo, marca, kmRemanente, medida, diseno, tipoBaja } = payload[0].payload;
   const color = getTasaColor(desgasteMilKms);
   const severity = desgasteMilKms > 2.5 ? 'Alto' : desgasteMilKms > 1.5 ? 'Moderado' : 'Normal';
 
@@ -47,7 +46,7 @@ function DesgasteTooltip({ active, payload, fleetAvg }: any) {
           {codNeumatico}
         </span>
         <span className='text-[10px] font-light'>
-          &nbsp; {marca} &middot; {placa} &middot; {posicion}
+          &nbsp; {marca} &middot; {diseno} &middot; {medida}
         </span>
       </div>
 
@@ -79,6 +78,10 @@ function DesgasteTooltip({ active, payload, fleetAvg }: any) {
         <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16 }}>
           <span style={{ fontSize: 12, color: isDark ? '#94a3b8' : '#64748b' }}>Km. * mm</span>
           <span style={{ fontSize: 12, fontWeight: 600, color: isDark ? '#f1f5f9' : '#1e293b' }}>{kmRemanente}</span>
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16 }}>
+          <span style={{ fontSize: 12, color: isDark ? '#94a3b8' : '#64748b' }}>Tipo de baja:</span>
+          <span style={{ fontSize: 12, fontWeight: 600, color: isDark ? '#f1f5f9' : '#1e293b' }}>{tipoBaja}</span>
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16 }}>
           <span style={{ fontSize: 12, color: isDark ? '#94a3b8' : '#64748b' }}>Desgaste</span>
@@ -163,9 +166,10 @@ export const DesgasteNeumaticos = (): React.JSX.Element => {
       kmTotales: n.KM_TOTAL_VIDA_NEUMATICO,
       costo: n.COSTO_NEUMATICO,
       marca: n.MARCA_NEUMATICO,
-      placa: n.PLACA_VEHICULO,
-      posicion: n.POSICION_NEUMATICO,
-      kmRemanente: n.KM_POR_REMAMENTE
+      medida: n.MEDIDA_NEUMATICO,
+      diseno: n.DISENO_NEUMATICO,
+      kmRemanente: n.KM_POR_REMAMENTE,
+      tipoBaja: n.TIPO_BAJA
     }))
 
     const alertCount = neumaticos.filter(d => d.desgasteMilKms > 2.0).length;
@@ -182,6 +186,8 @@ export const DesgasteNeumaticos = (): React.JSX.Element => {
   }>) => {
     setSelectedNeumaticos(e)
   }
+
+  const chartHeight = Math.max(240, desgasteNeumaticos.neumaticos.length * 36)
 
   return (
     <div style={{ padding: '16px 20px 0', display: 'flex', flexDirection: 'column' }}>
@@ -214,9 +220,6 @@ export const DesgasteNeumaticos = (): React.JSX.Element => {
                 isMulti
                 isSearchable
                 isDisabled={isLoading}
-                isOptionDisabled={(option) =>
-                  selectedNeumaticos.length >= 8
-                }
                 styles={{
                   multiValue: (base, state) => ({
                     ...base,
@@ -280,7 +283,7 @@ export const DesgasteNeumaticos = (): React.JSX.Element => {
 
             {/* Gráfico */}
             <div style={{ flex: 1 }}>
-              <ResponsiveContainer width="100%" height={240}>
+              <ResponsiveContainer width="100%" height={chartHeight}>
                 <BarChart
                   layout="vertical"
                   data={desgasteNeumaticos.neumaticos}

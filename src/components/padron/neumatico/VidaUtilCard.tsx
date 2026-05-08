@@ -8,7 +8,7 @@ import { MiniKpi } from './MiniKpi';
 import { cn } from '@/lib/utils';
 import { ComparisonBar } from './ComparisonBar';
 import { Sparkline } from './Sparkline';
-import { borderColor, vidaBgGradient, vidaColor } from '@/utils/helpers';
+import { borderColor, getDifferenceDays, vidaBgGradient, vidaColor } from '@/utils/helpers';
 
 export const VidaUtilCard = ({ neu, historial }: { neu: NeumaticoBuscado; historial: MovimientoHistorial[] }) => {
 
@@ -24,11 +24,37 @@ export const VidaUtilCard = ({ neu, historial }: { neu: NeumaticoBuscado; histor
     const mmDesgastados = montado - actual
     const tasaDesgaste = kmTotal > 0 ? (mmDesgastados / kmTotal) * 1000 : 0
 
-    let diasServicio = 0
-    if (historial.length > 0) {
-      const latest = Date.now()
-      const earliest = Date.parse(historial[historial.length - 1].FECHA_MOVIMIENTO)
-      diasServicio = Math.max(0, Math.round((latest - earliest) / (1000 * 60 * 60 * 24)))
+    let diasDeRecorrido = 0
+    let anteriorParada = ''
+    let anteriorBaja = ''
+    let restarUno = false
+    if (historial.length >= 1) {
+      historial.forEach((history, index) => {
+        // * Cuando es un montaje
+        if (history.ID_ACCION_REALIZADA === 2) {
+          if (anteriorBaja === history.FECHA_MOVIMIENTO) restarUno = true
+          else restarUno = false
+          anteriorParada = history.FECHA_MOVIMIENTO
+          return;
+        }
+        // * Cuando es una baja o recupero
+        if (history.ID_ACCION_REALIZADA === 6 || history.ID_ACCION_REALIZADA === 5) {
+          let resta = getDifferenceDays({ anterior: anteriorParada, actual: history.FECHA_MOVIMIENTO })
+          if (restarUno) resta = resta - 1
+          diasDeRecorrido = diasDeRecorrido + resta
+          anteriorBaja = history.FECHA_MOVIMIENTO
+          restarUno = false
+          return;
+        }
+        // * Cuando es una última inspección 
+        if (history.ID_ACCION_REALIZADA === 7 && index === historial.length - 1) {
+          let resta = getDifferenceDays({ anterior: anteriorParada, actual: history.FECHA_MOVIMIENTO })
+          if (restarUno) resta = resta - 1
+          diasDeRecorrido = diasDeRecorrido + resta
+          restarUno = false
+          return;
+        }
+      })
     }
 
     const remanenteSeries = [...historial]
@@ -38,7 +64,7 @@ export const VidaUtilCard = ({ neu, historial }: { neu: NeumaticoBuscado; histor
     const REMANENTE_MINIMO = 3
     const mmRestantes = Math.max(0, actual - REMANENTE_MINIMO)
     const kmRestantes = tasaDesgaste > 0 ? (mmRestantes / tasaDesgaste) * 1000 : null
-    const tasaDiaria = diasServicio > 0 ? mmDesgastados / diasServicio : 0
+    const tasaDiaria = diasDeRecorrido > 0 ? mmDesgastados / diasDeRecorrido : 0
     const diasRestantes = tasaDiaria > 0 ? Math.round(mmRestantes / tasaDiaria) : null
     const fechaEstimada = diasRestantes !== null
       ? new Date(Date.now() + diasRestantes * 24 * 60 * 60 * 1000)
@@ -48,8 +74,9 @@ export const VidaUtilCard = ({ neu, historial }: { neu: NeumaticoBuscado; histor
     const costoPorMm = kmTotal >= 1 ? neu.COSTO_NEUMATICO / mmDesgastados : 0
     const kmPorMm = kmTotal ? kmTotal / mmDesgastados : 0
 
+
     return {
-      kmTotal, tasaDesgaste, diasServicio, remanenteSeries, mmDesgastados,
+      kmTotal, tasaDesgaste, diasDeRecorrido, remanenteSeries, mmDesgastados,
       kmRestantes, diasRestantes, fechaEstimada, mmRestantes, REMANENTE_MINIMO, qtyInspecciones,
       costoPorkM, costoPorMm, kmPorMm
     }
@@ -85,9 +112,9 @@ export const VidaUtilCard = ({ neu, historial }: { neu: NeumaticoBuscado; histor
           />
           <MiniKpi
             icon={<Calendar className="size-3.5" />}
-            label="Días en servicio"
-            value={stats.diasServicio > 0 ? `${stats.diasServicio}` : "—"}
-            sub={stats.diasServicio > 0 ? `≈ ${Math.round(stats.diasServicio / 30)} meses` : "sin datos"}
+            label="Días en recorrido"
+            value={stats.diasDeRecorrido > 0 ? `${stats.diasDeRecorrido}` : "—"}
+            sub={stats.diasDeRecorrido > 0 ? `≈ ${Math.round(stats.diasDeRecorrido / 30)} meses` : "sin datos"}
             color="bg-indigo-50 text-indigo-600"
           />
           <MiniKpi
@@ -147,7 +174,7 @@ export const VidaUtilCard = ({ neu, historial }: { neu: NeumaticoBuscado; histor
               </div>
               <Sparkline
                 points={stats.remanenteSeries}
-                color={pct >= 60 ? "stop-teal-500" : pct >= 30 ? "stop-yellow-500" : "stop-red-500"}
+                color={pct < 39 ? "stop-red-500" : pct < 79 ? "stop-yellow-500" : "stop-green-500"}
               />
               <div className="flex items-center justify-between text-xs mt-2">
                 <span className="font-semibold text-gray-600">{stats.remanenteSeries[0]} mm</span>

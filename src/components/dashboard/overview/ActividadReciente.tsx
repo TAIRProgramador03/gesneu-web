@@ -151,7 +151,7 @@ export function ActividadReciente(): React.JSX.Element {
                 >
                   {/* Ícono / indicador */}
                   {item.esReciente ? (
-                    <span className="relative flex items-center justify-center flex-shrink-0" style={{ width: 22, height: 22 }}>
+                    <span className="relative flex items-center justify-center shrink-0" style={{ width: 22, height: 22 }}>
                       <span className="animate-ping absolute inline-flex rounded-full opacity-40" style={{ width: 14, height: 14, backgroundColor: config.color }} />
                       <span
                         className="relative inline-flex items-center justify-center rounded-full text-white font-bold"
@@ -162,7 +162,7 @@ export function ActividadReciente(): React.JSX.Element {
                     </span>
                   ) : (
                     <span
-                      className="inline-flex items-center justify-center rounded-full flex-shrink-0"
+                      className="inline-flex items-center justify-center rounded-full shrink-0"
                       style={{
                         width: 22, height: 22,
                         background: `${config.color}18`,
@@ -216,7 +216,7 @@ export function ActividadReciente(): React.JSX.Element {
       </div>
 
       {/* Footer */}
-      <Divider sx={{ mt: 1 }} />
+      {/* <Divider sx={{ mt: 1 }} />
       <div style={{ padding: '10px 0 12px', textAlign: 'center' }}>
         <button
           type="button"
@@ -242,7 +242,7 @@ export function ActividadReciente(): React.JSX.Element {
         >
           Ver historial completo →
         </button>
-      </div>
+      </div> */}
     </div>
   );
 }

@@ -10,11 +10,12 @@ import { ArrowBigRightDash, ArrowUpDown } from "lucide-react"
 import { DraggableNeumatico } from "@/components/dashboard/integrations/modal-asignacion-neu"
 import type { Neumatico } from "@/types/types"
 import { TipoMovimientoBadge } from "@/components/ui/TipoMovimientoBadge"
-import { NeuAsignadoTable, NeuAsignarTable, NeuDisponibleTable, NeuInspeccionTable, NeumaticoPorAsignar, NeuTemporalTable } from "@/types/neumatico"
+import { NeuAsignadoTable, NeuAsignarTable, NeuDisponibleTable, NeuInspeccionTable, NeumaticoPorAsignar, NeumaticoPorInspeccionar, NeumaticoReubicar, NeuTemporalTable } from "@/types/neumatico"
 import { InspeccionTable } from "@/types/inspecciones"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { TipoTerrenoBadge } from "@/components/ui/TipoTerrenoBadge"
 import { TipoRetenBadge } from "@/components/ui/TipoRetenBadge"
+import Link from "next/link"
 
 
 export const columnsNeuDisponible: ColumnDef<NeuDisponibleTable>[] = [
@@ -31,6 +32,7 @@ export const columnsNeuDisponible: ColumnDef<NeuDisponibleTable>[] = [
         </Button>
       )
     },
+    cell: ({ row }) => <Link href={`/padron/neumatico/${row.original.CODIGO}`} target="_blank">{row.original.CODIGO}</Link>
   },
   {
     accessorKey: "MARCA",
@@ -113,6 +115,7 @@ export const columnsNeuAsignado: ColumnDef<NeuAsignadoTable>[] = [
   {
     accessorKey: "CODIGO",
     header: "Código",
+    cell: ({ row }) => <Link href={`/padron/neumatico/${row.original.CODIGO}`} target="_blank">{row.original.CODIGO}</Link>
   },
   {
     accessorKey: "MARCA",
@@ -195,6 +198,7 @@ export const columnsNeuParaAsignar: ColumnDef<NeuAsignarTable>[] = [
         </Button>
       )
     },
+    cell: ({ row }) => <Link href={`/padron/neumatico/${row.original.CODIGO}`} target="_blank">{row.original.CODIGO}</Link>
   },
   {
     accessorKey: "MARCA",
@@ -285,6 +289,7 @@ export const columnsNeuParaAsignarDesdeDesasignar: ColumnDef<NeuAsignarTable>[] 
         </Button>
       )
     },
+    cell: ({ row }) => <Link href={`/padron/neumatico/${row.original.CODIGO}`} target="_blank">{row.original.CODIGO}</Link>
   },
   {
     accessorKey: "MARCA",
@@ -587,4 +592,127 @@ export const columnsNeuPorAsignar: ColumnDef<NeumaticoPorAsignar>[] = [
     cell: ({ row }) => convertToDateHuman(row.original.FechaAsignacion)
   },
 
+]
+
+export const columnsNeuPorInspeccionar: ColumnDef<NeumaticoPorInspeccionar>[] = [
+  {
+    accessorKey: "Posicion",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Posición
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
+  },
+  {
+    accessorKey: "CodigoNeumatico",
+    header: "Código",
+    cell: ({ row }) => <Link href={`/padron/neumatico/${row.original.CodigoNeumatico}`} target="_blank">{row.original.CodigoNeumatico}</Link>
+  },
+  {
+    accessorKey: "Marca",
+    header: "Marca",
+  },
+  {
+    accessorKey: "Medida",
+    header: "Medida",
+  },
+  {
+    accessorKey: "Remanente",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Remanente inspección (ahora)
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
+  },
+  {
+    accessorKey: "RemanenteReferencia",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Remanente anterior
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
+  },
+  {
+    accessorKey: "PresionAire",
+    header: "Presión",
+  },
+  {
+    accessorKey: "TorqueAplicado",
+    header: "Torque",
+  },
+]
+
+
+export const columnsNeuPorReubicar: ColumnDef<NeumaticoReubicar>[] = [
+  {
+    accessorKey: "CodigoNeumatico",
+    header: "Código",
+    cell: ({ row }) => <Link href={`/padron/neumatico/${row.original.CodigoNeumatico}`} target="_blank">{row.original.CodigoNeumatico}</Link>
+  },
+  {
+    accessorKey: "PosicionOrigen",
+    header: "Posición origen",
+    cell: ({ row }) => (
+      <span className="inline-flex items-center rounded-md bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800 ring-1 ring-inset ring-amber-300">
+        {row.original.PosicionOrigen}
+      </span>
+    ),
+  },
+  {
+    accessorKey: "PosicionDestino",
+    header: "Posición destino",
+    cell: ({ row }) => (
+      <span className="inline-flex items-center rounded-md bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-800 ring-1 ring-inset ring-emerald-300">
+        {row.original.PosicionDestino}
+      </span>
+    ),
+  },
+  {
+    accessorKey: "Marca",
+    header: "Marca",
+  },
+  {
+    accessorKey: "Medida",
+    header: "Medida",
+  },
+  {
+    accessorKey: "Remanente",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Remanente
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
+  },
+  {
+    accessorKey: "PresionAire",
+    header: "Presión",
+  },
+  {
+    accessorKey: "TorqueAplicado",
+    header: "Torque",
+  },
 ]

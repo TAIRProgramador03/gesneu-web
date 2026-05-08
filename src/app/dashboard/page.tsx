@@ -5,8 +5,9 @@ import Grid from '@mui/material/Unstable_Grid2';
 import {
   Gauge, PackageCheck, Truck, CircleDollarSign,
   XCircle, RefreshCcw, PieChart, BarChart2,
-  AlertTriangle, Clock, Award, Ruler, TrendingUp, Activity,
+  AlertTriangle, Ruler, TrendingUp,
   Component,
+  Award,
 } from 'lucide-react';
 
 import { useNeuStats } from '@/hooks/use-neu-stats';
@@ -16,11 +17,8 @@ import { Sales } from '@/components/dashboard/overview/inspeccion-neu';
 import { FlotaDonut } from '@/components/dashboard/overview/FlotaDonut';
 import { VidaUtilDistribucion } from '@/components/dashboard/overview/VidaUtilDistribucion';
 import { TablaCriticos } from '@/components/dashboard/overview/TablaCriticos';
-import { ProximosVencer } from '@/components/dashboard/overview/ProximosVencer';
 import { MarcasDonut } from '@/components/dashboard/overview/MarcasDonut';
 import { MedidasChart } from '@/components/dashboard/overview/MedidasChart';
-import { DesgasteVehiculos } from '@/components/dashboard/overview/DesgasteVehiculos';
-import { ActividadReciente } from '@/components/dashboard/overview/ActividadReciente';
 import { DisenosDonut } from '@/components/dashboard/overview/DisenosDonut';
 import { DesgasteNeumaticos } from '@/components/dashboard/overview/DesgasteNeumaticos';
 
@@ -187,7 +185,7 @@ export default function Page(): React.JSX.Element {
         <CollapsibleCard
           loading={isLoading}
           title="Tasa de Desgaste por Neumático"
-          subtitle="mm desgastados por cada 1,000 km"
+          subtitle="información desgastados (bajas)"
           icon={<TrendingUp size={16} />}
           iconColor="#EF4444"
           sx={{ height: '100%' }}
@@ -195,7 +193,7 @@ export default function Page(): React.JSX.Element {
           <DesgasteNeumaticos />
         </CollapsibleCard>
       </Grid>
-      <Grid lg={5} md={5} xs={12}>
+      {/* <Grid lg={5} md={5} xs={12}>
         <CollapsibleCard
           loading={isLoading}
           title="Actividad Reciente"
@@ -206,7 +204,7 @@ export default function Page(): React.JSX.Element {
         >
           <ActividadReciente />
         </CollapsibleCard>
-      </Grid>
+      </Grid> */}
 
       {/* Fila 6 — Inspecciones por vehículo */}
       <Grid lg={12} xs={12}>

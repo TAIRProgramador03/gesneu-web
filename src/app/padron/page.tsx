@@ -6,9 +6,9 @@ import { Card } from '@mui/material';
 import { columnsPadron } from './columns';
 import { DataTableNeumaticos } from '@/components/ui/data-table/data-table';
 import { Download as DownloadIcon } from '@phosphor-icons/react/dist/ssr/Download';
-import { Neumaticos } from '@/api/Neumaticos';
+import { Neumaticos, obtenerTodasLasMarcas, obtenerTodasLasMedidas, obtenerTodosLosDisenos } from '@/api/Neumaticos';
 import { useQuery } from '@tanstack/react-query';
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useTheme } from '@mui/material/styles';
 import { useUser } from '@/hooks/use-user';
 import Box from '@mui/material/Box';
@@ -22,8 +22,34 @@ import { LoadingButton2 } from '@/components/ui/loading-button2';
 import { RefreshCw, TrendingUpDown } from 'lucide-react';
 import { ModalReubicarNeumatico } from '@/components/dashboard/padron/modal-reubicar-neumatico';
 import { TableFilterChips } from '@/components/ui/TableFilterChips';
-import { useTableFilter, type FilterChipDef } from '@/hooks/use-table-filter';
+import { useComboFilter, type SelectFilterDef } from '@/hooks/use-combo-filter';
+import type { FilterChipDef } from '@/hooks/use-table-filter';
 import { PadronExcel } from '@/types/padron';
+import SelectBetter from 'react-select';
+import { useSelectPadron } from '@/hooks/use-select-padron';
+
+const SELECT_STYLES = {
+  multiValue: (base: object) => ({
+    ...base,
+    backgroundColor: '#edf3fe',
+    borderRadius: '6px',
+    border: '.5px solid #3B82F6',
+  }),
+  multiValueLabel: (base: object) => ({
+    ...base,
+    color: '#3B82F6',
+  }),
+  multiValueRemove: (base: object) => ({
+    ...base,
+    color: '#364153',
+    borderRadius: '0 6px 6px 0',
+    ':hover': {
+      backgroundColor: '#f9fafbb3',
+      color: '#364153',
+      cursor: 'pointer',
+    },
+  }),
+};
 
 export default function Page(): React.JSX.Element {
 
@@ -42,13 +68,23 @@ export default function Page(): React.JSX.Element {
     placeholderData: []
   })
 
-  const PADRON_CHIPS: FilterChipDef<PadronExcel>[] = React.useMemo(() => [
+  const { DISEÑO_OPTIONS, MARCA_OPTIONS, MEDIDA_OPTIONS, isLoadingSelectDiseno, isLoadingSelectMarca, isLoadingSelectMedida } = useSelectPadron()
+
+  const PADRON_CHIPS: FilterChipDef<PadronExcel>[] = useMemo(() => [
     { key: 'DISPONIBLE', label: 'Disponibles', color: 'green', filter: c => c.TIPO_MOVIMIENTO === 'DISPONIBLE' },
     { key: 'ASIGNADO', label: 'Asignados', color: 'yellow', filter: c => c.TIPO_MOVIMIENTO === 'ASIGNADO' },
     { key: 'BAJA', label: 'Baja Definitiva', color: 'red', filter: c => c.TIPO_MOVIMIENTO === 'BAJA' },
   ], []);
 
-  const { active: activeFilter, setActive: setActiveFilter, counts: filterCounts, filteredData: filteredCustomers } = useTableFilter(customers, PADRON_CHIPS);
+  const PADRON_SELECTS: SelectFilterDef<PadronExcel>[] = useMemo(() => [
+    { key: 'diseño', accessor: item => item.DISEÑO },
+    { key: 'medida', accessor: item => item.MEDIDA },
+    { key: 'id_marca', accessor: item => item.ID_MARCA },
+  ], []);
+
+  const { filteredData: filteredCustomers, chipActive, setChipActive, chipCounts, selectValues, setSelectValue } =
+    useComboFilter(customers, PADRON_CHIPS, PADRON_SELECTS);
+
 
   const ModalOverlay = styled.div`
   position: fixed;
@@ -179,11 +215,53 @@ export default function Page(): React.JSX.Element {
 
         <TableFilterChips
           chips={PADRON_CHIPS}
-          counts={filterCounts}
-          active={activeFilter}
-          onChange={setActiveFilter}
+          counts={chipCounts}
+          active={chipActive}
+          onChange={setChipActive}
           isLoading={isLoadingCustomers}
         />
+
+        <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+          <Box sx={{ minWidth: 200, flex: 1, maxWidth: 280 }}>
+            <SelectBetter
+              isMulti
+              isSearchable
+              isDisabled={isLoadingCustomers || isLoadingSelectMarca}
+              onChange={(opts) => setSelectValue('id_marca', opts ? opts.map((o: { value: string }) => o.value) : [])}
+              value={MARCA_OPTIONS.filter(o => (selectValues['id_marca'] ?? []).includes(o.value))}
+              options={MARCA_OPTIONS}
+              placeholder="Seleccionar marca(s)"
+              noOptionsMessage={() => 'Sin opciones'}
+              styles={SELECT_STYLES}
+            />
+          </Box>
+          <Box sx={{ minWidth: 200, flex: 1, maxWidth: 280 }}>
+            <SelectBetter
+              isMulti
+              isSearchable
+              isDisabled={isLoadingCustomers || isLoadingSelectDiseno}
+              onChange={(opts) => setSelectValue('diseño', opts ? opts.map((o: { value: string }) => o.value) : [])}
+              value={DISEÑO_OPTIONS.filter(o => (selectValues['diseño'] ?? []).includes(o.value))}
+              options={DISEÑO_OPTIONS}
+              placeholder="Seleccionar diseño(s)"
+              noOptionsMessage={() => 'Sin opciones'}
+              styles={SELECT_STYLES}
+            />
+          </Box>
+          <Box sx={{ minWidth: 200, flex: 1, maxWidth: 280 }}>
+            <SelectBetter
+              isMulti
+              isSearchable
+              isDisabled={isLoadingCustomers || isLoadingSelectMedida}
+              onChange={(opts) => setSelectValue('medida', opts ? opts.map((o: { value: string }) => o.value) : [])}
+              value={MEDIDA_OPTIONS.filter(o => (selectValues['medida'] ?? []).includes(o.value))}
+              options={MEDIDA_OPTIONS}
+              placeholder="Seleccionar medida(s)"
+              noOptionsMessage={() => 'Sin opciones'}
+              styles={SELECT_STYLES}
+            />
+          </Box>
+        </Box>
 
         <Card className='p-5'>
           <DataTableNeumaticos

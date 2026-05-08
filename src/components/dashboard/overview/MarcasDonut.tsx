@@ -58,7 +58,7 @@ function MarcasTooltip({ active, payload, total }: any) {
 export const MarcasDonut = (): React.JSX.Element => {
   const theme = useTheme();
 
-  const { data = [] } = useQuery({
+  const { data = [], isLoading } = useQuery({
     queryKey: ['cantidad-de-neumaticos-por-marca'],
     queryFn: obtenerCantidadPorMarca
   })
@@ -77,7 +77,7 @@ export const MarcasDonut = (): React.JSX.Element => {
     <div style={{ padding: '20px' }}>
 
       {
-        total === 0 && (
+        total === 0 && !isLoading && (
           <div className='flex gap-1 flex-wrap justify-center items-center bg-indigo-50 text-indigo-700 border-2 border-indigo-700 p-2 rounded-lg'>
             <BadgeCheck width={12} />
             <span className='italic text-xs'>Almacén Vacío.</span>

@@ -11,6 +11,7 @@ import { EsRecuperadoBadge } from '@/components/ui/EsRecuperadoBadge';
 
 export interface Customer {
   CODIGO: number;
+  ID_MARCA: string;
   MARCA: string;
   MEDIDA: string;
   DISEÑO: string;

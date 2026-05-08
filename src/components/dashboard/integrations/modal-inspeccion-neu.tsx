@@ -17,12 +17,13 @@ import ModalAsignacionNeu from './modal-asignacion-neu';
 import { toast } from 'sonner';
 import Image from 'next/image';
 import { convertToDateHuman } from '@/lib/utils';
-import { CheckCircle, CircleCheckBig, ClipboardList, ListChecks } from 'lucide-react';
+import { BadgeAlert, CheckCircle, CircleCheckBig, ClipboardList, ListChecks } from 'lucide-react';
 import { LoadingButton } from '@/components/ui/loading-button';
 import { Button as ButtonCustom } from '@/components/ui/button';
 import { LoadingButton2 } from '@/components/ui/loading-button2';
 import { Chip, DialogTitle } from '@mui/material';
 import { Textarea } from '@/components/ui/textarea';
+import { ModalInformacionInspeccion } from './modal-informacion-inspeccion';
 
 // --- Declaraciones de tipos fuera del componente ---
 interface FormValues {
@@ -97,6 +98,8 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
   // Mostrar el array de neumáticos asignados cada vez que se abre el modal
 
   const { user } = useContext(UserContext) || {};
+  const [openDialog, setOpenDialog] = useState(false)
+
   const [neumaticoSeleccionado, setNeumaticoSeleccionado] = useState<any | null>(null);
   const [formValues, setFormValues] = React.useState<FormValues>({
     kilometro: '',
@@ -655,14 +658,7 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
       return;
     }
 
-    // validaciones
-    // Consultar al backend si ya existe inspección para la fecha seleccionada y este vehículo
     try {
-      // Consultar para todos los códigos asignados y la fecha seleccionada
-
-      // const results = await Promise.all(
-      //   neumaticosAsignados.map(n => consultarInspeccionHoy({ codigo: n.CODIGO, placa, fecha: fechaSeleccionada }))
-      // );
 
       let placaTrim = placa.trim()
       const responseInspeccion = await consultarInspeccionHoy({ placa: placaTrim, fecha: fechaSeleccionada })
@@ -772,6 +768,7 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
         window.dispatchEvent(new CustomEvent('actualizar-diagrama-vehiculo'));
       }
       marcarInspeccionHoy(); // Marcar inspección realizada hoy
+      setOpenDialog(false)
       onClose();
     } catch (error: any) {
 
@@ -1375,14 +1372,59 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
                 Siguiente posición
               </ButtonCustom>
 
-              <LoadingButton2
+              {/* <LoadingButton2
                 variant="primary"
-                onClick={handleEnviarYGuardar}
+                // onClick={handleEnviarYGuardar}
                 disabled={inspeccionesPendientes.length !== 5 || bloquearFormulario || kmError}
                 icon={<ListChecks />}
               >
                 Registrar Inspección
+              </LoadingButton2> */}
+              <LoadingButton2
+                variant="primary"
+                icon={<BadgeAlert />}
+                disabled={inspeccionesPendientes.length !== 5 || bloquearFormulario || kmError}
+                onClick={() => {
+                  setOpenDialog(true)
+                }}
+              >
+                Confirmar Inspección
               </LoadingButton2>
+
+              {
+                openDialog && (
+                  <ModalInformacionInspeccion
+                    placa={placa}
+                    kilometraje={Odometro.toString()}
+                    fechaInspeccion={formValues.fecha_inspeccion}
+                    neumaticos={
+                      inspeccionesPendientes.map((neu) => {
+                        const codigo = neu!.codigo;
+                        const posicion = neu!.posicion;
+                        const remanente = parseFloat(neu!.remanente ?? 0);
+                        const remanenteReferencia = parseFloat(neu!.remanente_referencia ?? 0);
+                        const presionAire = parseFloat(neu!.presion_aire ?? 0);
+                        const torqueAplicado = parseFloat(neu!.torque ?? 0);
+                        const medida = neu!.medida ?? '-'
+                        return {
+                          Posicion: posicion,
+                          CodigoNeumatico: codigo,
+                          Marca: neu!.marca ?? '-',
+                          Medida: medida,
+                          FechaAsignacion: 'dwdw',
+                          Remanente: remanente,
+                          RemanenteReferencia: remanenteReferencia,
+                          PresionAire: presionAire,
+                          TorqueAplicado: torqueAplicado
+                        };
+                      })
+                    }
+                    open={openDialog}
+                    onSuccessInspeccion={handleEnviarYGuardar}
+                    onClose={() => setOpenDialog(false)} />
+                )
+              }
+
             </Box>
           </Box>
         </DialogActions>

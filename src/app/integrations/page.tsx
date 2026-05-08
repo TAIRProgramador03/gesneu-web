@@ -991,7 +991,7 @@ export default function Page(): React.JSX.Element {
           </div>
 
           <DataTableNeumaticos columns={columnsNeuDisponible} data={neumaticosDisponiblesUseQuery} type='pagination' filters={true} />
-
+          
         </Card>
 
       </Stack>

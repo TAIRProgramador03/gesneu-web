@@ -41,7 +41,7 @@ export const exportToExcel = ({ data, username, title = 'Default title', fileNam
       s: {
         font: { bold: true, color: { rgb: 'FFFFFF' } },
         fill: { fgColor: { rgb: '1A3276' } },
-        alignment: { horizontal: 'center' },
+        alignment: { vertical: 'middle', horizontal: 'center' },
         border: thinBorder,
       },
     };
@@ -56,7 +56,7 @@ export const exportToExcel = ({ data, username, title = 'Default title', fileNam
       ws[cellRef] = {
         v: value ?? '',
         t: typeof value === 'number' ? 'n' : 's',
-        s: { border: thinBorder, fill: rowFill },
+        s: { border: thinBorder, fill: rowFill, alignment: { horizontal: "center" } },
       };
     });
   });

@@ -17,7 +17,8 @@ import { convertToDateHuman } from '@/lib/utils';
 import { LoadingButton } from '@/components/ui/loading-button';
 import { Button as ButtonCustom } from '@/components/ui/button';
 import { LoadingButton2 } from '@/components/ui/loading-button2';
-import { ClipboardList } from 'lucide-react';
+import { BadgeAlert, ClipboardList } from 'lucide-react';
+import { ModalInformacionReubicacion } from './modal-informacion-reubicacion';
 
 interface ModalReubicarProps {
   open: boolean;
@@ -45,6 +46,7 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = memo(({
   const [initialAssignedMap, setInitialAssignedMap] = useState<Record<string, Neumatico>>({});
   const [fechaUltimaInspeccion, setFechaUltimaInspeccion] = useState<string>('');
   const [reubicacionBloqueada, setReubicacionBloqueada] = useState<boolean>(false);
+  const [openDialog, setOpenDialog] = useState(false)
 
   // Estados para control de arrastrar y soltar
   const [posicionOriginal, setPosicionOriginal] = useState<string | null>(null);
@@ -345,12 +347,7 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = memo(({
 
   };
 
-  // Handler para guardar reubicación
-  const handleGuardarReubicacion = async () => {
-    if (!fechaUltimaInspeccion) {
-      toast.error('No se puede reubicar: primero debe existir una inspección válida.');
-      return;
-    }
+  const handleReturnNormalizedPayload = (dateUltimaInspeccion: string) => {
 
     // Validar que hay cambios
     const movimientos: any[] = [];
@@ -404,7 +401,7 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = memo(({
           PROYECTO: vehiculo?.proyecto || '',
           COSTO: fullNeu.COSTO,
           PROVEEDOR: fullNeu.PROVEEDOR,
-          FECHA_REGISTRO: fechaUltimaInspeccion ? fechaUltimaInspeccion.slice(0, 10) : new Date().toISOString().slice(0, 10),
+          FECHA_REGISTRO: dateUltimaInspeccion ? dateUltimaInspeccion.slice(0, 10) : new Date().toISOString().slice(0, 10),
           FECHA_COMPRA: fullNeu.FECHA_COMPRA,
           USUARIO_SUPER: user?.usuario || user?.email || user?.nombre || '',
           PRESION_AIRE: fullNeu.PRESION_AIRE,
@@ -427,14 +424,38 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = memo(({
         movimientos.push(movimiento);
       }
     }
+    const normalizedPayloadArray = movimientos.map(normalizePayload);
+    return normalizedPayloadArray
+  }
 
-    if (movimientos.length === 0) {
-      toast.info('No hay cambios de posición para registrar.');
+  const verifyClickToConfirm = (): boolean => {
+    if (neumaticoEnZonaTemporal) return false
+    if (!fechaUltimaInspeccion) return false
+    const normalizedPayloadArray = handleReturnNormalizedPayload(fechaUltimaInspeccion);
+    if (!normalizedPayloadArray) return false
+    if (normalizedPayloadArray.length === 0) return false
+    return true
+  }
+
+  // Handler para guardar reubicación
+  const handleGuardarReubicacion = async () => {
+
+    if (!fechaUltimaInspeccion) {
+      toast.error('No se puede reubicar: primero debe existir una inspección válida.');
       return;
     }
 
     try {
-      const normalizedPayloadArray = movimientos.map(normalizePayload);
+      const normalizedPayloadArray = handleReturnNormalizedPayload(fechaUltimaInspeccion);
+
+      if (!normalizedPayloadArray) return;
+      if (normalizedPayloadArray.length === 0) {
+        toast.info('No hay cambios de posición para registrar.');
+        return;
+      }
+
+      console.log({ normalizedPayloadArray })
+
       await registrarReubicacionNeumatico(normalizedPayloadArray);
 
       toast.success('Reubicación registrada correctamente', {
@@ -442,6 +463,7 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = memo(({
         position: 'top-right'
       })
 
+      setOpenDialog(false);
       setPosicionOriginal(null);
       setCodigoOriginal(null);
       setSwapInfo(null);
@@ -732,12 +754,52 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = memo(({
                   >
                     Cerrar
                   </ButtonCustom>
+
                   <LoadingButton2
+                    variant="primary"
+                    icon={<BadgeAlert />}
+                    disabled={!verifyClickToConfirm()}
+                    onClick={() => {
+                      setOpenDialog(true)
+                    }}
+                  >
+                    Confirmar Reubicación
+                  </LoadingButton2>
+
+                  {
+                    openDialog && (
+                      <ModalInformacionReubicacion
+                        placa={placa}
+                        fechaReubicacion={convertToDateHuman(fechaUltimaInspeccion) || 'Sin registro'}
+                        neumaticos={
+                          handleReturnNormalizedPayload(fechaUltimaInspeccion).map((neu) => {
+                            return {
+                              CodigoNeumatico: neu.CODIGO,
+                              PosicionOrigen: neu.POSICION_INICIAL,
+                              PosicionDestino: neu.POSICION_FIN,
+                              Marca: neu.MARCA,
+                              Medida: neu.MEDIDA,
+                              Remanente: neu.REMANENTE,
+                              TorqueAplicado: neu.TORQUE_APLICADO,
+                              PresionAire: neu.PRESION_AIRE
+                            }
+                          })
+                        }
+                        onSuccessInspeccion={handleGuardarReubicacion}
+                        open={openDialog}
+                        onClose={() => setOpenDialog(false)}
+                      />
+                    )
+                  }
+
+                  {/* Nota */}
+                  {/* <LoadingButton2
                     variant="primary"
                     onClick={handleGuardarReubicacion}
                   >
                     Guardar Reubicación
-                  </LoadingButton2>
+                  </LoadingButton2> */}
+                  {/* Nota */}
                 </div>
 
               </Card>

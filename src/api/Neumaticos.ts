@@ -593,16 +593,17 @@ export interface DesgasteNeumatico {
   ID_NEUMATICO: number
   CODIGO_NEUMATICO: string
   MARCA_NEUMATICO: string
-  PLACA_VEHICULO: string
-  POSICION_NEUMATICO: string
+  MEDIDA_NEUMATICO: string
+  DISENO_NEUMATICO: string
   KM_TOTAL_VIDA_NEUMATICO: number
   REMANENTE_INCIAL: number
   REMANENTE_MONTADO: number
   REMANENTE_ACTUAL: number
   DESGASTE_POR_1000KM: number
   COSTO_POR_KM: number,
-  COSTO_NEUMATICO: number
   KM_POR_REMAMENTE: number
+  COSTO_NEUMATICO: number
+  TIPO_BAJA: number
 }
 
 export const obtenerDesgastePorMilKms = async (values: MultiValue<{
@@ -611,9 +612,6 @@ export const obtenerDesgastePorMilKms = async (values: MultiValue<{
 }>) => {
 
   const valuesToSend = values.length >= 1 ? values.map((value) => value.value) : []
-
-  console.log({ valuesToSend })
-
 
   try {
     const response = await axios.post<DesgasteNeumatico[]>(
@@ -644,6 +642,47 @@ export const obtenerCodigosNeumaticosDesgastadosPorMilKms = async (): Promise<Co
     return response.data;
   } catch (error) {
     console.error('Error en obtenerCodigosNeumaticosDesgastadosPorMilKms:', error);
+    throw error;
+  }
+}
+
+interface SelectOptions {
+  value: string,
+  label: string
+}
+
+export const obtenerTodosLosDisenos = async () => {
+  try {
+    const response = await axios.get<SelectOptions[]>(`/api/po-neumaticos/todos-los-disenos`, {
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error en obtenerTodosLosDisenos:', error);
+    throw error;
+  }
+}
+
+export const obtenerTodasLasMedidas = async () => {
+  try {
+    const response = await axios.get<SelectOptions[]>(`/api/po-neumaticos/todas-las-medidas`, {
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error en obtenerTodasLasMedidas:', error);
+    throw error;
+  }
+}
+
+export const obtenerTodasLasMarcas = async () => {
+  try {
+    const response = await axios.get<SelectOptions[]>(`/api/po-neumaticos/todas-las-marcas`, {
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error en obtenerTodasLasMarcas:', error);
     throw error;
   }
 }

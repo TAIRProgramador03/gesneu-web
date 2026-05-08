@@ -169,17 +169,7 @@ export const columnsPadron: ColumnDef<PadronExcel>[] = [
     accessorKey: "TIPO_MOVIMIENTO",
     meta: { exportLabel: "Situación" },
     cell: ({ row }) => < TipoMovimientoBadge tipoMovimiento={row.original.TIPO_MOVIMIENTO} />,
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Situación
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      )
-    },
+    header: ({ column }) => "Situación",
   },
   {
     accessorKey: "PLACA",
@@ -218,7 +208,7 @@ export const columnsPadron: ColumnDef<PadronExcel>[] = [
   {
     accessorKey: "ESTADO",
     meta: { exportLabel: "Estado (%)" },
-    cell: ({ row }) => <LinearProgressItem estado={row.original.ESTADO ?? 0} />,
+    cell: ({ row }) => <LinearProgressItem estado={row.original.ESTADO ?? 0} width="120px" />,
     header: ({ column }) => {
       return (
         <Button

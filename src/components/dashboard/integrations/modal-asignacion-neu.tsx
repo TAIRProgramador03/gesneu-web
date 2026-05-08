@@ -286,6 +286,7 @@ const DropZone: React.FC<DropZoneProps> = memo(({
                 fechaRegistroNeumatico={assignedNeumaticos[position]?.FECHA_REGISTRO || ''}
                 esRecuperado={assignedNeumaticos[position]?.RECUPERADO || false}
                 fechaRecuperado={assignedNeumaticos[position]?.FECHA_RECUPERADO || null}
+                position={position}
             />
         </div>
     );
@@ -431,12 +432,15 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
             for (const campo of camposRequeridos) {
                 // Permite 0 como valor válido, pero no null, undefined o NaN
                 const valor = (neu as any)[campo] ?? (neu as any)[campo.toUpperCase()];
+
                 if (valor === null || valor === undefined || (typeof valor === 'string' && valor.trim() === '') || (typeof valor === 'number' && isNaN(valor))) {
                     toast.error(`Falta completar el campo "${campo}" en la posición ${pos}.`);
                     return;
                 }
+
                 // Validación extra: el backend no acepta 0, así que bloqueamos 0 explícitamente (excepto FECHA_ASIGNACION)
                 if (campo !== 'FECHA_ASIGNACION' && typeof valor === 'number' && valor === 0) {
+                    if (pos === 'RES01' && campo === 'TORQUE_APLICADO') continue;
                     toast.error(`El campo "${campo}" no puede ser 0 en la posición ${pos}.`);
                     return;
                 }

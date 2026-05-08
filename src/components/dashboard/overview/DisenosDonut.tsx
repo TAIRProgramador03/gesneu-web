@@ -58,7 +58,7 @@ function DisenosTooltip({ active, payload, total }: any) {
 export const DisenosDonut = (): React.JSX.Element => {
   const theme = useTheme();
 
-  const { data = [] } = useQuery({
+  const { data = [], isLoading } = useQuery({
     queryKey: ['cantidad-de-neumaticos-por-diseno'],
     queryFn: obtenerCantidadPorDiseno
   })
@@ -77,7 +77,7 @@ export const DisenosDonut = (): React.JSX.Element => {
     <div style={{ padding: '20px' }}>
 
       {
-        total === 0 && (
+        total === 0 && !isLoading && (
           <div className='flex gap-1 flex-wrap justify-center items-center bg-cyan-50 text-cyan-700 border-2 border-cyan-700 p-2 rounded-lg'>
             <BadgeCheck width={12} />
             <span className='italic text-xs'>Almacén Vacío.</span>

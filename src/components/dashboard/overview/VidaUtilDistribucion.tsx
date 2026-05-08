@@ -85,11 +85,11 @@ export const VidaUtilDistribucion = (): React.JSX.Element => {
   const theme = useTheme();
 
   const { data = {
-    NEUMATICOS_CRITICO: 0,
-    NEUMATICOS_REGULAR: 0,
-    NEUMATICOS_BUENO: 0,
-    NEUMATICOS_TOTALES: 0
-  } } = useQuery({
+    NEUMATICOS_CRITICO: 1,
+    NEUMATICOS_REGULAR: 1,
+    NEUMATICOS_BUENO: 1,
+    NEUMATICOS_TOTALES: 1
+  }, isLoading } = useQuery({
     queryKey: ['vida-util-neumaticos'],
     queryFn: () => obtenerCantidadNeumaticosVidaUtil()
   })
@@ -104,7 +104,7 @@ export const VidaUtilDistribucion = (): React.JSX.Element => {
     <div style={{ padding: '20px' }}>
 
       {
-        data?.NEUMATICOS_TOTALES === 0 && (
+        data?.NEUMATICOS_TOTALES === 0 && !isLoading && (
           <div className='flex gap-1 flex-wrap justify-center items-center bg-orange-50 text-orange-700 border-2 border-orange-700 p-2 rounded-lg'>
             <BadgeCheck width={12} />
             <span className='italic text-xs'>Almacén Vacío.</span>

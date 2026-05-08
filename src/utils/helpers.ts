@@ -106,3 +106,14 @@ export function timelineCardAccent(tipo: string) {
   }
   return base[tipo] ?? base.REGISTRO
 }
+
+/**
+ * 
+ * @param object 
+ * @returns number days to difference
+ */
+export const getDifferenceDays = ({ anterior, actual }: { anterior: string, actual: string }): number => {
+  const antes = Date.parse(anterior)
+  const ahora = Date.parse(actual)
+  return Math.max(0, Math.round((ahora - antes) / (1000 * 60 * 60 * 24)) + 1)
+}

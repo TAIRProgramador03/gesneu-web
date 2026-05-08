@@ -21,6 +21,7 @@ interface PadronMapped {
 
 export interface PadronExcel {
   CODIGO: number,
+  ID_MARCA: string
   MARCA: string
   MEDIDA: string
   DISEÑO: string

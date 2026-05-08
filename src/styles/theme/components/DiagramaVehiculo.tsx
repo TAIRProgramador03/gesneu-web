@@ -377,8 +377,8 @@ const PosicionNeumatico: React.FC<{
                             neumatico && (
                                 <>
                                     <li>Neumático: {neumatico.CODIGO_NEU || neumatico.CODIGO}</li>
-                                    <li>Remanente: {neumatico.REMANENTE}mm</li>
-                                    <li>Estado: {neumatico.ESTADO}%</li>
+                                    {neumatico.REMANENTE && <li>Remanente: {neumatico.REMANENTE}mm</li>}
+                                    {neumatico.ESTADO && <li>Estado: {neumatico.ESTADO}%</li>}
                                 </>
                             )
                         }
