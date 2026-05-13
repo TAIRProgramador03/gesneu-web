@@ -13,6 +13,11 @@ const getBadgeColor = (cantidad: number) => {
 
 export const columnsPlacasNeumaticos: ColumnDef<PlacasConNeumaticos>[] = [
   {
+    id: "numero",
+    header: "#",
+    cell: ({ row }) => row.index + 1,
+  },
+  {
     accessorKey: "PLACA",
     meta: { exportLabel: "Placa" },
     cell: ({ row }) => <Link href={`/padron/placa/${row.original.PLACA}`} target="_blank">{row.original.PLACA}</Link>,
@@ -23,6 +28,36 @@ export const columnsPlacasNeumaticos: ColumnDef<PlacasConNeumaticos>[] = [
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
           Placa
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
+  },
+  {
+    accessorKey: "MARCA",
+    meta: { exportLabel: "Marca" },
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Marca
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
+  },
+  {
+    accessorKey: "MODELO",
+    meta: { exportLabel: "Modelo" },
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Modelo
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       )

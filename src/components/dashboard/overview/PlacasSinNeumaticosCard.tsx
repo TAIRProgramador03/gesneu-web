@@ -137,7 +137,7 @@ export function PlacasSinNeumaticosCard({ sx }: PlacasSinNeumaticosCardProps) {
       </Card>
 
 
-      <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth
+      <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth
         PaperProps={{
           sx: { borderRadius: 3, overflow: 'hidden' }
         }}

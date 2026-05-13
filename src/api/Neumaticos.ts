@@ -690,6 +690,8 @@ export const obtenerTodasLasMarcas = async () => {
 
 export interface PlacasConNeumaticos {
   PLACA: string,
+  MODELO: string,
+  MARCA: string,
   CANTIDAD_NEUMATICOS_INSTALADOS: number
 }
 
