@@ -190,7 +190,7 @@ export const DesgasteNeumaticos = (): React.JSX.Element => {
   const chartHeight = Math.max(240, desgasteNeumaticos.neumaticos.length * 36)
 
   return (
-    <div style={{ padding: '16px 20px 0', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column' }}>
 
       {
         isLoading && (
@@ -206,7 +206,7 @@ export const DesgasteNeumaticos = (): React.JSX.Element => {
         desgasteNeumaticos.neumaticos.length === 0 && !isLoading && (
           <div className='flex gap-1 flex-wrap justify-center items-center bg-red-50 text-red-700 border-2 border-red-700 p-2 rounded-lg'>
             <BadgeCheck width={12} />
-            <span className='italic text-xs'>Sin neumáticos asignados.</span>
+            <span className='italic text-xs'>Sin neumáticos en baja.</span>
           </div>
         )
       }

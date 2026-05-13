@@ -56,70 +56,68 @@ const SUGGESTION_GROUPS = [
 // ============================================
 // CHART RENDERER
 // ============================================
-function ChartBlock({ config }) {
-  const canvasRef = useRef(null);
-  const chartRef = useRef(null);
+export const ChartBlock = ({ config }: { config: any }) => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const chartRef = useRef<any>(null);
 
-  useEffect(() => {
-    const loadChart = async () => {
-      try {
-        const mod = await import(
-          /* webpackIgnore: true */ "https://cdn.jsdelivr.net/npm/chart.js@4.4.1/+esm"
-        );
-        const Chart = mod.Chart;
-        const registerables = mod.registerables || [];
-        if (registerables.length) Chart.register(...registerables);
-        if (chartRef.current) chartRef.current.destroy();
-        if (!canvasRef.current) return;
+  // useEffect(() => {
+  //   const loadChart = async () => {
+  //     try {
+  //       const mod = await import("chart.js");
+  //       const Chart = mod.Chart;
+  //       const registerables = mod.registerables || [];
+  //       if (registerables.length) Chart.register(...registerables);
+  //       if (chartRef.current) chartRef.current.destroy();
+  //       if (!canvasRef.current) return;
 
-        const defaults = [
-          "#3b82f6", "#22c55e", "#f59e0b", "#ef4444",
-          "#8b5cf6", "#14b8a6", "#ec4899", "#f97316",
-        ];
-        const colors = config.colors || defaults.slice(0, config.labels?.length || 4);
+  //       const defaults = [
+  //         "#3b82f6", "#22c55e", "#f59e0b", "#ef4444",
+  //         "#8b5cf6", "#14b8a6", "#ec4899", "#f97316",
+  //       ];
+  //       const colors = config.colors || defaults.slice(0, config.labels?.length || 4);
 
-        chartRef.current = new Chart(canvasRef.current, {
-          type: config.type || "bar",
-          data: {
-            labels: config.labels || [],
-            datasets: [
-              {
-                data: config.data || [],
-                backgroundColor: colors,
-                borderRadius: config.type === "bar" ? 6 : 0,
-                borderWidth: ["pie", "doughnut"].includes(config.type) ? 2 : 0,
-                borderColor: "#1a1f2e",
-              },
-            ],
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            indexAxis: config.horizontal ? "y" : "x",
-            plugins: {
-              legend: {
-                display: ["pie", "doughnut"].includes(config.type),
-                position: "bottom",
-                labels: { boxWidth: 10, padding: 12, font: { size: 11 }, color: "#94a3b8" },
-              },
-            },
-            scales: ["pie", "doughnut"].includes(config.type)
-              ? {}
-              : {
-                x: { grid: { color: "#1e293b" }, ticks: { font: { size: 10 }, color: "#64748b" } },
-                y: { grid: { color: "#1e293b" }, ticks: { font: { size: 10 }, color: "#64748b" } },
-              },
-          },
-        });
-      } catch (e) {
-        console.error("Chart error:", e);
-      }
-    };
-    loadChart();
-    return () => {
-      if (chartRef.current) chartRef.current.destroy();
-    };
-  }, [config]);
+  //       chartRef.current = new Chart(canvasRef.current, {
+  //         type: config.type || "bar",
+  //         data: {
+  //           labels: config.labels || [],
+  //           datasets: [
+  //             {
+  //               data: config.data || [],
+  //               backgroundColor: colors,
+  //               borderRadius: config.type === "bar" ? 6 : 0,
+  //               borderWidth: ["pie", "doughnut"].includes(config.type) ? 2 : 0,
+  //               borderColor: "#1a1f2e",
+  //             },
+  //           ],
+  //         },
+  //         options: {
+  //           responsive: true,
+  //           maintainAspectRatio: false,
+  //           indexAxis: config.horizontal ? "y" : "x",
+  //           plugins: {
+  //             legend: {
+  //               display: ["pie", "doughnut"].includes(config.type),
+  //               position: "bottom",
+  //               labels: { boxWidth: 10, padding: 12, font: { size: 11 }, color: "#94a3b8" },
+  //             },
+  //           },
+  //           scales: ["pie", "doughnut"].includes(config.type)
+  //             ? {}
+  //             : {
+  //               x: { grid: { color: "#1e293b" }, ticks: { font: { size: 10 }, color: "#64748b" } },
+  //               y: { grid: { color: "#1e293b" }, ticks: { font: { size: 10 }, color: "#64748b" } },
+  //             },
+  //         },
+  //       });
+  //     } catch (e) {
+  //       console.error("Chart error:", e);
+  //     }
+  //   };
+  //   loadChart();
+  //   return () => {
+  //     if (chartRef.current) chartRef.current.destroy();
+  //   };
+  // }, [config]);
 
   return (
     <div style={{ position: "relative", width: "100%", height: 200, margin: "12px 0" }}>
@@ -131,7 +129,7 @@ function ChartBlock({ config }) {
 // ============================================
 // BOT MESSAGE RENDERER — HTML + Charts
 // ============================================
-function BotMessage({ text }) {
+function BotMessage({ text }: { text: string }) {
   const chartRegex = /<!--chart:(.*?)-->/g;
   const charts = [];
   let match;
@@ -160,15 +158,21 @@ function BotMessage({ text }) {
 // ============================================
 // MAIN PAGE COMPONENT
 // ============================================
+interface Message {
+  role: "user" | "bot";
+  text: string;
+  time: Date;
+}
+
 export default function ChatPage() {
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const [imagen, setImagen] = useState(null);
+  const [imagen, setImagen] = useState<string | null>(null);
   const [showWelcome, setShowWelcome] = useState(true);
-  const endRef = useRef(null);
-  const inputRef = useRef(null);
-  const fileRef = useRef(null);
+  const endRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
   const sessionId = useRef(typeof window !== "undefined" ? getSessionId() : "server");
 
   useEffect(() => {
@@ -180,18 +184,18 @@ export default function ChatPage() {
   }, []);
 
   const send = useCallback(
-    async (text) => {
+    async (text: any) => {
       const msg = text || input.trim();
       if (!msg || loading) return;
 
       setInput("");
       setShowWelcome(false);
-      const userMsg = { role: "user", text: msg, time: new Date() };
+      const userMsg: Message = { role: "user", text: msg, time: new Date() };
       setMessages((prev) => [...prev, userMsg]);
       setLoading(true);
 
       try {
-        const body = {
+        const body: { mensaje: string; sessionId: string; imagen?: string } = {
           mensaje: msg,
           sessionId: sessionId.current,
         };
@@ -220,22 +224,26 @@ export default function ChatPage() {
     [input, loading, imagen]
   );
 
-  const handleKey = (e) => {
+  const handleKey = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      send();
+      send('d');
     }
   };
 
-  const handleImageUpload = (e) => {
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = () => setImagen(reader.result.split(",")[1]);
+    reader.onload = () => {
+      if (reader.result && typeof reader.result === "string") {
+        setImagen(reader.result.split(",")[1]);
+      }
+    };
     reader.readAsDataURL(file);
   };
 
-  const formatTime = (d) =>
+  const formatTime = (d: Date) =>
     d.toLocaleTimeString("es-PE", { hour: "2-digit", minute: "2-digit" });
 
   const clearChat = () => {
@@ -600,7 +608,7 @@ export default function ChatPage() {
                 const isHtml =
                   isBot &&
                   (/<[a-z][\s\S]*>/i.test(m.text) ||
-                    /<!--chart:/.test(m.text));
+                    m.text.includes('<!--chart:'));
                 return (
                   <div
                     key={i}
@@ -685,7 +693,7 @@ export default function ChatPage() {
             />
             <button
               className="chat-send-btn"
-              onClick={() => send()}
+              onClick={() => send('d')}
               disabled={!input.trim() || loading}
             >
               <svg viewBox="0 0 24 24">

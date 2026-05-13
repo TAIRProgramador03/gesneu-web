@@ -13,4 +13,5 @@ export interface NavItemConfig {
   // can extend it to accept multiple matchers.
   matcher?: { type: 'startsWith' | 'equals'; href: string };
   blockedUsers?: string[];
+  allowedUsers?: string[];
 }

@@ -15,6 +15,7 @@ import type { NavItemConfig } from '@/types/nav';
 import { isNavItemActive } from '@/lib/is-nav-item-active';
 
 
+import { useUser } from '@/hooks/use-user';
 import { navItems } from './config';
 import { navIcons } from './nav-icons';
 
@@ -25,6 +26,11 @@ interface SideNavProps {
 
 export function SideNav({ collapsed, setCollapsed }: SideNavProps): React.JSX.Element {
   const pathname = usePathname();
+  const { user } = useUser();
+  const username = user?.usuario?.toUpperCase() ?? '';
+  const visibleNavItems = navItems.filter((item) =>
+    !item.allowedUsers || item.allowedUsers.includes(username.trim())
+  );
 
   return (
     <Box
@@ -84,7 +90,7 @@ export function SideNav({ collapsed, setCollapsed }: SideNavProps): React.JSX.El
       {/* Menú */}
       <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', pt: 2, marginTop: '25px' }}>
         <Box component="nav" sx={{ width: '100%', padding: '10px' }}>
-          {renderNavItems({ pathname, items: navItems, collapsed })}
+          {renderNavItems({ pathname, items: visibleNavItems, collapsed })}
         </Box>
       </Box>
       <Divider />
@@ -136,62 +142,62 @@ function NavItem({
 
   return (
     <Tooltip title={collapsed ? title : ''} placement="right" arrow>
-    <li>
-      <Box
-        {...(href
-          ? {
-            component: external ? 'a' : RouterLink,
-            href,
-            target: external ? '_blank' : undefined,
-            rel: external ? 'noreferrer' : undefined,
-          }
-          : { role: 'button' })}
-        sx={{
-          alignItems: 'center',
-          borderRadius: 1,
-          color: '#fff',
-          cursor: 'pointer',
-          display: 'flex',
-          flex: '0 0 auto',
-          gap: 1,
-          p: collapsed ? '6px' : '6px 16px',
-          position: 'relative',
-          textDecoration: 'none',
-          whiteSpace: 'nowrap',
-          justifyContent: collapsed ? 'center' : 'flex-start',
-          ...(disabled && {
-            bgcolor: 'var(--NavItem-disabled-background)',
-            color: 'var(--NavItem-disabled-color)',
-            cursor: 'not-allowed',
-          }),
-          ...(active && { bgcolor: '#167bd9', color: '#fff' }),
-        }}
-      >
-        <Box sx={{ alignItems: 'center', display: 'flex', justifyContent: 'center', flex: '0 0 auto' }}>
-          {Icon ? (
-            <Icon
-              strokeWidth={2.5}
-              fill={active ? '#fff' : '#002141'}
-              fontSize="var(--icon-fontSize-lg)"
-              weight={'bold'}
-            />
-          ) : null}
-        </Box>
-        {/* Solo muestra el nombre si NO está colapsado */}
-        {!collapsed && (
-          <Box sx={{ flex: '1 1 auto' }}>
-            <Typography
-              component="span"
-              sx={{
-                color: 'inherit', fontSize: '16px', fontWeight: 500, lineHeight: '28px'
-              }}
-            >
-              {title}
-            </Typography>
+      <li>
+        <Box
+          {...(href
+            ? {
+              component: external ? 'a' : RouterLink,
+              href,
+              target: external ? '_blank' : undefined,
+              rel: external ? 'noreferrer' : undefined,
+            }
+            : { role: 'button' })}
+          sx={{
+            alignItems: 'center',
+            borderRadius: 1,
+            color: '#fff',
+            cursor: 'pointer',
+            display: 'flex',
+            flex: '0 0 auto',
+            gap: 1,
+            p: collapsed ? '6px' : '6px 16px',
+            position: 'relative',
+            textDecoration: 'none',
+            whiteSpace: 'nowrap',
+            justifyContent: collapsed ? 'center' : 'flex-start',
+            ...(disabled && {
+              bgcolor: 'var(--NavItem-disabled-background)',
+              color: 'var(--NavItem-disabled-color)',
+              cursor: 'not-allowed',
+            }),
+            ...(active && { bgcolor: '#167bd9', color: '#fff' }),
+          }}
+        >
+          <Box sx={{ alignItems: 'center', display: 'flex', justifyContent: 'center', flex: '0 0 auto' }}>
+            {Icon ? (
+              <Icon
+                strokeWidth={2.5}
+                fill={active ? '#fff' : '#002141'}
+                fontSize="var(--icon-fontSize-lg)"
+                weight={'bold'}
+              />
+            ) : null}
           </Box>
-        )}
-      </Box>
-    </li>
+          {/* Solo muestra el nombre si NO está colapsado */}
+          {!collapsed && (
+            <Box sx={{ flex: '1 1 auto' }}>
+              <Typography
+                component="span"
+                sx={{
+                  color: 'inherit', fontSize: '16px', fontWeight: 500, lineHeight: '28px'
+                }}
+              >
+                {title}
+              </Typography>
+            </Box>
+          )}
+        </Box>
+      </li>
     </Tooltip>
   );
 }

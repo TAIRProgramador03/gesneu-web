@@ -1,5 +1,6 @@
 import { Customer } from "@/components/dashboard/customer/customers-table";
 import { NeumaticoFetch } from "@/components/dashboard/padron/modal-reubicar-neumatico";
+import { NeumaticoInstalado, VehiculoMain } from "@/hooks/use-placa-detail";
 import { InspeccionTable } from "@/types/inspecciones";
 import { Neumatico } from "@/types/types";
 import axios, { AxiosError } from "axios";
@@ -54,7 +55,7 @@ export const cargarPadronNeumatico = async (archivoExcel: File) => {
 // Buscar vehículo por placa
 export const buscarVehiculoPorPlaca = async (placa: string) => {
   try {
-    const response = await axios.get(`/api/vehiculo/${placa}`, { withCredentials: true });
+    const response = await axios.get<VehiculoMain>(`/api/vehiculo/${placa}`, { withCredentials: true });
     return response.data;
   } catch (error: unknown) {
     const err = error as AxiosError<any>;
@@ -85,7 +86,7 @@ export const buscarVehiculoPorPlacaEmpresa = async (placa: string) => {
 // Obtener la lista de neumáticos asignados por placa
 export const obtenerNeumaticosAsignadosPorPlaca = async (placa: string) => {
   try {
-    const response = await axios.get(`/api/po-asignados/${placa}`);
+    const response = await axios.get<NeumaticoInstalado[]>(`/api/po-asignados/${placa}`);
     return response.data;
   } catch (error) {
     console.error('Error en obtenerNeumaticosAsignadosPorPlaca:', error);
@@ -703,3 +704,63 @@ export const obtenerPlacasConNeumaticos = async () => {
     throw error;
   }
 }
+
+
+export interface TallerConNeumaticos {
+  ID: number;
+  TALLER: string;
+  CH_SERI_TALLER: string;
+  NEUMATICOS_DISPONIBLES: number;
+  NEUMATICOS_ASIGNADOS: number;
+  NEUMATICOS_BAJAS: number;
+  CANTIDAD_NEUMATICOS: number;
+}
+
+export const obtenerTalleresConNeumaticos = async () => {
+  try {
+    const response = await axios.get<TallerConNeumaticos[]>(`/api/mapa/cantidad-flota-por-taller`, {
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error en obtenerTalleresConNeumaticos:', error);
+    throw error;
+  }
+}
+
+export interface NeumaticoDelHistorial {
+  ID_MOVIMIENTO: number;
+  CODIGO_NEUMATICO: string;
+  PLACA_VEHICULO: string;
+  TALLER_ASIGNADO: string;
+  ID_ACCION_REALIZADA: number;
+  ACCION_REALIZADA: string;
+  POSICION_ANTERIOR_EN_VEHICULO: string | null;
+  POSICION_NUEVA_EN_VEHICULO: string | null;
+  REMANENTE_MEDIDO_MM: number;
+  PRESION_AIRE_PSI: number;
+  TORQUE_APLICADO_NM: number;
+  KM_RECORRIDOS_EN_ETAPA: number;
+  PORCENTAJE_VIDA_UTIL: number;
+  OBSERVACION: string;
+  USUARIO_REGISTRADOR: string;
+  FECHA_MOVIMIENTO: Date;
+  FECHA_REGISTRO_MOVIMIENTO: Date;
+  CAMBIO_KILOMETRAJE: null | number
+  TIPO_TERRENO: null | string
+  CONDICION: null | string
+}
+
+export const obtenerHistorialPorPlaca = async (placa: string) => {
+  try {
+    const response = await axios.get<NeumaticoDelHistorial[]>(`/api/po-movimiento/historial-placa`, {
+      params: { placa },
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error en obtenerHistorialPorPlaca:', error);
+    throw error;
+  }
+}
+

@@ -39,30 +39,16 @@ export const columnsNeuDisponible: ColumnDef<NeuDisponibleTable>[] = [
     header: "Marca",
   },
   {
-    accessorKey: "DISEÑO",
-    header: "Diseño",
-  },
-  {
-    accessorKey: "REMANENTE",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Remanente
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      )
-    },
-  },
-  {
     accessorKey: "MEDIDA",
     header: "Medida",
   },
   {
+    accessorKey: "DISEÑO",
+    header: "Diseño",
+  },
+  {
     accessorKey: "FECHA_FABRICACION_COD",
-    header: "Fecha",
+    header: "F. fabricación",
     cell: ({ row }) => row.original.FECHA_FABRICACION_COD ?? '-',
   },
   {
@@ -81,6 +67,20 @@ export const columnsNeuDisponible: ColumnDef<NeuDisponibleTable>[] = [
     },
   },
   {
+    accessorKey: "REMANENTE",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Remanente
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
+  },
+  {
     accessorKey: "ESTADO",
     header: ({ column }) => {
       return (
@@ -93,7 +93,7 @@ export const columnsNeuDisponible: ColumnDef<NeuDisponibleTable>[] = [
         </Button>
       )
     },
-    cell: ({ row }) => <LinearProgressItem estado={row.original.ESTADO ?? 0} />
+    cell: ({ row }) => <LinearProgressItem estado={row.original.ESTADO ?? 0} width="120px" />
   },
 ]
 
@@ -122,22 +122,12 @@ export const columnsNeuAsignado: ColumnDef<NeuAsignadoTable>[] = [
     header: "Marca",
   },
   {
-    accessorKey: "MEDIDA",
-    header: "Medida",
+    accessorKey: "DISENO",
+    header: "Diseño",
   },
   {
-    accessorKey: "REMANENTE",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Remanente
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      )
-    },
+    accessorKey: "MEDIDA",
+    header: "Medida",
   },
   {
     accessorKey: "FECHA_ASIGNACION",
@@ -153,6 +143,28 @@ export const columnsNeuAsignado: ColumnDef<NeuAsignadoTable>[] = [
     accessorKey: "RECUPERADO",
     header: "Recuperado",
     cell: ({ row }) => <EsRecuperadoBadge esRecuperado={row.original.RECUPERADO ?? false} />,
+  },
+  {
+    accessorKey: "PRESION_AIRE",
+    header: "Presión",
+  },
+  {
+    accessorKey: "TORQUE_APLICADO",
+    header: "Torque",
+  },
+  {
+    accessorKey: "REMANENTE",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Remanente
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
   },
   {
     accessorKey: "ESTADO",
@@ -494,10 +506,6 @@ export const columnsNeuInspeccion: ColumnDef<NeuInspeccionTable>[] = [
     header: "Posición",
   },
   {
-    accessorKey: "REMANENTE",
-    header: "Remanente",
-  },
-  {
     accessorKey: "KM_RECORRIDO",
     header: "Km x etapa",
   },
@@ -532,6 +540,10 @@ export const columnsNeuInspeccion: ColumnDef<NeuInspeccionTable>[] = [
         </Tooltip>
       )
     }
+  },
+  {
+    accessorKey: "REMANENTE",
+    header: "Remanente",
   },
   {
     accessorKey: "PORCENTAJE_VIDA",

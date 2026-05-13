@@ -989,7 +989,7 @@ function normalizePayload(mov: any) {
     FECHA_COMPRA: mov.FECHA_COMPRA || '',
     USUARIO_SUPER: mov.USUARIO_SUPER || '',
     PRESION_AIRE: mov.PRESION_AIRE || '',
-    TORQUE_APLICADO: mov.TORQUE_APLICADO || '',
+    TORQUE_APLICADO: mov.TORQUE_APLICADO,
     ESTADO: mov.ESTADO || '',
     PLACA: mov.PLACA || '',
     POSICION_NEU: mov.POSICION_NEU || '',

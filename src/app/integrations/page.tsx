@@ -95,15 +95,17 @@ export default function Page(): React.JSX.Element {
     MODELO: string;
     TIPO: string;
     COLOR: string;
+    NROSERIE: string,
+    NROMOTOR: string,
     ANO: number;
-    PROYECTO: string;
-    OPERACION?: string;
-    KILOMETRO: number;
     KILOMETRAJE: number;
+    KILOMETRAJE_GESNEU: number;
     ID_OPERACION: number;
+    OPERACION: string;
     ID_SUPERVISOR: string;
-    TIPO_TERRENO: string
-    RETEN: string
+    TIPO_TERRENO: string;
+    RETEN: string;
+    mensaje?: null | string
   }
 
   const handleSearchChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -154,7 +156,7 @@ export default function Page(): React.JSX.Element {
           const pos = n.POSICION_NEU || n.POSICION;
           if (pos && ['POS01', 'POS02', 'POS03', 'POS04', 'RES01'].includes(pos)) {
             const existente = porPosicion.get(pos);
-            if (!existente || (n.ID_MOVIMIENTO || 0) > (existente.ID_MOVIMIENTO || 0)) {
+            if (!existente || (n.ID || 0) > (existente.ID || 0)) {
               porPosicion.set(pos, n);
             }
           }
@@ -175,7 +177,7 @@ export default function Page(): React.JSX.Element {
           .map((n: any) => Number(n.Odometro ?? n.ODOMETRO ?? n.KILOMETRO ?? n.KILOMETRAJE))
           .filter((v: number) => !isNaN(v) && v > 0);
 
-        const ultimoKmReal = odometros.length > 0 ? Math.max(...odometros) : Number(vehiculoData.KILOMETRO ?? vehiculoData.KILOMETRAJE ?? 0);
+        const ultimoKmReal = odometros.length > 0 ? Math.max(...odometros) : Number(vehiculoData.KILOMETRAJE_GESNEU ?? vehiculoData.KILOMETRAJE ?? 0);
 
         animateKilometraje(0, ultimoKmReal);
 
@@ -230,7 +232,7 @@ export default function Page(): React.JSX.Element {
           const pos = n.POSICION_NEU;
           if (pos && ['POS01', 'POS02', 'POS03', 'POS04', 'RES01'].includes(pos)) {
             const existente = neumaticosPorPosicion.get(pos);
-            if (!existente || (n.ID_MOVIMIENTO || 0) > (existente.ID_MOVIMIENTO || 0)) {
+            if (!existente || (n.ID || 0) > (existente.ID || 0)) {
               neumaticosPorPosicion.set(pos, n);
             }
           }
@@ -297,7 +299,7 @@ export default function Page(): React.JSX.Element {
         const pos = n.POSICION_NEU || n.POSICION;
         if (pos && ['POS01', 'POS02', 'POS03', 'POS04', 'RES01'].includes(pos)) {
           const existente = porPosicion.get(pos);
-          if (!existente || (n.ID_MOVIMIENTO || 0) > (existente.ID_MOVIMIENTO || 0)) {
+          if (!existente || (n.ID || 0) > (existente.ID || 0)) {
             porPosicion.set(pos, n);
           }
         }
@@ -357,7 +359,7 @@ export default function Page(): React.JSX.Element {
           const pos = n.POSICION_NEU || n.POSICION;
           if (pos && ['POS01', 'POS02', 'POS03', 'POS04', 'RES01'].includes(pos)) {
             const existente = porPosicion.get(pos);
-            if (!existente || (n.ID_MOVIMIENTO || 0) > (existente.ID_MOVIMIENTO || 0)) {
+            if (!existente || (n.ID || 0) > (existente.ID || 0)) {
               porPosicion.set(pos, n);
             }
           }
@@ -410,7 +412,7 @@ export default function Page(): React.JSX.Element {
         const pos = n.POSICION_NEU || n.POSICION;
         if (pos && ['POS01', 'POS02', 'POS03', 'POS04', 'RES01'].includes(pos)) {
           const existente = porPosicion.get(pos);
-          if (!existente || (n.ID_MOVIMIENTO || 0) > (existente.ID_MOVIMIENTO || 0)) {
+          if (!existente || (n.ID || 0) > (existente.ID || 0)) {
             porPosicion.set(pos, n);
           }
         }
@@ -545,7 +547,8 @@ export default function Page(): React.JSX.Element {
       return Math.max(...odometros);
     }
     // Fallback: usar el del vehículo
-    return Number(vehiculo?.KILOMETRO ?? vehiculo?.KILOMETRAJE ?? 0);
+    const kilometrajeFinalJe = vehiculo?.KILOMETRAJE_GESNEU ? vehiculo?.KILOMETRAJE_GESNEU : vehiculo?.KILOMETRAJE
+    return Number(kilometrajeFinalJe ?? 0);
   }, [movimientosHistoricos, vehiculo]);
 
   // Animar el kilometraje mostrado cuando cambie el valor real
@@ -991,7 +994,7 @@ export default function Page(): React.JSX.Element {
           </div>
 
           <DataTableNeumaticos columns={columnsNeuDisponible} data={neumaticosDisponiblesUseQuery} type='pagination' filters={true} />
-          
+
         </Card>
 
       </Stack>
@@ -1173,10 +1176,10 @@ export default function Page(): React.JSX.Element {
               modelo: vehiculo.MODELO,
               anio: String(vehiculo.ANO),
               color: vehiculo.COLOR,
-              proyecto: vehiculo.PROYECTO,
+              // proyecto: vehiculo.PROYECTO,
               operacion: vehiculo.OPERACION,
               id_operacion: vehiculo.ID_OPERACION,
-              kilometro: vehiculo.KILOMETRO,
+              kilometro: vehiculo.KILOMETRAJE_GESNEU ? vehiculo.KILOMETRAJE_GESNEU : vehiculo.KILOMETRAJE,
               cod_supervisor: vehiculo.ID_SUPERVISOR,
               tipo_terreno: vehiculo.TIPO_TERRENO,
               reten: vehiculo.RETEN
@@ -1246,10 +1249,10 @@ export default function Page(): React.JSX.Element {
           modelo: vehiculo.MODELO,
           anio: String(vehiculo.ANO),
           color: vehiculo.COLOR,
-          proyecto: vehiculo.PROYECTO,
+          // proyecto: vehiculo.PROYECTO,
           operacion: vehiculo.OPERACION,
           id_operacion: vehiculo.ID_OPERACION,
-          kilometro: vehiculo.KILOMETRO,
+          kilometro: vehiculo.KILOMETRAJE_GESNEU ? vehiculo.KILOMETRAJE_GESNEU : vehiculo.KILOMETRAJE,
           cod_supervisor: vehiculo.ID_SUPERVISOR
         } : undefined}
         user={user || undefined}
@@ -1294,9 +1297,9 @@ export default function Page(): React.JSX.Element {
               modelo: vehiculo.MODELO,
               anio: String(vehiculo.ANO),
               color: vehiculo.COLOR,
-              proyecto: vehiculo.PROYECTO,
+              // proyecto: vehiculo.PROYECTO,
               operacion: vehiculo.OPERACION,
-              kilometro: vehiculo.KILOMETRO,
+              kilometro: vehiculo.KILOMETRAJE_GESNEU ? vehiculo.KILOMETRAJE_GESNEU : vehiculo.KILOMETRAJE,
               id_operacion: vehiculo.ID_OPERACION,
               cod_supervisor: vehiculo.ID_SUPERVISOR
             } : undefined}

@@ -53,17 +53,47 @@ export const columnsPadron: ColumnDef<PadronExcel>[] = [
   {
     accessorKey: "MARCA",
     meta: { exportLabel: "Marca" },
-    header: "Marca",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Marca
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
   },
   {
     accessorKey: "MEDIDA",
     meta: { exportLabel: "Medida" },
-    header: "Medida",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Medida
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
   },
   {
     accessorKey: "DISEÑO",
     meta: { exportLabel: "Diseño" },
-    header: "Diseño",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Diseño
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
   },
   {
     accessorKey: "PR",
@@ -115,7 +145,17 @@ export const columnsPadron: ColumnDef<PadronExcel>[] = [
   {
     accessorKey: "LEASING",
     meta: { exportLabel: "Leasing" },
-    header: "Leasing",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Leasing
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
     cell: ({ row }) => row.original.LEASING ? row.original.LEASING : '-',
   },
   {
@@ -136,12 +176,32 @@ export const columnsPadron: ColumnDef<PadronExcel>[] = [
   {
     accessorKey: "COSTO",
     meta: { exportLabel: "Costo" },
-    header: "Costo ($)",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Costo ($)
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
   },
   {
     accessorKey: "PROVEEDOR",
     meta: { exportLabel: "Proveedor" },
-    header: "Proveedor",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Proveedor
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
   },
   {
     accessorKey: "FECHA_FABRICACION_COD",
@@ -185,6 +245,36 @@ export const columnsPadron: ColumnDef<PadronExcel>[] = [
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
           Placa
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
+  },
+  {
+    accessorKey: "TORQUE_ACTUAL",
+    meta: { exportLabel: "Torque" },
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Torque
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
+  },
+  {
+    accessorKey: "PRESION_AIRE",
+    meta: { exportLabel: "Presión" },
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Presión
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       )

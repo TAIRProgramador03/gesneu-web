@@ -40,6 +40,8 @@ export interface PadronExcel {
   RECUPERADO?: boolean | undefined
   ESTADO: number
   PLACA?: string
+  PRESION_AIRE: number,
+  TORQUE_ACTUAL: number
 }
 
 export type ListPadronMapped = PadronMapped[]

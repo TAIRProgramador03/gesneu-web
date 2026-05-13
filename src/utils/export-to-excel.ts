@@ -26,7 +26,7 @@ export const exportToExcel = ({ data, username, title = 'Default title', fileNam
     v: title,
     t: 's',
     s: {
-      font: { bold: true, color: { rgb: 'FFFFFF' }, sz: 22 },
+      font: { bold: true, color: { rgb: 'FFFFFF' }, sz: 12 },
       fill: { fgColor: { rgb: '002141' } },
       alignment: { horizontal: 'center', vertical: 'center' },
       border: thinBorder,
@@ -67,7 +67,7 @@ export const exportToExcel = ({ data, username, title = 'Default title', fileNam
   });
 
   ws['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: numCols - 1 } }];
-  ws['!rows'] = [{ hpt: 65 }];
+  ws['!rows'] = [{ hpt: 28 }];
 
   const colWidths = headers.map((header) => {
     if (header === 'Proveedor') return { wch: 30 };

@@ -39,7 +39,7 @@ interface FormValues {
   estado: string;
   observacion: string;
   presion_aire: string;
-  torque: string;
+  torque: number;
   fecha_inspeccion: string;
 }
 
@@ -114,7 +114,7 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
     estado: '',
     observacion: '',
     presion_aire: '',
-    torque: '',
+    torque: 0,
     fecha_inspeccion: '', // <-- Agregado para evitar el error
   });
   const [openAsignacion, setOpenAsignacion] = React.useState(false);
@@ -235,7 +235,7 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
           // Limpiar selección y formulario si los asignados cambian
           setNeumaticoSeleccionado(null);
           setFormValues({
-            kilometro: '', marca: '', modelo: '', codigo: '', posicion: '', medida: '', diseño: '', remanente: '', presion_aire: '', torque: '', tipo_movimiento: '', estado: '', observacion: '', fecha_inspeccion: '',
+            kilometro: '', marca: '', modelo: '', codigo: '', posicion: '', medida: '', diseño: '', remanente: '', presion_aire: '', torque: 0, tipo_movimiento: '', estado: '', observacion: '', fecha_inspeccion: '',
           });
           setFormValuesInicial(null);
         })
@@ -243,7 +243,7 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
           setNeuAsignados([]);
           setNeumaticoSeleccionado(null);
           setFormValues({
-            kilometro: '', marca: '', modelo: '', codigo: '', posicion: '', medida: '', diseño: '', remanente: '', presion_aire: '', torque: '', tipo_movimiento: '', estado: '', observacion: '', fecha_inspeccion: '',
+            kilometro: '', marca: '', modelo: '', codigo: '', posicion: '', medida: '', diseño: '', remanente: '', presion_aire: '', torque: 0, tipo_movimiento: '', estado: '', observacion: '', fecha_inspeccion: '',
           });
           setFormValuesInicial(null);
         });
@@ -314,7 +314,7 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
       if (!open) {
         setInspeccionesPendientes([]);
         setFormValues({
-          kilometro: '', marca: '', modelo: '', codigo: '', posicion: '', medida: '', diseño: '', remanente: '', presion_aire: '', torque: '', tipo_movimiento: '', estado: '', observacion: '', fecha_inspeccion: '',
+          kilometro: '', marca: '', modelo: '', codigo: '', posicion: '', medida: '', diseño: '', remanente: '', presion_aire: '', torque: 0, tipo_movimiento: '', estado: '', observacion: '', fecha_inspeccion: '',
         });
         setFormValuesInicial(null);
         setNeumaticoSeleccionado(null);
@@ -355,7 +355,7 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
     // Obtener el último movimiento real desde el backend
     let remanenteUltimoMovimientoX = '';
     let presionUltimoMovimiento = '';
-    let torqueUltimoMovimiento = '';
+    let torqueUltimoMovimiento = 0;
     let kilometroUltimoMovimiento = '';
     try {
       // DEBUG: Log Inputs
@@ -375,7 +375,7 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
 
       remanenteUltimoMovimientoX = finalData.REMANENTE ? finalData.REMANENTE.toString() : '';
       presionUltimoMovimiento = finalData.PRESION_AIRE ? finalData.PRESION_AIRE.toString() : '';
-      torqueUltimoMovimiento = finalData.TORQUE_APLICADO ? finalData.TORQUE_APLICADO.toString() : ''; // Cargar torque
+      torqueUltimoMovimiento = finalData.TORQUE_APLICADO ? finalData.TORQUE_APLICADO : 0; // Cargar torque
       kilometroUltimoMovimiento = finalData.KILOMETRO ? finalData.KILOMETRO.toString() : '';
 
       const fechaRef = finalData.FECHA_MOVIMIENTO || finalData.FECHA_REGISTRO || finalData.FECHA_ASIGNACION;
@@ -743,7 +743,7 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
         REMANENTE: ins.remanente ? parseFloat(ins.remanente) : null,
         RQ: poNeu?.RQ ?? null,
         TIPO_MOVIMIENTO: ins.tipo_movimiento ?? null,
-        TORQUE_APLICADO: ins.torque ? parseFloat(ins.torque) : null,
+        TORQUE_APLICADO: isNaN(ins.torque) ? 0 : Number(ins.torque),
         USUARIO_SUPER: user?.usuario || 'SISTEMA',
         VELOCIDAD: poNeu?.VELOCIDAD ?? null,
         COD_SUPERVISOR: vehiculo?.cod_supervisor,
@@ -897,6 +897,8 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
     }
   }, [open, placa, cantidadPosicionesValidas, advertenciaPosiciones.open]);
 
+  console.log({ formValues })
+
   return (
     <>
       {/* Modal de advertencia de cantidad de neumáticos */}
@@ -1019,7 +1021,7 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
                       {vehiculo?.kilometro !== undefined && (
                         <Box>
                           <Typography variant="caption" color="text.secondary">Kilometraje</Typography>
-                          <Typography variant="body2" sx={{ fontWeight: 'bold' }}>{vehiculo.kilometro.toLocaleString()} km</Typography>
+                          <Typography variant="body2" sx={{ fontWeight: 'bold' }}>{initialOdometro.toLocaleString()} km</Typography>
                         </Box>
                       )}
 
@@ -1107,11 +1109,11 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
                     name="torque"
                     type="number"
                     size="small"
-                    value={formValues.torque ?? ''}
+                    value={formValues.torque}
                     onChange={(e) => {
                       if (esRES01) return;
                       const value = Number(e.target.value);
-                      setFormValues(prev => ({ ...prev, torque: e.target.value }));
+                      setFormValues(prev => ({ ...prev, torque: Number(e.target.value) }));
                       if (value < 110 || value > 150) {
                         setTorqueError(true);
                       } else {

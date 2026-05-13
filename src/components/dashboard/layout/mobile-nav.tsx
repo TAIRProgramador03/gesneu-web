@@ -17,6 +17,7 @@ import { paths } from '@/paths';
 import { isNavItemActive } from '@/lib/is-nav-item-active';
 //import { Logo } from '@/components/core/logo';
 
+import { useUser } from '@/hooks/use-user';
 import { navItems } from './config';
 import { navIcons } from './nav-icons';
 
@@ -28,6 +29,11 @@ export interface MobileNavProps {
 
 export function MobileNav({ open, onClose }: MobileNavProps): React.JSX.Element {
   const pathname = usePathname();
+  const { user } = useUser();
+  const username = user?.usuario?.toUpperCase() ?? '';
+  const visibleNavItems = navItems.filter((item) =>
+    !item.allowedUsers || item.allowedUsers.includes(username.trim())
+  );
 
   return (
     <Drawer
@@ -67,7 +73,7 @@ export function MobileNav({ open, onClose }: MobileNavProps): React.JSX.Element 
       {/* Este Box empuja el nav hacia abajo */}
       <Box sx={{ flex: 1 }} />
       <Box component="nav" sx={{ p: '12px' }}>
-        {renderNavItems({ pathname, items: navItems, onClose })}
+        {renderNavItems({ pathname, items: visibleNavItems, onClose })}
       </Box>
       <Divider sx={{ borderColor: 'var(--mui-palette-neutral-700)' }} />
     </Drawer>
@@ -110,12 +116,12 @@ function NavItem({ disabled, external, href, icon, matcher, pathname, title, onC
       <Box
         {...(href
           ? {
-              component: external ? 'a' : RouterLink,
-              href,
-              target: external ? '_blank' : undefined,
-              rel: external ? 'noreferrer' : undefined,
-              onClick: onClose, // <-- Aquí cierras el drawer al hacer click
-            }
+            component: external ? 'a' : RouterLink,
+            href,
+            target: external ? '_blank' : undefined,
+            rel: external ? 'noreferrer' : undefined,
+            onClick: onClose, // <-- Aquí cierras el drawer al hacer click
+          }
           : { role: 'button', onClick: onClose })}
         sx={{
           alignItems: 'center',

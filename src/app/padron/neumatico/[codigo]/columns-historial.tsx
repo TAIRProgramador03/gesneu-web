@@ -5,6 +5,7 @@ import { ColumnDef } from '@tanstack/react-table'
 import { TipoMovimientoBadge } from '@/components/ui/TipoMovimientoBadge'
 import { convertToDateHuman } from '@/lib/utils'
 import type { MovimientoHistorial } from '@/hooks/use-neumatico-detail'
+import Link from 'next/link'
 
 const TipoMovimientoBadgeNew = ({ tipo = 0, text = '' }: { tipo: number, text: string }) => {
   return (
@@ -39,7 +40,7 @@ export const columnsHistorial: ColumnDef<MovimientoHistorial>[] = [
   {
     accessorKey: 'PLACA_VEHICULO',
     header: 'Placa',
-    cell: ({ row }) => row.original.PLACA_VEHICULO || '—',
+    cell: ({ row }) => row.original.PLACA_VEHICULO ? <Link href={`/padron/placa/${row.original.PLACA_VEHICULO}`} target="_blank">{row.original.PLACA_VEHICULO}</Link> : '—',
   },
   {
     accessorKey: 'POSICION_ANTERIOR_EN_VEHICULO',

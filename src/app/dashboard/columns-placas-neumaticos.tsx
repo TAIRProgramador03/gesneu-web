@@ -3,6 +3,7 @@ import { PlacasConNeumaticos } from "@/api/Neumaticos"
 import { Button } from "@/components/ui/button"
 import { ColumnDef } from "@tanstack/react-table"
 import { ArrowUpDown } from "lucide-react"
+import Link from "next/link"
 
 const getBadgeColor = (cantidad: number) => {
   if (cantidad === 0) return 'bg-red-100 text-red-700 border border-red-500'
@@ -14,6 +15,7 @@ export const columnsPlacasNeumaticos: ColumnDef<PlacasConNeumaticos>[] = [
   {
     accessorKey: "PLACA",
     meta: { exportLabel: "Placa" },
+    cell: ({ row }) => <Link href={`/padron/placa/${row.original.PLACA}`} target="_blank">{row.original.PLACA}</Link>,
     header: ({ column }) => {
       return (
         <Button

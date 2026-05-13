@@ -31,6 +31,8 @@ export interface Customer {
   ESTADO: number;
   PLACA?: string; // Añadido para poder agrupar por placa
   RECUPERADO?: boolean,
+  PRESION_AIRE: number,
+  TORQUE_ACTUAL: number
 }
 
 interface CustomersTableProps {

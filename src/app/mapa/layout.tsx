@@ -4,7 +4,7 @@ import { config } from '@/config';
 import { SideBarMain } from '@/components/navegation/SideBarMain';
 
 export const metadata: Metadata = {
-  title: `Movimiento | ${config.site.name}`,
+  title: `Mapa de Talleres | ${config.site.name}`,
 }
 
 export default function IntegrationsLayout({
