@@ -7,6 +7,8 @@ import { useTheme } from '@mui/material/styles';
 import Divider from '@mui/material/Divider';
 import { useQuery } from '@tanstack/react-query';
 import { obtenerTalleresConNeumaticos, TallerConNeumaticos } from '@/api/Neumaticos';
+import { PermissionGuard } from '@/components/auth/permission-guard';
+import { useUser } from '@/hooks/use-user';
 
 interface Taller {
   id: number;
@@ -116,47 +118,52 @@ export const MapaTalleres = () => {
     setSelectedId(prev => prev === id ? null : id);
   }
 
+  const { user, error, isLoading } = useUser();
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', gap: 14 }}>
 
-      {/* ── 4 Mini KPIs ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, flexShrink: 0 }}>
-        {([
-          { label: 'Total neumáticos', value: TOTAL_FLOTA, sub: 'neumáticos', color: '#3B82F6' },
-          { label: 'Talleres con neumáticos', value: talleresConNeumaticos.length, sub: 'en todo el Perú', color: '#8B5CF6' },
-          { label: 'Mayor taller', value: MAYOR.CANTIDAD_NEUMATICOS, sub: MAYOR.TALLER, color: '#F59E0B' },
-          { label: 'Promedio por taller', value: PROMEDIO, sub: 'neumáticos / taller', color: '#22C55E' },
-        ] as { label: string; value: number | string; sub: string; color: string }[]).map(({ label, value, sub, color }) => (
-          <div
-            key={label}
-            style={{
-              background: cardBg,
-              border: `1px solid ${border}`,
-              borderTop: `3px solid ${color}`,
-              borderRadius: 10,
-              padding: '12px 16px',
-              position: 'relative',
-              overflow: 'hidden',
-            }}
-          >
-            {/* Glow sutil */}
-            <div style={{
-              position: 'absolute', top: -20, right: -20,
-              width: 80, height: 80, borderRadius: '50%',
-              background: `${color}0C`, pointerEvents: 'none',
-            }} />
-            <div style={{ fontSize: 10, fontWeight: 700, color: textSec, letterSpacing: '0.07em', marginBottom: 4 }}>
-              {label.toUpperCase()}
-            </div>
-            <div style={{ fontSize: 26, fontWeight: 800, color: textPri, lineHeight: 1, marginBottom: 3 }}>
-              {value}
-            </div>
-            <div style={{ fontSize: 11, color: textSec, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              {sub}
-            </div>
+      {
+        user?.usuario?.trim() === 'EGAMBOA' || user?.usuario?.trim() === 'GESNEU' && (
+          < div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, flexShrink: 0 }}>
+            {([
+              { label: 'Total neumáticos', value: TOTAL_FLOTA, sub: 'neumáticos', color: '#3B82F6' },
+              { label: 'Talleres con neumáticos', value: talleresConNeumaticos.length, sub: 'en todo el Perú', color: '#8B5CF6' },
+              { label: 'Mayor taller', value: MAYOR.CANTIDAD_NEUMATICOS, sub: MAYOR.TALLER, color: '#F59E0B' },
+              { label: 'Promedio por taller', value: PROMEDIO, sub: 'neumáticos / taller', color: '#22C55E' },
+            ] as { label: string; value: number | string; sub: string; color: string }[]).map(({ label, value, sub, color }) => (
+              <div
+                key={label}
+                style={{
+                  background: cardBg,
+                  border: `1px solid ${border}`,
+                  borderTop: `3px solid ${color}`,
+                  borderRadius: 10,
+                  padding: '12px 16px',
+                  position: 'relative',
+                  overflow: 'hidden',
+                }}
+              >
+                {/* Glow sutil */}
+                <div style={{
+                  position: 'absolute', top: -20, right: -20,
+                  width: 80, height: 80, borderRadius: '50%',
+                  background: `${color}0C`, pointerEvents: 'none',
+                }} />
+                <div style={{ fontSize: 10, fontWeight: 700, color: textSec, letterSpacing: '0.07em', marginBottom: 4 }}>
+                  {label.toUpperCase()}
+                </div>
+                <div style={{ fontSize: 26, fontWeight: 800, color: textPri, lineHeight: 1, marginBottom: 3 }}>
+                  {value}
+                </div>
+                <div style={{ fontSize: 11, color: textSec, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {sub}
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
+        )
+      }
 
       {/* ── Mapa + Panel ── */}
       <div style={{ display: 'flex', gap: 20, flex: 1, minHeight: 0 }}>
@@ -341,6 +348,6 @@ export const MapaTalleres = () => {
           ))}
         </div>
       </div>
-    </div>
+    </div >
   );
 }

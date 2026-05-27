@@ -15,9 +15,9 @@ export default function IntegrationsLayout({
 }) {
   return (
     <SideBarMain>
-      <PermissionGuard allowedUsers={['GESNEU', 'EGAMBOA']}>
-        {children}
-      </PermissionGuard>
+      {/* <PermissionGuard allowedUsers={['GESNEU', 'EGAMBOA']}> */}
+      {children}
+      {/* </PermissionGuard> */}
     </SideBarMain>
   )
 }
