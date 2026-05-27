@@ -62,3 +62,15 @@ a{
   text-decoration: underline;
   color: #167bd9;
 }
+
+#map.focus {
+  outline: none;
+}
+
+#map .leaflet-interactive:focus {
+  outline: none;
+}
+
+#map .leaflet-interactive {
+  outline: none;
+}

@@ -766,3 +766,31 @@ export const obtenerHistorialPorPlaca = async (placa: string) => {
   }
 }
 
+export interface MovimientoEnBaja {
+  ID_MOVIMIENTO: number;
+  ID_NEUMATICO: number;
+  CODIGO_NEUMATICO: string;
+  MARCA_NEUMATICO: string;
+  MEDIDA_NEUMATICO: string;
+  DISENO_NEUMATICO: string;
+  COSTO_NEUMATICO: number;
+  PLACA_MOVIMIENTO: string;
+  PROYECTO_MOVIMIENTO: string;
+  KM_RECORRIDOS_MOVIMIENTO: number;
+  TERRENO: string;
+  CONDICION: string;
+  TIPO_BAJA: string;
+  FECHA_BAJA: Date | string;
+}
+
+export const obtenerMovimientosDeNeumaticosEnBaja = async () => {
+  try {
+    const response = await axios.get<MovimientoEnBaja[]>(`/api/po-reportes/bajas`, {
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error en obtenerMovimientosDeNeumaticosEnBaja:', error);
+    throw error;
+  }
+}

@@ -251,6 +251,37 @@ export const columnsPadron: ColumnDef<PadronExcel>[] = [
     },
   },
   {
+    accessorKey: "PRIMER_ODOMETRO",
+    meta: { exportLabel: "Odometro montaje" },
+    cell: ({ row }) => row.original.PRIMER_ODOMETRO !== null ? row.original.PRIMER_ODOMETRO : '-',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Odometro montaje
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
+  },
+  {
+    accessorKey: "KILOMETRO",
+    meta: { exportLabel: "Km recorrido" },
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Km recorrido
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
+  },
+  {
     accessorKey: "TORQUE_ACTUAL",
     meta: { exportLabel: "Torque" },
     header: ({ column }) => {

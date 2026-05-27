@@ -19,7 +19,7 @@ export default function Page(): React.JSX.Element {
           Mapa de Talleres
         </h2>
         <p style={{ margin: 0, fontSize: 14, color: '#64748b' }}>
-          Distribución geográfica de la flota por taller · datos mock
+          Distribución geográfica de la flota por taller
         </p>
       </div>
 

@@ -42,6 +42,8 @@ export interface PadronExcel {
   PLACA?: string
   PRESION_AIRE: number,
   TORQUE_ACTUAL: number
+  KILOMETRO: number
+  PRIMER_ODOMETRO?: number | null
 }
 
 export type ListPadronMapped = PadronMapped[]

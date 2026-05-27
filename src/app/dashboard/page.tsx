@@ -104,7 +104,7 @@ export default function Page(): React.JSX.Element {
       <Grid lg={4} md={6} xs={12}>
         <CollapsibleCard
           loading={isLoading}
-          title="Estado de la Flota"
+          title="Estado de los neumáticos"
           subtitle="Asignados vs disponibles"
           icon={<PieChart size={16} />}
           iconColor="#0084d1"

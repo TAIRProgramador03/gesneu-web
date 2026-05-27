@@ -552,7 +552,8 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
             KILOMETRO: kilometroActual,
             REMANENTE: neumaticoSeleccionado.REMANENTE,
             COD_SUPERVISOR: vehiculo?.cod_supervisor,
-            ID_OPERACION: vehiculo?.id_operacion
+            ID_OPERACION: vehiculo?.id_operacion,
+            POSICION: neumaticoSeleccionado.POSICION || neumaticoSeleccionado.POSICION_NEU
           });
         }
 
@@ -572,8 +573,7 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
 
         const data = await desasignarConReemplazo(payload);
 
-
-        toast.success(`${neumaticosSeleccionados.length} desasignación(es) y ${asignacionesTempo.length} asignación(es) registradas correctamente.`, {
+        toast.success(data?.mensaje || `${neumaticosSeleccionados.length} desasignación(es) y ${asignacionesTempo.length} asignación(es) registradas correctamente.`, {
           position: 'top-right',
           duration: 6000
         })
@@ -605,9 +605,12 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
       }
       onClose();
     } catch (error: any) {
-      const mensajeError = error?.response?.data?.detalle || error?.message || 'Error desconocido';
-      toast.error(`Error al registrar la desasignación: ${mensajeError}`, {
-        duration: 8000
+      const errData = error?.response?.data;
+      const mensajeError = errData?.error || errData?.detalle || error?.message || 'Error desconocido';
+      const detalle = errData?.error && errData?.detalle ? ` — ${errData.detalle}` : '';
+      toast.error(`${mensajeError}`, {
+        description: detalle,
+        duration: 6000,
       })
     }
   };
@@ -741,7 +744,7 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
                         >
                           <MenuItem value="RECOBRO">Recobro</MenuItem>
                           <MenuItem value="SINIESTRO">Siniestro</MenuItem>
-                          <MenuItem value="DESGASTE NATURAL">Desgaste natural</MenuItem>
+                          <MenuItem value="DESGASTE NORMAL">Desgaste normal</MenuItem>
                         </TextField>
                       )
                     }

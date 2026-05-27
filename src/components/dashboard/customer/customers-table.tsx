@@ -33,6 +33,8 @@ export interface Customer {
   RECUPERADO?: boolean,
   PRESION_AIRE: number,
   TORQUE_ACTUAL: number
+  KILOMETRO: number
+  PRIMER_ODOMETRO?: number | null
 }
 
 interface CustomersTableProps {

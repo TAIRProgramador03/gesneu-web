@@ -126,9 +126,9 @@ function NeuRow({ neu, tipo }: { neu: NeumaticoDelHistorial; tipo: number }) {
           {neu.PORCENTAJE_VIDA_UTIL !== null && (
             <span className={cn(
               'text-[10px] font-semibold rounded-full px-1.5',
-              neu.PORCENTAJE_VIDA_UTIL >= 60 ? 'bg-green-50 text-green-600' :
-                neu.PORCENTAJE_VIDA_UTIL >= 30 ? 'bg-amber-50 text-amber-600' :
-                  'bg-red-50 text-red-600'
+              neu.PORCENTAJE_VIDA_UTIL < 39 ? 'bg-red-50 text-red-600' :
+                neu.PORCENTAJE_VIDA_UTIL < 79 ? 'bg-amber-50 text-amber-600' :
+                  'bg-green-50 text-green-600'
             )}>
               {neu.PORCENTAJE_VIDA_UTIL}%
             </span>

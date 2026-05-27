@@ -9,9 +9,10 @@ import { useUser } from '@/hooks/use-user';
 export interface PermissionGuardProps {
   children: React.ReactNode;
   blockedUsers?: string[];
+  allowedUsers?: string[];
 }
 
-export function PermissionGuard({ children, blockedUsers = [] }: PermissionGuardProps): React.JSX.Element | null {
+export function PermissionGuard({ children, blockedUsers = [], allowedUsers }: PermissionGuardProps): React.JSX.Element | null {
   const router = useRouter();
   const { user, isLoading } = useUser();
   const [isChecking, setIsChecking] = React.useState<boolean>(true);
@@ -19,13 +20,20 @@ export function PermissionGuard({ children, blockedUsers = [] }: PermissionGuard
   React.useEffect(() => {
     if (isLoading) return;
 
-    if (user && blockedUsers.includes(user.usuario?.trim() ?? '')) {
+    const username = user?.usuario?.trim() ?? '';
+
+    if (allowedUsers && allowedUsers.length > 0) {
+      if (!user || !allowedUsers.includes(username)) {
+        router.replace(paths.dashboard.overview);
+        return;
+      }
+    } else if (user && blockedUsers.includes(username)) {
       router.replace(paths.dashboard.overview);
       return;
     }
 
     setIsChecking(false);
-  }, [user, isLoading, blockedUsers, router]);
+  }, [user, isLoading, blockedUsers, allowedUsers, router]);
 
   if (isChecking || isLoading) return null;
 
