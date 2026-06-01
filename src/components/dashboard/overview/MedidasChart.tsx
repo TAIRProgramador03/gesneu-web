@@ -73,7 +73,7 @@ export const MedidasChart = (): React.JSX.Element => {
 
   const { data = [], isLoading } = useQuery({
     queryKey: ['cantidad-de-neumaticos-por-medida', { filtro, taller }],
-    queryFn: () => obtenerCantidadPorMedida(filtro, taller),
+    queryFn: () => obtenerCantidadPorMedida(taller, filtro),
   })
 
   const medidasPorNeumaticos = data.map((neu) => {

@@ -498,7 +498,7 @@ interface CantidadNeumaticosVidaUtil {
   NEUMATICOS_TOTALES: number;
 }
 
-export const obtenerCantidadNeumaticosVidaUtil = async (filtro: FiltroEstadoNeumatico = 'todos', taller: string) => {
+export const obtenerCantidadNeumaticosVidaUtil = async (taller: string, filtro: FiltroEstadoNeumatico = 'todos') => {
   try {
     const response = await axios.get<CantidadNeumaticosVidaUtil>(`/api/po-neumaticos/cantidad-de-estados`, {
       withCredentials: true,
@@ -543,7 +543,7 @@ export interface MarcaNeumaticoCantidad {
   CANTIDAD_NEUMATICOS: number
 }
 
-export const obtenerCantidadPorMarca = async (filtro: FiltroEstadoNeumatico = 'todos', taller: string) => {
+export const obtenerCantidadPorMarca = async (taller: string, filtro: FiltroEstadoNeumatico = 'todos') => {
   try {
     const response = await axios.get<MarcaNeumaticoCantidad[]>(`/api/po-neumaticos/cantidad-por-marca`, {
       withCredentials: true,
@@ -563,7 +563,7 @@ export interface DisenoNeumaticoCantidad {
 
 export type FiltroEstadoNeumatico = 'todos' | 'asignados' | 'disponibles' | 'bajas' | 'recuperados';
 
-export const obtenerCantidadPorDiseno = async (filtro: FiltroEstadoNeumatico = 'todos', taller: string) => {
+export const obtenerCantidadPorDiseno = async (taller: string, filtro: FiltroEstadoNeumatico = 'todos') => {
   try {
     const response = await axios.get<DisenoNeumaticoCantidad[]>(`/api/po-neumaticos/cantidad-por-diseno`, {
       withCredentials: true,
@@ -584,7 +584,7 @@ export interface MedidaNeumaticoCantidad {
   CANTIDAD_NEUMATICOS: number
 }
 
-export const obtenerCantidadPorMedida = async (filtro: FiltroEstadoNeumatico = 'todos', taller: string) => {
+export const obtenerCantidadPorMedida = async (taller: string, filtro: FiltroEstadoNeumatico = 'todos') => {
   try {
     const response = await axios.get<MedidaNeumaticoCantidad[]>(`/api/po-neumaticos/cantidad-por-medida`, {
       withCredentials: true,

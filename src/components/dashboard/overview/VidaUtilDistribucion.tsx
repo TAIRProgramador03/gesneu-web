@@ -109,7 +109,7 @@ export const VidaUtilDistribucion = (): React.JSX.Element => {
     NEUMATICOS_TOTALES: 1
   }, isLoading } = useQuery({
     queryKey: ['vida-util-neumaticos', { filtro, taller }],
-    queryFn: () => obtenerCantidadNeumaticosVidaUtil(filtro, taller),
+    queryFn: () => obtenerCantidadNeumaticosVidaUtil(taller, filtro),
   })
 
   const MOCK_VIDA_UTIL = [

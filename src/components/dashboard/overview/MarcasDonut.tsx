@@ -79,7 +79,7 @@ export const MarcasDonut = (): React.JSX.Element => {
 
   const { data = [], isLoading } = useQuery({
     queryKey: ['cantidad-de-neumaticos-por-marca', { filtro, taller }],
-    queryFn: () => obtenerCantidadPorMarca(filtro, taller),
+    queryFn: () => obtenerCantidadPorMarca(taller, filtro),
   })
 
   const cantidadesPorMarca = data.map((neu, index) => {
