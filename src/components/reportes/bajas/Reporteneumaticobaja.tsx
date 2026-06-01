@@ -324,7 +324,7 @@ export default function ReporteNeumaticoBaja() {
             Análisis de rendimiento y costo por kilómetro (C.K) de neumáticos retirados
           </p>
         </div>
-        <button
+        {/* <button
           onClick={() => exportCSV(tablaCK, { condicion, medida, diseno, tipoBaja })}
           disabled={tablaCK.length === 0}
           style={{
@@ -339,7 +339,7 @@ export default function ReporteNeumaticoBaja() {
             <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" />
           </svg>
           Exportar CSV
-        </button>
+        </button> */}
       </div>
 
       {/* ---- FILTROS ---- */}

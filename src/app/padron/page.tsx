@@ -1,12 +1,13 @@
 'use client';
 
 import * as React from 'react';
+import { useEffect } from 'react';
 import { ArrowClockwise as RefreshIcon } from '@phosphor-icons/react/dist/ssr/ArrowClockwise';
 import { Card } from '@mui/material';
 import { columnsPadron } from './columns';
 import { DataTableNeumaticos } from '@/components/ui/data-table/data-table';
 import { Download as DownloadIcon } from '@phosphor-icons/react/dist/ssr/Download';
-import { Neumaticos, obtenerTodasLasMarcas, obtenerTodasLasMedidas, obtenerTodosLosDisenos } from '@/api/Neumaticos';
+import { Neumaticos, obtenerLosTalleresDelUsuario, obtenerTodasLasMarcas, obtenerTodasLasMedidas, obtenerTodosLosDisenos } from '@/api/Neumaticos';
 import { useQuery } from '@tanstack/react-query';
 import { useState, useMemo } from "react";
 import { useTheme } from '@mui/material/styles';
@@ -27,6 +28,7 @@ import type { FilterChipDef } from '@/hooks/use-table-filter';
 import { PadronExcel } from '@/types/padron';
 import SelectBetter from 'react-select';
 import { useSelectPadron } from '@/hooks/use-select-padron';
+
 
 const SELECT_STYLES = {
   multiValue: (base: object) => ({
@@ -68,7 +70,7 @@ export default function Page(): React.JSX.Element {
     placeholderData: []
   })
 
-  const { DISEÑO_OPTIONS, MARCA_OPTIONS, MEDIDA_OPTIONS, isLoadingSelectDiseno, isLoadingSelectMarca, isLoadingSelectMedida } = useSelectPadron()
+  const { DISEÑO_OPTIONS, MARCA_OPTIONS, MEDIDA_OPTIONS, TALLER_OPTIONS, isLoadingSelectDiseno, isLoadingSelectMarca, isLoadingSelectMedida, isLoadingSelectTaller } = useSelectPadron()
 
   const PADRON_CHIPS: FilterChipDef<PadronExcel>[] = useMemo(() => [
     { key: 'DISPONIBLE', label: 'Disponibles', color: 'green', filter: c => c.TIPO_MOVIMIENTO === 'DISPONIBLE' },
@@ -80,11 +82,17 @@ export default function Page(): React.JSX.Element {
     { key: 'diseño', accessor: item => item.DISEÑO },
     { key: 'medida', accessor: item => item.MEDIDA },
     { key: 'id_marca', accessor: item => item.ID_MARCA },
+    { key: 'value', accessor: item => item.PROYECTO },
   ], []);
 
   const { filteredData: filteredCustomers, chipActive, setChipActive, chipCounts, selectValues, setSelectValue } =
     useComboFilter(customers, PADRON_CHIPS, PADRON_SELECTS);
 
+  useEffect(() => {
+    if (TALLER_OPTIONS.length === 1) {
+      setSelectValue('value', [TALLER_OPTIONS[0].value]);
+    }
+  }, [TALLER_OPTIONS]);
 
   const ModalOverlay = styled.div`
   position: fixed;
@@ -222,6 +230,19 @@ export default function Page(): React.JSX.Element {
         />
 
         <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+          <Box sx={{ minWidth: 200, flex: 1, maxWidth: 280 }}>
+            <SelectBetter
+              isMulti
+              isSearchable
+              isDisabled={isLoadingCustomers || isLoadingSelectTaller || TALLER_OPTIONS.length === 1}
+              onChange={(opts) => setSelectValue('value', opts ? opts.map((o: { value: string }) => o.value) : [])}
+              value={TALLER_OPTIONS.filter(o => (selectValues['value'] ?? []).includes(o.value))}
+              options={TALLER_OPTIONS}
+              placeholder="Seleccionar taller(es)"
+              noOptionsMessage={() => 'Sin opciones'}
+              styles={SELECT_STYLES}
+            />
+          </Box>
           <Box sx={{ minWidth: 200, flex: 1, maxWidth: 280 }}>
             <SelectBetter
               isMulti

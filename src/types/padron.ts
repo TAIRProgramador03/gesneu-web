@@ -44,6 +44,7 @@ export interface PadronExcel {
   TORQUE_ACTUAL: number
   KILOMETRO: number
   PRIMER_ODOMETRO?: number | null
+  FECHA_BAJA: string | null
 }
 
 export type ListPadronMapped = PadronMapped[]

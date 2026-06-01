@@ -10,6 +10,7 @@ import { TipoMovimientoBadge } from "@/components/ui/TipoMovimientoBadge";
 import { LinearProgressItem } from "@/components/ui/LinearProgress";
 import { PadronExcel } from "@/types/padron";
 import Link from "next/link";
+import { convertToDateHuman } from "@/lib/utils";
 
 export const columnsPadron: ColumnDef<PadronExcel>[] = [
   {
@@ -276,6 +277,22 @@ export const columnsPadron: ColumnDef<PadronExcel>[] = [
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
           Km recorrido
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
+  },
+  {
+    accessorKey: "FECHA_BAJA",
+    meta: { exportLabel: "Fecha de baja" },
+    cell: ({ row }) => row.original.FECHA_BAJA !== null ? convertToDateHuman(row.original.FECHA_BAJA) : '-',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Fecha de baja
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       )

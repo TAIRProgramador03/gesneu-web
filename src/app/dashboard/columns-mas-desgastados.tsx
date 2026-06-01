@@ -49,6 +49,11 @@ export const columnsNeuCriticos: ColumnDef<NeumaticoEnCritico>[] = [
     header: "Torque",
   },
   {
+    accessorKey: "TALLER_ACTUAL",
+    meta: { exportLabel: "Taller" },
+    header: "Taller",
+  },
+  {
     accessorKey: "PLACA_VEHICULO",
     meta: { exportLabel: "Placa" },
     header: "Placa",

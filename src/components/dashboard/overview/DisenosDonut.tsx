@@ -4,8 +4,16 @@ import * as React from 'react';
 import { useTheme } from '@mui/material/styles';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 import { useQuery } from '@tanstack/react-query';
-import { obtenerCantidadPorDiseno } from '@/api/Neumaticos';
+import { obtenerCantidadPorDiseno, obtenerLosTalleresDelUsuario } from '@/api/Neumaticos';
 import { BadgeCheck } from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import type { FiltroEstadoNeumatico } from '@/api/Neumaticos';
 
 const VIBRANT_COLORS = [
   '#4f46e5',
@@ -49,7 +57,7 @@ function DisenosTooltip({ active, payload, total }: any) {
       </div>
       <div style={{ fontSize: 13, color: isDark ? '#f1f5f9' : '#1e293b' }}>{value} neumáticos</div>
       <div style={{ fontSize: 11, color: isDark ? '#94a3b8' : '#64748b', marginTop: 2 }}>
-        {((value / total) * 100).toFixed(1)}% del total
+        {((value / total) * 100).toFixed(2)}% del total
       </div>
     </div>
   );
@@ -57,10 +65,21 @@ function DisenosTooltip({ active, payload, total }: any) {
 
 export const DisenosDonut = (): React.JSX.Element => {
   const theme = useTheme();
+  const [filtro, setFiltro] = React.useState<FiltroEstadoNeumatico>('todos');
+  const [taller, setTaller] = React.useState<string>('todos');
+
+  const { data: talleres = [] } = useQuery({
+    queryKey: ['talleres-del-usuario'],
+    queryFn: obtenerLosTalleresDelUsuario,
+  });
+
+  React.useEffect(() => {
+    if (talleres.length === 1) setTaller(talleres[0].value);
+  }, [talleres]);
 
   const { data = [], isLoading } = useQuery({
-    queryKey: ['cantidad-de-neumaticos-por-diseno'],
-    queryFn: obtenerCantidadPorDiseno
+    queryKey: ['cantidad-de-neumaticos-por-diseno', { filtro, taller }],
+    queryFn: () => obtenerCantidadPorDiseno(filtro, taller),
   })
 
   const cantidadesPorMarca = data.map((neu, index) => {
@@ -75,6 +94,35 @@ export const DisenosDonut = (): React.JSX.Element => {
 
   return (
     <div style={{ padding: '20px' }}>
+
+      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginBottom: 12 }}>
+        <Select value={taller} onValueChange={setTaller}>
+          <SelectTrigger className="w-40 h-8 text-xs">
+            <SelectValue placeholder="Taller" />
+          </SelectTrigger>
+          <SelectContent className="max-h-60 overflow-y-auto">
+            {talleres.length > 1 && (
+              <SelectItem value="todos">Todos los talleres</SelectItem>
+            )}
+            {talleres.map((t) => (
+              <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        <Select value={filtro} onValueChange={(v) => setFiltro(v as FiltroEstadoNeumatico)}>
+          <SelectTrigger className="w-36 h-8 text-xs">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="todos">Todos</SelectItem>
+            <SelectItem value="asignados">Asignados</SelectItem>
+            <SelectItem value="disponibles">Disponibles</SelectItem>
+            <SelectItem value="bajas">Bajas</SelectItem>
+            <SelectItem value="recuperados">Recuperados</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
 
       {
         total === 0 && !isLoading && (
@@ -132,7 +180,7 @@ export const DisenosDonut = (): React.JSX.Element => {
             {/* Leyenda en 2 columnas */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px 16px', marginTop: 4 }}>
               {cantidadesPorMarca.map((item) => {
-                const pct = ((item.value / total) * 100).toFixed(1);
+                const pct = ((item.value / total) * 100).toFixed(2);
                 return (
                   <div key={item.name} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                     <div style={{ width: 9, height: 9, borderRadius: 2, background: item.color, flexShrink: 0 }} />

@@ -7,8 +7,16 @@ import {
   ResponsiveContainer, LabelList,
 } from 'recharts';
 import { useQuery } from '@tanstack/react-query';
-import { obtenerCantidadPorMedida } from '@/api/Neumaticos';
+import { obtenerCantidadPorMedida, obtenerLosTalleresDelUsuario } from '@/api/Neumaticos';
 import { BadgeCheck } from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import type { FiltroEstadoNeumatico } from '@/api/Neumaticos';
 
 const COLOR_ASIG = '#0084d1';
 const COLOR_BAJ = '#e7000b';
@@ -51,10 +59,21 @@ function MedidasTooltip({ active, payload, label }: any) {
 
 export const MedidasChart = (): React.JSX.Element => {
   const theme = useTheme();
+  const [filtro, setFiltro] = React.useState<FiltroEstadoNeumatico>('todos');
+  const [taller, setTaller] = React.useState<string>('todos');
+
+  const { data: talleres = [] } = useQuery({
+    queryKey: ['talleres-del-usuario'],
+    queryFn: obtenerLosTalleresDelUsuario,
+  });
+
+  React.useEffect(() => {
+    if (talleres.length === 1) setTaller(talleres[0].value);
+  }, [talleres]);
 
   const { data = [], isLoading } = useQuery({
-    queryKey: ['cantidad-de-neumaticos-por-medida'],
-    queryFn: obtenerCantidadPorMedida
+    queryKey: ['cantidad-de-neumaticos-por-medida', { filtro, taller }],
+    queryFn: () => obtenerCantidadPorMedida(filtro, taller),
   })
 
   const medidasPorNeumaticos = data.map((neu) => {
@@ -73,7 +92,7 @@ export const MedidasChart = (): React.JSX.Element => {
   function TotalLabel({ x, y, width, height, index }: any) {
     const item = medidasPorNeumaticos[index as number];
     if (!item) return null;
-    const pct = ((item.total / TOTAL_FLOTA) * 100).toFixed(1);
+    const pct = ((item.total / TOTAL_FLOTA) * 100).toFixed(2);
     const xPos = (x as number) + (width as number) + 8;
     const yMid = (y as number) + (height as number) / 2;
     return (
@@ -92,6 +111,37 @@ export const MedidasChart = (): React.JSX.Element => {
 
   return (
     <div style={{ padding: '20px' }}>
+
+      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginBottom: 12 }}>
+        <Select value={taller} onValueChange={setTaller}>
+          <SelectTrigger className="w-40 h-8 text-xs">
+            <SelectValue placeholder="Taller" />
+          </SelectTrigger>
+          <SelectContent className="max-h-60 overflow-y-auto">
+            {talleres.length > 1 && (
+              <SelectItem value="todos">Todos los talleres</SelectItem>
+            )}
+            {talleres.map((t) => (
+              <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        <Select value={filtro} onValueChange={(v) => setFiltro(v as FiltroEstadoNeumatico)}>
+          <SelectTrigger className="w-36 h-8 text-xs">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="todos">Todos</SelectItem>
+            <SelectItem value="asignados">Asignados</SelectItem>
+            <SelectItem value="disponibles">Disponibles</SelectItem>
+            <SelectItem value="bajas">Bajas</SelectItem>
+            <SelectItem value="recuperados">Recuperados</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+
       {
         TOTAL_FLOTA === 0 && !isLoading && (
           <div className='flex gap-1 flex-wrap justify-center items-center bg-indigo-50 text-blue-700 border-2 border-blue-700 p-2 rounded-lg'>

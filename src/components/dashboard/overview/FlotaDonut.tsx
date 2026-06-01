@@ -30,7 +30,7 @@ function DonutTooltip({ active, payload, total }: any) {
       </div>
       <div style={{ fontSize: 13, color: isDark ? '#f1f5f9' : '#1e293b' }}>{value} neumáticos</div>
       <div style={{ fontSize: 11, color: isDark ? '#94a3b8' : '#64748b', marginTop: 2 }}>
-        {((value / total) * 100).toFixed(1)}% del parque
+        {((value / total) * 100).toFixed(2)}% del taller
       </div>
     </div>
   );
@@ -111,7 +111,7 @@ export const FlotaDonut = ({ data }: { data: DataFlotaDonut[] }): React.JSX.Elem
             {/* Leyenda */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 4 }}>
               {data.map((item) => {
-                const pct = TOTAL === 0 ? 0 : ((item.value / TOTAL) * 100).toFixed(1);
+                const pct = TOTAL === 0 ? 0 : ((item.value / TOTAL) * 100).toFixed(2);
                 return (
                   <div key={item.name} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <div style={{ width: 10, height: 10, borderRadius: 2, background: item.color, flexShrink: 0 }} />

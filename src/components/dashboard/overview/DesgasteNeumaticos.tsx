@@ -8,10 +8,17 @@ import {
   ResponsiveContainer, Cell, ReferenceLine, LabelList,
 } from 'recharts';
 import { useQuery } from '@tanstack/react-query';
-import { obtenerCodigosNeumaticosDesgastadosPorMilKms, obtenerDesgastePorMilKms } from '@/api/Neumaticos';
+import { obtenerCodigosNeumaticosDesgastadosPorMilKms, obtenerDesgastePorMilKms, obtenerLosTalleresDelUsuario } from '@/api/Neumaticos';
 import { Divider, Skeleton } from '@mui/material';
 import { BadgeCheck } from 'lucide-react';
 import SelectBetter, { MultiValue } from 'react-select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 function getTasaColor(desgasteMilKms: number): string {
   if (desgasteMilKms > 2.5) return '#EF4444';
@@ -29,7 +36,7 @@ function DesgasteTooltip({ active, payload, fleetAvg }: any) {
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
   if (!active || !payload?.length) return null;
-  const { codNeumatico, desgasteMilKms, remanenteMontado, remanenteActual, costoPorKm, kmTotales, costo, marca, kmRemanente, medida, diseno, tipoBaja } = payload[0].payload;
+  const { codNeumatico, desgasteMilKms, remanenteMontado, remanenteActual, costoPorKm, kmTotales, costo, marca, kmRemanente, medida, diseno, tipoBaja, tallerActual } = payload[0].payload;
   const color = getTasaColor(desgasteMilKms);
   const severity = desgasteMilKms > 2.5 ? 'Alto' : desgasteMilKms > 1.5 ? 'Moderado' : 'Normal';
 
@@ -51,6 +58,10 @@ function DesgasteTooltip({ active, payload, fleetAvg }: any) {
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16 }}>
+          <span style={{ fontSize: 12, color: isDark ? '#94a3b8' : '#64748b' }}>Taller actual</span>
+          <span style={{ fontSize: 12, fontWeight: 600, color: isDark ? '#f1f5f9' : '#1e293b' }}>{tallerActual}</span>
+        </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16 }}>
           <span style={{ fontSize: 12, color: isDark ? '#94a3b8' : '#64748b' }}>Km. recorrido</span>
           <span style={{ fontSize: 12, fontWeight: 600, color: isDark ? '#f1f5f9' : '#1e293b' }}>{kmTotales}</span>
@@ -122,17 +133,27 @@ function TasaLabel({ x, y, width, height, index, desgastes }: any) {
 
 export const DesgasteNeumaticos = (): React.JSX.Element => {
   const theme = useTheme();
+  const [taller, setTaller] = React.useState<string>('todos');
+
+  const { data: talleres = [] } = useQuery({
+    queryKey: ['talleres-del-usuario'],
+    queryFn: obtenerLosTalleresDelUsuario,
+  });
+
+  React.useEffect(() => {
+    if (talleres.length === 1) setTaller(talleres[0].value);
+  }, [talleres]);
 
   const [selectedNeumaticos, setSelectedNeumaticos] = useState<MultiValue<{
     value: number;
     label: string;
   }>>([]);
 
-  const initialized = useRef(false);
+  const initializedTallerRef = useRef<string | null>(null);
 
   const { data: codigosNeumaticos = [] } = useQuery({
-    queryKey: ['codigos-neumaticos-desgastes-por-neumatico-1000-kms'],
-    queryFn: obtenerCodigosNeumaticosDesgastadosPorMilKms
+    queryKey: ['codigos-neumaticos-desgastes-por-neumatico-1000-kms', { taller }],
+    queryFn: () => obtenerCodigosNeumaticosDesgastadosPorMilKms(taller)
   })
 
   const codigosFormatSelect = useMemo(() =>
@@ -143,15 +164,20 @@ export const DesgasteNeumaticos = (): React.JSX.Element => {
     , [codigosNeumaticos])
 
   useEffect(() => {
-    if (codigosFormatSelect.length > 0 && !initialized.current) {
-      initialized.current = true;
+    initializedTallerRef.current = null;
+    setSelectedNeumaticos([]);
+  }, [taller])
+
+  useEffect(() => {
+    if (codigosFormatSelect.length > 0 && initializedTallerRef.current !== taller) {
+      initializedTallerRef.current = taller;
       setSelectedNeumaticos(codigosFormatSelect.slice(0, 5));
     }
-  }, [codigosFormatSelect])
+  }, [codigosFormatSelect, taller])
 
   const { data = [], isLoading } = useQuery({
-    queryKey: ['desgastes-por-neumatico-1000-kms', { values: selectedNeumaticos }],
-    queryFn: () => obtenerDesgastePorMilKms(selectedNeumaticos),
+    queryKey: ['desgastes-por-neumatico-1000-kms', { values: selectedNeumaticos, taller }],
+    queryFn: () => obtenerDesgastePorMilKms(selectedNeumaticos, taller),
     staleTime: 1000 * 60 * 5
   })
 
@@ -169,7 +195,8 @@ export const DesgasteNeumaticos = (): React.JSX.Element => {
       medida: n.MEDIDA_NEUMATICO,
       diseno: n.DISENO_NEUMATICO,
       kmRemanente: n.KM_POR_REMAMENTE,
-      tipoBaja: n.TIPO_BAJA
+      tipoBaja: n.TIPO_BAJA,
+      tallerActual: n.TALLER_ACTUAL
     }))
 
     const alertCount = neumaticos.filter(d => d.desgasteMilKms > 2.0).length;
@@ -191,6 +218,22 @@ export const DesgasteNeumaticos = (): React.JSX.Element => {
 
   return (
     <div style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column' }}>
+
+      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginBottom: 12 }}>
+        <Select value={taller} onValueChange={setTaller}>
+          <SelectTrigger className="w-40 h-8 text-xs">
+            <SelectValue placeholder="Taller" />
+          </SelectTrigger>
+          <SelectContent className="max-h-60 overflow-y-auto">
+            {talleres.length > 1 && (
+              <SelectItem value="todos">Todos los talleres</SelectItem>
+            )}
+            {talleres.map((t) => (
+              <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
 
       {
         isLoading && (

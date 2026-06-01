@@ -13,8 +13,15 @@ import {
   LabelList
 } from 'recharts';
 import { useQuery } from '@tanstack/react-query';
-import { obtenerCantidadNeumaticosVidaUtil } from '@/api/Neumaticos';
+import { FiltroEstadoNeumatico, obtenerCantidadNeumaticosVidaUtil, obtenerLosTalleresDelUsuario } from '@/api/Neumaticos';
 import { BadgeCheck } from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 function VidaTooltip({ active, payload, total }: any) {
 
@@ -42,7 +49,7 @@ function VidaTooltip({ active, payload, total }: any) {
         {cantidad} neumáticos
       </div>
       <div style={{ fontSize: 11, color: isDark ? '#94a3b8' : '#64748b', marginTop: 2 }}>
-        {((cantidad / total) * 100).toFixed(1)}% del total
+        {((cantidad / total) * 100).toFixed(2)}% del total
       </div>
     </div>
   );
@@ -53,7 +60,7 @@ function TopLabel({ x, y, width, value, index, total, items }: any) {
   const theme = useTheme();
   const item = items[index];
   if (!item) return null;
-  const pct = ((value / total) * 100).toFixed(0);
+  const pct = ((value / total) * 100).toFixed(2);
   return (
     <g>
       <text
@@ -83,6 +90,17 @@ function TopLabel({ x, y, width, value, index, total, items }: any) {
 
 export const VidaUtilDistribucion = (): React.JSX.Element => {
   const theme = useTheme();
+  const [filtro, setFiltro] = React.useState<FiltroEstadoNeumatico>('todos');
+  const [taller, setTaller] = React.useState<string>('todos');
+
+  const { data: talleres = [] } = useQuery({
+    queryKey: ['talleres-del-usuario'],
+    queryFn: obtenerLosTalleresDelUsuario,
+  });
+
+  React.useEffect(() => {
+    if (talleres.length === 1) setTaller(talleres[0].value);
+  }, [talleres]);
 
   const { data = {
     NEUMATICOS_CRITICO: 1,
@@ -90,8 +108,8 @@ export const VidaUtilDistribucion = (): React.JSX.Element => {
     NEUMATICOS_BUENO: 1,
     NEUMATICOS_TOTALES: 1
   }, isLoading } = useQuery({
-    queryKey: ['vida-util-neumaticos'],
-    queryFn: () => obtenerCantidadNeumaticosVidaUtil()
+    queryKey: ['vida-util-neumaticos', { filtro, taller }],
+    queryFn: () => obtenerCantidadNeumaticosVidaUtil(filtro, taller),
   })
 
   const MOCK_VIDA_UTIL = [
@@ -102,6 +120,35 @@ export const VidaUtilDistribucion = (): React.JSX.Element => {
 
   return (
     <div style={{ padding: '20px' }}>
+
+      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginBottom: 12 }}>
+        <Select value={taller} onValueChange={setTaller}>
+          <SelectTrigger className="w-40 text-xs">
+            <SelectValue placeholder="Taller" />
+          </SelectTrigger>
+          <SelectContent className='max-h-60 overflow-y-auto'>
+            {talleres.length > 1 && (
+              <SelectItem value="todos">Todos los talleres</SelectItem>
+            )}
+            {talleres.map((t) => (
+              <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        <Select value={filtro} onValueChange={(v) => setFiltro(v as FiltroEstadoNeumatico)}>
+          <SelectTrigger className="w-36 h-8 text-xs">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="todos">Todos</SelectItem>
+            <SelectItem value="asignados">Asignados</SelectItem>
+            <SelectItem value="disponibles">Disponibles</SelectItem>
+            <SelectItem value="bajas">Bajas</SelectItem>
+            <SelectItem value="recuperados">Recuperados</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
 
       {
         data?.NEUMATICOS_TOTALES === 0 && !isLoading && (

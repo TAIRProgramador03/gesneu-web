@@ -498,10 +498,11 @@ interface CantidadNeumaticosVidaUtil {
   NEUMATICOS_TOTALES: number;
 }
 
-export const obtenerCantidadNeumaticosVidaUtil = async () => {
+export const obtenerCantidadNeumaticosVidaUtil = async (filtro: FiltroEstadoNeumatico = 'todos', taller: string) => {
   try {
     const response = await axios.get<CantidadNeumaticosVidaUtil>(`/api/po-neumaticos/cantidad-de-estados`, {
       withCredentials: true,
+      params: { filtro, taller },
     });
     return response.data;
   } catch (error) {
@@ -521,12 +522,14 @@ export interface NeumaticoEnCritico {
   TORQUE_NEUMATICO: number
   REMANENTE_NEUMATICO: number
   PORCENTAJE_VIDA: number
+  TALLER_ACTUAL: string
 }
 
-export const obtenerNeumaticosEnCritico = async () => {
+export const obtenerNeumaticosEnCritico = async (taller: string) => {
   try {
     const response = await axios.get<NeumaticoEnCritico[]>(`/api/po-neumaticos/estado-critico`, {
       withCredentials: true,
+      params: { taller }
     });
     return response.data;
   } catch (error) {
@@ -540,10 +543,11 @@ export interface MarcaNeumaticoCantidad {
   CANTIDAD_NEUMATICOS: number
 }
 
-export const obtenerCantidadPorMarca = async () => {
+export const obtenerCantidadPorMarca = async (filtro: FiltroEstadoNeumatico = 'todos', taller: string) => {
   try {
     const response = await axios.get<MarcaNeumaticoCantidad[]>(`/api/po-neumaticos/cantidad-por-marca`, {
       withCredentials: true,
+      params: { filtro, taller },
     });
     return response.data;
   } catch (error) {
@@ -557,10 +561,13 @@ export interface DisenoNeumaticoCantidad {
   CANTIDAD_NEUMATICOS: number
 }
 
-export const obtenerCantidadPorDiseno = async () => {
+export type FiltroEstadoNeumatico = 'todos' | 'asignados' | 'disponibles' | 'bajas' | 'recuperados';
+
+export const obtenerCantidadPorDiseno = async (filtro: FiltroEstadoNeumatico = 'todos', taller: string) => {
   try {
     const response = await axios.get<DisenoNeumaticoCantidad[]>(`/api/po-neumaticos/cantidad-por-diseno`, {
       withCredentials: true,
+      params: { filtro, taller },
     });
     return response.data;
   } catch (error) {
@@ -577,10 +584,11 @@ export interface MedidaNeumaticoCantidad {
   CANTIDAD_NEUMATICOS: number
 }
 
-export const obtenerCantidadPorMedida = async () => {
+export const obtenerCantidadPorMedida = async (filtro: FiltroEstadoNeumatico = 'todos', taller: string) => {
   try {
     const response = await axios.get<MedidaNeumaticoCantidad[]>(`/api/po-neumaticos/cantidad-por-medida`, {
       withCredentials: true,
+      params: { filtro, taller },
     });
     return response.data;
   } catch (error) {
@@ -605,19 +613,20 @@ export interface DesgasteNeumatico {
   KM_POR_REMAMENTE: number
   COSTO_NEUMATICO: number
   TIPO_BAJA: number
+  TALLER_ACTUAL: string
 }
 
 export const obtenerDesgastePorMilKms = async (values: MultiValue<{
   value: number;
   label: string;
-}>) => {
+}>, taller: string) => {
 
   const valuesToSend = values.length >= 1 ? values.map((value) => value.value) : []
 
   try {
     const response = await axios.post<DesgasteNeumatico[]>(
       `/api/po-neumaticos/desgaste-por-mil-kms`,
-      { valuesToSend },
+      { valuesToSend, taller },
       {
         withCredentials: true,
       }
@@ -635,10 +644,11 @@ interface CodigoNeumatico {
   DESGASTE_POR_1000KM: number
 }
 
-export const obtenerCodigosNeumaticosDesgastadosPorMilKms = async (): Promise<CodigoNeumatico[]> => {
+export const obtenerCodigosNeumaticosDesgastadosPorMilKms = async (taller: string): Promise<CodigoNeumatico[]> => {
   try {
     const response = await axios.get<CodigoNeumatico[]>(`/api/po-neumaticos/codigo-neumaticos-desgaste-por-mil-kms`, {
       withCredentials: true,
+      params: { taller }
     });
     return response.data;
   } catch (error) {
@@ -791,6 +801,23 @@ export const obtenerMovimientosDeNeumaticosEnBaja = async () => {
     return response.data;
   } catch (error) {
     console.error('Error en obtenerMovimientosDeNeumaticosEnBaja:', error);
+    throw error;
+  }
+}
+
+export interface Talleres {
+  value: string
+  label: string
+}
+
+export const obtenerLosTalleresDelUsuario = async () => {
+  try {
+    const response = await axios.get<Talleres[]>(`/api/mapa/todos-los-talleres`, {
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error en obtenerLosTalleresDelUsuario:', error);
     throw error;
   }
 }
