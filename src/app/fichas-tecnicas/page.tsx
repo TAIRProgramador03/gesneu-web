@@ -32,21 +32,22 @@ const MARCAS: ('Todos' | Marca)[] = ['Todos', 'Hankook', 'Marshall', 'Pirelli'];
 
 // Data de ejemplo (luego vendrá de API)
 const FICHAS: FichaTecnica[] = [
-  { id: '1', marca: 'Hankook', modelo: 'Dynapro MT2 - RT05', medida: '265/65 R17', tipo: 'M/T', pdfUrl: '/fichas/LTR-0032 LT265 65R17 RT05.pdf' },
-  { id: '2', marca: 'Hankook', modelo: 'Dynapro MT2 - RT05', medida: '265/65 R17', tipo: 'MIXTA', pdfUrl: '/fichas/LTR-0032 LT265 65R17 RT05.pdf' },
-  { id: '3', marca: 'Marshall', modelo: 'Road Venture MT51', medida: '265/60 R18', tipo: 'M/T', pdfUrl: '/fichas/MARSHALL MT.pdf' },
-  { id: '4', marca: 'Marshall', modelo: 'Road Venture MT51', medida: '265/65 R17', tipo: 'A/T', pdfUrl: '/fichas/MARSHALL MT.pdf' },
-  { id: '5', marca: 'Marshall', modelo: 'Road Venture MT51', medida: '265/65 R17', tipo: 'M/T', pdfUrl: '/fichas/MARSHALL MT.pdf' },
-  { id: '6', marca: 'Marshall', modelo: 'Road Venture MT51', medida: '265/75 R17', tipo: 'M/T', pdfUrl: '/fichas/MARSHALL MT.pdf' },
-  { id: '7', marca: 'Marshall', modelo: 'Road Venture MT51', medida: '225/75 R16', tipo: 'M/T', pdfUrl: '/fichas/MARSHALL MT.pdf' },
-  { id: '8', marca: 'Pirelli', modelo: 'Scorpion ATR', medida: '215/75 R15', tipo: 'M/T', pdfUrl: '/fichas/PIRELLI AT + MT.pdf' },
-  { id: '9', marca: 'Pirelli', modelo: 'Scorpion ATR', medida: '215/75 R17.5', tipo: 'MIXTA', pdfUrl: '/fichas/PIRELLI AT + MT.pdf' },
-  { id: '10', marca: 'Pirelli', modelo: 'Scorpion ATR', medida: '225/75 R16', tipo: 'A/T', pdfUrl: '/fichas/PIRELLI AT + MT.pdf' },
-  { id: '11', marca: 'Pirelli', modelo: 'Scorpion ATR', medida: '255/70 R16', tipo: 'A/T', pdfUrl: '/fichas/PIRELLI AT + MT.pdf' },
-  { id: '12', marca: 'Pirelli', modelo: 'Scorpion ATR', medida: '265/60 R18', tipo: 'A/T', pdfUrl: '/fichas/PIRELLI AT + MT.pdf' },
-  { id: '13', marca: 'Pirelli', modelo: 'Scorpion ATR', medida: '265/65 R17', tipo: 'M/T', pdfUrl: '/fichas/PIRELLI AT + MT.pdf' },
-  { id: '14', marca: 'Pirelli', modelo: 'Scorpion ATR', medida: '265/65 R17', tipo: 'A/T', pdfUrl: '/fichas/PIRELLI AT + MT.pdf' },
-  { id: '15', marca: 'Pirelli', modelo: 'Scorpion ATR', medida: '265/75 R17', tipo: 'M/T', pdfUrl: '/fichas/PIRELLI AT + MT.pdf' },
+  { id: '1', marca: 'Hankook', modelo: 'Dynapro MT2 - RT05', medida: '265/65 R17', tipo: 'M/T', pdfUrl: '/fichas/LTR-0032-LT265-65R17-RT05.pdf' },
+  { id: '2', marca: 'Hankook', modelo: 'Dynapro MT2 - RT05', medida: '265/65 R17', tipo: 'MIXTA', pdfUrl: '/fichas/LTR-0032-LT265-65R17-RT05.pdf' },
+  { id: '3', marca: 'Marshall', modelo: 'Road Venture MT51', medida: '265/60 R18', tipo: 'M/T', pdfUrl: '/fichas/MARSHALL-MT.pdf' },
+  { id: '4', marca: 'Marshall', modelo: 'Road Venture MT51', medida: '265/65 R17', tipo: 'A/T', pdfUrl: '/fichas/MARSHALL-MT.pdf' },
+  { id: '5', marca: 'Marshall', modelo: 'Road Venture MT51', medida: '265/65 R17', tipo: 'M/T', pdfUrl: '/fichas/MARSHALL-MT.pdf' },
+  { id: '6', marca: 'Marshall', modelo: 'Road Venture MT51', medida: '265/75 R17', tipo: 'M/T', pdfUrl: '/fichas/MARSHALL-MT.pdf' },
+  { id: '7', marca: 'Marshall', modelo: 'Road Venture MT51', medida: '225/75 R16', tipo: 'M/T', pdfUrl: '/fichas/MARSHALL-MT.pdf' },
+
+  { id: '8', marca: 'Pirelli', modelo: 'Scorpion ATR', medida: '215/75 R15', tipo: 'M/T', pdfUrl: '/fichas/PIRELLI-AT-+-MT.pdf' },
+  { id: '9', marca: 'Pirelli', modelo: 'Scorpion ATR', medida: '215/75 R17.5', tipo: 'MIXTA', pdfUrl: '/fichas/PIRELLI-AT-+-MT.pdf' },
+  { id: '10', marca: 'Pirelli', modelo: 'Scorpion ATR', medida: '225/75 R16', tipo: 'A/T', pdfUrl: '/fichas/PIRELLI-AT-+-MT.pdf' },
+  { id: '11', marca: 'Pirelli', modelo: 'Scorpion ATR', medida: '255/70 R16', tipo: 'A/T', pdfUrl: '/fichas/PIRELLI-AT-+-MT.pdf' },
+  { id: '12', marca: 'Pirelli', modelo: 'Scorpion ATR', medida: '265/60 R18', tipo: 'A/T', pdfUrl: '/fichas/PIRELLI-AT-+-MT.pdf' },
+  { id: '13', marca: 'Pirelli', modelo: 'Scorpion ATR', medida: '265/65 R17', tipo: 'M/T', pdfUrl: '/fichas/PIRELLI-AT-+-MT.pdf' },
+  { id: '14', marca: 'Pirelli', modelo: 'Scorpion ATR', medida: '265/65 R17', tipo: 'A/T', pdfUrl: '/fichas/PIRELLI-AT-+-MT.pdf' },
+  { id: '15', marca: 'Pirelli', modelo: 'Scorpion ATR', medida: '265/75 R17', tipo: 'M/T', pdfUrl: '/fichas/PIRELLI-AT-+-MT.pdf' },
 ];
 
 export default function Page(): React.JSX.Element {
