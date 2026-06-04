@@ -61,6 +61,7 @@ export default function Page(): React.JSX.Element {
       const coincideTexto =
         q === '' ||
         f.modelo.toLowerCase().includes(q) ||
+        f.tipo.toLowerCase().includes(q) ||
         f.medida.toLowerCase().includes(q) ||
         f.marca.toLowerCase().includes(q);
       return coincideMarca && coincideTexto;
@@ -93,7 +94,7 @@ export default function Page(): React.JSX.Element {
             type="text"
             value={busqueda}
             onChange={(e) => setBusqueda(e.target.value)}
-            placeholder="Buscar por modelo, medida o marca…"
+            placeholder="Buscar por modelo, diseño, medida o marca…"
             className="w-full rounded-xl border border-gray-200 bg-gray-50 py-2.5 pl-11 pr-4 text-sm text-gray-800 outline-none transition focus:border-[#185FA5] focus:bg-white focus:ring-4 focus:ring-[#185FA5]/10"
           />
         </div>
