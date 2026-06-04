@@ -3,6 +3,7 @@
 import * as React from 'react';
 import RouterLink from 'next/link';
 import { usePathname } from 'next/navigation';
+import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
@@ -11,6 +12,7 @@ import Typography from '@mui/material/Typography';
 import { CaretLeft, CaretRight } from '@phosphor-icons/react';
 
 import Tooltip from '@mui/material/Tooltip';
+import type { User } from '@/types/user';
 import type { NavItemConfig } from '@/types/nav';
 import { isNavItemActive } from '@/lib/is-nav-item-active';
 
@@ -93,7 +95,77 @@ export function SideNav({ collapsed, setCollapsed }: SideNavProps): React.JSX.El
           {renderNavItems({ pathname, items: visibleNavItems, collapsed })}
         </Box>
       </Box>
-      <Divider />
+      <Divider sx={{ borderColor: 'rgba(255,255,255,0.12)' }} />
+      <UserCard user={user} collapsed={collapsed} />
+    </Box>
+  );
+}
+
+function UserCard({ user, collapsed }: { user: User | null; collapsed: boolean }): React.JSX.Element {
+  const nombreCompleto = user
+    ? `${String(user.nombre ?? '')} ${String(user.apellido_paterno ?? '')}`.trim()
+    : '';
+  const displayName = nombreCompleto || String(user?.nombre ?? user?.name ?? 'Usuario');
+  const usuario = String(user?.usuario ?? user?.email ?? '');
+  const rol =
+    Array.isArray(user?.perfiles) && user.perfiles.length > 0
+      ? String((user.perfiles[0] as { descripcion?: string }).descripcion ?? '')
+      : '';
+
+  const iniciales = (nombreCompleto || usuario || 'U')
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((p) => p.charAt(0).toUpperCase())
+    .join('');
+
+  return (
+    <Box
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 1.5,
+        px: collapsed ? 0 : 2,
+        py: 2,
+        justifyContent: collapsed ? 'center' : 'flex-start',
+      }}
+    >
+      <Tooltip title={collapsed ? `${displayName}${rol ? ` · ${rol}` : ''}` : ''} placement="right" arrow>
+        <Avatar
+          src={user?.avatar}
+          sx={{
+            bgcolor: '#167bd9',
+            color: '#fff',
+            width: 40,
+            height: 40,
+            fontSize: '0.95rem',
+            fontWeight: 600,
+            flexShrink: 0,
+          }}
+        >
+          {iniciales}
+        </Avatar>
+      </Tooltip>
+      {!collapsed && (
+        <Box sx={{ minWidth: 0, flex: '1 1 auto' }}>
+          <Typography
+            sx={{ color: '#fff', fontWeight: 600, fontSize: '0.95rem', lineHeight: 1.3 }}
+            noWrap
+          >
+            {displayName}
+          </Typography>
+          {rol && (
+            <Typography sx={{ color: '#167bd9', fontSize: '0.75rem', fontWeight: 500 }} noWrap>
+              {rol}
+            </Typography>
+          )}
+          {usuario && (
+            <Typography sx={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.75rem' }} noWrap>
+              {usuario}
+            </Typography>
+          )}
+        </Box>
+      )}
     </Box>
   );
 }
