@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { useState, useEffect } from 'react';
 import 'leaflet/dist/leaflet.css';
 import { MapContainer, TileLayer, CircleMarker, Popup, Tooltip, useMap } from 'react-leaflet';
 import { useTheme } from '@mui/material/styles';
@@ -9,6 +10,7 @@ import { useQuery } from '@tanstack/react-query';
 import { obtenerTalleresConNeumaticos, TallerConNeumaticos } from '@/api/Neumaticos';
 import { PermissionGuard } from '@/components/auth/permission-guard';
 import { useUser } from '@/hooks/use-user';
+import { Input } from '@/components/ui/input';
 
 interface Taller {
   id: number;
@@ -60,7 +62,7 @@ function getRadius(total: number, min: number, max: number): number {
 // Vuela al taller seleccionado (o vuelve a la vista completa de Perú)
 function MapFlyTo({ taller }: { taller: TallerConNeumaticos | null }) {
   const map = useMap();
-  React.useEffect(() => {
+  useEffect(() => {
     if (taller) {
       map.flyTo((MOCK_UBICACIONES[taller.TALLER] || [-9.5, -75.5]) as [number, number], 8, { animate: true, duration: 1.2 });
     } else {
@@ -74,7 +76,8 @@ function MapFlyTo({ taller }: { taller: TallerConNeumaticos | null }) {
 export const MapaTalleres = () => {
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
-  const [selectedId, setSelectedId] = React.useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [search, setSearch] = useState('');
 
   const { data: talleresConNeumaticos = [] } = useQuery({
     queryKey: ['talleres-con-neumaticos'],
@@ -277,59 +280,69 @@ export const MapaTalleres = () => {
 
           <Divider sx={{ my: 0.5 }} />
 
-          <div style={{ fontSize: 11, fontWeight: 700, color: textSec, letterSpacing: '0.07em', marginBottom: 2 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: textSec, letterSpacing: '0.07em', marginBottom: 4 }}>
             TALLERES — click para hacer zoom
           </div>
 
-          {talleresConNeumaticos.map((taller) => {
-            const color = getColor(taller);
-            const selected = selectedId === `${taller.ID}${taller.CH_SERI_TALLER}`;
-            return (
-              <div
-                key={`${taller.ID}${taller.CH_SERI_TALLER}`}
-                role="button"
-                tabIndex={0}
-                onClick={() => handleSelect(`${taller.ID}${taller.CH_SERI_TALLER}`)}
-                onKeyDown={e => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    handleSelect(`${taller.ID}${taller.CH_SERI_TALLER}`);
-                  }
-                }}
-                style={{
-                  padding: '10px 12px', borderRadius: 8, cursor: 'pointer',
-                  border: `1px solid ${selected ? color : border}`,
-                  background: selected ? `${color}12` : 'transparent',
-                  transition: 'all 0.15s',
-                }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 3 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
-                    <div style={{ width: 9, height: 9, borderRadius: '50%', background: color, flexShrink: 0 }} />
-                    <span style={{ fontSize: 12, fontWeight: 700, color: textPri, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {taller.TALLER}
+          {
+            talleresConNeumaticos.length >= 2 && (
+              <Input
+                placeholder="Buscar taller..."
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                className="h-7 text-xs"
+              />
+            )
+          }
+
+          {talleresConNeumaticos
+            .filter(t => t.TALLER.toLowerCase().includes(search.toLowerCase()))
+            .map((taller) => {
+              const color = getColor(taller);
+              const selected = selectedId === `${taller.ID}${taller.CH_SERI_TALLER}`;
+              return (
+                <div
+                  key={`${taller.ID}${taller.CH_SERI_TALLER}`}
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => handleSelect(`${taller.ID}${taller.CH_SERI_TALLER}`)}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleSelect(`${taller.ID}${taller.CH_SERI_TALLER}`);
+                    }
+                  }}
+                  style={{
+                    padding: '10px 12px', borderRadius: 8, cursor: 'pointer',
+                    border: `1px solid ${selected ? color : border}`,
+                    background: selected ? `${color}12` : 'transparent',
+                    transition: 'all 0.15s',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 3 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+                      <div style={{ width: 9, height: 9, borderRadius: '50%', background: color, flexShrink: 0 }} />
+                      <span style={{ fontSize: 12, fontWeight: 700, color: textPri, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {taller.TALLER}
+                      </span>
+                    </div>
+                    <span style={{ fontSize: 14, fontWeight: 800, color: textPri, flexShrink: 0, marginLeft: 6 }}>
+                      {taller.CANTIDAD_NEUMATICOS}
                     </span>
                   </div>
-                  <span style={{ fontSize: 14, fontWeight: 800, color: textPri, flexShrink: 0, marginLeft: 6 }}>
-                    {taller.CANTIDAD_NEUMATICOS}
-                  </span>
+                  <div style={{ height: 4, borderRadius: 2, background: trackBg, overflow: 'hidden', display: 'flex' }}>
+                    <div style={{ width: `${(taller.NEUMATICOS_ASIGNADOS / taller.CANTIDAD_NEUMATICOS) * 100}%`, background: '#3B82F6' }} />
+                    <div style={{ width: `${(taller.NEUMATICOS_DISPONIBLES / taller.CANTIDAD_NEUMATICOS) * 100}%`, background: '#22C55E' }} />
+                    <div style={{ width: `${(taller.NEUMATICOS_BAJAS / taller.CANTIDAD_NEUMATICOS) * 100}%`, background: '#EF4444' }} />
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
+                    <span style={{ fontSize: 10, color: '#3B82F6' }}>{taller.NEUMATICOS_ASIGNADOS} asig.</span>
+                    <span style={{ fontSize: 10, color: '#22C55E' }}>{taller.NEUMATICOS_DISPONIBLES} disp.</span>
+                    <span style={{ fontSize: 10, color: '#EF4444' }}>{taller.NEUMATICOS_BAJAS} baja</span>
+                  </div>
                 </div>
-                {/* <div style={{ fontSize: 10, color: textSec, marginBottom: 6 }}>
-                  {taller.ciudad} · {taller.zona}
-                </div> */}
-                <div style={{ height: 4, borderRadius: 2, background: trackBg, overflow: 'hidden', display: 'flex' }}>
-                  <div style={{ width: `${(taller.NEUMATICOS_ASIGNADOS / taller.CANTIDAD_NEUMATICOS) * 100}%`, background: '#3B82F6' }} />
-                  <div style={{ width: `${(taller.NEUMATICOS_DISPONIBLES / taller.CANTIDAD_NEUMATICOS) * 100}%`, background: '#22C55E' }} />
-                  <div style={{ width: `${(taller.NEUMATICOS_BAJAS / taller.CANTIDAD_NEUMATICOS) * 100}%`, background: '#EF4444' }} />
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
-                  <span style={{ fontSize: 10, color: '#3B82F6' }}>{taller.NEUMATICOS_ASIGNADOS} asig.</span>
-                  <span style={{ fontSize: 10, color: '#22C55E' }}>{taller.NEUMATICOS_DISPONIBLES} disp.</span>
-                  <span style={{ fontSize: 10, color: '#EF4444' }}>{taller.NEUMATICOS_BAJAS} baja</span>
-                </div>
-              </div>
-            );
-          })}
+              );
+            })}
 
           <Divider sx={{ my: 0.5 }} />
 

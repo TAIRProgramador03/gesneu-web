@@ -21,14 +21,14 @@ import {
 } from '@/components/ui/select';
 
 function getTasaColor(desgasteMilKms: number): string {
-  if (desgasteMilKms > 2.5) return '#EF4444';
-  if (desgasteMilKms > 1.5) return '#F59E0B';
+  if (desgasteMilKms > 3.5) return '#EF4444';
+  if (desgasteMilKms > 2.5) return '#F59E0B';
   return '#22C55E';
 }
 
 function getTasaBg(desgasteMilKms: number): string {
-  if (desgasteMilKms > 2.5) return '#EF444415';
-  if (desgasteMilKms > 1.5) return '#F59E0B15';
+  if (desgasteMilKms > 3.5) return '#EF444415';
+  if (desgasteMilKms > 2.5) return '#F59E0B15';
   return '#22C55E15';
 }
 
@@ -38,7 +38,7 @@ function DesgasteTooltip({ active, payload, fleetAvg }: any) {
   if (!active || !payload?.length) return null;
   const { codNeumatico, desgasteMilKms, remanenteMontado, remanenteActual, costoPorKm, kmTotales, costo, marca, kmRemanente, medida, diseno, tipoBaja, tallerActual } = payload[0].payload;
   const color = getTasaColor(desgasteMilKms);
-  const severity = desgasteMilKms > 2.5 ? 'Alto' : desgasteMilKms > 1.5 ? 'Moderado' : 'Normal';
+  const severity = desgasteMilKms > 3.5 ? 'Alto' : desgasteMilKms > 2.5 ? 'Moderado' : 'Normal';
 
   return (
     <div style={{
@@ -313,9 +313,9 @@ export const DesgasteNeumaticos = (): React.JSX.Element => {
             {/* Leyenda de severidad */}
             <div style={{ display: 'flex', gap: 12, marginBottom: 8 }}>
               {[
-                { color: '#EF4444', label: '> 2.5 — Alto' },
-                { color: '#F59E0B', label: '1.5–2.5 — Moderado' },
-                { color: '#22C55E', label: '< 1.5 — Normal' },
+                { color: '#EF4444', label: '> 3.5 — Alto' },
+                { color: '#F59E0B', label: '2.5–3.5 — Moderado' },
+                { color: '#22C55E', label: '< 2.5 — Normal' },
               ].map(({ color, label }) => (
                 <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                   <div style={{ width: 8, height: 8, borderRadius: 2, background: color, flexShrink: 0 }} />

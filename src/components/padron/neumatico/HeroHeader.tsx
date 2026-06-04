@@ -2,6 +2,7 @@ import { NeumaticoBuscado } from '@/api/Neumaticos'
 import { Spec } from '@/components/ui/Spec'
 import { TextoRecuperadoBadge } from '@/components/ui/TextoRecuperadoBadge'
 import { TipoMovimientoBadge } from '@/components/ui/TipoMovimientoBadge'
+import Link from 'next/link'
 import React from 'react'
 
 export const HeroHeader = ({ neu }: { neu: NeumaticoBuscado }) => {
@@ -23,7 +24,13 @@ export const HeroHeader = ({ neu }: { neu: NeumaticoBuscado }) => {
           </p>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-8 gap-y-2 text-sm">
-          <Spec label="Placa" value={neu.PLACA_ACTUAL || "—"} />
+          <div>
+            <span className="text-gray-400 block">Placa</span>
+            {neu.PLACA_ACTUAL
+              ? <Link href={`/padron/placa/${neu.PLACA_ACTUAL}`} className="font-medium text-blue-600 hover:underline">{neu.PLACA_ACTUAL}</Link>
+              : <span className="font-medium text-gray-800">—</span>
+            }
+          </div>
           <Spec label="Remanente" value={`${neu.REMANENTE_ACTUAL} mm`} />
           <Spec label="Taller" value={neu.TALLER_ACTUAL || "—"} />
           <Spec label="Costo" value={`$${neu.COSTO_NEUMATICO.toLocaleString("es-PE")}`} />

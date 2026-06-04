@@ -745,6 +745,7 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
                           <MenuItem value="RECOBRO">Recobro</MenuItem>
                           <MenuItem value="SINIESTRO">Siniestro</MenuItem>
                           <MenuItem value="DESGASTE NORMAL">Desgaste normal</MenuItem>
+                          <MenuItem value="FALLA DE FABRICA">Falla de fábrica</MenuItem>
                         </TextField>
                       )
                     }
