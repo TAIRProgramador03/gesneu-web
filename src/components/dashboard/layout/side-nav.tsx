@@ -110,6 +110,12 @@ function renderNavItems({
   const children = items.reduce((acc: React.ReactNode[], curr: NavItemConfig): React.ReactNode[] => {
     const { key, ...item } = curr;
 
+    if (key === 'fichas_tecnicas') {
+      acc.push(
+        <Divider key="divider-fichas" sx={{ my: 1, borderColor: 'rgba(255,255,255,0.30)' }} />
+      );
+    }
+
     acc.push(<NavItem key={key} pathname={pathname} collapsed={collapsed} {...item} />);
 
     return acc;

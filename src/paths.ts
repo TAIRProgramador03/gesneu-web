@@ -8,6 +8,7 @@ export const paths = {
     account: '/account',
     integrations: '/integrations',
     padron: '/padron',
+    ficha_tecnica: '/fichas-tecnicas',
     settings: '/dashboard/settings',
   },
   errors: { notFound: '/errors/not-found' },
