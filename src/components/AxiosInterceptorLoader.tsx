@@ -1,11 +1,15 @@
+'use client';
+
 import { useEffect } from 'react';
-import { useSessionError } from '../contexts/session-error-context';
+import { toast } from 'sonner';
+
 import { setupAxiosInterceptors } from '@/lib/auth/axios-interceptors';
 
-export function AxiosInterceptorLoader() {
-  const { setSessionError } = useSessionError();
+export function AxiosInterceptorLoader(): null {
   useEffect(() => {
-    setupAxiosInterceptors(setSessionError);
-  }, [setSessionError]);
+    setupAxiosInterceptors((msg) => {
+      if (msg) toast.error(msg);
+    });
+  }, []);
   return null;
 }

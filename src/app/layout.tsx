@@ -11,6 +11,7 @@ import '@/styles/global.css';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import NextTopLoader from 'nextjs-toploader';
 import { UserProvider } from '@/contexts/user-context';
+import { AxiosInterceptorLoader } from '@/components/AxiosInterceptorLoader';
 import { LocalizationProvider } from '@/components/core/localization-provider';
 import { ThemeProvider } from '@/components/core/theme-provider/theme-provider';
 import { Toaster } from '@/components/ui/sonner';
@@ -20,6 +21,11 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 1000 * 60 * 1,
+      retry: (failureCount, error: any) => {
+        const status = error?.response?.status;
+        if (status && status >= 400 && status < 500) return false;
+        return failureCount < 1;
+      },
     }
   }
 })
@@ -40,6 +46,7 @@ export default function Layout({ children }: LayoutProps): React.JSX.Element {
       <body>
         <NextTopLoader color="#167bd9" showSpinner={false} />
         <QueryClientProvider client={queryClient}>
+          <AxiosInterceptorLoader />
           <LocalizationProvider>
             <UserProvider>
               <ThemeProvider>

@@ -25,6 +25,14 @@ export const Neumaticos = async () => {
   return response.data;
 };
 
+export const heartbeat = async (timeoutMs = 5000) => {
+  const response = await axios.get(`/api/health`, {
+    withCredentials: true,
+    timeout: timeoutMs,
+  });
+  return response.status;
+};
+
 export const cargarPadronNeumatico = async (archivoExcel: File) => {
   const formData = new FormData();
   formData.append("archivo", archivoExcel);

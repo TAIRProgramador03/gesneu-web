@@ -32,9 +32,9 @@ export async function GET(request: NextRequest) {
     const data = await response.json();
     const nextResponse = NextResponse.json(data, { status: response.status });
 
-    const setCookieHeader = response.headers.get('set-cookie');
-    if (setCookieHeader) {
-      nextResponse.headers.set('Set-Cookie', setCookieHeader);
+    const setCookies = response.headers.getSetCookie();
+    for (const cookie of setCookies) {
+      nextResponse.headers.append('Set-Cookie', cookie);
     }
 
     return nextResponse;
@@ -98,9 +98,10 @@ export async function POST(request: NextRequest) {
       });
       const data = await response.json();
       const nextResponse = NextResponse.json(data, { status: response.status });
-      const setCookieHeader = response.headers.get('set-cookie');
-      if (setCookieHeader) {
-        nextResponse.headers.set('Set-Cookie', setCookieHeader);
+      // Reenviar cada Set-Cookie por separado (clave para que connect.sid del login persista).
+      const setCookies = response.headers.getSetCookie();
+      for (const cookie of setCookies) {
+        nextResponse.headers.append('Set-Cookie', cookie);
       }
       return nextResponse;
     } catch (error) {

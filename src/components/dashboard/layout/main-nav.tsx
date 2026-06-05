@@ -15,6 +15,7 @@ import { Users as UsersIcon } from '@phosphor-icons/react/dist/ssr/Users';
 
 import { usePopover } from '@/hooks/use-popover';
 
+import { ConnectionStatus } from './connection-status';
 import { MobileNav } from './mobile-nav';
 import { UserPopover } from './user-popover';
 
@@ -50,6 +51,7 @@ export function MainNav(): React.JSX.Element {
             </IconButton>
           </Stack>
           <Stack sx={{ alignItems: 'center' }} direction="row" spacing={2}>
+            <ConnectionStatus />
             <Tooltip title="Contactos">
               <span>
                 <IconButton disabled={true}>
