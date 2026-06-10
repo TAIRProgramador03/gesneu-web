@@ -4,7 +4,7 @@ const BACKEND_URL = process.env.NEXT_PUBLIC_API_GESNEU_URL;
 const CF_ACCESS_CLIENT_ID = process.env.CF_ACCESS_CLIENT_ID!;
 const CF_ACCESS_CLIENT_SECRET = process.env.CF_ACCESS_CLIENT_SECRET!;
 
-// export const runtime = 'edge';
+export const runtime = 'edge';
 
 export async function GET(request: NextRequest) {
   const path = request.nextUrl.pathname.replace('/api', '');
