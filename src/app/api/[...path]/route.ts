@@ -31,9 +31,13 @@ export async function GET(request: NextRequest) {
     }
 
     return nextResponse;
-  } catch (error) {
-    console.error('Proxy error:', error);
-    return NextResponse.json({ error: 'Error en el proxy' }, { status: 500 });
+  } catch (error: any) {
+    console.error('Proxy error:', error?.message, error?.cause, error?.stack);
+    return NextResponse.json(
+      { error: 'Error en el proxy', detail: error?.message },
+      { status: 500 }
+    );
+
   }
 }
 
@@ -87,9 +91,12 @@ export async function POST(request: NextRequest) {
       }
 
       return nextResponse;
-    } catch (error) {
-      console.error('Proxy error:', error);
-      return NextResponse.json({ error: 'Error en el proxy' }, { status: 500 });
+    } catch (error: any) {
+      console.error('Proxy error:', error?.message, error?.cause, error?.stack);
+      return NextResponse.json(
+        { error: 'Error en el proxy', detail: error?.message },
+        { status: 500 }
+      );
     }
   }
 }
