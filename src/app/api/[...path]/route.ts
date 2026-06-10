@@ -5,12 +5,18 @@ const BACKEND_URL = process.env.NEXT_PUBLIC_API_GESNEU_URL;
 export const runtime = 'edge';
 
 export async function GET(request: NextRequest) {
+  const CF_ACCESS_CLIENT_ID = process.env.CF_ACCESS_CLIENT_ID!;
+  const CF_ACCESS_CLIENT_SECRET = process.env.CF_ACCESS_CLIENT_SECRET!;
+
   const path = request.nextUrl.pathname.replace('/api', '');
   const searchParams = request.nextUrl.searchParams.toString();
   const url = `${BACKEND_URL}/api${path}${searchParams ? `?${searchParams}` : ''}`;
 
   try {
-    const headers: HeadersInit = {};
+    const headers: HeadersInit = {
+      'CF-Access-Client-Id': CF_ACCESS_CLIENT_ID,
+      'CF-Access-Client-Secret': CF_ACCESS_CLIENT_SECRET,
+    };
     const cookieHeader = request.headers.get('cookie');
     if (cookieHeader) headers['Cookie'] = cookieHeader;
 
@@ -43,13 +49,19 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const CF_ACCESS_CLIENT_ID = process.env.CF_ACCESS_CLIENT_ID!;
+  const CF_ACCESS_CLIENT_SECRET = process.env.CF_ACCESS_CLIENT_SECRET!;
+
   const path = request.nextUrl.pathname.replace('/api', '');
   const url = `${BACKEND_URL}/api${path}`;
 
   const contentType = request.headers.get('content-type') || '';
 
   if (contentType.includes('multipart/form-data')) {
-    const headers: HeadersInit = {};
+    const headers: HeadersInit = {
+      'CF-Access-Client-Id': CF_ACCESS_CLIENT_ID,
+      'CF-Access-Client-Secret': CF_ACCESS_CLIENT_SECRET,
+    };
     request.headers.forEach((value, key) => {
       if (key.toLowerCase() !== 'content-length') {
         headers[key] = value;
@@ -70,7 +82,11 @@ export async function POST(request: NextRequest) {
   } else {
     try {
       const body = await request.json();
-      const headers: HeadersInit = { 'Content-Type': 'application/json' };
+      const headers: HeadersInit = {
+        'Content-Type': 'application/json',
+        'CF-Access-Client-Id': CF_ACCESS_CLIENT_ID,
+        'CF-Access-Client-Secret': CF_ACCESS_CLIENT_SECRET,
+      };
       const cookieHeader = request.headers.get('cookie');
       if (cookieHeader) headers['Cookie'] = cookieHeader;
 
