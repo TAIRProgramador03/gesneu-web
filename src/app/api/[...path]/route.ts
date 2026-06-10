@@ -12,32 +12,33 @@ export async function GET(request: NextRequest) {
   try {
     const headers: HeadersInit = {};
     const cookieHeader = request.headers.get('cookie');
-    if (cookieHeader) {
-      headers['Cookie'] = cookieHeader;
+    if (cookieHeader) headers['Cookie'] = cookieHeader;
+
+    const response = await fetch(url, { method: 'GET', headers, credentials: 'include' });
+
+    const text = await response.text();
+    console.error('Backend GET response:', response.status, text.substring(0, 200));
+
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch {
+      data = { error: 'Respuesta no es JSON', raw: text.substring(0, 500) };
     }
 
-    const response = await fetch(url, {
-      method: 'GET',
-      headers,
-      credentials: 'include',
-    });
-
-    const data = await response.json();
     const nextResponse = NextResponse.json(data, { status: response.status });
-
     const setCookies = response.headers.getSetCookie();
     for (const cookie of setCookies) {
       nextResponse.headers.append('Set-Cookie', cookie);
     }
-
     return nextResponse;
+
   } catch (error: any) {
-    console.error('Proxy error:', error?.message, error?.cause, error?.stack);
+    console.error('Proxy GET error:', error?.message, error?.cause);
     return NextResponse.json(
       { error: 'Error en el proxy', detail: error?.message },
       { status: 500 }
     );
-
   }
 }
 
@@ -61,8 +62,8 @@ export async function POST(request: NextRequest) {
     let data;
     try {
       data = JSON.parse(text);
-    } catch (e) {
-      data = { error: 'Respuesta no es JSON', raw: text };
+    } catch {
+      data = { error: 'Respuesta no es JSON', raw: text.substring(0, 500) };
     }
     return NextResponse.json(data, { status: response.status });
 
@@ -71,9 +72,7 @@ export async function POST(request: NextRequest) {
       const body = await request.json();
       const headers: HeadersInit = { 'Content-Type': 'application/json' };
       const cookieHeader = request.headers.get('cookie');
-      if (cookieHeader) {
-        headers['Cookie'] = cookieHeader;
-      }
+      if (cookieHeader) headers['Cookie'] = cookieHeader;
 
       const response = await fetch(url, {
         method: 'POST',
@@ -82,17 +81,25 @@ export async function POST(request: NextRequest) {
         credentials: 'include',
       });
 
-      const data = await response.json();
-      const nextResponse = NextResponse.json(data, { status: response.status });
+      const text = await response.text();
+      console.error('Backend POST response:', response.status, text.substring(0, 200));
 
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        data = { error: 'Respuesta no es JSON', raw: text.substring(0, 500) };
+      }
+
+      const nextResponse = NextResponse.json(data, { status: response.status });
       const setCookies = response.headers.getSetCookie();
       for (const cookie of setCookies) {
         nextResponse.headers.append('Set-Cookie', cookie);
       }
-
       return nextResponse;
+
     } catch (error: any) {
-      console.error('Proxy error:', error?.message, error?.cause, error?.stack);
+      console.error('Proxy POST error:', error?.message, error?.cause);
       return NextResponse.json(
         { error: 'Error en el proxy', detail: error?.message },
         { status: 500 }
