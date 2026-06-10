@@ -15,6 +15,7 @@ import Typography from '@mui/material/Typography';
 import ModalTodasPlacas from './modal-todas-placas';
 import Image from 'next/image';
 import { CarFront, MapPinCheckInside } from 'lucide-react';
+import { Checkbox, FormControlLabel } from '@mui/material';
 
 interface CompaniesFiltersProps {
   onSearchChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
@@ -160,7 +161,7 @@ export const CompaniesFilters = memo(({ onSearchChange, operationName, autosDisp
         {/* TODO: Desabilitado para transito */}
         {/* <FormControlLabel
           control={<Checkbox onChange={handleCheckboxChange} checked={checkboxChecked} disabled={inputValue.trim() !== ''} />}
-          label="Transito"
+          label="Tránsito"
         /> */}
         {/* Información agrupada - Ubicación, Operación y Vehículos */}
         <Box

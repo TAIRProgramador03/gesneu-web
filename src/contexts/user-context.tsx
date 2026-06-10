@@ -32,7 +32,7 @@ export function UserProvider({ children }: UserProviderProps): React.JSX.Element
       const data = await checkSessionApi();
       setState((prev) => ({ ...prev, user: data ?? null, error: null, isLoading: false }));
     } catch (err: any) {
-      // Si el error es 401 (no autenticado), no mostrarlo en consola
+
       if (err?.response?.status === 401) {
         setState((prev) => ({ ...prev, user: null, error: null, isLoading: false }));
       } else {
@@ -52,7 +52,7 @@ export function UserProvider({ children }: UserProviderProps): React.JSX.Element
       }
       // noop
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- Expected
+
   }, []);
 
   return <UserContext.Provider value={{ ...state, checkSession }}>{children}</UserContext.Provider>;
