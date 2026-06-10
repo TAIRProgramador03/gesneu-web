@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_API_GESNEU_URL;
-const CF_ACCESS_CLIENT_ID = process.env.CF_ACCESS_CLIENT_ID!;
-const CF_ACCESS_CLIENT_SECRET = process.env.CF_ACCESS_CLIENT_SECRET!;
 
 export const runtime = 'edge';
 
@@ -12,12 +10,7 @@ export async function GET(request: NextRequest) {
   const url = `${BACKEND_URL}/api${path}${searchParams ? `?${searchParams}` : ''}`;
 
   try {
-
-    const headers: HeadersInit = {
-      'CF-Access-Client-Id': CF_ACCESS_CLIENT_ID,
-      'CF-Access-Client-Secret': CF_ACCESS_CLIENT_SECRET,
-    };
-
+    const headers: HeadersInit = {};
     const cookieHeader = request.headers.get('cookie');
     if (cookieHeader) {
       headers['Cookie'] = cookieHeader;
@@ -40,10 +33,7 @@ export async function GET(request: NextRequest) {
     return nextResponse;
   } catch (error) {
     console.error('Proxy error:', error);
-    return NextResponse.json(
-      { error: 'Error en el proxy' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Error en el proxy' }, { status: 500 });
   }
 }
 
@@ -61,15 +51,8 @@ export async function POST(request: NextRequest) {
       }
     });
 
-    headers['CF-Access-Client-Id'] = CF_ACCESS_CLIENT_ID;
-    headers['CF-Access-Client-Secret'] = CF_ACCESS_CLIENT_SECRET;
-
     const bodyBuffer = await request.arrayBuffer();
-    const response = await fetch(url, {
-      method: 'POST',
-      headers,
-      body: bodyBuffer,
-    });
+    const response = await fetch(url, { method: 'POST', headers, body: bodyBuffer });
     const text = await response.text();
     let data;
     try {
@@ -78,38 +61,35 @@ export async function POST(request: NextRequest) {
       data = { error: 'Respuesta no es JSON', raw: text };
     }
     return NextResponse.json(data, { status: response.status });
+
   } else {
     try {
       const body = await request.json();
-      const headers: HeadersInit = {
-        'Content-Type': 'application/json',
-        'CF-Access-Client-Id': CF_ACCESS_CLIENT_ID,
-        'CF-Access-Client-Secret': CF_ACCESS_CLIENT_SECRET,
-      };
+      const headers: HeadersInit = { 'Content-Type': 'application/json' };
       const cookieHeader = request.headers.get('cookie');
       if (cookieHeader) {
         headers['Cookie'] = cookieHeader;
       }
+
       const response = await fetch(url, {
         method: 'POST',
         headers,
         body: JSON.stringify(body),
         credentials: 'include',
       });
+
       const data = await response.json();
       const nextResponse = NextResponse.json(data, { status: response.status });
-      // Reenviar cada Set-Cookie por separado (clave para que connect.sid del login persista).
+
       const setCookies = response.headers.getSetCookie();
       for (const cookie of setCookies) {
         nextResponse.headers.append('Set-Cookie', cookie);
       }
+
       return nextResponse;
     } catch (error) {
       console.error('Proxy error:', error);
-      return NextResponse.json(
-        { error: 'Error en el proxy' },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: 'Error en el proxy' }, { status: 500 });
     }
   }
 }
