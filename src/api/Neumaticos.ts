@@ -829,3 +829,29 @@ export const obtenerLosTalleresDelUsuario = async () => {
     throw error;
   }
 }
+
+export interface OrdenDeTrabajo {
+  ALMACEN: string;
+  CLASE: string;
+  TIPO: string;
+  VALE: number;
+  CORRELATIVO: number;
+  FECHA_MOVIMIENTO: number;
+  PLACA: string;
+  OT: string;
+  CODNUEVO: string;
+  CODBAJA: string;
+}
+
+export const obtenerOrdenDeTrabajo = async (ordenDeTrabajo: string, placa: string) => {
+  try {
+    const response = await axios.get<OrdenDeTrabajo[]>(`/api/po-neumaticos/verificar-orden-de-trabajo`, {
+      withCredentials: true,
+      params: { ordenDeTrabajo, placa }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error en obtenerOrdenDeTrabajo:', error);
+    throw error;
+  }
+}
