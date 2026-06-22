@@ -61,9 +61,12 @@ export const cargarPadronNeumatico = async (archivoExcel: File) => {
 };
 
 // Buscar vehículo por placa
-export const buscarVehiculoPorPlaca = async (placa: string) => {
+export const buscarVehiculoPorPlaca = async (placa: string, transito: boolean = false) => {
   try {
-    const response = await axios.get<VehiculoMain>(`/api/vehiculo/${placa}`, { withCredentials: true });
+    const response = await axios.get<VehiculoMain>(`/api/vehiculo/${placa}`, {
+      withCredentials: true,
+      params: { transito },
+    });
     return response.data;
   } catch (error: unknown) {
     const err = error as AxiosError<any>;

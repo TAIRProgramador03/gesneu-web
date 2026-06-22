@@ -16,6 +16,9 @@ import ModalTodasPlacas from './modal-todas-placas';
 import Image from 'next/image';
 import { CarFront, MapPinCheckInside } from 'lucide-react';
 import { Checkbox, FormControlLabel } from '@mui/material';
+import { Field, FieldContent, FieldDescription, FieldGroup, FieldLabel } from '@/components/ui/field';
+import { Checkbox as CheckBoxCustom } from "@/components/ui/checkbox"
+
 
 interface CompaniesFiltersProps {
   onSearchChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
@@ -23,9 +26,11 @@ interface CompaniesFiltersProps {
   operationName?: string;
   autosDisponiblesCount?: number;
   onVehiculoSeleccionado?: (vehiculo: any) => void;
+  transitoChecked?: boolean;
+  onTransitoChange?: (checked: boolean) => void;
 }
 
-export const CompaniesFilters = memo(({ onSearchChange, operationName, autosDisponiblesCount, onVehiculoSeleccionado }: CompaniesFiltersProps): React.JSX.Element => {
+export const CompaniesFilters = memo(({ onSearchChange, operationName, autosDisponiblesCount, onVehiculoSeleccionado, transitoChecked = false, onTransitoChange }: CompaniesFiltersProps): React.JSX.Element => {
   const [openModal, setOpenModal] = React.useState(false);
   const [checkboxChecked, setCheckboxChecked] = React.useState(false);
   const [inputValue, setInputValue] = React.useState('');
@@ -158,6 +163,25 @@ export const CompaniesFilters = memo(({ onSearchChange, operationName, autosDisp
           disabled={checkboxChecked}
           sx={{ maxWidth: '450px', flex: '1 1 auto', minWidth: '300px' }}
         />
+
+        <div>
+          <FieldGroup className="mx-auto w-72">
+            <Field orientation="horizontal">
+              <CheckBoxCustom
+                id="placa-en-transito"
+                name="placa-en-transito"
+                checked={transitoChecked}
+                onCheckedChange={(checked) => onTransitoChange?.(checked === true)}
+              />
+              <FieldContent>
+                <FieldLabel htmlFor="placa-en-transito">
+                  Tránsito
+                </FieldLabel>
+              </FieldContent>
+            </Field>
+          </FieldGroup>
+        </div>
+
         {/* TODO: Desabilitado para transito */}
         {/* <FormControlLabel
           control={<Checkbox onChange={handleCheckboxChange} checked={checkboxChecked} disabled={inputValue.trim() !== ''} />}

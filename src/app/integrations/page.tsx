@@ -55,6 +55,7 @@ export default function Page(): React.JSX.Element {
   const { user } = useUser();
   const [vehiculo, setVehiculo] = React.useState<Vehiculo | null>(null);
   const [error, setError] = React.useState<string | null>(null);
+  const [transitoActivo, setTransitoActivo] = React.useState(false);
 
   const [animatedKilometraje, setAnimatedKilometraje] = useState(0);
   const [animatedTotalNeumaticos, setAnimatedTotalNeumaticos] = useState(0);
@@ -128,7 +129,7 @@ export default function Page(): React.JSX.Element {
       // setLoading(true); // Mostrar indicador de carga
 
       try {
-        const vehiculoData = await buscarVehiculoPorPlaca(placa);
+        const vehiculoData = await buscarVehiculoPorPlaca(placa, transitoActivo);
 
         if (!vehiculoData || vehiculoData?.mensaje === "Vehículo no encontrado") {
           toast.error('Vehículo no encontrado o la unidad no le pertenece.');
@@ -767,6 +768,8 @@ export default function Page(): React.JSX.Element {
         operationName={vehiculo?.OPERACION?.trim() || '—'}
         autosDisponiblesCount={autosDisponiblesCount}
         onVehiculoSeleccionado={handleVehiculoSeleccionado}
+        transitoChecked={transitoActivo}
+        onTransitoChange={setTransitoActivo}
       />
       <Stack direction="row" spacing={2}>
         <Card sx={{
