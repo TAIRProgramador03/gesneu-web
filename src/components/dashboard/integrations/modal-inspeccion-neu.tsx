@@ -11,7 +11,7 @@ import TextField from '@mui/material/TextField';
 import DiagramaVehiculo from '../../../styles/theme/components/DiagramaVehiculo';
 import { useState, useContext, useEffect } from 'react';
 import ModalInspeccionAver from '../../core/modal-inspeccion-aver';
-import { consultarInspeccionHoy, listarNeumaticosAsignados, guardarInspeccion, Neumaticos, obtenerUltimosMovimientosPorCodigo, getUltimaFechaInspeccionPorPlaca, obtenerUltimosMovimientosPorPosicion } from '../../../api/Neumaticos';
+import { consultarInspeccionHoy, listarNeumaticosAsignados, guardarInspeccion, Neumaticos, obtenerUltimosMovimientosPorCodigo, getUltimaFechaInspeccionPorPlaca, obtenerUltimosMovimientosPorPosicion, getFechasInspeccionVehicularPorPlaca } from '../../../api/Neumaticos';
 import { UserContext } from '../../../contexts/user-context';
 import ModalAsignacionNeu from './modal-asignacion-neu';
 import { toast } from 'sonner';
@@ -146,6 +146,10 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
   // Estado para controlar si ya se inspeccionó hoy
   const [inspeccionHoyRealizada, setInspeccionHoyRealizada] = useState(false);
 
+  // Si la placa NO tiene inspecciones previas => es la primera inspección.
+  // Solo en la primera inspección el RES01 es editable; luego se bloquea (flujo normal).
+  const [esPrimeraInspeccion, setEsPrimeraInspeccion] = useState(false);
+
   // Estado para la fecha mínima de inspección (no puede ser menor a la última registrada)
   const [fechaMinimaInspeccion, setFechaMinimaInspeccion] = useState<string | null>(null);
   const [fechaInspeccionError, setFechaInspeccionError] = useState<string | null>(null);
@@ -256,6 +260,20 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
       Neumaticos().then(setPoNeumaticos).catch(() => setPoNeumaticos([]));
     }
   }, [open]);
+
+  // Determinar si es la primera inspección de la placa (sin inspecciones previas).
+  // Default seguro: false => RES01 bloqueado mientras no se confirme que es la primera.
+  useEffect(() => {
+    if (open && placa) {
+      getFechasInspeccionVehicularPorPlaca(placa)
+        .then((data) => {
+          setEsPrimeraInspeccion(Array.isArray(data) && data.length === 0);
+        })
+        .catch(() => setEsPrimeraInspeccion(false));
+    } else {
+      setEsPrimeraInspeccion(false);
+    }
+  }, [open, placa]);
 
   // Verificar si ya existe inspección hoy al abrir el modal usando el endpoint correcto
   useEffect(() => {
@@ -533,8 +551,10 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
       toast.error('Debe seleccionar un neumático.')
       return;
     }
-    // Eliminada la restricción de RES01: ahora se guarda igual, pero los campos ya están bloqueados en el formulario
-    if (!hayCambiosFormulario && neumaticoSeleccionado.POSICION !== 'RES01') {
+    // RES01 (repuesto) puede guardarse sin cambios: bloqueado mantiene el último valor y editable
+    // puede conservar el mismo remanente/torque. En cualquier otra posición se exigen cambios.
+    const esRES01Local = neumaticoSeleccionado.POSICION === 'RES01' || formValues.posicion === 'RES01';
+    if (!hayCambiosFormulario && !esRES01Local) {
       toast.info('No hay cambios para guardar.')
       return;
     }
@@ -562,7 +582,7 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
     }
 
     if (torqueError) {
-      toast.error(`El valor de la torque no puede ser menor a 110 o mayor que 150.`)
+      toast.error(`El valor de la torque no puede ser menor a 110 o mayor que 160.`)
       return;
     }
 
@@ -810,13 +830,22 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
 
   // Constante para habilitar el botón solo si los campos requeridos están llenos
   const esRES01 = formValues.posicion === 'RES01';
-  // Para RES01, los campos no son editables, pero permitimos guardar la inspección (camposRequeridosLlenos siempre true para RES01)
-  const camposRequeridosLlenos = esRES01 ? true : !!(
-    formValues.remanente &&
-    formValues.presion_aire &&
-    formValues.torque &&
-    formValues.observacion
-  );
+  // RES01 solo es editable en la PRIMERA inspección de la placa. En las siguientes se bloquea.
+  const res01Bloqueado = esRES01 && !esPrimeraInspeccion;
+  const esRES01Editable = esRES01 && esPrimeraInspeccion;
+  // - RES01 bloqueado: no exigimos campos (se guarda con el último valor).
+  // - RES01 editable (1ra inspección): el torque puede ser 0, así que NO se exige lleno.
+  // - Rueda normal: se exigen todos los campos llenos.
+  const camposRequeridosLlenos = res01Bloqueado
+    ? true
+    : esRES01Editable
+      ? !!(formValues.remanente && formValues.presion_aire && formValues.observacion)
+      : !!(
+        formValues.remanente &&
+        formValues.presion_aire &&
+        formValues.torque &&
+        formValues.observacion
+      );
 
   // Estado para advertencia de cantidad de neumáticos
   const [advertenciaPosiciones, setAdvertenciaPosiciones] = useState<{ open: boolean; faltan: number }>({ open: false, faltan: 0 });
@@ -1058,7 +1087,7 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
                     size="small"
                     value={formValues.remanente}
                     onChange={e => {
-                      if (esRES01) return;
+                      if (res01Bloqueado) return;
                       const value = e.target.value.replace(/,/g, '.'); // Permitir punto decimal
                       // Permitir solo números y hasta 2 decimales
                       if (!/^\d*(\.?\d{0,2})?$/.test(value)) return;
@@ -1077,7 +1106,7 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
                       inputMode: 'decimal',
                       pattern: "^\\d*(\\.\\d{0,2})?$"
                     }}
-                    disabled={bloquearFormulario || esRES01}
+                    disabled={bloquearFormulario || res01Bloqueado}
                   />
                   <TextField
                     label="Presión de Aire (psi)"
@@ -1086,7 +1115,7 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
                     size="small"
                     value={formValues.presion_aire ?? ''}
                     onChange={(e) => {
-                      if (esRES01) return;
+                      if (res01Bloqueado) return;
                       const value = Number(e.target.value);
                       setFormValues(prev => ({ ...prev, presion_aire: e.target.value }));
                       if (value < 25 || value > 50) {
@@ -1102,7 +1131,7 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
                       max: 50,
                       style: { minWidth: `${(formValues.presion_aire ?? '').toString().length + 3}ch` }
                     }}
-                    disabled={bloquearFormulario || esRES01}
+                    disabled={bloquearFormulario || res01Bloqueado}
                   />
                   <TextField
                     label="Torque (Nm)"
@@ -1111,23 +1140,27 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
                     size="small"
                     value={formValues.torque}
                     onChange={(e) => {
-                      if (esRES01) return;
+                      if (res01Bloqueado) return;
                       const value = Number(e.target.value);
                       setFormValues(prev => ({ ...prev, torque: Number(e.target.value) }));
-                      if (value < 110 || value > 150) {
-                        setTorqueError(true);
-                      } else {
-                        setTorqueError(false);
-                      }
+                      // RES01 editable: el torque puede ser 0 (repuesto sin torque aplicado) o estar en 110-160.
+                      const torqueValido = esRES01Editable
+                        ? (value === 0 || (value >= 110 && value <= 160))
+                        : (value >= 110 && value <= 160);
+                      setTorqueError(!torqueValido);
                     }}
                     error={torqueError}
-                    helperText={torqueError ? 'Debe estar entre 110 y 150 Nm' : 'Recomendado: 110-150 Nm'}
+                    helperText={
+                      torqueError
+                        ? (esRES01Editable ? 'Debe ser 0 o estar entre 110 y 160 Nm' : 'Debe estar entre 110 y 160 Nm')
+                        : (esRES01Editable ? 'Permitido: 0 o 110-160 Nm' : 'Recomendado: 110-160 Nm')
+                    }
                     inputProps={{
-                      min: 110,
-                      max: 150,
+                      min: esRES01Editable ? 0 : 110,
+                      max: 160,
                       style: { minWidth: `${(formValues.torque ?? '').toString().length + 3}ch` }
                     }}
-                    disabled={bloquearFormulario || esRES01}
+                    disabled={bloquearFormulario || res01Bloqueado}
                   />
                   {/* <TextField
                     label="Tipo Movimiento"
@@ -1137,7 +1170,7 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
                     InputProps={{ readOnly: true, style: { minWidth: `${'INSPECCION'.length + 3}ch` } }}
                     disabled
                   /> */}
-                  <TextField label="Observación" name="observacion" size="small" multiline minRows={2} value={formValues.observacion} onChange={esRES01 ? undefined : handleInputChange} sx={{ gridColumn: 'span 2' }} disabled={bloquearFormulario || esRES01} />
+                  <TextField label="Observación" name="observacion" size="small" multiline minRows={2} value={formValues.observacion} onChange={res01Bloqueado ? undefined : handleInputChange} sx={{ gridColumn: 'span 2' }} disabled={bloquearFormulario || res01Bloqueado} />
                 </Box>
               </Card>
             </Stack>
@@ -1366,7 +1399,7 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
                 variant={'teal'}
                 onClick={handleGuardarInspeccionLocal}
                 disabled={
-                  !hayCambiosFormulario || bloquearFormulario || kmError || !camposRequeridosLlenos || inspeccionesPendientes.length >= 5
+                  (!hayCambiosFormulario && !esRES01) || bloquearFormulario || kmError || !camposRequeridosLlenos || inspeccionesPendientes.length >= 5
                 }
 
               >

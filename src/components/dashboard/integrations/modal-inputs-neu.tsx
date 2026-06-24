@@ -136,7 +136,7 @@ const ModalInputsNeu: React.FC<ModalInputsNeuProps> = ({ open, onClose, onSubmit
         }
 
         if (position !== 'RES01') {
-            if (TorqueAplicado < 110 || TorqueAplicado > 150) {
+            if (TorqueAplicado < 110 || TorqueAplicado > 160) {
                 setTorqueError(true);
                 return;
             }
@@ -263,7 +263,7 @@ const ModalInputsNeu: React.FC<ModalInputsNeuProps> = ({ open, onClose, onSubmit
                                 onChange={(e) => {
                                     const value = Number(e.target.value);
                                     setTorqueAplicado(value);
-                                    if (value < 110 || value > 150) {
+                                    if (value < 110 || value > 160) {
                                         setTorqueError(true);
                                     } else {
                                         setTorqueError(false);
@@ -271,9 +271,9 @@ const ModalInputsNeu: React.FC<ModalInputsNeuProps> = ({ open, onClose, onSubmit
                                 }}
                                 fullWidth
                                 error={torqueError}
-                                helperText={torqueError ? 'Debe estar entre 110 y 150 Nm' : 'Recomendado: 110-150 Nm'}
+                                helperText={torqueError ? 'Debe estar entre 110 y 160 Nm' : 'Recomendado: 110-160 Nm'}
                                 InputProps={{
-                                    inputProps: { min: 110, max: 150 },
+                                    inputProps: { min: 110, max: 160 },
                                     sx: {
                                         'input[type=number]::-webkit-outer-spin-button, input[type=number]::-webkit-inner-spin-button': {
                                             WebkitAppearance: 'none',
