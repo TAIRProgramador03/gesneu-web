@@ -204,6 +204,32 @@ export default function Page(): React.JSX.Element {
   };
 
 
+  // --- Reset total del filtro: limpia placa, datos y tránsito ---
+  const handleReset = () => {
+    setVehiculo(null);
+    setNeumaticos([]);
+    setNeumaticosFiltrados([]);
+    setNeumaticosAsignados([]);
+    setTransitoActivo(false);
+    setAnimatedKilometraje(0);
+    setAnimatedTotalNeumaticos(0);
+    setError(null);
+  };
+
+  // --- Re-buscar automáticamente al cambiar "tránsito" si hay una placa activa ---
+  // Evita mostrar datos de un vehículo cargados con un modo de tránsito que ya no corresponde.
+  const transitoInicializado = React.useRef(false);
+  useEffect(() => {
+    if (!transitoInicializado.current) {
+      transitoInicializado.current = true;
+      return;
+    }
+    if (vehiculo?.PLACA) {
+      handleSearchChange({ target: { value: vehiculo.PLACA } } as any);
+    }
+
+  }, [transitoActivo]);
+
   const animateKilometraje = (start: number, end: number) => {
     setAnimatedKilometraje(end);
   };
@@ -618,7 +644,8 @@ export default function Page(): React.JSX.Element {
       })
       return;
     }
-    await Promise.all([refreshAsignados(), refreshVehiculo()]);
+    await Promise.all([refreshAsignados()]);
+    // refreshVehiculo()
     // Espera un ciclo de event loop para asegurar que los estados estén actualizados
     setTimeout(() => {
       handleOpenModal();
@@ -770,6 +797,7 @@ export default function Page(): React.JSX.Element {
         onVehiculoSeleccionado={handleVehiculoSeleccionado}
         transitoChecked={transitoActivo}
         onTransitoChange={setTransitoActivo}
+        onReset={handleReset}
       />
       <Stack direction="row" spacing={2}>
         <Card sx={{
