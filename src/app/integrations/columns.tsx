@@ -500,6 +500,7 @@ export const columnsNeuInspeccion: ColumnDef<NeuInspeccionTable>[] = [
   {
     accessorKey: "CODIGO",
     header: "Código",
+    cell: ({ row }) => <Link href={`/padron/neumatico/${row.original.CODIGO}`} target="_blank">{row.original.CODIGO}</Link>
   },
   {
     accessorKey: "POSICION",

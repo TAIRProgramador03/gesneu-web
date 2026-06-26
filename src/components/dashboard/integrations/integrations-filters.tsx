@@ -6,16 +6,17 @@ import Card from '@mui/material/Card';
 import InputAdornment from '@mui/material/InputAdornment';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import Button from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
+import Tooltip from '@mui/material/Tooltip';
 import { MagnifyingGlass as MagnifyingGlassIcon } from '@phosphor-icons/react/dist/ssr/MagnifyingGlass';
-import { MapPin } from '@phosphor-icons/react/dist/ssr/MapPin';
-import { Car } from '@phosphor-icons/react/dist/ssr/Car';
 import Stack from '@mui/material/Stack';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import ModalTodasPlacas from './modal-todas-placas';
 import Image from 'next/image';
-import { CarFront, MapPinCheckInside } from 'lucide-react';
-import { Checkbox, FormControlLabel } from '@mui/material';
+import { CarFront, MapPinCheckInside, RotateCcw } from 'lucide-react';
+import { Checkbox as CheckBoxCustom } from "@/components/ui/checkbox"
+
 
 interface CompaniesFiltersProps {
   onSearchChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
@@ -23,9 +24,12 @@ interface CompaniesFiltersProps {
   operationName?: string;
   autosDisponiblesCount?: number;
   onVehiculoSeleccionado?: (vehiculo: any) => void;
+  transitoChecked?: boolean;
+  onTransitoChange?: (checked: boolean) => void;
+  onReset?: () => void;
 }
 
-export const CompaniesFilters = memo(({ onSearchChange, operationName, autosDisponiblesCount, onVehiculoSeleccionado }: CompaniesFiltersProps): React.JSX.Element => {
+export const CompaniesFilters = memo(({ onSearchChange, operationName, autosDisponiblesCount, onVehiculoSeleccionado, transitoChecked = false, onTransitoChange, onReset }: CompaniesFiltersProps): React.JSX.Element => {
   const [openModal, setOpenModal] = React.useState(false);
   const [checkboxChecked, setCheckboxChecked] = React.useState(false);
   const [inputValue, setInputValue] = React.useState('');
@@ -87,6 +91,15 @@ export const CompaniesFilters = memo(({ onSearchChange, operationName, autosDisp
     }
   };
 
+  const handleReset = () => {
+    setInputValue('');
+    setPlacaSeleccionada('');
+    setCheckboxChecked(false);
+    onReset?.();
+  };
+
+  const mostrarReset = inputValue.trim() !== '' || placaSeleccionada !== '' || transitoChecked;
+
   const handleVehiculoSeleccionado = (vehiculo: any) => {
     // Solo dispara la consulta si la placa es diferente a la actual
     if ((vehiculo?.PLACA || '').toUpperCase() !== inputValue.toUpperCase()) {
@@ -99,90 +112,141 @@ export const CompaniesFilters = memo(({ onSearchChange, operationName, autosDisp
   };
 
   return (
-    <Card sx={{ p: 2 }}>
+    <Card sx={{ p: 2, position: 'relative' }}>
+      {/* Botón limpiar: esquina superior derecha */}
+      {mostrarReset && (
+        <Tooltip title="Limpiar filtros" arrow>
+          <IconButton
+            onClick={handleReset}
+            size="small"
+            aria-label="Limpiar filtros"
+            sx={{
+              position: 'absolute',
+              top: 8,
+              right: 8,
+              zIndex: 2,
+              color: '#dc2626',
+              backgroundColor: '#fef2f2',
+              border: '1px solid #fecaca',
+              '&:hover': {
+                backgroundColor: '#fee2e2',
+                borderColor: '#dc2626',
+              },
+            }}
+          >
+            <RotateCcw size={18} />
+          </IconButton>
+        </Tooltip>
+      )}
+
       <Stack
-        direction="row"
-        spacing={3}
-        alignItems="center"
+        direction={{ xs: 'column', lg: 'row' }}
+        spacing={2}
+        alignItems={{ xs: 'stretch', lg: 'center' }}
         sx={{
           width: '100%',
           justifyContent: 'space-between',
-          flexWrap: 'wrap',
-          gap: 2
+          pr: { xs: 0, lg: 5 },
         }}
       >
-        {/* Input de búsqueda con botón integrado */}
-        <OutlinedInput
-          onChange={handleInputChange}
-          onKeyPress={handleKeyPress}
-          value={inputValue}
-          fullWidth
-          placeholder="Buscar por Placa"
-          inputProps={{
-            maxLength: 8, // 3 caracteres + guion + 4 caracteres = 8 total
-          }}
-          startAdornment={
-            <InputAdornment position="start">
-              <MagnifyingGlassIcon fontSize="var(--icon-fontSize-md)" />
-            </InputAdornment>
-          }
-          endAdornment={
-            <InputAdornment position="end">
-              <Button
-                onClick={() => handleBuscar(null)}
-                disabled={checkboxChecked || !inputValue.trim()}
-                variant="text"
-                sx={{
-                  minWidth: 'auto',
-                  padding: '6px 16px',
-                  marginRight: '-12px',
-                  color: 'text.primary',
-                  fontWeight: 500,
-                  textTransform: 'none',
-                  borderRadius: '4px',
-                  '&:hover:not(:disabled)': {
-                    backgroundColor: 'rgba(0, 0, 0, 0.04)',
-                  },
-                  '&:active:not(:disabled)': {
-                    backgroundColor: 'rgba(0, 0, 0, 0.08)',
-                  },
-                  '&:disabled': {
-                    color: 'action.disabled',
-                  }
-                }}
-              >
-                Buscar
-              </Button>
-            </InputAdornment>
-          }
-          disabled={checkboxChecked}
-          sx={{ maxWidth: '450px', flex: '1 1 auto', minWidth: '300px' }}
-        />
-        {/* TODO: Desabilitado para transito */}
-        {/* <FormControlLabel
-          control={<Checkbox onChange={handleCheckboxChange} checked={checkboxChecked} disabled={inputValue.trim() !== ''} />}
-          label="Tránsito"
-        /> */}
-        {/* Información agrupada - Ubicación, Operación y Vehículos */}
-        <Box
+        {/* Grupo izquierdo: controles de filtro (búsqueda + tránsito) */}
+        <Stack
+          direction={{ xs: 'column', sm: 'row' }}
+          spacing={2}
+          useFlexGap
+          alignItems={{ xs: 'stretch', sm: 'center' }}
           sx={{
-            display: 'flex',
+            flex: '1 1 auto',
             flexWrap: 'wrap',
-            alignItems: 'center',
-            // gap: 3,
-            // padding: '10px 16px',
-            // border: '1px solid rgba(0, 0, 0, 0.12)',
-            // borderRadius: '8px',
-            // backgroundColor: 'rgba(0, 0, 0, 0.02)',
-            // boxShadow: '0px 1px 3px rgba(0, 0, 0, 0.1)',
-            // flex: '0 0 auto',
-            ml: 'auto'
+            minWidth: 0,
+          }}
+        >
+          {/* Input de búsqueda con botón integrado */}
+          <OutlinedInput
+            onChange={handleInputChange}
+            onKeyPress={handleKeyPress}
+            value={inputValue}
+            fullWidth
+            placeholder="Buscar por Placa"
+            inputProps={{
+              maxLength: 8, // 3 caracteres + guion + 4 caracteres = 8 total
+            }}
+            startAdornment={
+              <InputAdornment position="start">
+                <MagnifyingGlassIcon fontSize="var(--icon-fontSize-md)" />
+              </InputAdornment>
+            }
+            endAdornment={
+              <InputAdornment position="end">
+                <Button
+                  onClick={() => handleBuscar(null)}
+                  disabled={checkboxChecked || !inputValue.trim()}
+                  variant="text"
+                  sx={{
+                    minWidth: 'auto',
+                    padding: '6px 16px',
+                    marginRight: '-12px',
+                    color: 'text.primary',
+                    fontWeight: 500,
+                    textTransform: 'none',
+                    borderRadius: '4px',
+                    '&:hover:not(:disabled)': {
+                      backgroundColor: 'rgba(0, 0, 0, 0.04)',
+                    },
+                    '&:active:not(:disabled)': {
+                      backgroundColor: 'rgba(0, 0, 0, 0.08)',
+                    },
+                    '&:disabled': {
+                      color: 'action.disabled',
+                    }
+                  }}
+                >
+                  Buscar
+                </Button>
+              </InputAdornment>
+            }
+            disabled={checkboxChecked}
+            sx={{ flex: '1 1 auto', maxWidth: { xs: '100%', sm: '450px' }, minWidth: { xs: 'auto', sm: '260px' } }}
+          />
+
+          <div className='flex items-center gap-3 shrink-0'>
+            <label
+              htmlFor="placa-en-transito"
+              className="flex items-center gap-2 cursor-pointer select-none text-sm font-medium text-gray-700 whitespace-nowrap"
+            >
+              <CheckBoxCustom
+                id="placa-en-transito"
+                className='h-5 w-5'
+                name="placa-en-transito"
+                checked={transitoChecked}
+                onCheckedChange={(checked) => onTransitoChange?.(checked === true)}
+              />
+              Tránsito
+            </label>
+          </div>
+
+          {/* TODO: Desabilitado para transito */}
+          {/* <FormControlLabel
+            control={<Checkbox onChange={handleCheckboxChange} checked={checkboxChecked} disabled={inputValue.trim() !== ''} />}
+            label="Tránsito"
+          /> */}
+        </Stack>
+
+        {/* Grupo derecho: información (Operación/Vehículos) + placa */}
+        <Stack
+          direction={{ xs: 'column', sm: 'row' }}
+          spacing={2}
+          useFlexGap
+          alignItems="center"
+          sx={{
+            flexShrink: 0,
+            flexWrap: 'wrap',
+            justifyContent: { xs: 'center', lg: 'flex-end' },
           }}
         >
           <div className='flex bg-linear-to-r from-gray-700 to-gray-600 p-3 gap-2 rounded-lg text-white flex-wrap'>
             {operationName && operationName !== '—' && (
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                {/* <MapPin size={18} weight="bold" style={{ color: 'rgba(0, 0, 0, 0.7)' }} /> */}
                 <MapPinCheckInside />
                 <Typography variant="body2" >
                   <Box component="span" sx={{ fontWeight: 'bold' }}>Operación: </Box> {operationName}
@@ -190,51 +254,50 @@ export const CompaniesFilters = memo(({ onSearchChange, operationName, autosDisp
               </Box>
             )}
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              {/* <Car size={18} weight="bold" style={{ color: 'rgba(0, 0, 0, 0.7)' }} /> */}
               <CarFront />
               <Typography variant="body2" >
                 <Box component="span" sx={{ fontWeight: 'bold' }}>Vehiculos: </Box> {autosDisponiblesCount}
               </Typography>
             </Box>
           </div>
-        </Box>
-        <Box sx={{ position: 'relative', display: 'inline-block' }}>
-          <Box
-            component="div"
-            sx={{
-              width: 170,
-              // ml: 1,
-              display: 'block',
-            }}
-          >
-            <Image src='/assets/placa.png' alt='Placa' width={170} height={40} />
-          </Box >
-          {(inputValue.trim() !== '' || placaSeleccionada) && (
-            <Typography
-              variant="h6"
+
+          <Box sx={{ position: 'relative', display: 'inline-block', flexShrink: 0 }}>
+            <Box
+              component="div"
               sx={{
-                position: 'absolute',
-                top: '55%',
-                left: '52%',
-                transform: 'translate(-50%, -50%)',
-                color: 'black',
-                fontWeight: 'bold',
-                fontSize: 33,
-                textShadow: '0 2px 8px #fff, 0 1px 0 #fff',
-                fontFamily: 'Arial, sans-serif',
-                pointerEvents: 'none',
-                width: '100%',
-                textAlign: 'center',
-                letterSpacing: 2,
+                width: 170,
+                display: 'block',
               }}
             >
-              {(inputValue.trim() || placaSeleccionada).toUpperCase()}
-            </Typography>
-          )}
-        </Box>
+              <Image src='/assets/placa.png' alt='Placa' width={170} height={40} />
+            </Box >
+            {(inputValue.trim() !== '' || placaSeleccionada) && (
+              <Typography
+                variant="h6"
+                sx={{
+                  position: 'absolute',
+                  top: '55%',
+                  left: '52%',
+                  transform: 'translate(-50%, -50%)',
+                  color: 'black',
+                  fontWeight: 'bold',
+                  fontSize: 33,
+                  textShadow: '0 2px 8px #fff, 0 1px 0 #fff',
+                  fontFamily: 'Arial, sans-serif',
+                  pointerEvents: 'none',
+                  width: '100%',
+                  textAlign: 'center',
+                  letterSpacing: 2,
+                }}
+              >
+                {(inputValue.trim() || placaSeleccionada).toUpperCase()}
+              </Typography>
+            )}
+          </Box>
+        </Stack>
       </Stack>
       {/* Modal para todas las placas */}
-      <ModalTodasPlacas open={openModal} onClose={handleCloseModal} onVehiculoSeleccionado={handleVehiculoSeleccionado} />
+      {/* <ModalTodasPlacas open={openModal} onClose={handleCloseModal} onVehiculoSeleccionado={handleVehiculoSeleccionado} /> */}
 
     </Card >
   );

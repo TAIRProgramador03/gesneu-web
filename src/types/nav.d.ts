@@ -6,6 +6,8 @@ export interface NavItemConfig {
   label?: string;
   icon?: string;
   href?: string;
+  /** Inserta un separador visual ANTES de este item en el menú. */
+  divider?: boolean;
   items?: NavItemConfig[];
   // Matcher cannot be a function in order
   // to be able to use it on the server.

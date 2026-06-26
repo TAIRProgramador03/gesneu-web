@@ -8,5 +8,5 @@ export const navItems = [
   { key: 'integrations', title: 'Movimiento', href: paths.dashboard.integrations, icon: 'plugs-connected' },
   { key: 'mapa', title: 'Mapa de Talleres', href: paths.dashboard.mapa, icon: 'map-pin' },
   { key: 'account', title: 'Perfil', href: paths.dashboard.account, icon: 'user' },
-  { key: 'fichas_tecnicas', title: 'Fichas técnicas', href: paths.dashboard.ficha_tecnica, icon: 'file-stack' },
+  { key: 'fichas_tecnicas', title: 'Fichas técnicas', href: paths.dashboard.ficha_tecnica, icon: 'file-stack', divider: true },
 ] as NavItemConfig[];
