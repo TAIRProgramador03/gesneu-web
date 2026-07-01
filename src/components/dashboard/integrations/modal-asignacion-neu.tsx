@@ -29,6 +29,7 @@ import { LoadingButton } from '@/components/ui/loading-button';
 import { LoadingButton2 } from '@/components/ui/loading-button2';
 import { BadgeAlert, ClipboardList, CloudCheck } from 'lucide-react';
 import { ModalInformacionAsignacion } from './modal-informacion-asignacion';
+import { Taller } from '@/types/user';
 
 const ItemType = {
     NEUMATICO: 'neumatico',
@@ -42,6 +43,8 @@ export interface ModalAsignacionNeuProps {
     placa: string;
     kilometro: number;
     onAssignedUpdate?: () => void; // Nuevo callback para refrescar asignados
+    enTransito: boolean,
+    talleres?: Array<Taller | string> | Taller | string;
 }
 
 export const DraggableNeumatico: React.FC<{
@@ -295,7 +298,7 @@ const DropZone: React.FC<DropZoneProps> = memo(({
 
 
 
-const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onClose, data, assignedNeumaticos: initialAssignedNeumaticos, placa, kilometro, onAssignedUpdate }) => {
+const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onClose, data, assignedNeumaticos: initialAssignedNeumaticos, placa, kilometro, onAssignedUpdate, enTransito, talleres }) => {
 
 
     const initialAssignedMap = useMemo<Record<string, Neumatico | null>>(
@@ -475,7 +478,11 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
                     ID_OPERACION: idOperacion,
                     COD_SUPERVISOR: codSupervisor,
                     FechaAsignacion: fechaRegistro,
+                    EnTransito: enTransito,
+                    Talleres: talleres
                     // KmRecorridoxEtapa: kmRecorrido,
+                    // agregar el taller
+                    // agregar si es transito o no
                 };
             });
 

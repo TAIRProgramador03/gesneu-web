@@ -1176,6 +1176,8 @@ export default function Page(): React.JSX.Element {
             await refreshVehiculo();
           }, 2500);
         }}
+        enTransito={transitoActivo}
+        talleres={user?.talleres}
       />
       {/* Modal de Inspección de Neumáticos - Integrado con modal de advertencia centralizado */}
 
