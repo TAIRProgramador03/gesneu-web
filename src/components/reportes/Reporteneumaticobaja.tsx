@@ -495,7 +495,7 @@ export default function ReporteNeumaticoBaja() {
             options={talleresConNeumaticosEnBaja}
             onChange={(values) => setTalleresSeleccionados(values)}
             value={talleresSeleccionados}
-            className="w-102.5"
+            // className="w-102.5"
             placeholder="Seleccionar taller(es)"
           />
         </div>
