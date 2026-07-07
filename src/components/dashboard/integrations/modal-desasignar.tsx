@@ -742,9 +742,10 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
                           onChange={(e) => setTipoAccion(e.target.value)}
                           sx={{ minWidth: 220, flex: 0.4, marginBottom: '14px' }}
                         >
+                          <MenuItem value="DESGASTE NORMAL">Desgaste normal</MenuItem>
+                          <MenuItem value="DESGASTE IRREGULAR">Desgaste irregular</MenuItem>
                           <MenuItem value="RECOBRO">Recobro</MenuItem>
                           <MenuItem value="SINIESTRO">Siniestro</MenuItem>
-                          <MenuItem value="DESGASTE NORMAL">Desgaste normal</MenuItem>
                           <MenuItem value="FALLA DE FABRICA">Falla de fábrica</MenuItem>
                         </TextField>
                       )
