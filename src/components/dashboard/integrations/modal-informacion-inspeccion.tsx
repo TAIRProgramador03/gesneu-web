@@ -49,7 +49,7 @@ export const ModalInformacionInspeccion = ({ open, kilometraje, fechaInspeccion,
         </Box>
         <Box sx={{ flex: 1 }}>
           <Typography variant="h6" fontWeight={700} lineHeight={1.2}>
-            Confirmar Inspección
+            Reconfirmar Inspección
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.4 }}>
             <Typography variant="body2" color="text.secondary">Vehículo:</Typography>
