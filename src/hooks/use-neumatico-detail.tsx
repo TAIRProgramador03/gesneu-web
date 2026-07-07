@@ -16,6 +16,7 @@ export interface MovimientoHistorial {
   PRESION_AIRE_PSI: number
   TORQUE_APLICADO_NM: number
   KM_RECORRIDOS_EN_ETAPA: number
+  ODOMETRO_VEHICULAR: number
   PORCENTAJE_VIDA_UTIL: number
   OBSERVACION: string
   USUARIO_REGISTRADOR: string
