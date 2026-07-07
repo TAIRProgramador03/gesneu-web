@@ -33,9 +33,9 @@
   --icon-fontSize-lg: 1.5rem;
 }
 
-*:focus-visible {
-  outline: 2px solid var(--mui-palette-primary-main);
-}
+  /* *:focus-visible {
+    outline: 2px solid var(--mui-palette-primary-main);
+  } */
 
 html {
   height: 100%;
@@ -73,4 +73,27 @@ a{
 
 #map .leaflet-interactive {
   outline: none;
+}
+
+/* Shimmer para skeletons (barras de gráficos, etc.) */
+@keyframes shimmer {
+  0% {
+    background-position: -400px 0;
+  }
+  100% {
+    background-position: 400px 0;
+  }
+}
+
+.skeleton-shimmer {
+  background-image: linear-gradient(
+    90deg,
+    #e2e8f0 0px,
+    #e2e8f0 40px,
+    #f1f5f9 80px,
+    #e2e8f0 120px,
+    #e2e8f0 160px
+  );
+  background-size: 400px 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
 }
