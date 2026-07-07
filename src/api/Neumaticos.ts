@@ -887,7 +887,7 @@ export interface TiposDeTerrenoEnBaja {
   KM_PROMEDIO: number
 }
 
-export const obtenerDistribucionPorTerrenoBajas = async (talleresSeleccionados: string[], diseno: string, marcaF: string, fechaInicio: string = '', fechaFin: string = '') => {
+export const obtenerDistribucionPorTerrenoBajas = async (talleresSeleccionados: string[], diseno = '', marcaF = '', fechaInicio = '', fechaFin = '') => {
   try {
     const response = await axios.post<TiposDeTerrenoEnBaja[]>(
       `/api/po-reportes/distribucion-por-terreno`,
@@ -908,7 +908,7 @@ export interface MotivosDeBajaEnBaja {
   KM_PROMEDIO: number
 }
 
-export const obtenerDistribucionMotivoDeBaja = async (talleresSeleccionados: string[], diseno: string, marcaF: string, fechaInicio: string = '', fechaFin: string = '') => {
+export const obtenerDistribucionMotivoDeBaja = async (talleresSeleccionados: string[], diseno = '', marcaF = '', fechaInicio = '', fechaFin = '') => {
   try {
     const response = await axios.post<MotivosDeBajaEnBaja[]>(`/api/po-reportes/distribucion-por-motivos-de-baja`,
       { talleresSeleccionados, diseno, marcaF, fechaInicio, fechaFin },
@@ -926,7 +926,7 @@ export interface VehiculosPorTerreno {
   value: number
 }
 
-export const obtenerVehiculosPorTerreno = async (talleresSeleccionados: string[] = [], diseno: string = '', marcaF: string = '', fechaInicio: string = '', fechaFin: string = '') => {
+export const obtenerVehiculosPorTerreno = async (talleresSeleccionados: string[] = [], diseno = '', marcaF = '', fechaInicio = '', fechaFin = '') => {
   try {
     const response = await axios.post<VehiculosPorTerreno[]>(`/api/po-reportes/distribucion-vehicular-por-terreno`,
       { talleresSeleccionados, diseno, marcaF, fechaInicio, fechaFin },
