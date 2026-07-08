@@ -16,11 +16,9 @@ interface NeumaticoExtendido extends Neumatico {
 import {
   registrarDesasignacionNeumatico,
   getUltimaFechaInspeccionPorPlaca,
-  desasignarConReemplazo,
-  obtenerOrdenDeTrabajo,
-  OrdenDeTrabajo
+  desasignarConReemplazo
 } from '../../../api/Neumaticos';
-import { ArrowRight, CheckCircle, ClipboardList, RotateCcw, SearchIcon, TriangleAlertIcon } from 'lucide-react';
+import { CheckCircle, ClipboardList, RotateCcw, TriangleAlertIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import Image from 'next/image';
 import { convertToDateHuman } from '@/lib/utils';
@@ -28,8 +26,6 @@ import { LoadingButton } from '@/components/ui/loading-button';
 import { Button as ButtonCustom } from '@/components/ui/button';
 import { LoadingButton2 } from '@/components/ui/loading-button2';
 import { Textarea } from '@/components/ui/textarea';
-import { Field, FieldDescription, FieldLabel } from '@/components/ui/field';
-import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group';
 
 interface ModalDesasignarProps {
   open: boolean;
@@ -75,26 +71,6 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
 
   // Estado para asignaciones temporales (NO guardadas en BD)
   const [asignacionesTemporales, setAsignacionesTemporales] = useState<any[]>([]);
-
-  // Estados Orden de Trabajo (OT)
-  const [ot, setOt] = useState<string>('');
-  const [otRows, setOtRows] = useState<OrdenDeTrabajo[] | null>(null);
-  const [otVerificando, setOtVerificando] = useState<boolean>(false);
-
-  // OT válida sólo si se verificó y trae filas
-  const otValida = otRows !== null && otRows.length > 0;
-
-  // Relación usado(CODBAJA) -> nuevo(CODNUEVO) de la OT
-  const paresOT = useMemo(
-    () => (otRows ?? []).map(r => ({ usado: r.CODBAJA, nuevo: r.CODNUEVO })),
-    [otRows]
-  );
-
-  // Set de códigos usados permitidos por la OT (los que se pueden desasignar)
-  const usadosPermitidos = useMemo(
-    () => new Set(paresOT.map(p => p.usado)),
-    [paresOT]
-  );
 
   // Ref para rastrear si ya se inicializó y evitar loops
   const prevOpenRef = React.useRef(false);
@@ -170,12 +146,6 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
       setObservacion('');
       setPosicionResaltada('');
       setAsignacionesTemporales([]); // Limpiar asignaciones temporales
-      setTipoAccion('');
-
-      // Resetear OT
-      setOt('');
-      setOtRows(null);
-      setOtVerificando(false);
 
       // Limpiar también el estado de enAreaDesasignacion
       setNeumaticosAsignadosState(prev =>
@@ -245,64 +215,11 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
     }
   }, [open, placa]);
 
-  // Handler para verificar la Orden de Trabajo (OT)
-  const handleVerificarOT = async () => {
-    if (!ot.trim()) {
-      toast.warning('Ingresa el número de OT.');
-      return;
-    }
-    setOtVerificando(true);
-    try {
-      const data = await obtenerOrdenDeTrabajo(ot.trim(), placa);
-
-      // a) La OT debe existir para esta placa (el backend ya filtra por placa)
-      if (!data || data.length === 0) {
-        setOtRows(null);
-        toast.error(`No se encontró la OT ${ot} para la placa ${placa}.`, { duration: 5000 });
-        return;
-      }
-
-      // b) Al menos 1 código a dar de baja (CODBAJA) debe estar montado en el vehículo
-      const montados = new Set(
-        neumaticosAsignados.map(n => n.CODIGO_NEU || n.CODIGO)
-      );
-      const hayUsadoMontado = data.some(r => montados.has(r.CODBAJA));
-      if (!hayUsadoMontado) {
-        setOtRows(null);
-        toast.error('Ningún neumático a desasignar de la OT está montado en este vehículo.', { duration: 5000 });
-        return;
-      }
-
-      setOtRows(data);
-      toast.success(`OT ${ot} verificada correctamente.`, { position: 'top-right' });
-    } catch (error: any) {
-      setOtRows(null);
-      const errData = error?.response?.data;
-      const mensajeError = errData?.error || errData?.detalle || error?.message || 'No se pudo verificar la OT.';
-      toast.error(mensajeError, { duration: 5000 });
-    } finally {
-      setOtVerificando(false);
-    }
-  };
-
   // Handler para click en posición del diagrama
   const handlePosicionClick = (neumatico: Neumatico | undefined) => {
     if (neumatico && neumatico.POSICION) {
-      // Bloquear si la OT aún no fue verificada
-      if (!otValida) {
-        toast.warning('Primero verifica una OT válida.');
-        return;
-      }
-
       // Bloquear neumáticos temporales (recién asignados desde modal de asignación)
       if ((neumatico as any).TIPO_MOVIMIENTO === 'TEMPORAL') {
-        return;
-      }
-
-      // El código usado debe pertenecer a la OT
-      const codClick = neumatico.CODIGO_NEU || neumatico.CODIGO;
-      if (!codClick || !usadosPermitidos.has(codClick)) {
-        toast.warning(`El neumático ${codClick || ''} no tiene un S60 (relacionada a ${ot}) como neumático a desasignar.`);
         return;
       }
 
@@ -400,19 +317,6 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
     if (overId === 'neumaticos-por-desasignar') {
       // Agregar neumático a la lista de seleccionados para desasignar
       const codigoNeumatico = neumatico.CODIGO_NEU || neumatico.CODIGO;
-
-      // Bloquear si la OT aún no fue verificada
-      if (!otValida) {
-        toast.warning('Primero verifica una OT válida.');
-        return;
-      }
-
-      // El código usado debe pertenecer a la OT
-      if (!codigoNeumatico || !usadosPermitidos.has(codigoNeumatico)) {
-        // toast.warning(`El neumático ${codigoNeumatico || ''} no está en la OT ${ot}.`);
-        toast.warning(`El neumático ${codigoNeumatico || ''} no tiene un S60 (relacionada a ${ot}) como neumático a desasignar.`);
-        return;
-      }
 
       // Bloquear neumáticos temporales (recién asignados desde modal de asignación)
       if ((neumatico as any).TIPO_MOVIMIENTO === 'TEMPORAL') {
@@ -572,12 +476,6 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
 
   // Handler para guardar desasignación
   const handleGuardarDesasignacion = async () => {
-    // 0. Validar OT verificada
-    if (!otValida) {
-      toast.warning('Primero verifica una OT válida.')
-      return;
-    }
-
     // 1. Validar observación obligatoria
     if (!observacion || observacion.trim() === '') {
       toast.warning('La observación es obligatoria. Por favor, ingresa una observación.')
@@ -620,24 +518,6 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
           duration: 6000
         })
         return;
-      }
-
-      // Validar que cada usado seleccionado tenga instalado su nuevo según la pareja de la OT
-      const nuevosInstalados = new Set(
-        asignacionesTemporales.map((a: any) => String(a.CodigoNeumatico))
-      );
-      for (const sel of neumaticosSeleccionados) {
-        const codUsado = sel.CODIGO_NEU || sel.CODIGO;
-        const par = paresOT.find(p => p.usado === codUsado);
-        if (!par) {
-          // toast.error(`El neumático ${codUsado} no está en la OT ${ot}.`, { duration: 6000 })
-          toast.error(`El neumático ${codUsado} no tiene un S60 (relacionada a ${ot}) como neumático a desasignar.`, { duration: 6000 });
-          return;
-        }
-        if (!nuevosInstalados.has(String(par.nuevo))) {
-          toast.error(`Según la OT, el reemplazo de ${codUsado} debe ser ${par.nuevo}. Asígnalo antes de guardar.`, { duration: 6000 })
-          return;
-        }
       }
 
       // **FLUJO ÚNICO**: Usar endpoint /api/desasignar-con-reemplazo
@@ -687,7 +567,6 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
 
         // Enviar asignaciones + desasignaciones juntas
         const payload = {
-          OT: ot.trim(),
           desasignaciones,
           asignaciones: asignacionesTempo
         };
@@ -719,8 +598,6 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
       setAccion('');
       setTipoAccion('');
       setObservacion('');
-      setOt('');
-      setOtRows(null);
 
       // Solo llamar onSuccess cuando la acción se completa exitosamente
       if (onSuccess) {
@@ -785,7 +662,7 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
       <DialogContent>
         <DndContext onDragEnd={handleDragEnd}>
           <Stack direction="row" spacing={2}>
-            <Stack direction="column" spacing={2} sx={{ flex: 0.7, width: '1px', marginTop: '10px' }}>
+            <Stack direction="column" spacing={2} sx={{ flex: 1, width: '1px', marginTop: '10px' }}>
               {/* Card de información del vehículo */}
               <Card sx={{ p: 2, boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)' }}>
                 <Box>
@@ -820,153 +697,6 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
                       No hay datos del vehículo.
                     </Typography>
                   )}
-
-                  <div>
-                    <Field className="max-w-sm">
-                      <FieldLabel htmlFor="inline-start-input">Orden De Trabajo (OT)</FieldLabel>
-                      <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-                        <InputGroup>
-                          <InputGroupInput
-                            id="inline-start-input"
-                            placeholder="Buscar..."
-                            value={ot}
-                            disabled={otValida || otVerificando}
-                            onChange={(e) => setOt(e.target.value)}
-                            onKeyDown={(e) => {
-                              if (e.key === 'Enter') {
-                                e.preventDefault();
-                                if (!otValida) handleVerificarOT();
-                              }
-                            }}
-                          />
-                          <InputGroupAddon align="inline-start">
-                            <SearchIcon className="text-muted-foreground" />
-                          </InputGroupAddon>
-                        </InputGroup>
-                        {otValida ? (
-                          <ButtonCustom variant={'warning'} onClick={() => {
-                            setOt('');
-                            setOtRows(null);
-                            handleLimpiar()
-                          }}>
-                            Cambiar
-                          </ButtonCustom>
-                        ) : (
-                          <LoadingButton2
-                            variant={'primary'}
-                            disabled={otVerificando || !ot.trim()}
-                            onClick={handleVerificarOT}
-                          >
-                            Verificar
-                          </LoadingButton2>
-                        )}
-                      </Box>
-                      {!otValida && (
-                        <FieldDescription>
-                          Verifica una OT válida para esta placa para habilitar la desasignación.
-                        </FieldDescription>
-                      )}
-                    </Field>
-
-                    {/* Relación de neumáticos usado -> nuevo de la OT */}
-                    {otValida && (() => {
-                      const totalMontados = paresOT.filter(p =>
-                        neumaticosAsignados.some(n => (n.CODIGO_NEU || n.CODIGO) === p.usado)
-                      ).length;
-
-                      return (
-                        <Box sx={{
-                          mt: 1.5, borderRadius: 2, overflow: 'hidden',
-                          border: '1px solid', borderColor: 'divider',
-                          boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
-                        }}>
-                          {/* Header */}
-                          <Box sx={{
-                            display: 'flex', alignItems: 'center', gap: 1,
-                            px: 1.5, py: 1,
-                            background: 'linear-gradient(135deg, #eff6ff 0%, #eef2ff 100%)',
-                            borderBottom: '1px solid', borderColor: 'divider',
-                          }}>
-                            <ClipboardList size={16} className="text-blue-600" />
-                            <Typography variant="caption" sx={{ fontWeight: 700, color: '#1e3a8a' }}>
-                              Orden de Trabajo {ot}
-                            </Typography>
-                            <Box sx={{ flex: 1 }} />
-                            <Chip
-                              label={`${paresOT.length} ${paresOT.length === 1 ? 'par' : 'pares'}`}
-                              size="small"
-                              sx={{ height: 20, fontSize: 10, fontWeight: 700, bgcolor: '#dbeafe', color: '#1d4ed8' }}
-                            />
-                            <Chip
-                              label={`${totalMontados} montado${totalMontados === 1 ? '' : 's'}`}
-                              size="small"
-                              sx={{ height: 20, fontSize: 10, fontWeight: 700, bgcolor: '#dcfce7', color: '#15803d' }}
-                            />
-                          </Box>
-
-                          {/* Filas */}
-                          <Stack divider={<Box sx={{ height: '1px', bgcolor: 'divider' }} />}>
-                            {paresOT.map((p, i) => {
-                              const montado = neumaticosAsignados.some(n => (n.CODIGO_NEU || n.CODIGO) === p.usado);
-                              return (
-                                <Box
-                                  key={`${p.usado}-${p.nuevo}-${i}`}
-                                  sx={{
-                                    display: 'flex', alignItems: 'center', gap: 1.5,
-                                    px: 1.5, py: 1,
-                                    bgcolor: montado ? '#fff' : '#fafafa',
-                                    opacity: montado ? 1 : 0.7,
-                                  }}
-                                >
-                                  {/* Sale */}
-                                  <Box sx={{ minWidth: 0 }}>
-                                    <Typography sx={{ fontSize: 9, fontWeight: 700, letterSpacing: 0.5, color: '#b91c1c' }}>
-                                      SALE
-                                    </Typography>
-                                    <Chip
-                                      label={p.usado}
-                                      size="small"
-                                      sx={{ height: 22, fontWeight: 700, fontSize: 11, bgcolor: '#fee2e2', color: '#b91c1c' }}
-                                    />
-                                  </Box>
-
-                                  <ArrowRight size={16} className="text-slate-400 shrink-0" />
-
-                                  {/* Entra */}
-                                  <Box sx={{ minWidth: 0 }}>
-                                    <Typography sx={{ fontSize: 9, fontWeight: 700, letterSpacing: 0.5, color: '#15803d' }}>
-                                      ENTRA
-                                    </Typography>
-                                    <Chip
-                                      label={p.nuevo}
-                                      size="small"
-                                      sx={{ height: 22, fontWeight: 700, fontSize: 11, bgcolor: '#dcfce7', color: '#15803d' }}
-                                    />
-                                  </Box>
-
-                                  <Box sx={{ flex: 1 }} />
-
-                                  {/* Estado */}
-                                  {montado ? (
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: '#15803d' }}>
-                                      <CheckCircle size={14} />
-                                      <Typography sx={{ fontSize: 10, fontWeight: 600 }}>Montado</Typography>
-                                    </Box>
-                                  ) : (
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: '#94a3b8' }}>
-                                      <TriangleAlertIcon size={14} />
-                                      <Typography sx={{ fontSize: 10, fontWeight: 600, fontStyle: 'italic' }}>No montado</Typography>
-                                    </Box>
-                                  )}
-                                </Box>
-                              );
-                            })}
-                          </Stack>
-                        </Box>
-                      );
-                    })()}
-                  </div>
-
                 </Box>
               </Card>
 
@@ -995,7 +725,6 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
                       label="Acción"
                       size="small"
                       value={accion}
-                      disabled={!otValida}
                       onChange={(e) => setAccion(e.target.value)}
                       sx={{ minWidth: 220, flex: 0.4, marginBottom: '14px', marginTop: '10px' }}
                     >
@@ -1010,7 +739,6 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
                           label="Tipo de baja"
                           size="small"
                           value={tipoAccion}
-                          disabled={!otValida}
                           onChange={(e) => setTipoAccion(e.target.value)}
                           sx={{ minWidth: 220, flex: 0.4, marginBottom: '14px' }}
                         >
@@ -1026,7 +754,6 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
                     <Textarea placeholder="Escribe la observación..."
                       className='h-15 mb-4'
                       value={observacion}
-                      disabled={!otValida}
                       onChange={(e) => setObservacion(e.target.value)}
                     />
 
@@ -1115,40 +842,6 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
               maxWidth: 400, minWidth: 420, width: '100%',
               marginTop: '10px'
             }}>
-              {/* Overlay de bloqueo mientras la OT no esté verificada */}
-              {!otValida && (
-                <Box sx={{
-                  position: 'absolute', inset: 0, zIndex: 10,
-                  bgcolor: 'rgba(248,250,252,0.78)',
-                  backdropFilter: 'blur(3px)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  borderRadius: 2, cursor: 'not-allowed',
-                }}>
-                  <Box sx={{
-                    textAlign: 'center', px: 3, py: 3, mx: 2,
-                    borderRadius: 3,
-                    bgcolor: '#fff',
-                    border: '1px solid', borderColor: 'divider',
-                    boxShadow: '0 8px 24px rgba(15,23,42,0.12)',
-                    maxWidth: 280,
-                  }}>
-                    <Box sx={{
-                      width: 56, height: 56, borderRadius: '50%',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      mx: 'auto', mb: 1.5,
-                      background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)',
-                    }}>
-                      <TriangleAlertIcon size={26} className="text-amber-500" />
-                    </Box>
-                    <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#1e293b' }}>
-                      Diagrama bloqueado
-                    </Typography>
-                    <Typography variant="caption" sx={{ display: 'block', color: 'text.secondary', mt: 0.5, lineHeight: 1.4 }}>
-                      Verifica una OT válida para habilitar el diagrama del vehículo.
-                    </Typography>
-                  </Box>
-                </Box>
-              )}
               <Box sx={{ position: 'relative', width: '370px', height: '430px' }}>
                 <DiagramaVehiculo
                   key={`diagrama-live-${Date.now()}`}
