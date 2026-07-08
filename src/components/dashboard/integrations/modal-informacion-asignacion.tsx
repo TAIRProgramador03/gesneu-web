@@ -47,7 +47,7 @@ export const ModalInformacionAsignacion = ({ open, kilometraje, neumaticos = [],
         </Box>
         <Box sx={{ flex: 1 }}>
           <Typography variant="h6" fontWeight={700} lineHeight={1.2}>
-            Confirmar Asignación
+            Reconfirmar Asignación
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.4 }}>
             <Typography variant="body2" color="text.secondary">Vehículo:</Typography>

@@ -21,6 +21,7 @@ import { CollapsibleSection } from "@/components/ui/CollapsibleSection"
 import { VidaUtilCard } from "@/components/padron/neumatico/VidaUtilCard"
 import { RemanenteChart } from "@/components/padron/neumatico/RemanenteChart"
 import { Timeline } from '../../../../components/padron/neumatico/Timeline';
+import { KilometrajeChart } from "@/components/padron/neumatico/KilometrajeChart"
 
 export const NeumaticoDashboard = ({ codigo }: { codigo: string }) => {
   const { neumatico, historial, isLoading, isError } = useNeumaticoDetail({ codigo })
@@ -95,6 +96,9 @@ export const NeumaticoDashboard = ({ codigo }: { codigo: string }) => {
 
       {/* Remanente Chart */}
       <RemanenteChart historial={historial} neu={neumatico} />
+
+      {/* Kilometraje Chart */}
+      <KilometrajeChart historial={historial} neu={neumatico} />
 
       {/* Timeline */}
       <Timeline movimientos={[...historial].reverse()} />

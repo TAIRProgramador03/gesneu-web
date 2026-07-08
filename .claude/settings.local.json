@@ -4,7 +4,12 @@
       "Bash(npm install *)",
       "Bash(npx tsc *)",
       "PowerShell(npm run *)",
-      "Bash(npm run *)"
+      "Bash(npm run *)",
+      "Bash(node -p \"require\\('date-fns/package.json'\\).version\")",
+      "Bash(tasklist //FI \"IMAGENAME eq node.exe\" //FO TABLE)",
+      "Bash(netstat -ano)",
+      "Bash(wmic process *)",
+      "Bash(powershell -Command \"Get-CimInstance Win32_Process -Filter 'ProcessId=20352' | Select-Object CommandLine\")"
     ]
   }
 }

@@ -816,14 +816,14 @@ export const obtenerMovimientosDeNeumaticosEnBaja = async () => {
   }
 }
 
-export interface Talleres {
+export interface ValuesLabel {
   value: string
   label: string
 }
 
 export const obtenerLosTalleresDelUsuario = async () => {
   try {
-    const response = await axios.get<Talleres[]>(`/api/mapa/todos-los-talleres`, {
+    const response = await axios.get<ValuesLabel[]>(`/api/mapa/todos-los-talleres`, {
       withCredentials: true,
     });
     return response.data;
@@ -855,6 +855,114 @@ export const obtenerOrdenDeTrabajo = async (ordenDeTrabajo: string, placa: strin
     return response.data;
   } catch (error) {
     console.error('Error en obtenerOrdenDeTrabajo:', error);
+  }
+}
+
+export const obtenerTalleresConNeumaticosEnBaja = async () => {
+  try {
+    const response = await axios.get<ValuesLabel[]>(`/api/po-reportes/talleres`, {
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error en obtenerTalleresConNeumaticosEnBaja:', error);
+    throw error;
+  }
+}
+
+
+export const obtenerCondicionesConNeumaticosEnBaja = async () => {
+  try {
+    const response = await axios.get<ValuesLabel[]>(`/api/po-reportes/condiciones`, {
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error en obtenerCondicionesConNeumaticosEnBaja:', error);
+    throw error;
+  }
+}
+
+
+export const obtenerDisenosConNeumaticosEnBaja = async () => {
+  try {
+    const response = await axios.get<ValuesLabel[]>(`/api/po-reportes/disenos`, {
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error en obtenerDisenosConNeumaticosEnBaja:', error);
+    throw error;
+  }
+}
+
+export const obtenerMarcasConNeumaticosEnBaja = async () => {
+  try {
+    const response = await axios.get<ValuesLabel[]>(`/api/po-reportes/marcas`, {
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error en obtenerMarcasConNeumaticosEnBaja:', error);
+    throw error;
+  }
+}
+
+export interface TiposDeTerrenoEnBaja {
+  TIPO_TERRENO: string
+  QTY_NEUMATICOS_BAJA: number
+  KM_TOTAL: number
+  KM_PROMEDIO: number
+}
+
+export const obtenerDistribucionPorTerrenoBajas = async (talleresSeleccionados: string[], diseno = '', marcaF = '', fechaInicio = '', fechaFin = '') => {
+  try {
+    const response = await axios.post<TiposDeTerrenoEnBaja[]>(
+      `/api/po-reportes/distribucion-por-terreno`,
+      { talleresSeleccionados, diseno, marcaF, fechaInicio, fechaFin },
+      { withCredentials: true }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error en obtenerDistribucionPorTerrenoBajas:', error);
+    throw error;
+  }
+}
+
+export interface MotivosDeBajaEnBaja {
+  TIPO_BAJA: string
+  QTY_NEUMATICOS_BAJA: number
+  KM_TOTAL: number
+  KM_PROMEDIO: number
+}
+
+export const obtenerDistribucionMotivoDeBaja = async (talleresSeleccionados: string[], diseno = '', marcaF = '', fechaInicio = '', fechaFin = '') => {
+  try {
+    const response = await axios.post<MotivosDeBajaEnBaja[]>(`/api/po-reportes/distribucion-por-motivos-de-baja`,
+      { talleresSeleccionados, diseno, marcaF, fechaInicio, fechaFin },
+      { withCredentials: true }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error en obtenerDistribucionMotivoDeBaja:', error);
+    throw error;
+  }
+}
+
+export interface VehiculosPorTerreno {
+  name: string,
+  value: number
+}
+
+export const obtenerVehiculosPorTerreno = async (talleresSeleccionados: string[] = [], diseno = '', marcaF = '', fechaInicio = '', fechaFin = '') => {
+  try {
+    const response = await axios.post<VehiculosPorTerreno[]>(`/api/po-reportes/distribucion-vehicular-por-terreno`,
+      { talleresSeleccionados, diseno, marcaF, fechaInicio, fechaFin },
+      { withCredentials: true }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error en obtenerVehiculosPorTerreno:', error);
     throw error;
   }
 }

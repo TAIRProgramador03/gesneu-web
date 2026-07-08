@@ -5,7 +5,7 @@ import { SideBarMain } from '@/components/navegation/SideBarMain';
 import { PermissionGuard } from '@/components/auth/permission-guard';
 
 export const metadata: Metadata = {
-  title: `Análisis de bajas | ${config.site.name}`,
+  title: `Análisis | ${config.site.name}`,
 }
 
 export default function IntegrationsLayout({
