@@ -25,6 +25,7 @@ export interface VehiculoMain {
   KILOMETRAJE_GESNEU: number;
   ID_OPERACION: number;
   OPERACION: string;
+  TALLER: string;
   ID_SUPERVISOR: string;
   TIPO_TERRENO: string;
   RETEN: string;

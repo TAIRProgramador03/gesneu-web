@@ -61,7 +61,7 @@ export const cargarPadronNeumatico = async (archivoExcel: File) => {
 };
 
 // Buscar vehículo por placa
-export const buscarVehiculoPorPlaca = async (placa: string, transito: boolean = false) => {
+export const buscarVehiculoPorPlaca = async (placa: string, transito = false) => {
   try {
     const response = await axios.get<VehiculoMain>(`/api/vehiculo/${placa}`, {
       withCredentials: true,
@@ -915,11 +915,11 @@ export interface TiposDeTerrenoEnBaja {
   KM_PROMEDIO: number
 }
 
-export const obtenerDistribucionPorTerrenoBajas = async (talleresSeleccionados: string[], diseno = '', marcaF = '', fechaInicio = '', fechaFin = '') => {
+export const obtenerDistribucionPorTerrenoBajas = async (talleresSeleccionados: string[], disenos: string[], marcas: string[], fechaInicio = '', fechaFin = '') => {
   try {
     const response = await axios.post<TiposDeTerrenoEnBaja[]>(
       `/api/po-reportes/distribucion-por-terreno`,
-      { talleresSeleccionados, diseno, marcaF, fechaInicio, fechaFin },
+      { talleresSeleccionados, disenos, marcas, fechaInicio, fechaFin },
       { withCredentials: true }
     );
     return response.data;
@@ -936,10 +936,10 @@ export interface MotivosDeBajaEnBaja {
   KM_PROMEDIO: number
 }
 
-export const obtenerDistribucionMotivoDeBaja = async (talleresSeleccionados: string[], diseno = '', marcaF = '', fechaInicio = '', fechaFin = '') => {
+export const obtenerDistribucionMotivoDeBaja = async (talleresSeleccionados: string[], disenos: string[], marcas: string[], fechaInicio = '', fechaFin = '') => {
   try {
     const response = await axios.post<MotivosDeBajaEnBaja[]>(`/api/po-reportes/distribucion-por-motivos-de-baja`,
-      { talleresSeleccionados, diseno, marcaF, fechaInicio, fechaFin },
+      { talleresSeleccionados, disenos, marcas, fechaInicio, fechaFin },
       { withCredentials: true }
     );
     return response.data;
@@ -954,15 +954,61 @@ export interface VehiculosPorTerreno {
   value: number
 }
 
-export const obtenerVehiculosPorTerreno = async (talleresSeleccionados: string[] = [], diseno = '', marcaF = '', fechaInicio = '', fechaFin = '') => {
+export const obtenerVehiculosPorTerreno = async (talleresSeleccionados: string[], disenos: string[], marcas: string[], fechaInicio = '', fechaFin = '') => {
   try {
     const response = await axios.post<VehiculosPorTerreno[]>(`/api/po-reportes/distribucion-vehicular-por-terreno`,
-      { talleresSeleccionados, diseno, marcaF, fechaInicio, fechaFin },
+      { talleresSeleccionados, disenos, marcas, fechaInicio, fechaFin },
       { withCredentials: true }
     );
     return response.data;
   } catch (error) {
     console.error('Error en obtenerVehiculosPorTerreno:', error);
+    throw error;
+  }
+}
+
+export type RelacionesNeumaticoTerreno = RelacionNeumaticoTerreno[]
+
+export interface RelacionNeumaticoTerreno {
+  ID_NEUMATICO: number
+  CODIGO_NEUMATICO: string
+  MARCA_NEUMATICO: string
+  MEDIDA_NEUMATICO: string
+  DISENO_NEUMATICO: string
+  PROYECTO_NEUMATICO: string
+  COSTO_NEUMATICO: number
+  ES_RECUPERADO: boolean
+  PLACA_BAJA: string
+  KM_TOTAL_VIDA: number
+  TIPO_TERRENO: string
+  TIPO_BAJA: string
+  FECHA_BAJA: string
+  REMANENTE_ACTUAL: number
+  PORCENTAJE_VIDA: number
+}
+
+export const relacionNeumaticosDeBajaTerreno = async (terreno: string, talleresSeleccionados: string[], disenos: string[], marcas: string[], fechaInicio = '', fechaFin = '') => {
+  try {
+    const response = await axios.post<RelacionesNeumaticoTerreno>(`/api/po-reportes/relacion-neumaticos-por-terreno`,
+      { terreno, talleresSeleccionados, disenos, marcas, fechaInicio, fechaFin },
+      { withCredentials: true }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error en relacionNeumaticosDeBajaTerreno:', error);
+    throw error;
+  }
+}
+
+export const relacionNeumaticosDeBajaPor = async (baja: string, talleresSeleccionados: string[], disenos: string[], marcas: string[], fechaInicio = '', fechaFin = '') => {
+  try {
+    const response = await axios.post<RelacionesNeumaticoTerreno>(`/api/po-reportes/relacion-neumaticos-por-baja`,
+      { baja, talleresSeleccionados, disenos, marcas, fechaInicio, fechaFin },
+      { withCredentials: true }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error en relacionNeumaticosDeBajaPor:', error);
     throw error;
   }
 }

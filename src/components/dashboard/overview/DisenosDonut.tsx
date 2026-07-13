@@ -145,8 +145,8 @@ export const DisenosDonut = (): React.JSX.Element => {
                     cx="50%"
                     cy="50%"
                     innerRadius={65}
-                    outerRadius={88}
-                    paddingAngle={3}
+                    outerRadius={100}
+                    paddingAngle={4}
                     dataKey="value"
                     strokeWidth={0}
                     startAngle={90}

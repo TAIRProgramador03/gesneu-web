@@ -19,6 +19,14 @@ import { CollapsibleCard } from "../dashboard/CollapsibleCard";
 import { FlotaDonut } from "../dashboard/overview/FlotaDonut";
 import { MultiSearchSelect } from "../ui/multiple-select";
 import { SearchSelect } from "../ui/search-select";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
+import { Button } from "../ui/button";
+import { Field, FieldGroup } from "../ui/field";
+import { Label } from "../ui/label";
+import { Input } from "../ui/input";
+import { capitalizeCustomString } from "@/lib/utils";
+import { NeumaticosTerrenoDialog } from "./NeumaticosTerrenoDialog";
+import { NeumaticosBajaDialog } from "./NeumaticosBajaDialog";
 
 // ============================================
 // TYPES
@@ -259,11 +267,29 @@ export default function ReporteNeumaticoBaja() {
   const [talleresSeleccionados, setTalleresSeleccionados] = useState<string[]>([]);
   const [condicion, setCondicion] = useState<string>("");
   const [medida, setMedida] = useState<string>("");
-  const [diseno, setDiseno] = useState<string>("");
-  const [marcaF, setMarcaF] = useState<string>("");
+  const [disenos, setDisenos] = useState<string[]>([]);
+  const [marcas, setMarcas] = useState<string[]>([]);
+
   const [fechaInicio, setFechaInicio] = useState<string>("");
   const [fechaFin, setFechaFin] = useState<string>("");
   const [tipoBaja, setTipoBaja] = useState<string>("");
+
+  const [openModalTipoTerreno, setOpenModalTipoTerreno] = useState(false)
+  const [selectedTipoTerreno, setSelectedTipoTerreno] = useState({
+    TIPO_TERRENO: '',
+    QTY_NEUMATICOS_BAJA: 0,
+    KM_PROMEDIO: 0,
+    KM_TOTAL: 0,
+  })
+
+  const [openModalTipoBaja, setOpenModalTipoBaja] = useState(false)
+  const [selectedTipoBaja, setSelectedTipoBaja] = useState({
+    TIPO_BAJA: '',
+    QTY_NEUMATICOS_BAJA: 0,
+    KM_PROMEDIO: 0,
+    KM_TOTAL: 0,
+  })
+
 
   // const { data = [] } = useQuery({
   //   queryKey: ['analisis-neumaticos-en-baja'],
@@ -296,20 +322,20 @@ export default function ReporteNeumaticoBaja() {
 
   // * distribución de tipo de terreno en baja
   const { data: distirbucionTipoTerrenoEnBaja = [], isLoading: isLoadingDistribucionTipoTerrenoEnBaja } = useQuery({
-    queryKey: ['distribucion-tipos-de-terrenos-en-baja', { talleresSeleccionados, diseno, marcaF, fechaInicio, fechaFin }],
-    queryFn: () => obtenerDistribucionPorTerrenoBajas(talleresSeleccionados, diseno, marcaF, fechaInicio, fechaFin)
+    queryKey: ['distribucion-tipos-de-terrenos-en-baja', { talleresSeleccionados, disenos, marcas, fechaInicio, fechaFin }],
+    queryFn: () => obtenerDistribucionPorTerrenoBajas(talleresSeleccionados, disenos, marcas, fechaInicio, fechaFin)
   })
 
   // * distribución de motivo de baja
   const { data: distribucionMotivoDeBaja = [] } = useQuery({
-    queryKey: ['distribucion-motivo-de-baja', { talleresSeleccionados, diseno, marcaF, fechaInicio, fechaFin }],
-    queryFn: () => obtenerDistribucionMotivoDeBaja(talleresSeleccionados, diseno, marcaF, fechaInicio, fechaFin)
+    queryKey: ['distribucion-motivo-de-baja', { talleresSeleccionados, disenos, marcas, fechaInicio, fechaFin }],
+    queryFn: () => obtenerDistribucionMotivoDeBaja(talleresSeleccionados, disenos, marcas, fechaInicio, fechaFin)
   })
 
   // * vehiculos por tipo de terreno en bajas
   const { data: distribucionVehicularPorTerreno = [], isLoading: isLoadingDistribucionVehicularPorTerreno } = useQuery({
-    queryKey: ['distribucion-vehicular-por-terreno', { talleresSeleccionados, diseno, marcaF, fechaInicio, fechaFin }],
-    queryFn: () => obtenerVehiculosPorTerreno(talleresSeleccionados, diseno, marcaF, fechaInicio, fechaFin)
+    queryKey: ['distribucion-vehicular-por-terreno', { talleresSeleccionados, disenos, marcas, fechaInicio, fechaFin }],
+    queryFn: () => obtenerVehiculosPorTerreno(talleresSeleccionados, disenos, marcas, fechaInicio, fechaFin)
   })
 
   // ---- Datos filtrados ----
@@ -403,15 +429,15 @@ export default function ReporteNeumaticoBaja() {
   const limpiarFiltros = () => {
     setTalleresSeleccionados([]);
     setCondicion("");
-    setMarcaF("");
+    setMarcas([]);
     setMedida("");
-    setDiseno("");
+    setDisenos([]);
     setTipoBaja("");
     setFechaInicio("");
     setFechaFin("");
   };
 
-  const hayFiltrosActivos = talleresSeleccionados.length > 0 || condicion || medida || marcaF || diseno || tipoBaja || fechaInicio || fechaFin;
+  const hayFiltrosActivos = talleresSeleccionados.length > 0 || condicion || medida || marcas.length > 0 || disenos.length > 0 || tipoBaja || fechaInicio || fechaFin;
 
   // ---- Lookup pivot ----
   // const pivotLookup = useMemo(() => {
@@ -503,24 +529,24 @@ export default function ReporteNeumaticoBaja() {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 12 }}>
           <div>
             <p style={{ fontSize: 11, fontWeight: 600, color: "#64748b", margin: "0 0 5px", textTransform: "uppercase", letterSpacing: ".05em" }}>
-              Marca
+              Marca(s)
             </p>
-            <SearchSelect
+            <MultiSearchSelect
               options={marcasConNeumaticosEnBaja}
-              value={marcaF}
-              onChange={(value) => setMarcaF(value)}
-              placeholder="Seleccionar marca"
+              onChange={(value) => setMarcas(value)}
+              value={marcas}
+              placeholder="Seleccionar marca(s)"
             />
           </div>
           <div>
             <p style={{ fontSize: 11, fontWeight: 600, color: "#64748b", margin: "0 0 5px", textTransform: "uppercase", letterSpacing: ".05em" }}>
-              Diseño
+              Diseño(s)
             </p>
-            <SearchSelect
+            <MultiSearchSelect
               options={disenosConNeumaticosEnBaja}
-              value={diseno}
-              onChange={(value) => setDiseno(value)}
-              placeholder="Seleccionar diseño"
+              value={disenos}
+              onChange={(value) => setDisenos(value)}
+              placeholder="Seleccionar diseño(s)"
             />
           </div>
           <div>
@@ -587,8 +613,8 @@ export default function ReporteNeumaticoBaja() {
                           cx="50%"
                           cy="50%"
                           innerRadius={72}
-                          outerRadius={98}
-                          paddingAngle={3}
+                          outerRadius={110}
+                          paddingAngle={4}
                           dataKey="value"
                           strokeWidth={0}
                           startAngle={90}
@@ -712,7 +738,10 @@ export default function ReporteNeumaticoBaja() {
                           allowDecimals={false}
                         />
                         <Tooltip content={<TerrenoTooltip />} cursor={{ fill: "rgba(59,130,246,0.06)" }} />
-                        <Bar dataKey="KM_PROMEDIO" radius={[8, 8, 0, 0]} maxBarSize={90}>
+                        <Bar dataKey="KM_PROMEDIO" radius={[8, 8, 0, 0]} maxBarSize={90} onClick={(data) => {
+                          setSelectedTipoTerreno(data.payload)
+                          setOpenModalTipoTerreno(prev => !prev)
+                        }} className="cursor-pointer">
                           {(() => {
                             const vals = distirbucionTipoTerrenoEnBaja.map(d => d.KM_PROMEDIO);
                             const min = Math.min(...vals), max = Math.max(...vals);
@@ -792,7 +821,12 @@ export default function ReporteNeumaticoBaja() {
                       allowDecimals={false}
                     />
                     <Tooltip content={<MotivoTooltip />} cursor={{ fill: "rgba(239,68,68,0.06)" }} />
-                    <Bar dataKey="KM_PROMEDIO" radius={[8, 8, 0, 0]} maxBarSize={90}>
+                    <Bar dataKey="KM_PROMEDIO" radius={[8, 8, 0, 0]} maxBarSize={90}
+                      onClick={(data) => {
+                        setSelectedTipoBaja(data.payload)
+                        setOpenModalTipoBaja(prev => !prev)
+                      }}
+                      className="cursor-pointer">
                       {(() => {
                         const vals = distribucionMotivoDeBaja.map(d => d.KM_PROMEDIO);
                         const min = Math.min(...vals), max = Math.max(...vals);
@@ -815,14 +849,91 @@ export default function ReporteNeumaticoBaja() {
 
 
 
+      {/* ------------ Modal: Tipo de terreno ----------- */}
+      <Dialog open={openModalTipoTerreno} onOpenChange={setOpenModalTipoTerreno}>
+        <DialogContent
+          forceMount={undefined}
+          className="flex flex-col w-full max-w-[90vw] sm:max-w-[90vw] max-h-[90vh] xl:max-h-[80vh] h-fit overflow-hidden border-none"
+        >
+          <div className="h-2 w-full bg-blue-900 shrink-0 absolute top-0 left-0" />
 
+          <DialogHeader>
+            <DialogTitle className="text-3xl font-semibold text-[#002141]">
+              Neumáticos dados de baja en el terreno: {capitalizeCustomString(selectedTipoTerreno.TIPO_TERRENO)}
+            </DialogTitle>
+            <DialogDescription>
+              Lista de los neumáticos dados de baja que pertenezcan al terreno: {capitalizeCustomString(selectedTipoTerreno.TIPO_TERRENO)}.
+            </DialogDescription>
+          </DialogHeader>
 
+          <div className="w-full h-full overflow-auto">
+            {openModalTipoTerreno && selectedTipoTerreno && (
+              <NeumaticosTerrenoDialog
+                data={selectedTipoTerreno}
+                talleresSeleccionados={talleresSeleccionados}
+                disenos={disenos}
+                marcas={marcas}
+                fechaInicio={fechaInicio}
+                fechaFin={fechaFin}
+              />
+            )}
+          </div>
 
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button
+                type="button"
+                className="cursor-pointer"
+              >
+                Cerrar
+              </Button>
+            </DialogClose>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
+      {/* ------------ Modal: Tipo de baja ----------- */}
+      <Dialog open={openModalTipoBaja} onOpenChange={setOpenModalTipoBaja}>
+        <DialogContent
+          forceMount={undefined}
+          className="flex flex-col w-full max-w-[90vw] sm:max-w-[90vw] max-h-[90vh] xl:max-h-[80vh] h-fit overflow-hidden border-none"
+        >
+          <div className="h-2 w-full bg-blue-900 shrink-0 absolute top-0 left-0" />
 
+          <DialogHeader>
+            <DialogTitle className="text-3xl font-semibold text-[#002141]">
+              Neumáticos dados de baja por: {capitalizeCustomString(selectedTipoBaja.TIPO_BAJA)}
+            </DialogTitle>
+            <DialogDescription>
+              Lista de los neumáticos dados de baja por: {capitalizeCustomString(selectedTipoBaja.TIPO_BAJA)}.
+            </DialogDescription>
+          </DialogHeader>
 
+          <div className="w-full h-full overflow-auto">
+            {openModalTipoBaja && selectedTipoBaja && (
+              <NeumaticosBajaDialog
+                data={selectedTipoBaja}
+                talleresSeleccionados={talleresSeleccionados}
+                disenos={disenos}
+                marcas={marcas}
+                fechaInicio={fechaInicio}
+                fechaFin={fechaFin}
+              />
+            )}
+          </div>
 
-
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button
+                type="button"
+                className="cursor-pointer"
+              >
+                Cerrar
+              </Button>
+            </DialogClose>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
 
       {/* {filtrado.length === 0 ? (

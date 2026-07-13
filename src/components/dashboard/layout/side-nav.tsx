@@ -52,7 +52,7 @@ export function SideNav({ collapsed, setCollapsed }: SideNavProps): React.JSX.El
         top: 0,
         display: 'flex',
         flexDirection: 'column',
-        zIndex: 1200,
+        zIndex: 1,
       }}
     >
       {/* Logo y botón */}
@@ -150,129 +150,129 @@ function UserCard({ user, collapsed }: { user: User | null; collapsed: boolean }
 
   return (
     <>
-    <Box
-      ref={popover.anchorRef}
-      role="button"
-      tabIndex={0}
-      onClick={popover.handleToggle}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          popover.handleToggle();
-        }
-      }}
-      aria-label="Abrir menú de usuario"
-      sx={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 1.5,
-        px: collapsed ? 0 : 2,
-        py: 2,
-        cursor: 'pointer',
-        outline: 'none',
-        justifyContent: collapsed ? 'center' : 'flex-start',
-        transition: 'background-color 0.15s ease',
-        '&:hover': { bgcolor: 'rgba(255,255,255,0.06)' },
-        '&:focus-visible': { outline: '2px solid #67b0f5', outlineOffset: '-2px' },
-      }}
-    >
-      <Tooltip
-        title={collapsed ? <span style={{ whiteSpace: 'pre-line' }}>{tooltipColapsado}</span> : ''}
-        placement="right"
-        arrow
+      <Box
+        ref={popover.anchorRef}
+        role="button"
+        tabIndex={0}
+        onClick={popover.handleToggle}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            popover.handleToggle();
+          }
+        }}
+        aria-label="Abrir menú de usuario"
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 1.5,
+          px: collapsed ? 0 : 2,
+          py: 2,
+          cursor: 'pointer',
+          outline: 'none',
+          justifyContent: collapsed ? 'center' : 'flex-start',
+          transition: 'background-color 0.15s ease',
+          '&:hover': { bgcolor: 'rgba(255,255,255,0.06)' },
+          '&:focus-visible': { outline: '2px solid #67b0f5', outlineOffset: '-2px' },
+        }}
       >
-        <Badge
-          badgeContent={collapsed && talleres.length > 1 ? talleres.length : 0}
-          color="primary"
-          overlap="circular"
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-          sx={{ '& .MuiBadge-badge': { bgcolor: '#167bd9', color: '#fff', fontSize: '0.6rem' } }}
+        <Tooltip
+          title={collapsed ? <span style={{ whiteSpace: 'pre-line' }}>{tooltipColapsado}</span> : ''}
+          placement="right"
+          arrow
         >
-          <Avatar
-            src={user?.avatar}
-            sx={{
-              bgcolor: '#167bd9',
-              color: '#fff',
-              width: 40,
-              height: 40,
-              fontSize: '0.95rem',
-              fontWeight: 600,
-              flexShrink: 0,
-            }}
+          <Badge
+            badgeContent={collapsed && talleres.length > 1 ? talleres.length : 0}
+            color="primary"
+            overlap="circular"
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+            sx={{ '& .MuiBadge-badge': { bgcolor: '#167bd9', color: '#fff', fontSize: '0.6rem' } }}
           >
-            {iniciales}
-          </Avatar>
-        </Badge>
-      </Tooltip>
-      {!collapsed && (
-        <Box sx={{ minWidth: 0, flex: '1 1 auto' }}>
-          <Typography
-            sx={{ color: '#fff', fontWeight: 600, fontSize: '0.95rem', lineHeight: 1.3 }}
-            noWrap
-          >
-            {displayName}
-          </Typography>
-          {rol && (
-            <Typography sx={{ color: '#167bd9', fontSize: '0.75rem', fontWeight: 500 }} noWrap>
-              {rol}
+            <Avatar
+              src={user?.avatar}
+              sx={{
+                bgcolor: '#167bd9',
+                color: '#fff',
+                width: 40,
+                height: 40,
+                fontSize: '0.95rem',
+                fontWeight: 600,
+                flexShrink: 0,
+              }}
+            >
+              {iniciales}
+            </Avatar>
+          </Badge>
+        </Tooltip>
+        {!collapsed && (
+          <Box sx={{ minWidth: 0, flex: '1 1 auto' }}>
+            <Typography
+              sx={{ color: '#fff', fontWeight: 600, fontSize: '0.95rem', lineHeight: 1.3 }}
+              noWrap
+            >
+              {displayName}
             </Typography>
-          )}
-          {usuario && (
-            <Typography sx={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.75rem' }} noWrap>
-              {usuario}
-            </Typography>
-          )}
-          {tieneTalleres && (
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 0.5, mt: 0.75 }}>
-              {visibles.map((nombre) => (
-                <Tooltip key={nombre} title={nombre} placement="top" arrow>
-                  <Chip
-                    size="small"
-                    icon={<Buildings size={13} weight="fill" />}
-                    label={nombre}
-                    sx={{
-                      maxWidth: 130,
-                      height: 22,
-                      bgcolor: 'rgba(22,123,217,0.18)',
-                      color: '#cfe6ff',
-                      border: '1px solid rgba(22,123,217,0.45)',
-                      '& .MuiChip-label': { px: 0.75, fontSize: '0.7rem', fontWeight: 500 },
-                      '& .MuiChip-icon': { color: '#67b0f5', ml: 0.5 },
-                    }}
-                  />
-                </Tooltip>
-              ))}
-              {ocultos.length > 0 && (
-                <Tooltip
-                  title={<span style={{ whiteSpace: 'pre-line' }}>{ocultos.join('\n')}</span>}
-                  placement="top"
-                  arrow
-                >
-                  <Chip
-                    size="small"
-                    label={`+${ocultos.length}`}
-                    sx={{
-                      height: 22,
-                      bgcolor: 'rgba(255,255,255,0.1)',
-                      color: 'rgba(255,255,255,0.85)',
-                      '& .MuiChip-label': { px: 0.75, fontSize: '0.7rem', fontWeight: 600 },
-                    }}
-                  />
-                </Tooltip>
-              )}
-            </Box>
-          )}
-        </Box>
-      )}
-      {!collapsed && (
-        <CaretUpDown size={16} color="rgba(255,255,255,0.5)" style={{ flexShrink: 0 }} />
-      )}
-    </Box>
-    <UserPopover
-      anchorEl={popover.anchorRef.current}
-      open={popover.open}
-      onClose={popover.handleClose}
-    />
+            {rol && (
+              <Typography sx={{ color: '#167bd9', fontSize: '0.75rem', fontWeight: 500 }} noWrap>
+                {rol}
+              </Typography>
+            )}
+            {usuario && (
+              <Typography sx={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.75rem' }} noWrap>
+                {usuario}
+              </Typography>
+            )}
+            {tieneTalleres && (
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 0.5, mt: 0.75 }}>
+                {visibles.map((nombre) => (
+                  <Tooltip key={nombre} title={nombre} placement="top" arrow>
+                    <Chip
+                      size="small"
+                      icon={<Buildings size={13} weight="fill" />}
+                      label={nombre}
+                      sx={{
+                        maxWidth: 130,
+                        height: 22,
+                        bgcolor: 'rgba(22,123,217,0.18)',
+                        color: '#cfe6ff',
+                        border: '1px solid rgba(22,123,217,0.45)',
+                        '& .MuiChip-label': { px: 0.75, fontSize: '0.7rem', fontWeight: 500 },
+                        '& .MuiChip-icon': { color: '#67b0f5', ml: 0.5 },
+                      }}
+                    />
+                  </Tooltip>
+                ))}
+                {ocultos.length > 0 && (
+                  <Tooltip
+                    title={<span style={{ whiteSpace: 'pre-line' }}>{ocultos.join('\n')}</span>}
+                    placement="top"
+                    arrow
+                  >
+                    <Chip
+                      size="small"
+                      label={`+${ocultos.length}`}
+                      sx={{
+                        height: 22,
+                        bgcolor: 'rgba(255,255,255,0.1)',
+                        color: 'rgba(255,255,255,0.85)',
+                        '& .MuiChip-label': { px: 0.75, fontSize: '0.7rem', fontWeight: 600 },
+                      }}
+                    />
+                  </Tooltip>
+                )}
+              </Box>
+            )}
+          </Box>
+        )}
+        {!collapsed && (
+          <CaretUpDown size={16} color="rgba(255,255,255,0.5)" style={{ flexShrink: 0 }} />
+        )}
+      </Box>
+      <UserPopover
+        anchorEl={popover.anchorRef.current}
+        open={popover.open}
+        onClose={popover.handleClose}
+      />
     </>
   );
 }
@@ -354,8 +354,8 @@ function NavItem({
             '&:focus-visible': { outline: '2px solid #67b0f5', outlineOffset: '2px' },
             ...(!active &&
               !disabled && {
-                '&:hover': { bgcolor: 'rgba(255,255,255,0.08)' },
-              }),
+              '&:hover': { bgcolor: 'rgba(255,255,255,0.08)' },
+            }),
             ...(disabled && {
               bgcolor: 'var(--NavItem-disabled-background)',
               color: 'var(--NavItem-disabled-color)',

@@ -37,7 +37,6 @@ const MOCK_UBICACIONES: { [key: string]: number[] } = {
   'HUALLANCA': [-9.8976421, -76.9403488],
   'PUCAMARCA': [-17.812127, -69.805307],
   'CUAJONE': [-17.069073, -70.780786],
-  'SAN CRISTOBAL': [-11.7279782, -76.0717685],
   'HUANCAVELICA': [-12.563888, -74.392081],
   'CHUNGAR': [-11.0274750, -76.4311920],
   'UCHUCCHACUA': [-10.6180404, -76.68802],
@@ -48,8 +47,8 @@ const MOCK_UBICACIONES: { [key: string]: number[] } = {
   'TAIR LIMA': [-12.0553171, -76.970169],
   'ILO': [-17.6292956, -71.3508113],
   'TAIR AREQUIPA': [-16.406881, -71.560109],
-  // * fata
-  'HUARIPAMPA': [-12.0464, -77.0428],
+  'HUARIPAMPA': [-11.7279782, -76.0717685],
+  'SAN CRISTOBAL': [-11.7391800, -76.0562680],
 };
 
 function getColor(t: TallerConNeumaticos): string {

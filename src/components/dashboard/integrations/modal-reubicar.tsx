@@ -29,6 +29,8 @@ interface ModalReubicarProps {
   vehiculo?: Vehiculo;
   user?: User;
   onAbrirInspeccion?: () => void;
+  enTransito: boolean,
+  taller?: string;
 }
 
 export const ModalReubicar: React.FC<ModalReubicarProps> = memo(({
@@ -40,6 +42,8 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = memo(({
   vehiculo,
   user,
   onAbrirInspeccion,
+  enTransito,
+  taller
 }) => {
 
   const [neumaticosAsignadosState, setNeumaticosAsignadosState] = useState<Neumatico[]>([]);
@@ -417,7 +421,9 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = memo(({
           FECHA_MOVIMIENTO: getPeruLocalISOString(),
           OBSERVACION: observacion,
           ID_OPERACION: vehiculo?.id_operacion,
-          COD_SUPERVISOR: vehiculo?.cod_supervisor
+          COD_SUPERVISOR: vehiculo?.cod_supervisor,
+          TRANSITO: enTransito,
+          TALLER: taller
         };
 
         movimientosPorCodigo.set(codigoNeu, movimiento);
@@ -453,8 +459,6 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = memo(({
         toast.info('No hay cambios de posición para registrar.');
         return;
       }
-
-      console.log({ normalizedPayloadArray })
 
       await registrarReubicacionNeumatico(normalizedPayloadArray);
 
@@ -1002,6 +1006,8 @@ function normalizePayload(mov: any) {
     OBSERVACION: mov.OBSERVACION || mov.OBS || mov.observacion || '',
     ID_OPERACION: mov.ID_OPERACION,
     COD_SUPERVISOR: mov.COD_SUPERVISOR,
+    TALLER: mov.TALLER,
+    TRANSITO: mov.TRANSITO
   };
 }
 

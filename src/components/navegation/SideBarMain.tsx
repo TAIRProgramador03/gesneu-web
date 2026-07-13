@@ -55,7 +55,7 @@ export const SideBarMain = ({ children }: { children: React.ReactNode }) => {
         </Box>
 
         {/* Botón hamburguesa solo en móvil */}
-        <IconButton
+        {/* <IconButton
           onClick={() => setMobileOpen(true)}
           sx={{
             position: 'fixed',
@@ -68,7 +68,7 @@ export const SideBarMain = ({ children }: { children: React.ReactNode }) => {
           }}
         >
           <MenuIcon />
-        </IconButton>
+        </IconButton> */}
 
         {/* Drawer móvil */}
         <MobileNav open={mobileOpen} onClose={() => setMobileOpen(false)} />

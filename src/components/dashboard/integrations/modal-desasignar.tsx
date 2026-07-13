@@ -40,6 +40,8 @@ interface ModalDesasignarProps {
   onAbrirAsignacion?: (data: { cachedNeumaticosAsignados: Neumatico[]; posicionesVacias: string[] }) => void; // Callback para abrir modal de asignación con datos cacheados
   onReceiveTemporaryAssignments?: (callback: (asignaciones: any[]) => void) => void; // Callback para registrar receptor de asignaciones temporales
   asignacionesTemporalesExternas?: any[]; // Asignaciones temporales desde modal de asignación
+  enTransito: boolean,
+  taller?: string;
 }
 
 export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
@@ -54,6 +56,8 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
   onAbrirAsignacion,
   onReceiveTemporaryAssignments,
   asignacionesTemporalesExternas = [],
+  enTransito,
+  taller
 }) => {
 
 
@@ -553,7 +557,9 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
             REMANENTE: neumaticoSeleccionado.REMANENTE,
             COD_SUPERVISOR: vehiculo?.cod_supervisor,
             ID_OPERACION: vehiculo?.id_operacion,
-            POSICION: neumaticoSeleccionado.POSICION || neumaticoSeleccionado.POSICION_NEU
+            POSICION: neumaticoSeleccionado.POSICION || neumaticoSeleccionado.POSICION_NEU,
+            TRANSITO: enTransito,
+            TALLER: taller
           });
         }
 
@@ -562,7 +568,9 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
           Odometro: kilometroActual,
           COD_SUPERVISOR: vehiculo?.cod_supervisor,
           ID_OPERACION: vehiculo?.id_operacion,
-          FechaAsignacion: asi.FechaRegistro
+          FechaAsignacion: asi.FechaRegistro,
+          EnTransito: enTransito,
+          Taller: taller
         }))
 
         // Enviar asignaciones + desasignaciones juntas

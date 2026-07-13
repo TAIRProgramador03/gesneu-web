@@ -43,6 +43,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem,
 import { Button as ButtonCustom } from '@/components/ui/button';
 import { LoadingButton2 } from '@/components/ui/loading-button2';
 import { ModalActualizarKilometraje } from '@/components/dashboard/integrations/modal-actualizar-kilometraje';
+import Link from 'next/link';
 
 
 export default function Page(): React.JSX.Element {
@@ -103,6 +104,7 @@ export default function Page(): React.JSX.Element {
     KILOMETRAJE_GESNEU: number;
     ID_OPERACION: number;
     OPERACION: string;
+    TALLER: string;
     ID_SUPERVISOR: string;
     TIPO_TERRENO: string;
     RETEN: string;
@@ -476,7 +478,7 @@ export default function Page(): React.JSX.Element {
   const refreshVehiculo = async () => {
     if (vehiculo?.PLACA) {
       try {
-        const vehiculoData = await buscarVehiculoPorPlaca(vehiculo.PLACA);
+        const vehiculoData = await buscarVehiculoPorPlaca(vehiculo.PLACA, transitoActivo);
         if (vehiculoData) {
           setVehiculo(vehiculoData);
           // NO volver a animar el kilometraje aquí, para evitar mostrar un valor antiguo
@@ -923,6 +925,7 @@ export default function Page(): React.JSX.Element {
               <Table>
                 <TableHead>
                   <TableRow>
+                    <TableCell sx={{ backgroundColor: '#e0f7fa', fontWeight: 'bold', fontSize: '0.78rem' }}>Placa</TableCell>
                     <TableCell sx={{ backgroundColor: '#e0f7fa', fontWeight: 'bold', fontSize: '0.78rem' }}>Marca</TableCell>
                     <TableCell sx={{ backgroundColor: '#e0f7fa', fontWeight: 'bold', fontSize: '0.78rem' }}>Modelo</TableCell>
                     <TableCell sx={{ backgroundColor: '#e0f7fa', fontWeight: 'bold', fontSize: '0.78rem' }}>Tipo</TableCell>
@@ -933,6 +936,9 @@ export default function Page(): React.JSX.Element {
                 <TableBody>
                   {vehiculo ? (
                     <TableRow>
+                      <TableCell>
+                        <Link href={`/padron/placa/${vehiculo.PLACA}`} target="_blank">{vehiculo.PLACA}</Link>
+                      </TableCell>
                       <TableCell>{vehiculo.MARCA}</TableCell>
                       <TableCell>{vehiculo.MODELO}</TableCell>
                       <TableCell>{vehiculo.TIPO}</TableCell>
@@ -1177,7 +1183,7 @@ export default function Page(): React.JSX.Element {
           }, 2500);
         }}
         enTransito={transitoActivo}
-        talleres={user?.talleres}
+        taller={vehiculo?.TALLER}
       />
       {/* Modal de Inspección de Neumáticos - Integrado con modal de advertencia centralizado */}
 
@@ -1221,6 +1227,8 @@ export default function Page(): React.JSX.Element {
             onSeleccionarNeumatico={() => { }}
             onUpdateAsignados={refreshAsignados}
             onAbrirAsignacion={handleOpenModalConRefresh}
+            enTransito={transitoActivo}
+            taller={vehiculo?.TALLER}
           />
         )
       }
@@ -1290,6 +1298,8 @@ export default function Page(): React.JSX.Element {
         } : undefined}
         user={user || undefined}
         onAbrirInspeccion={handleAbrirInspeccionDesdeMantenimiento}
+        enTransito={transitoActivo}
+        taller={vehiculo?.TALLER}
       />
 
       {/* Modal para DESASIGNAR */}
@@ -1341,6 +1351,8 @@ export default function Page(): React.JSX.Element {
             onAbrirInspeccion={handleAbrirInspeccionDesdeMantenimiento}
             onAbrirAsignacion={handleAbrirAsignacionDesdeDesasignacion}
             asignacionesTemporalesExternas={asignacionesTemporales}
+            enTransito={transitoActivo}
+            taller={vehiculo?.TALLER}
           />
         )
       }

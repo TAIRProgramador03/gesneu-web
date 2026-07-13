@@ -29,3 +29,8 @@ export const convertDateAndHour = (fecha: string) => {
   const fechaFormateada = dayjs(fechaOriginal).format('dddd D [de] MMMM [a las] HH:mm');
   return fechaFormateada.charAt(0).toUpperCase() + fechaFormateada.slice(1)
 }
+
+export const capitalizeCustomString = (texto: string) => {
+  if (!texto) return texto;
+  return texto.charAt(0).toUpperCase() + texto.slice(1).toLowerCase();
+}

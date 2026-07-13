@@ -44,7 +44,7 @@ export interface ModalAsignacionNeuProps {
     kilometro: number;
     onAssignedUpdate?: () => void; // Nuevo callback para refrescar asignados
     enTransito: boolean,
-    talleres?: Array<Taller | string> | Taller | string;
+    taller?: string;
 }
 
 export const DraggableNeumatico: React.FC<{
@@ -298,7 +298,7 @@ const DropZone: React.FC<DropZoneProps> = memo(({
 
 
 
-const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onClose, data, assignedNeumaticos: initialAssignedNeumaticos, placa, kilometro, onAssignedUpdate, enTransito, talleres }) => {
+const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onClose, data, assignedNeumaticos: initialAssignedNeumaticos, placa, kilometro, onAssignedUpdate, enTransito, taller }) => {
 
 
     const initialAssignedMap = useMemo<Record<string, Neumatico | null>>(
@@ -479,7 +479,7 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
                     COD_SUPERVISOR: codSupervisor,
                     FechaAsignacion: fechaRegistro,
                     EnTransito: enTransito,
-                    Talleres: talleres
+                    Taller: taller
                     // KmRecorridoxEtapa: kmRecorrido,
                     // agregar el taller
                     // agregar si es transito o no

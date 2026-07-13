@@ -92,9 +92,11 @@ interface ModalInpeccionNeuProps {
   onUpdateAsignados?: () => void; // NUEVO: callback para refrescar asignados
   onAbrirAsignacion?: () => void; // <-- AGREGADO para permitir la prop desde page.tsx
   kilometroRealActual: number
+  enTransito: boolean,
+  taller?: string;
 }
 
-const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, onClose, placa, neumaticosAsignados, vehiculo, onSeleccionarNeumatico, onUpdateAsignados, onAbrirAsignacion, kilometroRealActual }) => {
+const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, onClose, placa, neumaticosAsignados, vehiculo, onSeleccionarNeumatico, onUpdateAsignados, onAbrirAsignacion, kilometroRealActual, enTransito, taller }) => {
   // Mostrar el array de neumáticos asignados cada vez que se abre el modal
 
   const { user } = useContext(UserContext) || {};
@@ -770,7 +772,9 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
         ID_OPERACION: vehiculo?.id_operacion,
         FECHA_INSPECCION: formatDate(fechaInspeccionGlobal) || null,
         TIPO_TERRENO: vehiculo?.tipo_terreno,
-        RETEN: vehiculo?.reten
+        RETEN: vehiculo?.reten,
+        TRANSITO: enTransito,
+        TALLER: taller
       };
       return obj;
     });
@@ -966,6 +970,8 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
           listarNeumaticosAsignados(placa).then(setNeuAsignados);
           setAdvertenciaPosiciones({ open: false, faltan: 0 });
         }}
+        enTransito={enTransito}
+        taller={taller}
       />
       <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth
         PaperProps={{
