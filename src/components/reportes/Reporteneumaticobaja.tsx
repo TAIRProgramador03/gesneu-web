@@ -177,9 +177,9 @@ function TerrenoTooltip({ active, payload }: { active?: boolean; payload?: { pay
       <div style={{ display: "flex", justifyContent: "space-between", gap: 16, marginBottom: 3 }}>
         <span style={{ color: "#94a3b8" }}>Neumáticos</span><span style={{ fontWeight: 600 }}>{d.QTY_NEUMATICOS_BAJA}</span>
       </div>
-      <div style={{ display: "flex", justifyContent: "space-between", gap: 16, marginBottom: 3 }}>
+      {/* <div style={{ display: "flex", justifyContent: "space-between", gap: 16, marginBottom: 3 }}>
         <span style={{ color: "#94a3b8" }}>KM total</span><span style={{ fontWeight: 600 }}>{fmtKm(d.KM_TOTAL)}</span>
-      </div>
+      </div> */}
       <div style={{ display: "flex", justifyContent: "space-between", gap: 16 }}>
         <span style={{ color: "#94a3b8" }}>KM prom.</span><span style={{ fontWeight: 600 }}>{fmtKm(d.KM_PROMEDIO)}</span>
       </div>
@@ -199,9 +199,9 @@ function MotivoTooltip({ active, payload }: { active?: boolean; payload?: { payl
       <div style={{ display: "flex", justifyContent: "space-between", gap: 16, marginBottom: 3 }}>
         <span style={{ color: "#94a3b8" }}>Neumáticos</span><span style={{ fontWeight: 600 }}>{d.QTY_NEUMATICOS_BAJA}</span>
       </div>
-      <div style={{ display: "flex", justifyContent: "space-between", gap: 16, marginBottom: 3 }}>
+      {/* <div style={{ display: "flex", justifyContent: "space-between", gap: 16, marginBottom: 3 }}>
         <span style={{ color: "#94a3b8" }}>KM total</span><span style={{ fontWeight: 600 }}>{fmtKm(d.KM_TOTAL)}</span>
-      </div>
+      </div> */}
       <div style={{ display: "flex", justifyContent: "space-between", gap: 16 }}>
         <span style={{ color: "#94a3b8" }}>KM prom.</span><span style={{ fontWeight: 600 }}>{fmtKm(d.KM_PROMEDIO)}</span>
       </div>
@@ -699,7 +699,7 @@ export default function ReporteNeumaticoBaja() {
                   <>
                     <StatPill label="Tipos de terreno" value={distirbucionTipoTerrenoEnBaja.length.toString()} accent="#1d4ed8" />
                     <StatPill label="Neumáticos" value={totalNeu.toString()} accent="#1d4ed8" />
-                    <StatPill label="KM total" value={fmtKm(totalKm)} accent="#1d4ed8" muted />
+                    {/* <StatPill label="KM total" value={fmtKm(totalKm)} accent="#1d4ed8" muted /> */}
                   </>
                 );
               })()}
@@ -784,7 +784,7 @@ export default function ReporteNeumaticoBaja() {
                 <>
                   <StatPill label="Motivos de baja" value={distribucionMotivoDeBaja.length.toString()} accent="#b91c1c" />
                   <StatPill label="Neumáticos" value={totalNeu.toString()} accent="#b91c1c" />
-                  <StatPill label="KM total" value={fmtKm(totalKm)} accent="#b91c1c" muted />
+                  {/* <StatPill label="KM total" value={fmtKm(totalKm)} accent="#b91c1c" muted /> */}
                 </>
               );
             })()}
