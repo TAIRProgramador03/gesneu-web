@@ -132,7 +132,15 @@ export const MapaTalleres = () => {
 
       {
         user?.usuario?.trim() === 'EGAMBOA' || user?.usuario?.trim() === 'GESNEU' && (
-          < div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, flexShrink: 0 }}>
+          < div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+              gap: 12,
+              flexShrink: 0
+            }}
+            className='grid-cols-4 gap-12'
+          >
             {([
               { label: 'Total neumáticos', value: TOTAL_FLOTA, sub: 'neumáticos', color: '#3B82F6' },
               { label: 'Talleres con neumáticos', value: talleresConNeumaticos.length, sub: 'en todo el Perú', color: '#8B5CF6' },
@@ -173,10 +181,12 @@ export const MapaTalleres = () => {
       }
 
       {/* ── Mapa + Panel ── */}
-      <div style={{ display: 'flex', gap: 20, flex: 1, minHeight: 0 }}>
+      <div className="flex flex-col lg:flex-row gap-3 lg:gap-5 flex-1 min-h-0">
+        {/* <div style={{ display: 'flex', gap: 20, flex: 1, minHeight: 0 }}> */}
 
         {/* Mapa */}
-        <div style={{ flex: 1, borderRadius: 12, overflow: 'hidden', border: `1px solid ${border}` }}>
+        <div className="flex-1 min-h-80 lg:min-h-0 rounded-xl overflow-hidden"
+          style={{ border: `1px solid ${border}` }}>
           <MapContainer
             center={[-9.5, -75.5]}
             zoom={6}
@@ -252,12 +262,8 @@ export const MapaTalleres = () => {
         </div>
 
         {/* Panel lateral */}
-        <div style={{
-          width: 272, flexShrink: 0,
-          display: 'flex', flexDirection: 'column', gap: 8,
-          background: cardBg, border: `1px solid ${border}`,
-          borderRadius: 12, padding: 16, overflowY: 'auto',
-        }}>
+        <div className="w-full lg:w-68 lg:shrink-0 flex flex-col gap-2 rounded-xl p-4 overflow-y-auto lg:max-h-none max-h-[70dvh]"
+          style={{ background: cardBg, border: `1px solid ${border}` }}>
 
           {/* Resumen nacional */}
           <div style={{ fontSize: 11, fontWeight: 700, color: textSec, letterSpacing: '0.07em', marginBottom: 2 }}>
