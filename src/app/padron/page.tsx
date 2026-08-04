@@ -1,57 +1,27 @@
 'use client';
 
 import * as React from 'react';
-import { useEffect } from 'react';
-import { ArrowClockwise as RefreshIcon } from '@phosphor-icons/react/dist/ssr/ArrowClockwise';
 import { Card } from '@mui/material';
 import { columnsPadron } from './columns';
 import { DataTableNeumaticos } from '@/components/ui/data-table/data-table';
 import { Download as DownloadIcon } from '@phosphor-icons/react/dist/ssr/Download';
-import { Neumaticos, obtenerLosTalleresDelUsuario, obtenerTodasLasMarcas, obtenerTodasLasMedidas, obtenerTodosLosDisenos } from '@/api/Neumaticos';
+import { Neumaticos } from '@/api/Neumaticos';
 import { useQuery } from '@tanstack/react-query';
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { useTheme } from '@mui/material/styles';
 import { useUser } from '@/hooks/use-user';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
 import Image from 'next/image';
 import ModalInsertExcel from '@/components/dashboard/customer/modal-insert-excel';
 import Stack from '@mui/material/Stack';
 import styled from '@emotion/styled';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { LoadingButton2 } from '@/components/ui/loading-button2';
-import { RefreshCw, TrendingUpDown } from 'lucide-react';
+import { ListRestart, RefreshCw, TrendingUpDown } from 'lucide-react';
 import { ModalReubicarNeumatico } from '@/components/dashboard/padron/modal-reubicar-neumatico';
-import { TableFilterChips } from '@/components/ui/TableFilterChips';
-import { useComboFilter, type SelectFilterDef } from '@/hooks/use-combo-filter';
-import type { FilterChipDef } from '@/hooks/use-table-filter';
-import { PadronExcel } from '@/types/padron';
-import SelectBetter from 'react-select';
 import { useSelectPadron } from '@/hooks/use-select-padron';
-
-
-const SELECT_STYLES = {
-  multiValue: (base: object) => ({
-    ...base,
-    backgroundColor: '#edf3fe',
-    borderRadius: '6px',
-    border: '.5px solid #3B82F6',
-  }),
-  multiValueLabel: (base: object) => ({
-    ...base,
-    color: '#3B82F6',
-  }),
-  multiValueRemove: (base: object) => ({
-    ...base,
-    color: '#364153',
-    borderRadius: '0 6px 6px 0',
-    ':hover': {
-      backgroundColor: '#f9fafbb3',
-      color: '#364153',
-      cursor: 'pointer',
-    },
-  }),
-};
+import { MultiSearchSelect } from '@/components/ui/multiple-select';
+import { SearchSelect } from '@/components/ui/search-select';
 
 export default function Page(): React.JSX.Element {
 
@@ -64,35 +34,52 @@ export default function Page(): React.JSX.Element {
   const [modalImportarVisible, setModalImportarVisible] = useState(false);
   const [modalReubicarVisible, setModalReubicarVisible] = useState(false);
 
+  const [talleresSelected, setTalleresSelected] = useState<string[]>([]);
+  const [marcasSelected, setMarcasSelected] = useState<string[]>([]);
+  const [disenosSelected, setDisenosSelected] = useState<string[]>([]);
+  const [medidasSelected, setMedidasSelected] = useState<string[]>([]);
+  const [situacionesSelected, setSituacionesSelected] = useState<string[]>([]);
+  const [recuperadoSelected, setRecuperadoSelected] = useState<string>('all');
+
   const { data: customers = [], refetch: customersRefetch, isLoading: isLoadingCustomers } = useQuery({
-    queryKey: ['customers'],
-    queryFn: Neumaticos,
-    placeholderData: []
+    queryKey: ['padron-de-neumaticos', {
+      talleresSelected,
+      marcasSelected,
+      disenosSelected,
+      medidasSelected,
+      situacionesSelected,
+      recuperadoSelected
+    }],
+    queryFn: () => Neumaticos(talleresSelected, marcasSelected, disenosSelected, medidasSelected, situacionesSelected, recuperadoSelected),
   })
 
-  const { DISEÑO_OPTIONS, MARCA_OPTIONS, MEDIDA_OPTIONS, TALLER_OPTIONS, isLoadingSelectDiseno, isLoadingSelectMarca, isLoadingSelectMedida, isLoadingSelectTaller } = useSelectPadron()
-
-  const PADRON_CHIPS: FilterChipDef<PadronExcel>[] = useMemo(() => [
-    { key: 'DISPONIBLE', label: 'Disponibles', color: 'green', filter: c => c.TIPO_MOVIMIENTO === 'DISPONIBLE' },
-    { key: 'ASIGNADO', label: 'Asignados', color: 'yellow', filter: c => c.TIPO_MOVIMIENTO === 'ASIGNADO' },
-    { key: 'BAJA', label: 'Baja Definitiva', color: 'red', filter: c => c.TIPO_MOVIMIENTO === 'BAJA' },
-  ], []);
-
-  const PADRON_SELECTS: SelectFilterDef<PadronExcel>[] = useMemo(() => [
-    { key: 'diseño', accessor: item => item.DISEÑO },
-    { key: 'medida', accessor: item => item.MEDIDA },
-    { key: 'id_marca', accessor: item => item.ID_MARCA },
-    { key: 'value', accessor: item => item.PROYECTO },
-  ], []);
-
-  const { filteredData: filteredCustomers, chipActive, setChipActive, chipCounts, selectValues, setSelectValue } =
-    useComboFilter(customers, PADRON_CHIPS, PADRON_SELECTS);
-
-  useEffect(() => {
-    if (TALLER_OPTIONS.length === 1) {
-      setSelectValue('value', [TALLER_OPTIONS[0].value]);
+  const RECUPERADO_OPTIONS = [
+    {
+      value: "all",
+      label: "Todos",
+    },
+    {
+      value: "0",
+      label: "Nuevos",
+    },
+    {
+      value: "1",
+      label: "Recuperados",
     }
-  }, [TALLER_OPTIONS]);
+  ]
+
+  const {
+    DISEÑO_OPTIONS,
+    MARCA_OPTIONS,
+    MEDIDA_OPTIONS,
+    TALLER_OPTIONS,
+    SITUACION_OPTIONS,
+    isLoadingSelectDiseno,
+    isLoadingSelectMarca,
+    isLoadingSelectMedida,
+    isLoadingSelectTaller,
+    isLoadingSelectSituacion
+  } = useSelectPadron()
 
   const ModalOverlay = styled.div`
   position: fixed;
@@ -168,6 +155,15 @@ export default function Page(): React.JSX.Element {
     }
   };
 
+  const handleClearFilters = () => {
+    setTalleresSelected([])
+    setMarcasSelected([])
+    setDisenosSelected([])
+    setMedidasSelected([])
+    setSituacionesSelected([])
+    setRecuperadoSelected('all')
+  }
+
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -198,7 +194,7 @@ export default function Page(): React.JSX.Element {
               variant={'indigo'}
               icon={<TrendingUpDown />}
               onClick={() => setModalReubicarVisible(true)}
-              disabled={loading || esJefeTaller}
+              disabled={loading || esJefeTaller || isLoadingCustomers}
             >
               Reubicar Neumático
             </LoadingButton2>
@@ -206,7 +202,7 @@ export default function Page(): React.JSX.Element {
               variant={'teal'}
               icon={<DownloadIcon />}
               onClick={() => setModalImportarVisible(true)}
-              disabled={loading || esJefeTaller}
+              disabled={loading || esJefeTaller || isLoadingCustomers}
             >
               {isMobile ? null : (loading ? "Cargando..." : "Importar")}
             </LoadingButton2>
@@ -214,72 +210,104 @@ export default function Page(): React.JSX.Element {
               variant={'life'}
               icon={<RefreshCw />}
               onClick={handleRefresh}
-              disabled={loading}
+              disabled={loading || isLoadingCustomers}
             >
               Refrescar
             </LoadingButton2>
+            {
+              (
+                talleresSelected.length >= 1 ||
+                marcasSelected.length >= 1 ||
+                disenosSelected.length >= 1 ||
+                medidasSelected.length >= 1 ||
+                situacionesSelected.length >= 1 ||
+                recuperadoSelected !== 'all'
+              ) && (
+                <LoadingButton2
+                  variant={'destructive'}
+                  icon={<ListRestart />}
+                  onClick={handleClearFilters}
+                  disabled={isLoadingCustomers}
+                >
+                  Limpiar filtros
+                </LoadingButton2>
+              )
+            }
           </Box>
         </Stack>
 
-        <TableFilterChips
-          chips={PADRON_CHIPS}
-          counts={chipCounts}
-          active={chipActive}
-          onChange={setChipActive}
-          isLoading={isLoadingCustomers}
-        />
-
         <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
           <Box sx={{ minWidth: 200, flex: 1, maxWidth: 280 }}>
-            <SelectBetter
-              isMulti
-              isSearchable
-              isDisabled={isLoadingCustomers || isLoadingSelectTaller || TALLER_OPTIONS.length === 1}
-              onChange={(opts) => setSelectValue('value', opts ? opts.map((o: { value: string }) => o.value) : [])}
-              value={TALLER_OPTIONS.filter(o => (selectValues['value'] ?? []).includes(o.value))}
+            <p style={{ fontSize: 11, fontWeight: 600, color: "#64748b", margin: "0 0 5px", textTransform: "uppercase", letterSpacing: ".05em" }}>
+              Taller(es)
+            </p>
+            <MultiSearchSelect
               options={TALLER_OPTIONS}
+              value={talleresSelected}
+              onChange={(value) => setTalleresSelected(value)}
               placeholder="Seleccionar taller(es)"
-              noOptionsMessage={() => 'Sin opciones'}
-              styles={SELECT_STYLES}
+              disabled={isLoadingCustomers || isLoadingSelectTaller}
             />
           </Box>
           <Box sx={{ minWidth: 200, flex: 1, maxWidth: 280 }}>
-            <SelectBetter
-              isMulti
-              isSearchable
-              isDisabled={isLoadingCustomers || isLoadingSelectMarca}
-              onChange={(opts) => setSelectValue('id_marca', opts ? opts.map((o: { value: string }) => o.value) : [])}
-              value={MARCA_OPTIONS.filter(o => (selectValues['id_marca'] ?? []).includes(o.value))}
+            <p style={{ fontSize: 11, fontWeight: 600, color: "#64748b", margin: "0 0 5px", textTransform: "uppercase", letterSpacing: ".05em" }}>
+              Marca(s)
+            </p>
+            <MultiSearchSelect
               options={MARCA_OPTIONS}
+              value={marcasSelected}
+              onChange={(value) => setMarcasSelected(value)}
               placeholder="Seleccionar marca(s)"
-              noOptionsMessage={() => 'Sin opciones'}
-              styles={SELECT_STYLES}
+              disabled={isLoadingCustomers || isLoadingSelectMarca}
             />
           </Box>
           <Box sx={{ minWidth: 200, flex: 1, maxWidth: 280 }}>
-            <SelectBetter
-              isMulti
-              isSearchable
-              isDisabled={isLoadingCustomers || isLoadingSelectDiseno}
-              onChange={(opts) => setSelectValue('diseño', opts ? opts.map((o: { value: string }) => o.value) : [])}
-              value={DISEÑO_OPTIONS.filter(o => (selectValues['diseño'] ?? []).includes(o.value))}
+            <p style={{ fontSize: 11, fontWeight: 600, color: "#64748b", margin: "0 0 5px", textTransform: "uppercase", letterSpacing: ".05em" }}>
+              Diseño(s)
+            </p>
+            <MultiSearchSelect
               options={DISEÑO_OPTIONS}
+              value={disenosSelected}
+              onChange={(value) => setDisenosSelected(value)}
               placeholder="Seleccionar diseño(s)"
-              noOptionsMessage={() => 'Sin opciones'}
-              styles={SELECT_STYLES}
+              disabled={isLoadingCustomers || isLoadingSelectDiseno}
             />
           </Box>
           <Box sx={{ minWidth: 200, flex: 1, maxWidth: 280 }}>
-            <SelectBetter
-              isMulti
-              isSearchable
-              isDisabled={isLoadingCustomers || isLoadingSelectMedida}
-              onChange={(opts) => setSelectValue('medida', opts ? opts.map((o: { value: string }) => o.value) : [])}
-              value={MEDIDA_OPTIONS.filter(o => (selectValues['medida'] ?? []).includes(o.value))}
+            <p style={{ fontSize: 11, fontWeight: 600, color: "#64748b", margin: "0 0 5px", textTransform: "uppercase", letterSpacing: ".05em" }}>
+              Medida(s)
+            </p>
+            <MultiSearchSelect
               options={MEDIDA_OPTIONS}
+              value={medidasSelected}
+              onChange={(value) => setMedidasSelected(value)}
               placeholder="Seleccionar medida(s)"
-              noOptionsMessage={() => 'Sin opciones'}
-              styles={SELECT_STYLES}
+              disabled={isLoadingCustomers || isLoadingSelectMedida}
+            />
+          </Box>
+          <Box sx={{ minWidth: 200, flex: 1, maxWidth: 280 }}>
+            <p style={{ fontSize: 11, fontWeight: 600, color: "#64748b", margin: "0 0 5px", textTransform: "uppercase", letterSpacing: ".05em" }}>
+              Situación(es)
+            </p>
+            <MultiSearchSelect
+              options={SITUACION_OPTIONS}
+              value={situacionesSelected}
+              onChange={(value) => setSituacionesSelected(value)}
+              placeholder="Seleccionar situación(es)"
+              disabled={isLoadingCustomers || isLoadingSelectSituacion}
+            />
+          </Box>
+          <Box sx={{ minWidth: 200, flex: 1, maxWidth: 280 }}>
+            <p style={{ fontSize: 11, fontWeight: 600, color: "#64748b", margin: "0 0 5px", textTransform: "uppercase", letterSpacing: ".05em" }}>
+              Recuperado
+            </p>
+            <SearchSelect
+              options={RECUPERADO_OPTIONS}
+              value={recuperadoSelected}
+              onChange={(value) => setRecuperadoSelected(value)}
+              placeholder="Seleccionar si es recuperado"
+              disabled={isLoadingCustomers}
+              withButtonClear={false}
             />
           </Box>
         </Box>
@@ -287,7 +315,7 @@ export default function Page(): React.JSX.Element {
         <Card className='p-5'>
           <DataTableNeumaticos
             columns={columnsPadron}
-            data={filteredCustomers}
+            data={customers}
             type='pagination'
             filters={true}
             withExport={true}

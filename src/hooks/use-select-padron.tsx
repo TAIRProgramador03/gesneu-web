@@ -1,5 +1,5 @@
 import React from 'react'
-import { obtenerLosTalleresDelUsuario, obtenerTodasLasMarcas, obtenerTodasLasMedidas, obtenerTodosLosDisenos } from '@/api/Neumaticos'
+import { obtenerLosTalleresDelUsuario, obtenerTodasLasMarcas, obtenerTodasLasMedidas, obtenerTodosLosDisenos, obtenerTodosLosEstados } from '@/api/Neumaticos'
 import { useQuery } from '@tanstack/react-query'
 
 export const useSelectPadron = () => {
@@ -24,15 +24,22 @@ export const useSelectPadron = () => {
     queryFn: obtenerLosTalleresDelUsuario,
   });
 
+  const { data: SITUACION_OPTIONS = [], isLoading: isLoadingSelectSituacion } = useQuery({
+    queryKey: ['situaciones-del-neumatico'],
+    queryFn: obtenerTodosLosEstados,
+  });
+
 
   return {
     DISEÑO_OPTIONS,
     MEDIDA_OPTIONS,
     MARCA_OPTIONS,
     TALLER_OPTIONS,
+    SITUACION_OPTIONS,
     isLoadingSelectDiseno,
     isLoadingSelectMarca,
     isLoadingSelectMedida,
-    isLoadingSelectTaller
+    isLoadingSelectTaller,
+    isLoadingSelectSituacion
   }
 }

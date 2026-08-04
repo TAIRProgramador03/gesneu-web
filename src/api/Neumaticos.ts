@@ -20,8 +20,15 @@ export const obtenerHistorialMovimientosPorCodigo = async (codigo: string) => {
 };
 
 
-export const Neumaticos = async () => {
-  const response = await axios.get<Customer[]>(`/api/po-neumaticos`, { withCredentials: true });
+export const Neumaticos = async (talleresSelected: string[], marcasSelected: string[], disenosSelected: string[], medidasSelected: string[], situacionesSelected: string[], recuperadoSelected: string) => {
+  const response = await axios.get<Customer[]>(`/api/po-neumaticos`,
+    {
+      params: {
+        talleresSelected, marcasSelected, disenosSelected, medidasSelected, situacionesSelected, recuperadoSelected
+      },
+      withCredentials: true
+    }
+  );
   return response.data;
 };
 
@@ -705,6 +712,18 @@ export const obtenerTodasLasMarcas = async () => {
     return response.data;
   } catch (error) {
     console.error('Error en obtenerTodasLasMarcas:', error);
+    throw error;
+  }
+}
+
+export const obtenerTodosLosEstados = async () => {
+  try {
+    const response = await axios.get<SelectOptions[]>(`/api/po-neumaticos/todos-los-estados`, {
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error en obtenerTodosLosEstados:', error);
     throw error;
   }
 }
