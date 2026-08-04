@@ -210,7 +210,7 @@ export function MultiSearchSelect({
             onValueChange={setSearch}
           />
 
-          <CommandList>
+          <CommandList className="max-h-none overflow-visible">
             <div ref={parentRef} className="max-h-72 overflow-auto mt-2">
               {filteredOptions.length === 0 ? (
                 <CommandEmpty>{emptyMessage}</CommandEmpty>

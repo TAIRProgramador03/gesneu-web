@@ -24,6 +24,7 @@ import { Input } from "@/components/ui/input"
 import { Upload as UploadIcon } from '@phosphor-icons/react/dist/ssr/Upload';
 import { exportToExcel } from "@/utils/export-to-excel"
 import { LoadingButton2 } from "../loading-button2"
+import { Spinner } from "@/components/ui/spinner"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -188,7 +189,13 @@ export function DataTableNeumaticos<TData, TValue>({
             ) : (
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
-                  Sin resultados.
+                  {isLoading ? (
+                    <div className="flex items-center justify-center">
+                      <Spinner className="size-6" />
+                    </div>
+                  ) : (
+                    "Sin resultados."
+                  )}
                 </TableCell>
               </TableRow>
             )}

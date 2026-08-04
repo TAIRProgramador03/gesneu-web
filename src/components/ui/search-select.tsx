@@ -37,6 +37,7 @@ interface SearchSelectProps extends Omit<
   searchPlaceholder?: string;
   emptyMessage?: string;
   disabled?: boolean;
+  withButtonClear?: boolean;
   className?: string;
   contentClassName?: string;
 }
@@ -49,6 +50,7 @@ export function SearchSelect({
   searchPlaceholder = "Buscar...",
   emptyMessage = "Sin resultados",
   disabled = false,
+  withButtonClear = true,
   className,
   contentClassName,
   ...buttonProps
@@ -174,20 +176,25 @@ export function SearchSelect({
                 </div>
               </div>
               {/* BOTON LIMPIAR */}
-              <div className="border-t p-2">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  className="w-full cursor-pointer"
-                  onClick={() => {
-                    onChange("");
-                    setOpen(false);
-                    setSearch("");
-                  }}
-                >
-                  Limpiar selección
-                </Button>
-              </div>
+              {
+                withButtonClear && (
+                  <div className="border-t p-2">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      className="w-full cursor-pointer"
+                      onClick={() => {
+                        onChange("");
+                        setOpen(false);
+                        setSearch("");
+                      }}
+                    >
+                      Limpiar selección
+                    </Button>
+                  </div>
+                )
+              }
+
             </CommandList>
           )}
         </Command>
