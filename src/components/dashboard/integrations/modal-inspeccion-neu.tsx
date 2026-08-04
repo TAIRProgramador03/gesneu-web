@@ -259,7 +259,7 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
   // Cargar todos los po_neumaticos al abrir el modal (solo una vez)
   useEffect(() => {
     if (open) {
-      Neumaticos().then(setPoNeumaticos).catch(() => setPoNeumaticos([]));
+      Neumaticos([], [], [], [], [], 'all').then(setPoNeumaticos).catch(() => setPoNeumaticos([]));
     }
   }, [open]);
 

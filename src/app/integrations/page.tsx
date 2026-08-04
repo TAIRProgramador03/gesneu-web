@@ -184,7 +184,7 @@ export default function Page(): React.JSX.Element {
 
         animateKilometraje(0, ultimoKmReal);
 
-        const listaNeumaticos = await Neumaticos();
+        const listaNeumaticos = await Neumaticos([], [], [], [], [], 'all');
 
         setNeumaticos(listaNeumaticos);
         setNeumaticosFiltrados(listaNeumaticos);
@@ -352,7 +352,7 @@ export default function Page(): React.JSX.Element {
       const ultimoKmReal = odometros.length > 0 ? Math.max(...odometros) : Number(vehiculoSeleccionado.KILOMETRO ?? vehiculoSeleccionado.KILOMETRAJE ?? 0);
       animateKilometraje(0, ultimoKmReal);
 
-      const listaNeumaticos = await Neumaticos();
+      const listaNeumaticos = await Neumaticos([], [], [], [], [], 'all');
 
       setNeumaticos(listaNeumaticos);
       setNeumaticosFiltrados(listaNeumaticos);
