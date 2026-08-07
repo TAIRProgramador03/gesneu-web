@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrig
 import { Stack } from '@mui/system';
 import { toast } from 'sonner';
 import { useQuery } from '@tanstack/react-query';
+import { useVirtualizer } from '@tanstack/react-virtual';
 import DialogActions from '@mui/material/DialogActions';
 import React, { useMemo, useRef, useState } from 'react'
 import { TipoMovimientoBadge } from '@/components/ui/TipoMovimientoBadge';
@@ -134,6 +135,19 @@ export const ModalReubicarNeumatico = ({ open, onClose, onSuccess }: ModalReubic
     return proyectosEnTotal.filter(item => !proyectosSeleccionados.has(item.DESCRIPCION))
   }, [neumaticosTrasladados])
 
+  const neumaticosDisponibles = useMemo(() => {
+    return neumaticosParaReubicar.filter(neu => !neumaticosTrasladados?.find(n => n.id === neu.ID_NEUMATICO))
+  }, [neumaticosParaReubicar, neumaticosTrasladados])
+
+  const listaOrigenRef = useRef<HTMLDivElement>(null)
+
+  const rowVirtualizer = useVirtualizer({
+    count: neumaticosDisponibles.length,
+    getScrollElement: () => listaOrigenRef.current,
+    estimateSize: () => 56,
+    overscan: 6,
+  })
+
   return (
     <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth
       PaperProps={{ sx: { borderRadius: 3, overflow: 'hidden' } }}
@@ -244,65 +258,73 @@ export const ModalReubicarNeumatico = ({ open, onClose, onSuccess }: ModalReubic
               <span className="text-xs font-semibold text-slate-400 uppercase tracking-wide text-center">Vida útil</span>
             </div>
 
-            <div className="flex flex-col gap-2 max-h-95 overflow-y-auto pr-1">
+            <div ref={listaOrigenRef} className="max-h-60 overflow-y-auto pr-1">
               {
-                neumaticosParaReubicar.length === 0 ? (
+                neumaticosDisponibles.length === 0 ? (
                   <p className='text-center text-sm mt-2 italic'>Sin resultados.</p>
-                ) :
+                ) : (
+                  <div style={{ height: rowVirtualizer.getTotalSize(), position: 'relative' }}>
+                    {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+                      const neu = neumaticosDisponibles[virtualRow.index]
+                      const isSelected = neumaticoSeleccionados?.find(n => n.id === neu.ID_NEUMATICO)
 
-                  neumaticosParaReubicar.map((neu) => {
-                    const isSelected = neumaticoSeleccionados?.find(n => n.id === neu.ID_NEUMATICO)
-                    const isMoved = neumaticosTrasladados?.find(n => n.id === neu.ID_NEUMATICO)
+                      return (
+                        <div
+                          key={neu.ID_NEUMATICO}
+                          role="button"
+                          tabIndex={0}
+                          onClick={() => handleClickOnNeumatico({ neumatico: neu })}
+                          onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && handleClickOnNeumatico({ neumatico: neu })}
+                          style={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            width: '100%',
+                            height: virtualRow.size - 8,
+                            transform: `translateY(${virtualRow.start}px)`,
+                          }}
+                          className={`
+                        grid grid-cols-[1fr_auto_auto_auto_auto] items-center gap-x-4
+                        rounded-xl px-3 py-2.5 cursor-pointer border-2 transition-all duration-150
+                        ${isSelected
+                              ? 'border-blue-500 bg-blue-50 shadow-sm'
+                              : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
+                            }
+                      `}
+                        >
+                          {/* Código + badge estado */}
+                          <div className="flex flex-col gap-0.5">
+                            <span className="font-normal text-sm text-slate-800 truncate">
+                              {neu.CODIGO}
+                            </span>
+                          </div>
 
-                    if (isMoved) return
+                          {/* Taller */}
+                          <div className="flex flex-col items-center">
+                            <span className="font-light italic text-xs text-slate-700  truncate">
+                              {neu.PROYECTO_ACTUAL}
+                            </span>
+                          </div>
 
-                    return (
-                      <div
-                        key={neu.ID_NEUMATICO}
-                        role="button"
-                        tabIndex={0}
-                        onClick={() => handleClickOnNeumatico({ neumatico: neu })}
-                        onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && handleClickOnNeumatico({ neumatico: neu })}
-                        className={`
-                      relative grid grid-cols-[1fr_auto_auto_auto_auto] items-center gap-x-4
-                      rounded-xl px-3 py-2.5 cursor-pointer border-2 transition-all duration-150
-                      ${isSelected
-                            ? 'border-blue-500 bg-blue-50 shadow-sm'
-                            : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
-                          }
-                    `}
-                      >
-                        {/* Código + badge estado */}
-                        <div className="flex flex-col gap-0.5">
-                          <span className="font-normal text-sm text-slate-800 truncate">
-                            {neu.CODIGO}
-                          </span>
+                          {/* Recuperado */}
+                          <div className="flex items-center justify-center">
+                            <EsRecuperadoBadge esRecuperado={neu.RECUPERADO} />
+                          </div>
+
+                          {/* Disponibilidad */}
+                          <div className="flex items-center justify-center">
+                            <TipoMovimientoBadge tipoMovimiento={neu.CODIGO_INTERNO} />
+                          </div>
+
+                          {/* Vida útil */}
+                          <div className="flex items-center justify-center">
+                            <LinearProgressItem estado={neu.PORCENTAJE_VIDA} width='75px' />
+                          </div>
                         </div>
-
-                        {/* Taller */}
-                        <div className="flex flex-col items-center">
-                          <span className="font-light italic text-xs text-slate-700  truncate">
-                            {neu.PROYECTO_ACTUAL}
-                          </span>
-                        </div>
-
-                        {/* Recuperado */}
-                        <div className="flex items-center justify-center">
-                          <EsRecuperadoBadge esRecuperado={neu.RECUPERADO} />
-                        </div>
-
-                        {/* Disponibilidad */}
-                        <div className="flex items-center justify-center">
-                          <TipoMovimientoBadge tipoMovimiento={neu.CODIGO_INTERNO} />
-                        </div>
-
-                        {/* Vida útil */}
-                        <div className="flex items-center justify-center">
-                          <LinearProgressItem estado={neu.PORCENTAJE_VIDA} width='75px' />
-                        </div>
-                      </div>
-                    );
-                  })
+                      );
+                    })}
+                  </div>
+                )
               }
             </div>
             {
@@ -380,7 +402,7 @@ export const ModalReubicarNeumatico = ({ open, onClose, onSuccess }: ModalReubic
               <span className="text-xs font-semibold text-slate-400 uppercase tracking-wide text-center">Vida útil</span>
             </div>
 
-            <div className="flex flex-col gap-2 max-h-95 overflow-y-auto pr-1">
+            <div className="flex flex-col gap-2 max-h-60 overflow-y-auto pr-1">
               {
 
                 !neumaticosTrasladados || neumaticosTrasladados?.length === 0 ? (
