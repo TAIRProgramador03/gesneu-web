@@ -9,7 +9,16 @@
       "Bash(tasklist //FI \"IMAGENAME eq node.exe\" //FO TABLE)",
       "Bash(netstat -ano)",
       "Bash(wmic process *)",
-      "Bash(powershell -Command \"Get-CimInstance Win32_Process -Filter 'ProcessId=20352' | Select-Object CommandLine\")"
+      "Bash(powershell -Command \"Get-CimInstance Win32_Process -Filter 'ProcessId=20352' | Select-Object CommandLine\")",
+      "Bash(npx --yes playwright@1.48.0 install chromium --with-deps)",
+      "Bash(curl *)",
+      "Bash(echo \"TSC:$?\")",
+      "Bash(npx eslint *)",
+      "Bash(echo \"LINT:$?\")",
+      "Bash(timeout 20 npx --yes playwright@1.48.0 --version)",
+      "Bash(echo \"EXIT:$?\")",
+      "Bash(timeout 30 npx --yes playwright@1.48.0 install chromium)",
+      "Bash(git mv *)"
     ]
   }
 }
