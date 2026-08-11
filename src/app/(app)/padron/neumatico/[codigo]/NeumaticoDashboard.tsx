@@ -20,7 +20,7 @@ import { FichaTecnica } from "@/components/padron/neumatico/FichaTecnica"
 import { CollapsibleSection } from "@/components/ui/CollapsibleSection"
 import { VidaUtilCard } from "@/components/padron/neumatico/VidaUtilCard"
 import { RemanenteChart } from "@/components/padron/neumatico/RemanenteChart"
-import { Timeline } from '../../../../components/padron/neumatico/Timeline';
+import { Timeline } from '@/components/padron/neumatico/Timeline';
 import { KilometrajeChart } from "@/components/padron/neumatico/KilometrajeChart"
 
 export const NeumaticoDashboard = ({ codigo }: { codigo: string }) => {

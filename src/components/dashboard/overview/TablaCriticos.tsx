@@ -5,7 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { obtenerLosTalleresDelUsuario, obtenerNeumaticosEnCritico } from '@/api/Neumaticos';
 import { DataTableNeumaticos } from '@/components/ui/data-table/data-table';
 import { useUser } from '@/hooks/use-user';
-import { columnsNeuCriticos } from '@/app/dashboard/columns-mas-desgastados';
+import { columnsNeuCriticos } from '@/app/(app)/dashboard/columns-mas-desgastados';
 import { BadgeCheck } from 'lucide-react';
 import {
   Select,

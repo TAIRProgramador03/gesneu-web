@@ -17,7 +17,7 @@ import CountUp from 'react-countup';
 import { useQuery } from '@tanstack/react-query';
 import { obtenerPlacasConNeumaticos } from '@/api/Neumaticos';
 import { DataTableNeumaticos } from '@/components/ui/data-table/data-table';
-import { columnsPlacasNeumaticos } from '@/app/dashboard/columns-placas-neumaticos';
+import { columnsPlacasNeumaticos } from '@/app/(app)/dashboard/columns-placas-neumaticos';
 import { Box } from '@mui/system';
 import { Button as ButtonCustom } from '@/components/ui/button';
 import { useUser } from '@/hooks/use-user';
