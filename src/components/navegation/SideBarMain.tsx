@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import GlobalStyles from '@mui/material/GlobalStyles';
@@ -12,12 +12,11 @@ import { SideNav } from '@/components/dashboard/layout/side-nav';
 import { MobileNav } from '@/components/dashboard/layout/mobile-nav';
 
 export const SideBarMain = ({ children }: { children: React.ReactNode }) => {
-  const [collapsed, setCollapsed] = useState<boolean>(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('sidebar-collapsed') === 'true';
-    }
-    return false;
-  });
+  const [collapsed, setCollapsed] = useState<boolean>(false);
+
+  useEffect(() => {
+    setCollapsed(localStorage.getItem('sidebar-collapsed') === 'true');
+  }, []);
 
   const handleSetCollapsed = (value: boolean) => {
     setCollapsed(value);
@@ -78,7 +77,7 @@ export const SideBarMain = ({ children }: { children: React.ReactNode }) => {
             display: 'flex',
             flex: '1 1 auto',
             flexDirection: 'column',
-            pl: { lg: collapsed ? '72px' : 'var(--SideNav-width)' },
+            pl: { md: collapsed ? '72px' : 'var(--SideNav-width)' },
             transition: 'padding-left 0.2s',
             overflow: 'hidden',
             height: '100%',
