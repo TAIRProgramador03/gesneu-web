@@ -393,20 +393,6 @@ export const Sales = React.memo(({ sx }: SalesProps): React.JSX.Element => {
       <div style={{ display: 'grid', gridTemplateRows: open ? '1fr' : '0fr', transition: 'grid-template-rows 0.3s ease' }}>
       <div style={{ overflow: 'hidden' }}>
       <div style={{ width: 300, display: 'flex', flexDirection: 'column', gap: 8, flexShrink: 0 }} className='mx-8 mt-8 gap-6'>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Typography variant="caption" color="text.secondary">
-            {selectedSeries.length} de {allPlacas.length} seleccionadas
-          </Typography>
-          <div style={{ display: 'flex', gap: 4 }}>
-            <Button size="small" variant="text" sx={{ minWidth: 0, px: 1, fontSize: 11 }} onClick={handleSelectAll}>
-              Todas
-            </Button>
-            <Button size="small" variant="text" sx={{ minWidth: 0, px: 1, fontSize: 11 }} onClick={handleSelectNone}>
-              Ninguna
-            </Button>
-          </div>
-        </div>
-
         <Autocomplete
           multiple
           limitTags={10}

@@ -605,7 +605,7 @@ export default function ReporteNeumaticoBaja() {
               return (
                 <>
                   {/* Donut */}
-                  <div style={{ position: 'relative', height: 230 }}>
+                  <div style={{ position: 'relative', height: 250 }}>
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
                         <Pie
@@ -613,7 +613,7 @@ export default function ReporteNeumaticoBaja() {
                           cx="50%"
                           cy="50%"
                           innerRadius={72}
-                          outerRadius={110}
+                          outerRadius={125}
                           paddingAngle={4}
                           dataKey="value"
                           strokeWidth={0}

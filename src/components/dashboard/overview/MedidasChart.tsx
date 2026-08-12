@@ -163,35 +163,37 @@ export const MedidasChart = (): React.JSX.Element => {
               ))}
             </div>
 
-            <ResponsiveContainer width="100%" height={chartHeight}>
-              <BarChart
-                layout="vertical"
-                data={medidasPorNeumaticos}
-                barSize={16}
-                margin={{ top: 0, right: 58, bottom: 0, left: 0 }}
-              >
-                <XAxis
-                  type="number"
-                  tick={{ fontSize: 10, fill: theme.palette.text.secondary as string }}
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <YAxis
-                  type="category"
-                  dataKey="medida"
-                  width={104}
-                  tick={{ fontSize: 11, fill: theme.palette.text.primary as string, fontWeight: 600, fontFamily: 'monospace' }}
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <Tooltip content={<MedidasTooltip />} cursor={{ fill: 'rgba(0,0,0,0.04)' }} />
-                <Bar dataKey="disponibles" name="Disponibles" stackId="a" fill={COLOR_DISP} radius={[3, 0, 0, 3]} />
-                <Bar dataKey="asignados" name="Asignados" stackId="a" fill={COLOR_ASIG} radius={[0, 0, 0, 0]} />
-                <Bar dataKey="baja" name="Bajas" stackId="a" fill={COLOR_BAJ} radius={[0, 3, 3, 0]}>
-                  <LabelList content={<TotalLabel />} />
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
+            <div style={{ maxHeight: 400, overflowY: 'auto' }}>
+              <ResponsiveContainer width="100%" height={chartHeight}>
+                <BarChart
+                  layout="vertical"
+                  data={medidasPorNeumaticos}
+                  barSize={16}
+                  margin={{ top: 0, right: 58, bottom: 0, left: 0 }}
+                >
+                  <XAxis
+                    type="number"
+                    tick={{ fontSize: 10, fill: theme.palette.text.secondary as string }}
+                    axisLine={false}
+                    tickLine={false}
+                  />
+                  <YAxis
+                    type="category"
+                    dataKey="medida"
+                    width={104}
+                    tick={{ fontSize: 11, fill: theme.palette.text.primary as string, fontWeight: 600, fontFamily: 'monospace' }}
+                    axisLine={false}
+                    tickLine={false}
+                  />
+                  <Tooltip content={<MedidasTooltip />} cursor={{ fill: 'rgba(0,0,0,0.04)' }} />
+                  <Bar dataKey="disponibles" name="Disponibles" stackId="a" fill={COLOR_DISP} radius={[3, 0, 0, 3]} />
+                  <Bar dataKey="asignados" name="Asignados" stackId="a" fill={COLOR_ASIG} radius={[0, 0, 0, 0]} />
+                  <Bar dataKey="baja" name="Bajas" stackId="a" fill={COLOR_BAJ} radius={[0, 3, 3, 0]}>
+                    <LabelList content={<TotalLabel />} />
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
           </>
         )
       }

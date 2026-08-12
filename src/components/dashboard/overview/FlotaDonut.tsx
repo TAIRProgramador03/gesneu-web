@@ -66,7 +66,7 @@ export const FlotaDonut = ({ data }: { data: DataFlotaDonut[] }): React.JSX.Elem
         TOTAL >= 1 && (
           <>
             {/* Donut */}
-            <div style={{ position: 'relative', height: 230 }}>
+            <div style={{ position: 'relative', height: 250 }}>
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
@@ -74,8 +74,8 @@ export const FlotaDonut = ({ data }: { data: DataFlotaDonut[] }): React.JSX.Elem
                     cx="50%"
                     cy="50%"
                     innerRadius={72}
-                    outerRadius={110}
-                    paddingAngle={3}
+                    outerRadius={120}
+                    paddingAngle={4}
                     dataKey="value"
                     strokeWidth={0}
                     startAngle={90}

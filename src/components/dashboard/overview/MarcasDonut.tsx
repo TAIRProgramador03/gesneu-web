@@ -137,15 +137,15 @@ export const MarcasDonut = (): React.JSX.Element => {
         total >= 1 && (
           <>
             {/* Donut */}
-            <div style={{ position: 'relative', height: 210 }}>
+            <div style={{ position: 'relative', height: 250 }}>
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
                     data={cantidadesPorMarca}
                     cx="50%"
                     cy="50%"
-                    innerRadius={65}
-                    outerRadius={100}
+                    innerRadius={72}
+                    outerRadius={120}
                     paddingAngle={4}
                     dataKey="value"
                     strokeWidth={0}

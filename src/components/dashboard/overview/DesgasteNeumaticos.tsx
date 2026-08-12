@@ -325,7 +325,7 @@ export const DesgasteNeumaticos = (): React.JSX.Element => {
             </div>
 
             {/* Gráfico */}
-            <div style={{ flex: 1 }}>
+            <div style={{ maxHeight: 400, overflowY: 'auto', flex: 1 }}>
               <ResponsiveContainer width="100%" height={chartHeight}>
                 <BarChart
                   layout="vertical"
