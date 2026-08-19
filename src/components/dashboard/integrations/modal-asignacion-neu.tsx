@@ -28,6 +28,7 @@ import { NeuTemporalTable } from '@/types/neumatico';
 import { LoadingButton } from '@/components/ui/loading-button';
 import { LoadingButton2 } from '@/components/ui/loading-button2';
 import { BadgeAlert, ClipboardList, CloudCheck } from 'lucide-react';
+import { SteeringWheel } from '@phosphor-icons/react/dist/ssr/SteeringWheel';
 import { ModalInformacionAsignacion } from './modal-informacion-asignacion';
 import { Taller } from '@/types/user';
 
@@ -710,6 +711,35 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
                                     <span className='bg-slate-50 text-slate-600 p-1 rounded-md border-slate-200 border text-xs font-bold shadow-lg absolute left-[38px] top-[36px]'>
                                         POS01
                                     </span>
+                                    <Box
+                                        sx={{
+                                            position: 'absolute',
+                                            top: '-34px',
+                                            left: '-6px',
+                                            zIndex: 6,
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '4px',
+                                            background: 'linear-gradient(135deg, #1976d2, #1565c0)',
+                                            color: '#fff',
+                                            borderRadius: '999px',
+                                            padding: '4px 10px 4px 6px',
+                                            fontSize: '11px',
+                                            fontWeight: 700,
+                                            letterSpacing: '0.3px',
+                                            boxShadow: '0 2px 8px rgba(25,118,210,0.45)',
+                                            pointerEvents: 'none',
+                                            whiteSpace: 'nowrap',
+                                            animation: 'conductorGlow 2.2s ease-in-out infinite',
+                                            '@keyframes conductorGlow': {
+                                                '0%, 100%': { boxShadow: '0 2px 8px rgba(25,118,210,0.45)' },
+                                                '50%': { boxShadow: '0 2px 14px rgba(25,118,210,0.9)' },
+                                            },
+                                        }}
+                                    >
+                                        <SteeringWheel size={14} weight="fill" />
+                                        CONDUCTOR
+                                    </Box>
                                 </Box>
                                 {/* POS02: DropZone y número a la izquierda */}
                                 <Box sx={{ position: 'absolute', top: '65px', left: '172px', zIndex: 2 }}>

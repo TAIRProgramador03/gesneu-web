@@ -10,6 +10,7 @@ import { obtenerInfoDesgaste } from '../../../utils/tire-utils';
 import axios from 'axios';
 import { Customer } from '@/components/dashboard/customer/customers-table';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { SteeringWheel } from '@phosphor-icons/react/dist/ssr/SteeringWheel';
 
 interface Neumatico {
     POSICION: string;
@@ -385,6 +386,38 @@ const PosicionNeumatico: React.FC<{
                     </ul>
                 </TooltipContent>
             </Tooltip>
+            {/* Insignia fija: POS01 = posición del conductor */}
+            {keyPos === 'POS01' && (
+                <Box
+                    sx={{
+                        position: 'absolute',
+                        top: `calc(${top} - 34px)`,
+                        left: `calc(${left} - 32px)`,
+                        zIndex: 6,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        background: 'linear-gradient(135deg, #1976d2, #1565c0)',
+                        color: '#fff',
+                        borderRadius: '999px',
+                        padding: '4px 10px 4px 6px',
+                        fontSize: '11px',
+                        fontWeight: 700,
+                        letterSpacing: '0.3px',
+                        boxShadow: '0 2px 8px rgba(25,118,210,0.45)',
+                        pointerEvents: 'none',
+                        whiteSpace: 'nowrap',
+                        animation: 'conductorGlow 2.2s ease-in-out infinite',
+                        '@keyframes conductorGlow': {
+                            '0%, 100%': { boxShadow: '0 2px 8px rgba(25,118,210,0.45)' },
+                            '50%': { boxShadow: '0 2px 14px rgba(25,118,210,0.9)' },
+                        },
+                    }}
+                >
+                    <SteeringWheel size={14} weight="fill" />
+                    CONDUCTOR
+                </Box>
+            )}
             {/* Mostrar presión de aire en dashboard y en modal de mantenimiento */}
             {(layout === 'dashboard' || (layout === 'modal' && tipoModal === 'mantenimiento')) && neumatico && neumatico.PRESION_AIRE !== undefined && neumatico.PRESION_AIRE !== null && neumatico.PRESION_AIRE !== '' && (
                 keyPos === 'RES01' ? (
