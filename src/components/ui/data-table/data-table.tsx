@@ -51,6 +51,7 @@ export function DataTableNeumaticos<TData, TValue>({
 }: DataTableProps<TData, TValue>) {
 
   const [sorting, setSorting] = useState<SortingState>([])
+  const [codigoSearchValue, setCodigoSearchValue] = useState<string>('')
   const [searchValue, setSearchValue] = useState<string>('')
 
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
@@ -63,14 +64,26 @@ export function DataTableNeumaticos<TData, TValue>({
   const [rowSelection, setRowSelection] = useState({})
 
   const filteredData = useMemo(() => {
-    if (!searchValue) return data
-    const lower = searchValue.toLowerCase()
-    return (data as Record<string, unknown>[]).filter((row) =>
-      Object.values(row).some((val) =>
-        val !== null && val !== undefined && String(val).toLowerCase().includes(lower)
+    let result = data as Record<string, unknown>[]
+
+    if (codigoSearchValue) {
+      const lowerCodigo = codigoSearchValue.toLowerCase()
+      result = result.filter((row) =>
+        String(row.CODIGO ?? '').toLowerCase().includes(lowerCodigo)
       )
-    ) as TData[]
-  }, [data, searchValue])
+    }
+
+    if (searchValue) {
+      const lower = searchValue.toLowerCase()
+      result = result.filter((row) =>
+        Object.values(row).some((val) =>
+          val !== null && val !== undefined && String(val).toLowerCase().includes(lower)
+        )
+      )
+    }
+
+    return result as TData[]
+  }, [data, codigoSearchValue, searchValue])
 
   const table = useReactTable({
     data: filteredData,
@@ -127,13 +140,22 @@ export function DataTableNeumaticos<TData, TValue>({
           <div className="flex items-center py-4 gap-6 justify-between">
             {
               filters && (
-                <Input
-                  placeholder={isLoading ? 'Cargando datos...' : 'Buscar...'}
-                  disabled={isLoading}
-                  value={searchValue}
-                  onChange={e => setSearchValue(e.target.value)}
-                  className="max-w-sm"
-                />
+                <div className="flex gap-2">
+                  <Input
+                    placeholder={isLoading ? 'Cargando datos...' : 'Búsqueda por código'}
+                    disabled={isLoading}
+                    value={codigoSearchValue}
+                    onChange={e => setCodigoSearchValue(e.target.value)}
+                    className="max-w-xs"
+                  />
+                  <Input
+                    placeholder={isLoading ? 'Cargando datos...' : 'Búsqueda general'}
+                    disabled={isLoading}
+                    value={searchValue}
+                    onChange={e => setSearchValue(e.target.value)}
+                    className="max-w-sm"
+                  />
+                </div>
               )
             }
             {
