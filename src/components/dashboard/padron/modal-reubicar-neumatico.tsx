@@ -7,7 +7,7 @@ import { EsRecuperadoBadge } from '@/components/ui/EsRecuperadoBadge';
 import { Field } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { LinearProgressItem } from '@/components/ui/LinearProgress';
-import { listarNeumaticosParaReubicar, listarProyectos, reubicarNeumaticosPorProyecto } from '@/api/Neumaticos';
+import { listarNeumaticosParaReubicar, listarProyectos, obtenerLosTalleresDelUsuario, reubicarNeumaticosPorProyecto } from '@/api/Neumaticos';
 import { LoadingButton2 } from '@/components/ui/loading-button2';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Stack } from '@mui/system';
@@ -18,6 +18,8 @@ import DialogActions from '@mui/material/DialogActions';
 import React, { useMemo, useRef, useState } from 'react'
 import { TipoMovimientoBadge } from '@/components/ui/TipoMovimientoBadge';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { MultiSearchSelect } from '@/components/ui/multiple-select';
+import { SearchSelect } from '@/components/ui/search-select';
 
 interface Neumatico {
   id: string;
@@ -59,7 +61,7 @@ export const ModalReubicarNeumatico = ({ open, onClose, onSuccess }: ModalReubic
     enabled: proyectoOrigen.length !== 0
   })
 
-  const { data: proyectosEnTotal = [] } = useQuery({
+  const { data: proyectosEnTotal = [], isLoading: isLoadingProyectosEnTotal } = useQuery({
     queryKey: ['proyectos-en-total'],
     queryFn: () => listarProyectos(),
   })
@@ -202,24 +204,24 @@ export const ModalReubicarNeumatico = ({ open, onClose, onSuccess }: ModalReubic
               </ButtonCustom>
             }
 
-            <Select value={proyectoOrigen} onValueChange={(e) => {
-              if (codigoNeuRef.current !== null) codigoNeuRef.current.value = ''
-              setProyectoOrigen(e)
-            }} >
-              <SelectTrigger className="w-full max-w-64">
-                <SelectValue placeholder="Selecciona un taller origen" />
-              </SelectTrigger>
-              <SelectContent className="max-h-60 overflow-y-auto">
-                <SelectGroup>
-                  <SelectLabel>Talleres</SelectLabel>
+            <Box sx={{ minWidth: 200, flex: 1, maxWidth: 280 }}>
+              <SearchSelect
+                options={proyectosEnTotal.map(proyecto => (
                   {
-                    proyectosEnTotal.map(proyecto => (
-                      <SelectItem key={proyecto.ID} value={proyecto.DESCRIPCION}> {proyecto.DESCRIPCION} </SelectItem>
-                    ))
+                    value: proyecto.DESCRIPCION,
+                    label: proyecto.DESCRIPCION
                   }
-                </SelectGroup>
-              </SelectContent>
-            </Select>
+                ))}
+                value={proyectoOrigen}
+                onChange={(e) => {
+                  if (codigoNeuRef.current !== null) codigoNeuRef.current.value = ''
+                  setProyectoOrigen(e)
+                }}
+                placeholder="Seleccionar un taller de origen"
+                disabled={isLoadingProyectosEnTotal}
+                withButtonClear={false}
+              />
+            </Box>
 
             <br />
 
@@ -301,7 +303,7 @@ export const ModalReubicarNeumatico = ({ open, onClose, onSuccess }: ModalReubic
 
                           {/* Taller */}
                           <div className="flex flex-col items-center">
-                            <span className="font-light italic text-xs text-slate-700  truncate">
+                            <span className="font-light italic text-[10px] text-slate-700  truncate">
                               {neu.PROYECTO_ACTUAL}
                             </span>
                           </div>
@@ -371,28 +373,24 @@ export const ModalReubicarNeumatico = ({ open, onClose, onSuccess }: ModalReubic
               </span>
             </div>
 
-
-            <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 0.5 }}>
-              Taller destino:
-            </Typography>
-
-            <Select value={proyectoDestino} onValueChange={setProyectoDestino} disabled={neumaticosTrasladados.length === 0}>
-              <SelectTrigger className="w-full max-w-60">
-                <SelectValue placeholder="Selecciona un nuevo taller" />
-              </SelectTrigger>
-              <SelectContent className="max-h-60 overflow-y-auto">
-                <SelectGroup>
-                  <SelectLabel>Talleres</SelectLabel>
+            <Box sx={{ minWidth: 200, flex: 1, maxWidth: 280 }}>
+              <p style={{ fontSize: 11, fontWeight: 600, color: "#64748b", margin: "0 0 5px", textTransform: "uppercase", letterSpacing: ".05em" }}>
+                Taller destino:
+              </p>
+              <SearchSelect
+                options={proyectosNoSeleccionados.map(proyecto => (
                   {
-                    proyectosNoSeleccionados.map(proyecto => {
-                      return (
-                        <SelectItem key={proyecto.ID} value={proyecto.DESCRIPCION}> {proyecto.DESCRIPCION} </SelectItem>
-                      )
-                    })
+                    value: proyecto.DESCRIPCION,
+                    label: proyecto.DESCRIPCION
                   }
-                </SelectGroup>
-              </SelectContent>
-            </Select>
+                ))}
+                value={proyectoDestino}
+                onChange={(value) => setProyectoDestino(value)}
+                placeholder="Seleccionar taller de destino"
+                disabled={neumaticosTrasladados.length === 0}
+                withButtonClear={false}
+              />
+            </Box>
 
             <div className="grid grid-cols-[1fr_auto_auto_auto_auto] items-center gap-x-4 px-3 mt-3 mb-1">
               <span className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Código</span>
@@ -447,7 +445,7 @@ export const ModalReubicarNeumatico = ({ open, onClose, onSuccess }: ModalReubic
                         </div>
 
                         <div className="flex flex-col items-center">
-                          <span className="font-light italic text-xs  text-slate-700  truncate">{neu.proyecto}</span>
+                          <span className="font-light italic text-[10px]  text-slate-700  truncate">{neu.proyecto}</span>
                         </div>
 
                         <div className="flex items-center justify-center">
