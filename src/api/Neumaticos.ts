@@ -1031,3 +1031,58 @@ export const relacionNeumaticosDeBajaPor = async (baja: string, talleresSeleccio
     throw error;
   }
 }
+
+export interface ResponseDespachoDeNeumaticos {
+  TALLER: string
+  QTY_NEUMATICOS_DESPACHADOS: number
+}
+
+export const obtenerDespachoDeNeumaticosPorTaller = async (talleresSeleccionados: string[], disenos: string[], marcas: string[], fechaInicio = '', fechaFin = '') => {
+  try {
+    const response = await axios.post<ResponseDespachoDeNeumaticos[]>(`/api/po-reportes/despachos-neumaticos-por-taller`,
+      { talleresSeleccionados, disenos, marcas, fechaInicio, fechaFin },
+      { withCredentials: true }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error en obtenerDespachoDeNeumaticosPorTaller:', error);
+    throw error;
+  }
+}
+
+export interface ResponseRelacionDespachoDeNeumaticos {
+  VALE_SALIDA: number
+  CORRELATIVO_SALIDA: number
+  CODIGO_ARTICULO_SALIDA: string
+  FECHA_SALIDA: string
+  PLACA_SALIDA: string
+  OT_SALIDA: string
+  NUEVO_USADO_SALIDA: string
+  TALLER_SALIDA: string
+  TIPO_MANT_SALIDA: string
+  CODIGO: string
+  DISENO_NEUMATICO: string
+  MEDIDA_NEUMATICO: string
+  TALLER_NEUMATICO: string
+  COSTO_NEUMATICO: number
+  RECUPERADO_NEUMATICO: boolean
+  KM_NEUMATICO: number
+  PLACA_NEUMATICO?: string
+  SITUACION_NEUMATICO: string
+  REMANENTE_NEUMATICO: number
+  VIDA_NEUMATICO: number
+  MARCA_NEUMATICO: string
+}
+
+export const relacionNeumaticosDespachados = async (talleresSeleccionados: string[], disenos: string[], marcas: string[], fechaInicio = '', fechaFin = '') => {
+  try {
+    const response = await axios.post<ResponseRelacionDespachoDeNeumaticos[]>(`/api/po-reportes/despachos-neumaticos-por-taller-unico`,
+      { talleresSeleccionados, disenos, marcas, fechaInicio, fechaFin },
+      { withCredentials: true }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error en relacionNeumaticosDespachados:', error);
+    throw error;
+  }
+}

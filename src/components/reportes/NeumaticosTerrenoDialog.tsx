@@ -2,7 +2,7 @@ import React from 'react'
 import { DataTableNeumaticos } from '../ui/data-table/data-table'
 import { relacionNeumaticosDeBajaTerreno } from '@/api/Neumaticos'
 import { useQuery } from '@tanstack/react-query'
-import { columnsRelacionNeumaticosPorTerreno } from '@/app/(app)/reportes/columns'
+import { columnsRelacionNeumaticosPorTerreno } from '@/app/(app)/analisis-rendimiento/columns'
 
 interface PropsNeumaticosTerreno {
   data: {

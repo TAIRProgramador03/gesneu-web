@@ -1,7 +1,6 @@
 "use client";
 
-import { obtenerCondicionesConNeumaticosEnBaja, obtenerDisenosConNeumaticosEnBaja, obtenerDistribucionMotivoDeBaja, obtenerDistribucionPorTerrenoBajas, obtenerMarcasConNeumaticosEnBaja, obtenerMovimientosDeNeumaticosEnBaja, obtenerTalleresConNeumaticosEnBaja, obtenerVehiculosPorTerreno, type MotivosDeBajaEnBaja, type TiposDeTerrenoEnBaja } from "@/api/Neumaticos";
-import { Combobox } from "@/components/ui/combobox";
+import { obtenerDisenosConNeumaticosEnBaja, obtenerDistribucionMotivoDeBaja, obtenerDistribucionPorTerrenoBajas, obtenerMarcasConNeumaticosEnBaja, obtenerTalleresConNeumaticosEnBaja, obtenerVehiculosPorTerreno, type MotivosDeBajaEnBaja, type TiposDeTerrenoEnBaja } from "@/api/Neumaticos";
 import { BarChartSkeleton } from "@/components/ui/bar-chart-skeleton";
 import { DonutChartSkeleton } from "@/components/ui/donut-chart-skeleton";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -9,31 +8,96 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useQuery } from "@tanstack/react-query";
 import React from "react";
-import { useState, useMemo, useCallback } from "react";
+import { useState } from "react";
 import { Bar, BarChart, CartesianGrid, Cell, LabelList, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { useTheme } from '@mui/material/styles';
 import { BarChart2, CalendarIcon } from "lucide-react";
 import dayjs from "dayjs";
 import { es } from "date-fns/locale/es";
-import { CollapsibleCard } from "../dashboard/CollapsibleCard";
-import { FlotaDonut } from "../dashboard/overview/FlotaDonut";
 import { MultiSearchSelect } from "../ui/multiple-select";
-import { SearchSelect } from "../ui/search-select";
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Button } from "../ui/button";
-import { Field, FieldGroup } from "../ui/field";
-import { Label } from "../ui/label";
-import { Input } from "../ui/input";
 import { capitalizeCustomString } from "@/lib/utils";
 import { NeumaticosTerrenoDialog } from "./NeumaticosTerrenoDialog";
 import { NeumaticosBajaDialog } from "./NeumaticosBajaDialog";
 
 // ============================================
-// TYPES
+// CONSTANTES
 // ============================================
 
 const PALETA_DONUT_TERRENO = ["#1d4ed8", "#f59e0b", "#22c55e", "#ef4444", "#8b5cf6", "#06b6d4"];
 
+function fmtKm(n: number): string {
+  return Math.round(n).toLocaleString("es-PE");
+}
+
+// ============================================
+// COLOR SCALES
+// ============================================
+function lerpColor(a: string, b: string, t: number): string {
+  const ah = a.replace("#", ""), bh = b.replace("#", "");
+  const ar = parseInt(ah.slice(0, 2), 16), ag = parseInt(ah.slice(2, 4), 16), ab = parseInt(ah.slice(4, 6), 16);
+  const br = parseInt(bh.slice(0, 2), 16), bg = parseInt(bh.slice(2, 4), 16), bb = parseInt(bh.slice(4, 6), 16);
+  const r = Math.round(ar + (br - ar) * t);
+  const g = Math.round(ag + (bg - ag) * t);
+  const bl = Math.round(ab + (bb - ab) * t);
+  return `#${[r, g, bl].map(x => x.toString(16).padStart(2, "0")).join("")}`;
+}
+
+// escala celeste (menos km) -> azul fuerte (mas km)
+const TERRENO_CELESTE = "#8ec5ff"; // blue-300
+const TERRENO_AZUL = "#1e40af";    // blue-800
+
+function azulPorValor(v: number, min: number, max: number): string {
+  const t = max > min ? (v - min) / (max - min) : 1;
+  return lerpColor(TERRENO_CELESTE, TERRENO_AZUL, t);
+}
+
+// escala rojo claro (menos km) -> rojo intenso (mas km)
+const MOTIVO_ROJO_CLARO = "#fca5a5"; // red-300
+const MOTIVO_ROJO = "#991b1b";       // red-800
+
+function rojoPorValor(v: number, min: number, max: number): string {
+  const t = max > min ? (v - min) / (max - min) : 1;
+  return lerpColor(MOTIVO_ROJO_CLARO, MOTIVO_ROJO, t);
+}
+
+// ============================================
+// STAT PILL
+// ============================================
+interface StatPillProps {
+  label: string;
+  value: string;
+  accent: string;   // color de acento (hex)
+  muted?: boolean;  // valor en slate en vez de acento
+}
+
+function StatPill({ label, value, accent, muted }: StatPillProps) {
+  const theme = useTheme();
+  const isDark = theme.palette.mode === 'dark';
+  return (
+    <div
+      className="group flex items-stretch gap-3 rounded-xl border shadow-sm transition-all hover:-translate-y-0.5 hover:shadow"
+      style={{
+        minWidth: 104, paddingLeft: 4, paddingRight: 16, paddingTop: 8, paddingBottom: 8,
+        background: isDark ? '#1e293b' : '#fff',
+        borderColor: isDark ? '#334155' : '#f1f5f9',
+      }}
+    >
+      <span className="w-1 rounded-full" style={{ background: accent }} />
+      <div className="flex flex-col justify-center">
+        <span className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: isDark ? '#64748b' : '#94a3b8' }}>{label}</span>
+        <span className="text-xl font-extrabold leading-tight tabular-nums" style={{ color: muted ? theme.palette.text.primary : accent }}>
+          {value}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+// ============================================
+// TOOLTIPS
+// ============================================
 function DonutTooltip({ active, payload, total }: any) {
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
@@ -64,146 +128,47 @@ function DonutTooltip({ active, payload, total }: any) {
   );
 }
 
-interface FilaReporte {
-  marca: string;
-  zona: string;
-  kmPromedio: number;
-  cantidad: number;
-  costo: number;
-  ck: number;
-}
-
-interface FilaCK {
-  marca: string;
-  kmPromedio: number;
-  costo: number;
-  ck: number;
-  cantidad: number;
-}
-
-// ============================================
-// UTILS
-// ============================================
-function moda(valores: number[]): number {
-  const freq: Record<number, number> = {};
-  let maxFreq = 0;
-  let modaVal = valores[0];
-  for (const v of valores) {
-    freq[v] = (freq[v] || 0) + 1;
-    if (freq[v] > maxFreq) { maxFreq = freq[v]; modaVal = v; }
-  }
-  return modaVal;
-}
-
-function fmtKm(n: number): string {
-  return Math.round(n).toLocaleString("es-PE");
-}
-
-function fmtCosto(n: number): string {
-  return n.toFixed(2);
-}
-
-function fmtCK(n: number): string {
-  return n.toFixed(5);
-}
-
-// ============================================
-// GRAFICO TIPO TERRENO
-// ============================================
-// escala celeste (menos km) -> azul fuerte (mas km)
-const TERRENO_CELESTE = "#8ec5ff"; // blue-300
-const TERRENO_AZUL = "#1e40af";    // blue-800
-
-function lerpColor(a: string, b: string, t: number): string {
-  const ah = a.replace("#", ""), bh = b.replace("#", "");
-  const ar = parseInt(ah.slice(0, 2), 16), ag = parseInt(ah.slice(2, 4), 16), ab = parseInt(ah.slice(4, 6), 16);
-  const br = parseInt(bh.slice(0, 2), 16), bg = parseInt(bh.slice(2, 4), 16), bb = parseInt(bh.slice(4, 6), 16);
-  const r = Math.round(ar + (br - ar) * t);
-  const g = Math.round(ag + (bg - ag) * t);
-  const bl = Math.round(ab + (bb - ab) * t);
-  return `#${[r, g, bl].map(x => x.toString(16).padStart(2, "0")).join("")}`;
-}
-
-function azulPorValor(v: number, min: number, max: number): string {
-  const t = max > min ? (v - min) / (max - min) : 1;
-  return lerpColor(TERRENO_CELESTE, TERRENO_AZUL, t);
-}
-
-// escala rojo claro (menos km) -> rojo intenso (mas km)
-const MOTIVO_ROJO_CLARO = "#fca5a5"; // red-300
-const MOTIVO_ROJO = "#991b1b";       // red-800
-
-function rojoPorValor(v: number, min: number, max: number): string {
-  const t = max > min ? (v - min) / (max - min) : 1;
-  return lerpColor(MOTIVO_ROJO_CLARO, MOTIVO_ROJO, t);
-}
-
-// ============================================
-// STAT PILL
-// ============================================
-interface StatPillProps {
-  label: string;
-  value: string;
-  accent: string;   // color de acento (hex)
-  muted?: boolean;  // valor en slate en vez de acento
-}
-
-function StatPill({ label, value, accent, muted }: StatPillProps) {
-  return (
-    <div
-      className="group flex items-stretch gap-3 rounded-xl border border-slate-100 bg-white pl-1 pr-4 py-2 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow"
-      style={{ minWidth: 104 }}
-    >
-      <span className="w-1 rounded-full" style={{ background: accent }} />
-      <div className="flex flex-col justify-center">
-        <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">{label}</span>
-        <span className="text-xl font-extrabold leading-tight tabular-nums" style={{ color: muted ? "#0f172a" : accent }}>
-          {value}
-        </span>
-      </div>
-    </div>
-  );
-}
-
 function TerrenoTooltip({ active, payload }: { active?: boolean; payload?: { payload: TiposDeTerrenoEnBaja }[] }) {
+  const theme = useTheme();
+  const isDark = theme.palette.mode === 'dark';
   if (!active || !payload?.length) return null;
   const d = payload[0].payload;
   return (
     <div style={{
-      background: "#fff", color: "#0f172a", borderRadius: 10, padding: "10px 14px",
+      background: isDark ? '#1e293b' : '#fff',
+      border: `1px solid ${isDark ? '#334155' : '#e2e8f0'}`,
+      color: theme.palette.text.primary as string, borderRadius: 10, padding: "10px 14px",
       fontSize: 12, boxShadow: "0 8px 24px rgba(0,0,0,.25)", minWidth: 160,
     }}>
       <p style={{ margin: "0 0 6px", fontWeight: 700, fontSize: 13 }}>{d.TIPO_TERRENO}</p>
       <div style={{ display: "flex", justifyContent: "space-between", gap: 16, marginBottom: 3 }}>
-        <span style={{ color: "#94a3b8" }}>Neumáticos</span><span style={{ fontWeight: 600 }}>{d.QTY_NEUMATICOS_BAJA}</span>
+        <span style={{ color: theme.palette.text.secondary as string }}>Neumáticos</span><span style={{ fontWeight: 600 }}>{d.QTY_NEUMATICOS_BAJA}</span>
       </div>
-      {/* <div style={{ display: "flex", justifyContent: "space-between", gap: 16, marginBottom: 3 }}>
-        <span style={{ color: "#94a3b8" }}>KM total</span><span style={{ fontWeight: 600 }}>{fmtKm(d.KM_TOTAL)}</span>
-      </div> */}
       <div style={{ display: "flex", justifyContent: "space-between", gap: 16 }}>
-        <span style={{ color: "#94a3b8" }}>KM prom.</span><span style={{ fontWeight: 600 }}>{fmtKm(d.KM_PROMEDIO)}</span>
+        <span style={{ color: theme.palette.text.secondary as string }}>KM prom.</span><span style={{ fontWeight: 600 }}>{fmtKm(d.KM_PROMEDIO)}</span>
       </div>
     </div>
   );
 }
 
 function MotivoTooltip({ active, payload }: { active?: boolean; payload?: { payload: MotivosDeBajaEnBaja }[] }) {
+  const theme = useTheme();
+  const isDark = theme.palette.mode === 'dark';
   if (!active || !payload?.length) return null;
   const d = payload[0].payload;
   return (
     <div style={{
-      background: "#fff", color: "#0f172a", borderRadius: 10, padding: "10px 14px",
+      background: isDark ? '#1e293b' : '#fff',
+      border: `1px solid ${isDark ? '#334155' : '#e2e8f0'}`,
+      color: theme.palette.text.primary as string, borderRadius: 10, padding: "10px 14px",
       fontSize: 12, boxShadow: "0 8px 24px rgba(0,0,0,.25)", minWidth: 160,
     }}>
       <p style={{ margin: "0 0 6px", fontWeight: 700, fontSize: 13 }}>{d.TIPO_BAJA}</p>
       <div style={{ display: "flex", justifyContent: "space-between", gap: 16, marginBottom: 3 }}>
-        <span style={{ color: "#94a3b8" }}>Neumáticos</span><span style={{ fontWeight: 600 }}>{d.QTY_NEUMATICOS_BAJA}</span>
+        <span style={{ color: theme.palette.text.secondary as string }}>Neumáticos</span><span style={{ fontWeight: 600 }}>{d.QTY_NEUMATICOS_BAJA}</span>
       </div>
-      {/* <div style={{ display: "flex", justifyContent: "space-between", gap: 16, marginBottom: 3 }}>
-        <span style={{ color: "#94a3b8" }}>KM total</span><span style={{ fontWeight: 600 }}>{fmtKm(d.KM_TOTAL)}</span>
-      </div> */}
       <div style={{ display: "flex", justifyContent: "space-between", gap: 16 }}>
-        <span style={{ color: "#94a3b8" }}>KM prom.</span><span style={{ fontWeight: 600 }}>{fmtKm(d.KM_PROMEDIO)}</span>
+        <span style={{ color: theme.palette.text.secondary as string }}>KM prom.</span><span style={{ fontWeight: 600 }}>{fmtKm(d.KM_PROMEDIO)}</span>
       </div>
     </div>
   );
@@ -219,9 +184,12 @@ interface DatePickerProps {
 }
 
 function DatePicker({ value, onChange, placeholder = "Seleccionar" }: DatePickerProps) {
+  const theme = useTheme();
+  const isDark = theme.palette.mode === 'dark';
   const [open, setOpen] = useState(false);
   const selected = value ? dayjs(value).toDate() : undefined;
   const activo = Boolean(value);
+  const acento = "#ef4444";
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -231,12 +199,12 @@ function DatePicker({ value, onChange, placeholder = "Seleccionar" }: DatePicker
           style={{
             width: "100%", display: "flex", alignItems: "center", gap: 8,
             padding: "8px 12px", borderRadius: 8,
-            border: `1.5px solid ${activo ? "#3b82f6" : "#e2e8f0"}`,
-            fontSize: 13, background: "#fff", cursor: "pointer", textAlign: "left",
-            color: activo ? "#1e293b" : "#94a3b8", boxSizing: "border-box",
+            border: `1.5px solid ${activo ? acento : (isDark ? '#334155' : '#e2e8f0')}`,
+            fontSize: 13, background: isDark ? '#1e293b' : '#fff', cursor: "pointer", textAlign: "left",
+            color: activo ? theme.palette.text.primary : theme.palette.text.secondary, boxSizing: "border-box",
           }}
         >
-          <CalendarIcon size={15} color={activo ? "#3b82f6" : "#94a3b8"} />
+          <CalendarIcon size={15} color={activo ? acento : "#94a3b8"} />
           {activo ? dayjs(value).format("DD/MM/YYYY") : placeholder}
         </button>
       </PopoverTrigger>
@@ -262,17 +230,15 @@ function DatePicker({ value, onChange, placeholder = "Seleccionar" }: DatePicker
 // ============================================
 export default function ReporteNeumaticoBaja() {
   const theme = useTheme();
+  const isDark = theme.palette.mode === 'dark';
 
   // ---- Estado de filtros ----
   const [talleresSeleccionados, setTalleresSeleccionados] = useState<string[]>([]);
-  const [condicion, setCondicion] = useState<string>("");
-  const [medida, setMedida] = useState<string>("");
   const [disenos, setDisenos] = useState<string[]>([]);
   const [marcas, setMarcas] = useState<string[]>([]);
 
   const [fechaInicio, setFechaInicio] = useState<string>("");
   const [fechaFin, setFechaFin] = useState<string>("");
-  const [tipoBaja, setTipoBaja] = useState<string>("");
 
   const [openModalTipoTerreno, setOpenModalTipoTerreno] = useState(false)
   const [selectedTipoTerreno, setSelectedTipoTerreno] = useState({
@@ -290,32 +256,20 @@ export default function ReporteNeumaticoBaja() {
     KM_TOTAL: 0,
   })
 
-
-  // const { data = [] } = useQuery({
-  //   queryKey: ['analisis-neumaticos-en-baja'],
-  //   queryFn: obtenerMovimientosDeNeumaticosEnBaja
-  // })
-
   // * marcas
-  const { data: marcasConNeumaticosEnBaja = [] } = useQuery({
+  const { data: marcasConNeumaticosEnBaja = [], isLoading: isLoadingSelectMarca } = useQuery({
     queryKey: ['marcas-con-neumaticos-en-baja'],
     queryFn: obtenerMarcasConNeumaticosEnBaja
   })
 
   // * talleres
-  const { data: talleresConNeumaticosEnBaja = [] } = useQuery({
+  const { data: talleresConNeumaticosEnBaja = [], isLoading: isLoadingSelectTaller } = useQuery({
     queryKey: ['talleres-con-neumaticos-en-baja'],
     queryFn: obtenerTalleresConNeumaticosEnBaja
   })
 
-  // * condiciones
-  // const { data: condicionesConNeumaticosEnBaja = [] } = useQuery({
-  //   queryKey: ['condiciones-con-neumaticos-en-baja'],
-  //   queryFn: obtenerCondicionesConNeumaticosEnBaja
-  // })
-
   // * diseños
-  const { data: disenosConNeumaticosEnBaja = [] } = useQuery({
+  const { data: disenosConNeumaticosEnBaja = [], isLoading: isLoadingSelectDiseno } = useQuery({
     queryKey: ['disenos-con-neumaticos-en-baja'],
     queryFn: obtenerDisenosConNeumaticosEnBaja
   })
@@ -327,7 +281,7 @@ export default function ReporteNeumaticoBaja() {
   })
 
   // * distribución de motivo de baja
-  const { data: distribucionMotivoDeBaja = [] } = useQuery({
+  const { data: distribucionMotivoDeBaja = [], isLoading: isLoadingDistribucionMotivoDeBaja } = useQuery({
     queryKey: ['distribucion-motivo-de-baja', { talleresSeleccionados, disenos, marcas, fechaInicio, fechaFin }],
     queryFn: () => obtenerDistribucionMotivoDeBaja(talleresSeleccionados, disenos, marcas, fechaInicio, fechaFin)
   })
@@ -338,136 +292,19 @@ export default function ReporteNeumaticoBaja() {
     queryFn: () => obtenerVehiculosPorTerreno(talleresSeleccionados, disenos, marcas, fechaInicio, fechaFin)
   })
 
-  // ---- Datos filtrados ----
-  // const filtrado = useMemo(() => {
-  //   return data.filter(d => {
-  //     if (talleresSeleccionados.length > 0 && !talleresSeleccionados.includes(d.PROYECTO_MOVIMIENTO.trim())) return false;
-  //     if (condicion && d.CONDICION.trim() !== condicion) return false;
-  //     if (medida && d.MEDIDA_NEUMATICO.trim() !== medida) return false;
-  //     if (diseno && d.DISENO_NEUMATICO.trim() !== diseno) return false;
-  //     if (tipoBaja && d.TIPO_BAJA.trim() !== tipoBaja) return false;
-  //     if (fechaInicio && d.FECHA_BAJA < fechaInicio) return false;
-  //     if (fechaFin && d.FECHA_BAJA > fechaFin) return false;
-  //     return true;
-  //   });
-  // }, [data, talleresSeleccionados, condicion, medida, diseno, tipoBaja, fechaInicio, fechaFin]);
-
-  // ---- Calcular KM total por neumático (suma de etapas) ----
-  // const kmPorNeumatico = useMemo(() => {
-  //   const map = new Map<number, { kmTotal: number; marca: string; zona: string; costos: number[] }>();
-  //   for (const row of filtrado) {
-  //     const id = row.ID_NEUMATICO;
-  //     if (!map.has(id)) {
-  //       map.set(id, { kmTotal: 0, marca: row.MARCA_NEUMATICO.trim(), zona: row.CONDICION.trim(), costos: [] });
-  //     }
-  //     const entry = map.get(id)!;
-  //     entry.kmTotal += row.KM_RECORRIDOS_MOVIMIENTO;
-  //     entry.costos.push(row.COSTO_NEUMATICO);
-  //   }
-  //   return map;
-  // }, [filtrado]);
-
-  // ---- Tabla PIVOT: Marca × Zona ----
-  // const tablaPivot = useMemo(() => {
-  //   const grupos = new Map<string, { kmSumas: number[]; costos: number[] }>();
-  //   for (const [, neu] of kmPorNeumatico) {
-  //     const key = `${neu.marca}|||${neu.zona}`;
-  //     if (!grupos.has(key)) grupos.set(key, { kmSumas: [], costos: [] });
-  //     const g = grupos.get(key)!;
-  //     g.kmSumas.push(neu.kmTotal);
-  //     g.costos.push(...neu.costos);
-  //   }
-  //   const filas: FilaReporte[] = [];
-  //   for (const [key, g] of grupos) {
-  //     const [marca, zona] = key.split("|||");
-  //     const kmPromedio = g.kmSumas.reduce((a, b) => a + b, 0) / g.kmSumas.length;
-  //     const costo = moda(g.costos);
-  //     filas.push({ marca, zona, kmPromedio, cantidad: g.kmSumas.length, costo, ck: kmPromedio > 0 ? costo / kmPromedio : 0 });
-  //   }
-  //   return filas.sort((a, b) => a.marca.localeCompare(b.marca) || a.zona.localeCompare(b.zona));
-  // }, [kmPorNeumatico]);
-
-  // ---- Zonas únicas presentes ----
-  // const zonasPresentes = useMemo(() =>
-  //   [...new Set(tablaPivot.map(r => r.zona))].sort(), [tablaPivot]);
-
-  // ---- Marcas únicas presentes ----
-  // const marcasPresentes = useMemo(() =>
-  //   [...new Set(tablaPivot.map(r => r.marca))].sort(), [tablaPivot]);
-
-  // ---- Tabla C.K (resumen total por marca) ----
-  // const tablaCK = useMemo((): FilaCK[] => {
-  //   const grupos = new Map<string, { kmSumas: number[]; costos: number[] }>();
-  //   for (const [, neu] of kmPorNeumatico) {
-  //     if (!grupos.has(neu.marca)) grupos.set(neu.marca, { kmSumas: [], costos: [] });
-  //     const g = grupos.get(neu.marca)!;
-  //     g.kmSumas.push(neu.kmTotal);
-  //     g.costos.push(...neu.costos);
-  //   }
-  //   return [...grupos.entries()].map(([marca, g]) => {
-  //     const kmPromedio = g.kmSumas.reduce((a, b) => a + b, 0) / g.kmSumas.length;
-  //     const costo = moda(g.costos);
-  //     return { marca, kmPromedio, costo, ck: kmPromedio > 0 ? costo / kmPromedio : 0, cantidad: g.kmSumas.length };
-  //   }).sort((a, b) => a.ck - b.ck);
-  // }, [kmPorNeumatico]);
-
-  // ---- Totales generales ----
-  // const totalKmGeneral = useMemo(() => {
-  //   if (tablaCK.length === 0) return 0;
-  //   const totalNeus = tablaCK.reduce((a, b) => a + b.cantidad, 0);
-  //   return tablaCK.reduce((a, b) => a + b.kmPromedio * b.cantidad, 0) / totalNeus;
-  // }, [tablaCK]);
-  // const totalCantGeneral = useMemo(() => tablaCK.reduce((a, b) => a + b.cantidad, 0), [tablaCK]);
-
-  // ---- Toggle taller ----
-  // const toggleTaller = useCallback((taller: string) => {
-  //   setTalleresSeleccionados(prev =>
-  //     prev.includes(taller) ? prev.filter(t => t !== taller) : [...prev, taller]
-  //   );
-  // }, []);
-
   const limpiarFiltros = () => {
     setTalleresSeleccionados([]);
-    setCondicion("");
     setMarcas([]);
-    setMedida("");
     setDisenos([]);
-    setTipoBaja("");
     setFechaInicio("");
     setFechaFin("");
   };
 
-  const hayFiltrosActivos = talleresSeleccionados.length > 0 || condicion || medida || marcas.length > 0 || disenos.length > 0 || tipoBaja || fechaInicio || fechaFin;
-
-  // ---- Lookup pivot ----
-  // const pivotLookup = useMemo(() => {
-  //   const map = new Map<string, FilaReporte>();
-  //   for (const row of tablaPivot) map.set(`${row.marca}|||${row.zona}`, row);
-  //   return map;
-  // }, [tablaPivot]);
-
-  // const pivotTotalMarca = useMemo(() => {
-  //   const map = new Map<string, { kmTotal: number; cant: number }>();
-  //   for (const ck of tablaCK) map.set(ck.marca, { kmTotal: ck.kmPromedio, cant: ck.cantidad });
-  //   return map;
-  // }, [tablaCK]);
-
-  // ---- Datos para el gráfico de barras C.K ----
-  // const chartCK = useMemo(() => {
-  //   if (tablaCK.length === 0) return [];
-  //   const mejor = tablaCK[0].ck;
-  //   const peor = tablaCK[tablaCK.length - 1].ck;
-  //   const rango = peor - mejor;
-  //   return tablaCK.map(row => {
-  //     const pct = rango > 0 ? (row.ck - mejor) / rango : 0;
-  //     const color = pct < 0.33 ? "#22c55e" : pct < 0.66 ? "#f59e0b" : "#ef4444";
-  //     return { marca: row.marca, ck: row.ck, color };
-  //   });
-  // }, [tablaCK]);
+  const hayFiltrosActivos = talleresSeleccionados.length > 0 || marcas.length > 0 || disenos.length > 0 || fechaInicio || fechaFin;
 
   return (
     <div style={{
-      background: "#f8fafc", minHeight: "100vh", padding: "28px 32px", color: "#1e293b",
+      background: theme.palette.background.default, minHeight: "100vh", padding: "28px 32px", color: theme.palette.text.primary,
     }}>
 
       <div style={{ marginBottom: 28, display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: 16 }}>
@@ -476,33 +313,28 @@ export default function ReporteNeumaticoBaja() {
             <div style={{
               width: 36, height: 36, borderRadius: 10,
               background: "linear-gradient(135deg, #ef4444, #dc2626)",
-              display: "flex", alignItems: "center", justifyContent: "center",
+              display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
             }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5">
-                <circle cx="12" cy="12" r="10" />
-                <path d="M12 8v4M12 16h.01" />
-              </svg>
+              <BarChart2 size={18} color="#fff" strokeWidth={2.5} />
             </div>
-            <h1 style={{ fontSize: 22, fontWeight: 700, color: "#0f172a", margin: 0, letterSpacing: "-0.4px" }}>
+            <h1 style={{ fontSize: 22, fontWeight: 700, color: theme.palette.text.primary, margin: 0, letterSpacing: "-0.4px" }}>
               Reporte de neumáticos en baja
             </h1>
           </div>
-          <p style={{ fontSize: 13, color: "#94a3b8", margin: 0 }}>
-            Análisis de rendimiento y costo por kilómetro (C.K) de neumáticos retirados
-            del sistema
+          <p style={{ fontSize: 13, color: theme.palette.text.secondary, margin: 0 }}>
+            Análisis de rendimiento y costo por kilómetro (C.K) de neumáticos retirados del sistema.
           </p>
         </div>
       </div>
 
       {/* Filtros */}
       <div style={{
-        background: "#fff", borderRadius: 14, border: "1px solid #e2e8f0",
+        background: isDark ? '#1e293b' : '#fff', borderRadius: 14, border: `1px solid ${isDark ? '#334155' : '#e2e8f0'}`,
         padding: "20px 24px", marginBottom: 24,
       }}
-      // className="sticky z-999 top-0"
       >
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-          <span style={{ fontSize: 13, fontWeight: 600, color: "#334155" }}>Filtros:</span>
+          <span style={{ fontSize: 13, fontWeight: 600, color: theme.palette.text.primary }}>Filtros:</span>
           {hayFiltrosActivos && (
             <button onClick={limpiarFiltros} style={{
               fontSize: 12, color: "#ef4444", background: "none", border: "none",
@@ -514,21 +346,21 @@ export default function ReporteNeumaticoBaja() {
         </div>
 
         <div style={{ marginBottom: 14 }}>
-          <p style={{ fontSize: 11, fontWeight: 600, color: "#64748b", margin: "0 0 8px", textTransform: "uppercase", letterSpacing: ".05em" }}>
+          <p style={{ fontSize: 11, fontWeight: 600, color: theme.palette.text.secondary, margin: "0 0 8px", textTransform: "uppercase", letterSpacing: ".05em" }}>
             Taller(es)
           </p>
           <MultiSearchSelect
             options={talleresConNeumaticosEnBaja}
             onChange={(values) => setTalleresSeleccionados(values)}
             value={talleresSeleccionados}
-            // className="w-102.5"
             placeholder="Seleccionar taller(es)"
+            disabled={isLoadingSelectTaller}
           />
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 12 }}>
           <div>
-            <p style={{ fontSize: 11, fontWeight: 600, color: "#64748b", margin: "0 0 5px", textTransform: "uppercase", letterSpacing: ".05em" }}>
+            <p style={{ fontSize: 11, fontWeight: 600, color: theme.palette.text.secondary, margin: "0 0 5px", textTransform: "uppercase", letterSpacing: ".05em" }}>
               Marca(s)
             </p>
             <MultiSearchSelect
@@ -536,10 +368,11 @@ export default function ReporteNeumaticoBaja() {
               onChange={(value) => setMarcas(value)}
               value={marcas}
               placeholder="Seleccionar marca(s)"
+              disabled={isLoadingSelectMarca}
             />
           </div>
           <div>
-            <p style={{ fontSize: 11, fontWeight: 600, color: "#64748b", margin: "0 0 5px", textTransform: "uppercase", letterSpacing: ".05em" }}>
+            <p style={{ fontSize: 11, fontWeight: 600, color: theme.palette.text.secondary, margin: "0 0 5px", textTransform: "uppercase", letterSpacing: ".05em" }}>
               Diseño(s)
             </p>
             <MultiSearchSelect
@@ -547,14 +380,15 @@ export default function ReporteNeumaticoBaja() {
               value={disenos}
               onChange={(value) => setDisenos(value)}
               placeholder="Seleccionar diseño(s)"
+              disabled={isLoadingSelectDiseno}
             />
           </div>
           <div>
-            <p style={{ fontSize: 11, fontWeight: 600, color: "#64748b", margin: "0 0 5px", textTransform: "uppercase", letterSpacing: ".05em" }}>Fecha desde</p>
+            <p style={{ fontSize: 11, fontWeight: 600, color: theme.palette.text.secondary, margin: "0 0 5px", textTransform: "uppercase", letterSpacing: ".05em" }}>Fecha desde</p>
             <DatePicker value={fechaInicio} onChange={setFechaInicio} placeholder="Todas" />
           </div>
           <div>
-            <p style={{ fontSize: 11, fontWeight: 600, color: "#64748b", margin: "0 0 5px", textTransform: "uppercase", letterSpacing: ".05em" }}>Fecha hasta</p>
+            <p style={{ fontSize: 11, fontWeight: 600, color: theme.palette.text.secondary, margin: "0 0 5px", textTransform: "uppercase", letterSpacing: ".05em" }}>Fecha hasta</p>
             <DatePicker value={fechaFin} onChange={setFechaFin} placeholder="Todas" />
           </div>
         </div>
@@ -566,14 +400,17 @@ export default function ReporteNeumaticoBaja() {
 
         {/* Gráfico para la distrución vehicular */}
         <div
-          className="rounded-2xl border border-slate-200 border-t-[5px] border-t-emerald-600 shadow-sm transition-shadow hover:shadow-md"
-          style={{ background: "#fff", padding: "20px 24px" }}
+          className="rounded-2xl border border-t-[5px] shadow-sm transition-shadow hover:shadow-md"
+          style={{
+            background: isDark ? '#1e293b' : '#fff', padding: "20px 24px",
+            borderColor: isDark ? '#334155' : '#e2e8f0', borderTopColor: "#059669",
+          }}
         >
           {/* Header + stats */}
           <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: 16, marginBottom: 18 }}>
             <div>
-              <p style={{ fontSize: 15, fontWeight: 700, color: "#0f172a", margin: 0 }}>Distribución vehicular</p>
-              <p style={{ fontSize: 12, color: "#94a3b8", margin: "2px 0 0" }}>Vehículos con neumáticos dados de baja según terreno de operación</p>
+              <p style={{ fontSize: 15, fontWeight: 700, color: theme.palette.text.primary, margin: 0 }}>Distribución vehicular</p>
+              <p style={{ fontSize: 12, color: theme.palette.text.secondary, margin: "2px 0 0" }}>Vehículos con neumáticos dados de baja según terreno de operación</p>
             </div>
 
             <div className="flex flex-wrap gap-2.5">
@@ -681,25 +518,26 @@ export default function ReporteNeumaticoBaja() {
 
         {/* Gráfico para la Distribución por tipo de terreno */}
         <div
-          className="rounded-2xl border border-slate-200 border-t-[5px] border-t-blue-600 shadow-sm transition-shadow hover:shadow-md"
-          style={{ background: "#fff", padding: "20px 24px" }}
+          className="rounded-2xl border border-t-[5px] shadow-sm transition-shadow hover:shadow-md"
+          style={{
+            background: isDark ? '#1e293b' : '#fff', padding: "20px 24px",
+            borderColor: isDark ? '#334155' : '#e2e8f0', borderTopColor: "#1d4ed8",
+          }}
         >
           {/* Header + stats */}
           <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: 16, marginBottom: 18 }}>
             <div>
-              <p style={{ fontSize: 15, fontWeight: 700, color: "#0f172a", margin: 0 }}>Distribución por tipo de terreno</p>
-              <p style={{ fontSize: 12, color: "#94a3b8", margin: "2px 0 0" }}>Neumáticos dados de baja según terreno de operación</p>
+              <p style={{ fontSize: 15, fontWeight: 700, color: theme.palette.text.primary, margin: 0 }}>Distribución por tipo de terreno</p>
+              <p style={{ fontSize: 12, color: theme.palette.text.secondary, margin: "2px 0 0" }}>Neumáticos dados de baja según terreno de operación</p>
             </div>
 
             <div className="flex flex-wrap gap-2.5">
               {(() => {
                 const totalNeu = distirbucionTipoTerrenoEnBaja.reduce((a, b) => a + b.QTY_NEUMATICOS_BAJA, 0);
-                const totalKm = distirbucionTipoTerrenoEnBaja.reduce((a, b) => a + b.KM_TOTAL, 0);
                 return (
                   <>
                     <StatPill label="Tipos de terreno" value={distirbucionTipoTerrenoEnBaja.length.toString()} accent="#1d4ed8" />
                     <StatPill label="Neumáticos" value={totalNeu.toString()} accent="#1d4ed8" />
-                    {/* <StatPill label="KM total" value={fmtKm(totalKm)} accent="#1d4ed8" muted /> */}
                   </>
                 );
               })()}
@@ -767,24 +605,25 @@ export default function ReporteNeumaticoBaja() {
 
       {/* Gráfico para la Distribución por motivo de baja */}
       <div
-        className="rounded-2xl border border-slate-200 border-t-[5px] border-t-red-700 shadow-sm transition-shadow hover:shadow-md"
-        style={{ background: "#fff", padding: "20px 24px", marginBottom: 24 }}
+        className="rounded-2xl border border-t-[5px] shadow-sm transition-shadow hover:shadow-md"
+        style={{
+          background: isDark ? '#1e293b' : '#fff', padding: "20px 24px", marginBottom: 24,
+          borderColor: isDark ? '#334155' : '#e2e8f0', borderTopColor: "#b91c1c",
+        }}
       >
         {/* Header + stats */}
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: 16, marginBottom: 18 }}>
           <div>
-            <p style={{ fontSize: 15, fontWeight: 700, color: "#0f172a", margin: 0 }}>Distribución por motivo de baja</p>
-            <p style={{ fontSize: 12, color: "#94a3b8", margin: "2px 0 0" }}>Neumáticos dados de baja según motivo</p>
+            <p style={{ fontSize: 15, fontWeight: 700, color: theme.palette.text.primary, margin: 0 }}>Distribución por motivo de baja</p>
+            <p style={{ fontSize: 12, color: theme.palette.text.secondary, margin: "2px 0 0" }}>Neumáticos dados de baja según motivo</p>
           </div>
           <div className="flex flex-wrap gap-2.5">
             {(() => {
               const totalNeu = distribucionMotivoDeBaja.reduce((a, b) => a + b.QTY_NEUMATICOS_BAJA, 0);
-              const totalKm = distribucionMotivoDeBaja.reduce((a, b) => a + b.KM_TOTAL, 0);
               return (
                 <>
                   <StatPill label="Motivos de baja" value={distribucionMotivoDeBaja.length.toString()} accent="#b91c1c" />
                   <StatPill label="Neumáticos" value={totalNeu.toString()} accent="#b91c1c" />
-                  {/* <StatPill label="KM total" value={fmtKm(totalKm)} accent="#b91c1c" muted /> */}
                 </>
               );
             })()}
@@ -792,10 +631,10 @@ export default function ReporteNeumaticoBaja() {
         </div>
 
         {
-          isLoadingDistribucionVehicularPorTerreno ?
+          isLoadingDistribucionMotivoDeBaja ?
             (
               <BarChartSkeleton bars={4} height={340} className="px-1" />
-            ) : distribucionVehicularPorTerreno.length === 0 ? (
+            ) : distribucionMotivoDeBaja.length === 0 ? (
               <EmptyState
                 title="No hay datos de motivo de baja"
                 description="No se encontraron neumáticos dados de baja según los parámetros seleccionados."
@@ -846,7 +685,6 @@ export default function ReporteNeumaticoBaja() {
             )
         }
       </div>
-
 
 
       {/* ------------ Modal: Tipo de terreno ----------- */}
@@ -934,261 +772,6 @@ export default function ReporteNeumaticoBaja() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
-
-      {/* {filtrado.length === 0 ? (
-        <div style={{ textAlign: "center", padding: "60px 0", color: "#94a3b8", background: "#fff", borderRadius: 14, border: "1px solid #e2e8f0" }}>
-          <p style={{ fontSize: 16, margin: "0 0 4px" }}>Sin resultados</p>
-          <p style={{ fontSize: 13 }}>Ajusta los filtros para ver datos</p>
-        </div>
-      ) : (
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }} className="items-start">
-
-          <div style={{ background: "#fff", borderRadius: 14, border: "1px solid #e2e8f0", overflow: "hidden" }}>
-            <div style={{ padding: "16px 20px", borderBottom: "1px solid #f1f5f9" }}>
-              <p style={{ fontSize: 14, fontWeight: 600, color: "#0f172a", margin: 0 }}>Rendimiento por marca y condición</p>
-              <p style={{ fontSize: 11, color: "#94a3b8", margin: "2px 0 0" }}>KM promedio total por neumático</p>
-            </div>
-            <div style={{ overflowX: "auto" }}>
-              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
-                <thead>
-                  <tr style={{ background: "#f8fafc" }}>
-                    <th style={thStyle}>Marca</th>
-                    {zonasPresentes.map(z => (
-                      <th key={z} colSpan={2} style={{ ...thStyle, textAlign: "center", borderLeft: "2px solid #e2e8f0" }}>
-                        {z}
-                      </th>
-                    ))}
-                    <th colSpan={2} style={{ ...thStyle, textAlign: "center", borderLeft: "2px solid #e2e8f0", background: "#f1f5f9" }}>
-                      TOTAL
-                    </th>
-                  </tr>
-                  <tr style={{ background: "#f8fafc" }}>
-                    <th style={thStyle}></th>
-                    {zonasPresentes.map(z => (
-                      <>
-                        <th key={`${z}-km`} style={{ ...thStyle, borderLeft: "2px solid #e2e8f0" }}>KM PROM.</th>
-                        <th key={`${z}-cant`} style={thStyle}>CANT.</th>
-                      </>
-                    ))}
-                    <th style={{ ...thStyle, borderLeft: "2px solid #e2e8f0", background: "#f1f5f9", textAlign: 'center' }}>KM PROM.</th>
-                    <th style={{ ...thStyle, background: "#f1f5f9" }}>CANT.</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {marcasPresentes.map((marca, mi) => {
-                    const total = pivotTotalMarca.get(marca);
-                    return (
-                      <tr key={marca} style={{ background: mi % 2 === 0 ? "#fff" : "#fafafa" }}
-                        onMouseEnter={e => (e.currentTarget.style.background = "#f0f7ff")}
-                        onMouseLeave={e => (e.currentTarget.style.background = mi % 2 === 0 ? "#fff" : "#fafafa")}
-                      >
-                        <td style={{ ...tdStyle, fontWeight: 600, color: "#0f172a" }}>{marca}</td>
-                        {zonasPresentes.map(zona => {
-                          const row = pivotLookup.get(`${marca}|||${zona}`);
-                          return (
-                            <>
-                              <td key={`${marca}-${zona}-km`} style={{ ...tdStyle, borderLeft: "2px solid #f1f5f9" }}>
-                                {row ? fmtKm(row.kmPromedio) : "—"}
-                              </td>
-                              <td key={`${marca}-${zona}-cant`} style={{ ...tdStyle }}>
-                                {row ? (
-                                  <span style={{
-                                    display: "inline-block", padding: "1px 8px", borderRadius: 10,
-                                    background: "#eff6ff", color: "#1d4ed8", fontWeight: 600, fontSize: 11,
-                                  }}>{row.cantidad}</span>
-                                ) : "—"}
-                              </td>
-                            </>
-                          );
-                        })}
-                        <td style={{ ...tdStyle, fontWeight: 700, borderLeft: "2px solid #e2e8f0", background: "#f8fafc", color: "#0f172a" }}>
-                          {total ? fmtKm(total.kmTotal) : "—"}
-                        </td>
-                        <td style={{ ...tdStyle, fontWeight: 700, background: "#f8fafc" }}>
-                          {total ? (
-                            <span style={{
-                              display: "inline-block", padding: "1px 8px", borderRadius: 10,
-                              background: "#0f172a", color: "#fff", fontWeight: 600, fontSize: 11,
-                            }}>{total.cant}</span>
-                          ) : "—"}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-                <tfoot>
-                  <tr style={{ background: "#f1f5f9", borderTop: "2px solid #e2e8f0" }}>
-                    <td style={{ ...tdStyle, fontWeight: 700, color: "#0f172a" }}>Total general</td>
-                    {zonasPresentes.map(zona => {
-                      const filaZona = tablaPivot.filter(r => r.zona === zona);
-                      const totalNeus = filaZona.reduce((a, b) => a + b.cantidad, 0);
-                      const kmProm = totalNeus > 0
-                        ? filaZona.reduce((a, b) => a + b.kmPromedio * b.cantidad, 0) / totalNeus
-                        : 0;
-                      return (
-                        <>
-                          <td key={`total-${zona}-km`} style={{ ...tdStyle, fontWeight: 700, borderLeft: "2px solid #e2e8f0", color: "#0f172a" }}>
-                            {totalNeus > 0 ? fmtKm(kmProm) : "—"}
-                          </td >
-                          <td key={`total-${zona}-cant`} style={{ ...tdStyle, fontWeight: 700 }}>
-                            {totalNeus > 0 ? (
-                              <span style={{
-                                display: "inline-block", padding: "1px 8px", borderRadius: 10,
-                                background: "#334155", color: "#fff", fontWeight: 600, fontSize: 11,
-                              }}>{totalNeus}</span>
-                            ) : "—"}
-                          </td>
-                        </>
-                      );
-                    })}
-                    <td style={{ ...tdStyle, fontWeight: 700, borderLeft: "2px solid #e2e8f0", color: "#0f172a" }}>
-                      {fmtKm(totalKmGeneral)}
-                    </td>
-                    <td style={{ ...tdStyle, textAlign: "center", fontWeight: 700 }}>
-                      <span style={{
-                        display: "inline-block", padding: "1px 8px", borderRadius: 10,
-                        background: "#0f172a", color: "#fff", fontWeight: 600, fontSize: 11,
-                      }}>{totalCantGeneral}</span>
-                    </td>
-                  </tr>
-                </tfoot>
-              </table>
-            </div>
-          </div>
-
-          <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-            <div style={{ background: "#fff", borderRadius: 14, border: "1px solid #e2e8f0", overflow: "hidden" }}>
-              <div style={{ padding: "16px 20px", borderBottom: "1px solid #f1f5f9" }}>
-                <p style={{ fontSize: 14, fontWeight: 600, color: "#0f172a", margin: 0 }}>Costo por kilómetro (C.K)</p>
-                <p style={{ fontSize: 11, color: "#94a3b8", margin: "2px 0 0" }}>
-                  C.K = precio modal / km promedio — menor es mejor
-                </p>
-              </div>
-              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
-                <thead>
-                  <tr style={{ background: "#f8fafc" }}>
-                    <th style={thStyle}>Marca</th>
-                    <th style={{ ...thStyle }}>KM Prom.</th>
-                    <th style={{ ...thStyle }}>Cantidad</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {tablaCK.map((row, i) => {
-                    const mejor = tablaCK[0].ck;
-                    const peor = tablaCK[tablaCK.length - 1].ck;
-                    const rango = peor - mejor;
-                    const pct = rango > 0 ? (row.ck - mejor) / rango : 0;
-                    const color = pct < 0.33 ? "#22c55e" : pct < 0.66 ? "#f59e0b" : "#ef4444";
-                    return (
-                      <tr key={row.marca} style={{ background: i % 2 === 0 ? "#fff" : "#fafafa" }}
-                        onMouseEnter={e => (e.currentTarget.style.background = "#f0f7ff")}
-                        onMouseLeave={e => (e.currentTarget.style.background = i % 2 === 0 ? "#fff" : "#fafafa")}
-                      >
-                        <td style={{ ...tdStyle, fontWeight: 600, color: "#0f172a" }}>
-                          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 7 }}>
-                            {i === 0 && <span style={{ fontSize: 10, background: "#f0fdf4", color: "#16a34a", padding: "1px 7px", borderRadius: 8, fontWeight: 600 }}>MEJOR</span>}
-                            {row.marca}
-                          </div>
-                        </td>
-                        <td style={{ ...tdStyle }}>{fmtKm(row.kmPromedio)}</td>
-                        <td style={{ ...tdStyle, textAlign: "center" }}>
-                          <span style={{
-                            display: "inline-block", padding: "1px 8px", borderRadius: 10,
-                            background: "#eff6ff", color: "#1d4ed8", fontWeight: 600, fontSize: 11,
-                          }}>{row.cantidad}</span>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-                <tfoot>
-                  <tr style={{ background: "#f1f5f9", borderTop: "2px solid #e2e8f0" }}>
-                    <td style={{ ...tdStyle, fontWeight: 700 }}>Total general</td>
-                    <td style={{ ...tdStyle, fontWeight: 700 }}>{fmtKm(totalKmGeneral)}</td>
-                    <td style={{ ...tdStyle, fontWeight: 700 }}>
-                      <span style={{ display: "inline-block", padding: "1px 8px", borderRadius: 10, background: "#0f172a", color: "#fff", fontWeight: 600, fontSize: 11 }}>
-                        {totalCantGeneral}
-                      </span>
-                    </td>
-                  </tr>
-                </tfoot>
-              </table>
-            </div>
-
-            <div style={{ background: "#fff", borderRadius: 14, border: "1px solid #e2e8f0", padding: "16px 20px" }}>
-              <p style={{ fontSize: 13, fontWeight: 600, color: "#0f172a", margin: "0 0 14px" }}>Comparativa C.K por marca</p>
-
-              <ResponsiveContainer width="100%" height={230}>
-                <BarChart
-                  data={chartCK}
-                  barSize={80}
-                  margin={{ top: 40, right: 12, bottom: 0, left: -24 }}
-                >
-                  <XAxis
-                    dataKey="marca"
-                    tick={{ fontSize: 12, fill: theme.palette.text.secondary as string, fontWeight: 600 }}
-                    axisLine={{ stroke: theme.palette.divider }}
-                    tickLine={false}
-                  />
-                  <YAxis
-                    tick={{ fontSize: 11, fill: theme.palette.text.secondary as string }}
-                    axisLine={false}
-                    tickLine={false}
-                    tickFormatter={(v) => fmtCK(v as number)}
-                  />
-                  <Tooltip
-                    formatter={(v) => [fmtCK(v as number), "C.K"]}
-                    cursor={{ fill: "rgba(0,0,0,0.04)" }}
-                  />
-                  <Bar dataKey="ck" radius={[6, 6, 0, 0]}>
-                    {chartCK.map((entry) => (
-                      <Cell key={entry.marca} fill={entry.color} fillOpacity={0.82} />
-                    ))}
-                    <LabelList
-                      dataKey="ck"
-                      position="top"
-                      formatter={(v) => fmtCK(Number(v))}
-                      style={{ fontSize: 11, fontWeight: 700, fill: theme.palette.text.primary as string }}
-                    />
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-
-              <p style={{ fontSize: 10, color: "#94a3b8", margin: "10px 0 0" }}>
-                Verde = menor costo por km (mejor rendimiento) · Rojo = mayor costo por km
-              </p>
-            </div>
-          </div>
-        </div>
-      )
-      } */}
-
-      {/* ---- INFO METODOLOGÍA ---- */}
-      {/* <div style={{
-        marginTop: 20, padding: "12px 18px", background: "#fffbeb", borderRadius: 10,
-        border: "1px solid #fde68a", display: "flex", alignItems: "flex-start", gap: 10,
-      }}>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d97706" strokeWidth="2" style={{ flexShrink: 0, marginTop: 1 }}>
-          <circle cx="12" cy="12" r="10" /><path d="M12 8h.01M12 12v4" />
-        </svg>
-        <p style={{ fontSize: 12, color: "#92400e", margin: 0, lineHeight: 1.6 }}>
-          <strong>Metodología:</strong> KM promedio = suma de todos los km de etapa por neumático, luego promedio por marca. &nbsp;
-          Precio = moda del costo registrado en la marca para el período filtrado. &nbsp;
-          C.K = precio / km promedio (costo por kilómetro recorrido).
-        </p>
-      </div> */}
-    </div >
+    </div>
   );
 }
-
-// ---- Estilos de tabla ----
-const thStyle: React.CSSProperties = {
-  padding: "9px 12px", textAlign: "center", fontSize: 10, fontWeight: 600,
-  color: "#64748b", textTransform: "uppercase", letterSpacing: ".05em",
-  borderBottom: "2px solid #e2e8f0",
-};
-
-const tdStyle: React.CSSProperties = {
-  padding: "9px 12px", borderBottom: "1px solid #f1f5f9", color: "#475569", textAlign: "center"
-};

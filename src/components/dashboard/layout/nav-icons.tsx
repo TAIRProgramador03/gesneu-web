@@ -1,7 +1,7 @@
 import type { Icon } from '@phosphor-icons/react/dist/lib/types';
 import { GearSix as GearSixIcon } from '@phosphor-icons/react/dist/ssr/GearSix';
 import { XSquare } from '@phosphor-icons/react/dist/ssr/XSquare';
-import { Car, Layers3Icon, LayoutDashboardIcon, User2Icon, MapPin, ChartColumnStacked, FileStack } from 'lucide-react';
+import { Car, Layers3Icon, LayoutDashboardIcon, User2Icon, MapPin, ChartColumnStacked, FileStack, PackageCheck } from 'lucide-react';
 
 export const navIcons = {
   'chart-pie': LayoutDashboardIcon,
@@ -12,5 +12,6 @@ export const navIcons = {
   users: Layers3Icon,
   'map-pin': MapPin,
   'bajas': ChartColumnStacked,
+  'consumos': PackageCheck,
   'file-stack': FileStack,
 } as Record<string, Icon>;
