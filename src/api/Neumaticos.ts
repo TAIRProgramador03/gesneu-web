@@ -1086,3 +1086,126 @@ export const relacionNeumaticosDespachados = async (talleresSeleccionados: strin
     throw error;
   }
 }
+
+
+// TODO: ---------------------------------- Asignación masiva Excel ----------------------------------
+
+export interface NeumaticoAsignacion {
+  codigo: string;
+  posicion: 'POS01' | 'POS02' | 'POS03' | 'POS04' | 'RES01';
+  remanente: number;
+  presion: number;
+  torque: number | null;
+  fechaAsignacion: string;
+  error?: string;
+}
+
+export interface PlacaAprobada {
+  placa: string;
+  kilometraje: number;
+  neumaticos: NeumaticoAsignacion[];
+}
+
+export interface PlacaRechazada {
+  placa: string;
+  kilometraje: number;
+  neumaticos: NeumaticoAsignacion[];
+  motivo: string;
+  arrastrada?: boolean;
+}
+
+export interface ResultadoProcesamiento {
+  batchId: string;
+  totalFilas: number;
+  aprobadas: PlacaAprobada[];
+  rechazadas: PlacaRechazada[];
+}
+
+export interface ResumenConfirmacion {
+  placasRegistradas: number;
+  neumaticosRegistrados: number;
+  placas: string[];
+}
+
+const BASE_URL = '/api/asignacion-masiva';
+
+async function manejarRespuesta<T>(res: Response): Promise<T> {
+  if (!res.ok) {
+    const body = await res.json().catch(() => null);
+    throw new Error(body?.mensaje ?? `Error HTTP ${res.status}`);
+  }
+  return res.json() as Promise<T>;
+}
+
+// ---------------------------------------------------------------------
+// 1. Descargar plantilla Excel
+// ---------------------------------------------------------------------
+
+// export async function descargarPlantillaAsignacionMasiva(): Promise<void> {
+//   const res = await fetch(`${BASE_URL}/plantilla`, { method: 'GET' });
+//   if (!res.ok) throw new Error('No se pudo descargar la plantilla');
+
+//   const blob = await res.blob();
+//   const url = window.URL.createObjectURL(blob);
+//   const link = document.createElement('a');
+//   link.href = url;
+//   link.download = 'GESNEU_plantilla_asignacion_masiva.xlsx';
+//   link.click();
+//   window.URL.revokeObjectURL(url);
+// }
+
+// ---------------------------------------------------------------------
+// 2. Validar archivo (dry-run, no escribe en BD)
+// ---------------------------------------------------------------------
+
+export async function validarAsignacionMasiva(archivo: File): Promise<ResultadoProcesamiento> {
+  const formData = new FormData();
+  formData.append('archivo', archivo);
+
+  const res = await fetch(`${BASE_URL}/validar`, {
+    method: 'POST',
+    body: formData,
+  });
+
+  return manejarRespuesta<ResultadoProcesamiento>(res);
+}
+
+// ---------------------------------------------------------------------
+// 3. Confirmar: registra en BD solo las placas aprobadas del batchId validado
+// --------------------------------------------------------------------- 
+
+export async function confirmarAsignacionMasiva(batchId: string): Promise<ResumenConfirmacion> {
+  const res = await fetch(`${BASE_URL}/confirmar`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ batchId }),
+  });
+
+  return manejarRespuesta<ResumenConfirmacion>(res);
+}
+
+// ---------------------------------------------------------------------
+// 4. Descargar reporte de un lote ya procesado
+// ---------------------------------------------------------------------
+
+export async function descargarReporteAsignacionMasiva(batchId: string): Promise<void> {
+  const res = await fetch(`${BASE_URL}/reporte/${batchId}`, { method: 'GET' });
+  if (!res.ok) throw new Error('No se pudo descargar el reporte');
+
+  const blob = await res.blob();
+  const url = window.URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `reporte_asignacion_${batchId}.xlsx`;
+  link.click();
+  window.URL.revokeObjectURL(url);
+}
+
+// ---------------------------------------------------------------------
+// 5. (Opcional) Recuperar un lote validado que aún no fue confirmado
+// ---------------------------------------------------------------------
+
+export async function obtenerLoteAsignacionMasiva(batchId: string): Promise<ResultadoProcesamiento> {
+  const res = await fetch(`${BASE_URL}/lotes/${batchId}`, { method: 'GET' });
+  return manejarRespuesta<ResultadoProcesamiento>(res);
+}

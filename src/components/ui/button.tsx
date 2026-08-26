@@ -22,6 +22,7 @@ const buttonVariants = cva(
         life: "bg-cyan-600 text-primary-foreground shadow hover:bg-cyan-700",
         teal: "bg-teal-600 text-primary-foreground shadow hover:bg-teal-700",
         indigo: "bg-indigo-600 text-primary-foreground shadow hover:bg-indigo-700",
+        amber: "bg-amber-600 text-primary-foreground shadow hover:bg-amber-700",
         warning: "bg-yellow-600 text-primary-foreground shadow hover:bg-yellow-700",
         link: "text-primary underline-offset-4 hover:underline",
       },
