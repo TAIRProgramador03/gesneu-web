@@ -1,6 +1,6 @@
 "use client";
 
-import { obtenerDisenosConNeumaticosEnBaja, obtenerDistribucionMotivoDeBaja, obtenerDistribucionPorTerrenoBajas, obtenerMarcasConNeumaticosEnBaja, obtenerTalleresConNeumaticosEnBaja, obtenerVehiculosPorTerreno, type MotivosDeBajaEnBaja, type TiposDeTerrenoEnBaja } from "@/api/Neumaticos";
+import { obtenerDisenosConNeumaticosEnBaja, obtenerDistribucionMotivoDeBaja, obtenerDistribucionPorTerrenoBajas, obtenerLosTalleresDelUsuario, obtenerMarcasConNeumaticosEnBaja, obtenerTalleresConNeumaticosEnBaja, obtenerTodasLasMarcas, obtenerTodosLosDisenos, obtenerVehiculosPorTerreno, type MotivosDeBajaEnBaja, type TiposDeTerrenoEnBaja } from "@/api/Neumaticos";
 import { BarChartSkeleton } from "@/components/ui/bar-chart-skeleton";
 import { DonutChartSkeleton } from "@/components/ui/donut-chart-skeleton";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -258,20 +258,20 @@ export default function ReporteNeumaticoBaja() {
 
   // * marcas
   const { data: marcasConNeumaticosEnBaja = [], isLoading: isLoadingSelectMarca } = useQuery({
-    queryKey: ['marcas-con-neumaticos-en-baja'],
-    queryFn: obtenerMarcasConNeumaticosEnBaja
+    queryKey: ['select-marcas'],
+    queryFn: obtenerTodasLasMarcas
   })
 
   // * talleres
   const { data: talleresConNeumaticosEnBaja = [], isLoading: isLoadingSelectTaller } = useQuery({
-    queryKey: ['talleres-con-neumaticos-en-baja'],
-    queryFn: obtenerTalleresConNeumaticosEnBaja
-  })
+    queryKey: ['talleres-del-usuario'],
+    queryFn: obtenerLosTalleresDelUsuario,
+  });
 
   // * diseños
   const { data: disenosConNeumaticosEnBaja = [], isLoading: isLoadingSelectDiseno } = useQuery({
-    queryKey: ['disenos-con-neumaticos-en-baja'],
-    queryFn: obtenerDisenosConNeumaticosEnBaja
+    queryKey: ['select-diseños'],
+    queryFn: obtenerTodosLosDisenos
   })
 
   // * distribución de tipo de terreno en baja

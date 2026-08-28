@@ -13,8 +13,10 @@ export default function IntegrationsLayout({
   children: React.ReactNode
 }) {
   return (
-    <PermissionGuard allowedUsers={['GESNEU', 'EGAMBOA']}>
+    <>
       {children}
-    </PermissionGuard>
+    </>
+    // <PermissionGuard allowedUsers={['GESNEU', 'EGAMBOA']}>
+    // </PermissionGuard>
   )
 }
