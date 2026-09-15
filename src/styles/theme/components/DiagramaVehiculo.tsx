@@ -440,7 +440,7 @@ const PosicionNeumatico: React.FC<{
                             border: '1px solid #b9b9b9',
                         }}
                     >
-                        {` ${neumatico.PRESION_AIRE} psi`}
+                        {` ${neumatico.REMANENTE} mm`}
                     </Box>
                 ) : (
                     <Box
@@ -465,7 +465,7 @@ const PosicionNeumatico: React.FC<{
                             border: '1px solid #b9b9b9',
                         }}
                     >
-                        {` ${neumatico.PRESION_AIRE} psi`}
+                        {` ${neumatico.REMANENTE} mm`}
                     </Box>
                 )
             )}
