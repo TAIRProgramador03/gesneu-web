@@ -40,6 +40,7 @@ export interface PadronExcel {
   RECUPERADO?: boolean | undefined
   ESTADO: number
   PLACA?: string
+  POSICION_NEU?: string
   PRESION_AIRE: number,
   TORQUE_ACTUAL: number
   KILOMETRO: number

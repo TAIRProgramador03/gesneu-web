@@ -30,6 +30,7 @@ export interface Customer {
   TIPO_MOVIMIENTO: string;
   ESTADO: number;
   PLACA?: string; // Añadido para poder agrupar por placa
+  POSICION_NEU?: string;
   RECUPERADO?: boolean,
   PRESION_AIRE: number,
   TORQUE_ACTUAL: number

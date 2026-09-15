@@ -252,6 +252,15 @@ export const columnsPadron: ColumnDef<PadronExcel>[] = [
     },
   },
   {
+    accessorKey: "POSICION_NEU",
+    meta: { exportLabel: "Posición" },
+    header: "Posición",
+    cell: ({ row }) => {
+      if (!row.original.POSICION_NEU) return '-'
+      return row.original.POSICION_NEU
+    },
+  },
+  {
     accessorKey: "PRIMER_ODOMETRO",
     meta: { exportLabel: "Odometro montaje" },
     cell: ({ row }) => row.original.PRIMER_ODOMETRO !== null ? row.original.PRIMER_ODOMETRO : '-',
