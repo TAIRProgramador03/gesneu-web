@@ -175,13 +175,17 @@ export function DataTableNeumaticos<TData, TValue>({
       }
 
       <div className="overflow-hidden rounded-md border">
-        <Table>
+        <Table containerClassName="relative w-full max-h-[480px] overflow-auto">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead key={header.id} className="font-bold text-center">
+                    <TableHead
+                      key={header.id}
+                      className="sticky top-0 z-10 font-bold text-center bg-sky-900 text-white"
+                      style={{ '--accent': 'rgba(255,255,255,0.15)', '--accent-foreground': '#ffffff' } as React.CSSProperties}
+                    >
                       {header.isPlaceholder
                         ? null
                         : flexRender(
@@ -212,8 +216,9 @@ export function DataTableNeumaticos<TData, TValue>({
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
                   {isLoading ? (
-                    <div className="flex items-center justify-center">
+                    <div className="flex gap-1 items-center justify-center">
                       <Spinner className="size-6" />
+                      <span className="italic">Cargando</span>
                     </div>
                   ) : (
                     "Sin resultados."

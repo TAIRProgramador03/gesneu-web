@@ -75,10 +75,8 @@ const DiagramaVehiculo: React.FC<DiagramaVehiculoProps & { onPosicionClick?: (ne
     }
     // Eliminar useMemo para evitar cache y forzar procesamiento inmediato
     const neumaticosFiltrados = (() => {
-        // En el modal reubicar, usar directamente los datos sincronizados
         if (tipoModal === 'mantenimiento') {
 
-            // PROCESAMIENTO DIRECTO - datos ya están sincronizados
             const result = neumaticosAsignados.filter((n: any) => n.TIPO_MOVIMIENTO !== 'BAJA DEFINITIVA');
             return result;
         }
@@ -107,22 +105,11 @@ const DiagramaVehiculo: React.FC<DiagramaVehiculoProps & { onPosicionClick?: (ne
         return result;
     })();
 
-    // --- INICIO INTEGRACIÓN MODALES ---
-    const [openMantenimiento, setOpenMantenimiento] = React.useState(false);
-    const [openInspeccion, setOpenInspeccion] = React.useState(false);
-
-    // Definir placa y neumaticosAsignados para los modales
-    // Usar solo la prop 'placa' (no buscar en los neumáticos)
     const placaModal = placa || '';
-    // Usar el array original de neumáticos asignados, asegurando que CODIGO nunca sea undefined
     const neumaticosAsignadosModal = neumaticosAsignados.map((n: any) => ({
         ...n,
         CODIGO: n.CODIGO ?? '', // Forzar string
     }));
-
-    // Puedes ajustar cuándo abrir cada modal según tu lógica
-    // Por ejemplo, podrías abrir el modal de mantenimiento con un botón o acción específica
-    // Aquí solo se muestra la integración básica
 
     return (
         <>

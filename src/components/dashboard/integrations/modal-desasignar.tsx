@@ -59,8 +59,8 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
   enTransito,
   taller
 }) => {
-
-
+  
+  
   const [neumaticosAsignadosState, setNeumaticosAsignadosState] = useState<NeumaticoExtendido[]>([]);
   const [initialAssignedMap, setInitialAssignedMap] = useState<Record<string, Neumatico>>({});
   const [fechaUltimaInspeccion, setFechaUltimaInspeccion] = useState<any>(null);
@@ -180,14 +180,15 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
           );
 
           // Crear objeto de neumático temporal para mostrar en diagrama
-          // NOTA: No se incluye REMANENTE porque sin REMANENTE_ORIGINAL ni ESTADO se interpreta
-          // erróneamente como porcentaje y pinta el neumático de rojo. El neumático recién asignado
-          // aún no tiene inspección, por lo que se muestra sin color (transparente).
+          // Se incluye REMANENTE (el valor recién ingresado) para mostrarlo en el diagrama.
+          // No pinta de rojo porque DiagramaVehiculo fuerza el color turquesa cuando
+          // TIPO_MOVIMIENTO === 'TEMPORAL', sin importar REMANENTE.
           const neumaticoTemporal: any = {
             CODIGO: asig.CodigoNeumatico?.toString(),
             CODIGO_NEU: asig.CodigoNeumatico?.toString(),
             POSICION: asig.Posicion,
             POSICION_NEU: asig.Posicion,
+            REMANENTE: asig.Remanente,
             PRESION_AIRE: asig.PresionAire,
             TORQUE_APLICADO: asig.TorqueAplicado,
             TIPO_MOVIMIENTO: 'TEMPORAL', // Marcador para identificar asignaciones temporales

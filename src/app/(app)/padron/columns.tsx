@@ -23,6 +23,7 @@ export const columnsPadron: ColumnDef<PadronExcel>[] = [
         }
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
         aria-label="Seleccionar todo"
+        className="border-white data-[state=checked]:bg-white data-[state=checked]:text-sky-900 data-[state=indeterminate]:bg-white data-[state=indeterminate]:text-sky-900"
       />
     ),
     cell: ({ row }) => (
