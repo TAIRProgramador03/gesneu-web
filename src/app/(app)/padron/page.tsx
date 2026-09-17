@@ -17,12 +17,13 @@ import Stack from '@mui/material/Stack';
 import styled from '@emotion/styled';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { LoadingButton2 } from '@/components/ui/loading-button2';
-import { ListRestart, RefreshCw, Sheet, TrendingUpDown } from 'lucide-react';
+import { BanknoteArrowUp, ListRestart, RefreshCw, Sheet, TrendingUpDown } from 'lucide-react';
 import { ModalReubicarNeumatico } from '@/components/dashboard/padron/modal-reubicar-neumatico';
 import { useSelectPadron } from '@/hooks/use-select-padron';
 import { MultiSearchSelect } from '@/components/ui/multiple-select';
 import { SearchSelect } from '@/components/ui/search-select';
 import { ModalAsignacionMasivaNeumatico } from '@/components/dashboard/padron/modal-asignacion-masiva-neumatico';
+import { ModalVentaNeumatico } from '@/components/dashboard/padron/modal-venta-neumatico';
 
 export default function Page(): React.JSX.Element {
 
@@ -35,6 +36,7 @@ export default function Page(): React.JSX.Element {
   const [modalImportarVisible, setModalImportarVisible] = useState(false);
   const [modalReubicarVisible, setModalReubicarVisible] = useState(false);
   const [modalAsignacionMasivaVisible, setModalAsignacionMasivaVisible] = useState(false);
+  const [modalVenta, setModalVenta] = useState(false);
 
   const [talleresSelected, setTalleresSelected] = useState<string[]>([]);
   const [marcasSelected, setMarcasSelected] = useState<string[]>([]);
@@ -199,6 +201,14 @@ export default function Page(): React.JSX.Element {
               disabled={loading || esJefeTaller || isLoadingCustomers}
             >
               Asignación Masiva
+            </LoadingButton2>
+            <LoadingButton2
+              variant={'rose'}
+              icon={<BanknoteArrowUp />}
+              onClick={() => setModalVenta(true)}
+              disabled={loading || isLoadingCustomers}
+            >
+              Vender Neumático(s)
             </LoadingButton2>
             <LoadingButton2
               variant={'indigo'}
@@ -457,6 +467,16 @@ export default function Page(): React.JSX.Element {
           <ModalAsignacionMasivaNeumatico
             open={modalAsignacionMasivaVisible}
             onClose={() => setModalAsignacionMasivaVisible(false)}
+            onSuccess={() => customersRefetch()}
+          />
+        )
+      }
+
+      {
+        modalVenta && (
+          <ModalVentaNeumatico
+            open={modalVenta}
+            onClose={() => setModalVenta(false)}
             onSuccess={() => customersRefetch()}
           />
         )

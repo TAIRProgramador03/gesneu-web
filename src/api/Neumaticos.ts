@@ -1087,6 +1087,66 @@ export const relacionNeumaticosDespachados = async (talleresSeleccionados: strin
   }
 }
 
+export interface NeumaticoParaVenta {
+  ID_NEUMATICO: number
+  CODIGO: string
+  MARCA: string
+  MEDIDA: string
+  DISEÑO: string
+  PROYECTO: string
+  COSTO: number
+  RECUPERADO: boolean
+  ESTADO: number
+  ESTADO_ACTUAL: number
+  TIPO_MOVIMIENTO: string
+  REMANENTE: number
+}
+
+export const obtenerNeumaticosDisponiblesParaVenta = async (codigo = '') => {
+  try {
+    const response = await axios.get<NeumaticoParaVenta[]>(`/api/po-neumaticos/neumaticos-disponibles-para-venta`,
+      {
+        params: { codigo },
+        withCredentials: true
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error en obtenerNeumaticosDisponiblesParaVenta:', error);
+    throw error;
+  }
+}
+
+export interface PayloadRegistrarVenta {
+  numeroCotizacion: string
+  comentarios?: string
+  neumaticos: {
+    idNeumatico: number
+    costoVenta: number
+    remanenteAlVender?: number
+    estadoAlVender?: number
+  }[]
+}
+
+export interface ResumenVentaNeumaticos {
+  idVenta: number
+  neumaticosVendidos: number
+}
+
+export const registrarVentaNeumaticos = async (payload: PayloadRegistrarVenta) => {
+  try {
+    const response = await axios.post<ResumenVentaNeumaticos>(
+      `/api/po-neumaticos/registrar-venta`,
+      payload,
+      { withCredentials: true }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error en registrarVentaNeumaticos:', error);
+    throw error;
+  }
+}
+
 
 // TODO: ---------------------------------- Asignación masiva Excel ----------------------------------
 
