@@ -217,7 +217,7 @@ const ModalInputsNeu: React.FC<ModalInputsNeuProps> = ({ open, onClose, onSubmit
                             {
                                 esRecuperado && (
                                     <span className='text-green-600 ml-3.5 font-normal italic text-xs mt-0.75'>
-                                        {`Neúmatico recuperado`}
+                                        {`Neumático recuperado`}
                                     </span>
                                 )
                             }
