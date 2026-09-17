@@ -3,7 +3,7 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import { Box, Card, Dialog, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material'
 import { Stack } from '@mui/system'
-import { BanknoteArrowUp, PackageSearch, RotateCw, Search, SquareCheck, X } from 'lucide-react'
+import { BanknoteArrowUp, ChevronLeft, ChevronRight, PackageSearch, RotateCw, Search, SquareCheck, X } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button as ButtonCustom } from '@/components/ui/button'
 import { LoadingButton2 } from '@/components/ui/loading-button2'
@@ -19,6 +19,8 @@ import { NeumaticoParaVenta, obtenerNeumaticosDisponiblesParaVenta, registrarVen
 
 const formatCosto = (costo: number) =>
   new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(costo ?? 0)
+
+const NEUMATICOS_POR_PAGINA = 50
 
 interface ModalVentaNeumaticoProps {
   open: boolean;
@@ -75,6 +77,7 @@ const NeumaticoRow = React.memo(function NeumaticoRow({
 
 export const ModalVentaNeumatico = ({ open, onClose, onSuccess }: ModalVentaNeumaticoProps) => {
   const [busqueda, setBusqueda] = useState('')
+  const [pagina, setPagina] = useState(0)
   const [seleccionados, setSeleccionados] = useState<NeumaticoParaVenta[]>([])
   const [numeroCotizacion, setNumeroCotizacion] = useState('')
   const [comentarios, setComentarios] = useState('')
@@ -86,6 +89,21 @@ export const ModalVentaNeumatico = ({ open, onClose, onSuccess }: ModalVentaNeum
     queryFn: () => obtenerNeumaticosDisponiblesParaVenta(busqueda)
   })
 
+  const totalPaginas = Math.max(1, Math.ceil(neumaticosDisponiblesParaVenta.length / NEUMATICOS_POR_PAGINA))
+  const paginaActual = Math.min(pagina, totalPaginas - 1)
+  const neumaticosPagina = useMemo(
+    () => neumaticosDisponiblesParaVenta.slice(
+      paginaActual * NEUMATICOS_POR_PAGINA,
+      (paginaActual + 1) * NEUMATICOS_POR_PAGINA
+    ),
+    [neumaticosDisponiblesParaVenta, paginaActual]
+  )
+
+  const cambiarBusqueda = (value: string) => {
+    setBusqueda(value)
+    setPagina(0)
+  }
+
   const toggleSeleccion = useCallback((neu: NeumaticoParaVenta) => {
     setSeleccionados(prev =>
       prev.some(n => n.ID_NEUMATICO === neu.ID_NEUMATICO)
@@ -94,16 +112,16 @@ export const ModalVentaNeumatico = ({ open, onClose, onSuccess }: ModalVentaNeum
     )
   }, [])
 
-  const todosVisiblesSeleccionados = neumaticosDisponiblesParaVenta.length > 0 &&
-    neumaticosDisponiblesParaVenta.every(neu => seleccionados.some(n => n.ID_NEUMATICO === neu.ID_NEUMATICO))
+  const todosVisiblesSeleccionados = neumaticosPagina.length > 0 &&
+    neumaticosPagina.every(neu => seleccionados.some(n => n.ID_NEUMATICO === neu.ID_NEUMATICO))
 
   const toggleSeleccionarTodosVisibles = () => {
     if (todosVisiblesSeleccionados) {
-      setSeleccionados(prev => prev.filter(n => !neumaticosDisponiblesParaVenta.some(neu => neu.ID_NEUMATICO === n.ID_NEUMATICO)))
+      setSeleccionados(prev => prev.filter(n => !neumaticosPagina.some(neu => neu.ID_NEUMATICO === n.ID_NEUMATICO)))
     } else {
       setSeleccionados(prev => [
         ...prev,
-        ...neumaticosDisponiblesParaVenta.filter(neu => !prev.some(n => n.ID_NEUMATICO === neu.ID_NEUMATICO))
+        ...neumaticosPagina.filter(neu => !prev.some(n => n.ID_NEUMATICO === neu.ID_NEUMATICO))
       ])
     }
   }
@@ -118,6 +136,7 @@ export const ModalVentaNeumatico = ({ open, onClose, onSuccess }: ModalVentaNeum
     setNumeroCotizacion('')
     setComentarios('')
     setBusqueda('')
+    setPagina(0)
   }
 
   const handleClose = () => {
@@ -193,14 +212,14 @@ export const ModalVentaNeumatico = ({ open, onClose, onSuccess }: ModalVentaNeum
               <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
               <Input
                 value={busqueda}
-                onChange={(e) => setBusqueda(e.target.value)}
+                onChange={(e) => cambiarBusqueda(e.target.value)}
                 placeholder="Buscar por código"
                 className="h-9 pl-9 pr-8"
               />
               {busqueda.length > 0 && (
                 <button
                   type="button"
-                  onClick={() => setBusqueda('')}
+                  onClick={() => cambiarBusqueda('')}
                   className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
                   aria-label="Limpiar búsqueda"
                 >
@@ -217,7 +236,7 @@ export const ModalVentaNeumatico = ({ open, onClose, onSuccess }: ModalVentaNeum
                   aria-label="Seleccionar todos los visibles"
                 />
                 <span className="text-xs text-slate-500">
-                  Seleccionar todos los visibles ({neumaticosDisponiblesParaVenta.length})
+                  Seleccionar todos los visibles de esta página ({neumaticosPagina.length} de {neumaticosDisponiblesParaVenta.length})
                 </span>
                 {isFetching && !isLoading && <Spinner className="size-3.5 text-slate-400" />}
               </div>
@@ -239,7 +258,7 @@ export const ModalVentaNeumatico = ({ open, onClose, onSuccess }: ModalVentaNeum
                 </div>
               ) : (
                 <div className="flex flex-col gap-2">
-                  {neumaticosDisponiblesParaVenta.map((neu) => (
+                  {neumaticosPagina.map((neu) => (
                     <NeumaticoRow
                       key={neu.ID_NEUMATICO}
                       neu={neu}
@@ -250,6 +269,34 @@ export const ModalVentaNeumatico = ({ open, onClose, onSuccess }: ModalVentaNeum
                 </div>
               )}
             </div>
+
+            {!isLoading && neumaticosDisponiblesParaVenta.length > NEUMATICOS_POR_PAGINA && (
+              <div className="flex items-center justify-between mt-2 px-1">
+                <span className="text-xs text-slate-500">
+                  Página {paginaActual + 1} de {totalPaginas}
+                </span>
+                <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={() => setPagina(p => Math.max(0, p - 1))}
+                    disabled={paginaActual === 0}
+                    className="p-1.5 rounded-md border border-slate-200 text-slate-500 hover:bg-slate-100 disabled:opacity-40 disabled:hover:bg-transparent"
+                    aria-label="Página anterior"
+                  >
+                    <ChevronLeft size={14} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPagina(p => Math.min(totalPaginas - 1, p + 1))}
+                    disabled={paginaActual >= totalPaginas - 1}
+                    className="p-1.5 rounded-md border border-slate-200 text-slate-500 hover:bg-slate-100 disabled:opacity-40 disabled:hover:bg-transparent"
+                    aria-label="Página siguiente"
+                  >
+                    <ChevronRight size={14} />
+                  </button>
+                </div>
+              </div>
+            )}
 
             {seleccionados.length > 0 && (
               <div className="mt-3 rounded-lg bg-rose-50 border border-rose-200 p-2.5">
