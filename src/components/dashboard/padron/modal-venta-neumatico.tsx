@@ -58,7 +58,7 @@ const NeumaticoRow = React.memo(function NeumaticoRow({
           <TipoMovimientoBadge tipoMovimiento={neu.TIPO_MOVIMIENTO} />
         </div>
         <p className="text-xs text-slate-500 truncate mt-0.5">
-          {neu.MARCA} · {neu.MEDIDA} · {neu.PROYECTO}
+          {neu.MARCA} · {neu.MEDIDA} · {neu.DISEÑO} · {neu.PROYECTO}
         </p>
       </div>
 
