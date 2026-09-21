@@ -1148,6 +1148,31 @@ export const registrarVentaNeumaticos = async (payload: PayloadRegistrarVenta) =
 }
 
 
+export interface Camioneta {
+  ID: number
+  PLACA: string
+  CANTIDAD_NEUMATICOS: number
+  KILOMETRAJE?: number
+  TALLER?: string
+  ID_OPERACION?: number
+  ID_SUPERVISOR?: string
+}
+
+
+export const obtenerVehiculosDeCamionetas = async () => {
+  try {
+    const response = await axios.get<Camioneta[]>(
+      `/api/vehiculo/camionetas`,
+      { withCredentials: true }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error en obtenerVehiculosDeCamionetas:', error);
+    throw error;
+  }
+}
+
+
 // TODO: ---------------------------------- Asignación masiva Excel ----------------------------------
 
 export interface NeumaticoAsignacion {

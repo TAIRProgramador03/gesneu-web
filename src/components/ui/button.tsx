@@ -24,6 +24,7 @@ const buttonVariants = cva(
         indigo: "bg-indigo-600 text-primary-foreground shadow hover:bg-indigo-700",
         amber: "bg-amber-600 text-primary-foreground shadow hover:bg-amber-700",
         rose: "bg-rose-600 text-primary-foreground shadow hover:bg-rose-700",
+        lime: "bg-lime-600 text-primary-foreground shadow hover:bg-lime-700",
         warning: "bg-yellow-600 text-primary-foreground shadow hover:bg-yellow-700",
         link: "text-primary underline-offset-4 hover:underline",
       },

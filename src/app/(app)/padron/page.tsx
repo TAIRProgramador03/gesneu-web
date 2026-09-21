@@ -17,13 +17,17 @@ import Stack from '@mui/material/Stack';
 import styled from '@emotion/styled';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { LoadingButton2 } from '@/components/ui/loading-button2';
-import { BanknoteArrowUp, ListRestart, RefreshCw, Sheet, TrendingUpDown } from 'lucide-react';
+import { ArrowLeftRightIcon, BanknoteArrowUp, ListRestart, RefreshCw, Replace, Sheet, TrendingUpDown } from 'lucide-react';
 import { ModalReubicarNeumatico } from '@/components/dashboard/padron/modal-reubicar-neumatico';
 import { useSelectPadron } from '@/hooks/use-select-padron';
 import { MultiSearchSelect } from '@/components/ui/multiple-select';
 import { SearchSelect } from '@/components/ui/search-select';
 import { ModalAsignacionMasivaNeumatico } from '@/components/dashboard/padron/modal-asignacion-masiva-neumatico';
 import { ModalVentaNeumatico } from '@/components/dashboard/padron/modal-venta-neumatico';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Button as ButtonCustom } from '@/components/ui/button';
+import { ClipboardText } from '@phosphor-icons/react';
+import { ModalAsignacionCamiones } from '@/components/dashboard/padron/modal-asignacion-camiones';
 
 export default function Page(): React.JSX.Element {
 
@@ -37,6 +41,7 @@ export default function Page(): React.JSX.Element {
   const [modalReubicarVisible, setModalReubicarVisible] = useState(false);
   const [modalAsignacionMasivaVisible, setModalAsignacionMasivaVisible] = useState(false);
   const [modalVenta, setModalVenta] = useState(false);
+  const [modalAsignacionCamiones, setModalAsignacionCamiones] = useState(false);
 
   const [talleresSelected, setTalleresSelected] = useState<string[]>([]);
   const [marcasSelected, setMarcasSelected] = useState<string[]>([]);
@@ -202,22 +207,41 @@ export default function Page(): React.JSX.Element {
             >
               Asignación Masiva
             </LoadingButton2>
-            <LoadingButton2
-              variant={'rose'}
-              icon={<BanknoteArrowUp />}
-              onClick={() => setModalVenta(true)}
-              disabled={loading || isLoadingCustomers}
-            >
-              Vender Neumático(s)
-            </LoadingButton2>
-            <LoadingButton2
-              variant={'indigo'}
-              icon={<TrendingUpDown />}
-              onClick={() => setModalReubicarVisible(true)}
-              disabled={loading || esJefeTaller || isLoadingCustomers}
-            >
-              Reubicar Neumático
-            </LoadingButton2>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <ButtonCustom variant="lime"
+                >
+                  <ClipboardText />
+                  Acciones para Neumáticos
+                </ButtonCustom>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-40" align="start">
+                <DropdownMenuGroup>
+                  <DropdownMenuItem
+                    onClick={() => setModalVenta(true)}
+                    disabled={loading || isLoadingCustomers}
+                  >
+                    <BanknoteArrowUp />
+                    Vender Neumáticos
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => setModalReubicarVisible(true)}
+                    disabled={loading || esJefeTaller || isLoadingCustomers}
+                  >
+                    <TrendingUpDown />
+                    Reubicar Neumáticos
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => setModalAsignacionCamiones(true)}
+                    disabled={loading || isLoadingCustomers}
+                  >
+                    <Replace />
+                    Asignar para Camiones
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
             <LoadingButton2
               variant={'teal'}
               icon={<DownloadIcon />}
@@ -477,6 +501,16 @@ export default function Page(): React.JSX.Element {
           <ModalVentaNeumatico
             open={modalVenta}
             onClose={() => setModalVenta(false)}
+            onSuccess={() => customersRefetch()}
+          />
+        )
+      }
+
+      {
+        modalAsignacionCamiones && (
+          <ModalAsignacionCamiones
+            open={modalAsignacionCamiones}
+            onClose={() => setModalAsignacionCamiones(false)}
             onSuccess={() => customersRefetch()}
           />
         )
