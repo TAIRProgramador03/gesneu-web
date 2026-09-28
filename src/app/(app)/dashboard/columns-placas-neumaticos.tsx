@@ -7,6 +7,8 @@ import Link from "next/link"
 
 const getBadgeColor = (cantidad: number) => {
   if (cantidad === 0) return 'bg-red-100 text-red-700 border border-red-500'
+  if (cantidad === 2) return 'bg-violet-100 text-violet-700 border border-violet-500'
+  if (cantidad === 7) return 'bg-amber-100 text-amber-700 border border-amber-500'
   if (cantidad === 5) return 'bg-cyan-100 text-cyan-700 border border-cyan-500'
   return 'bg-gray-100 text-gray-700 border border-gray-300'
 }

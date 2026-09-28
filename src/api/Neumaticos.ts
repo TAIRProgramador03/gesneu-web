@@ -1177,7 +1177,9 @@ export const obtenerVehiculosDeCamionetas = async () => {
 
 export interface NeumaticoAsignacion {
   codigo: string;
-  posicion: 'POS01' | 'POS02' | 'POS03' | 'POS04' | 'RES01';
+  /** Código de posición (POS01, POS02, ..., RES01). El set válido depende de la cantidad
+   *  de neumáticos del vehículo — ver `obtenerConfiguracionNeumaticos` en utils. */
+  posicion: string;
   remanente: number;
   presion: number;
   torque: number | null;

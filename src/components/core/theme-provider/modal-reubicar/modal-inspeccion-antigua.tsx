@@ -1,14 +1,9 @@
 import React, { memo } from 'react';
-import Dialog from '@mui/material/Dialog';
-import DialogContent from '@mui/material/DialogContent';
-import DialogActions from '@mui/material/DialogActions';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
-import Box from '@mui/material/Box';
-import FactCheckIcon from '@mui/icons-material/FactCheck';
+import { CalendarX2 } from 'lucide-react';
 import { Button as ButtonCustom } from '@/components/ui/button';
+import ModalAviso from '@/components/core/modal-aviso';
 
-interface ModalInspeccionObligatoriaProps {
+interface ModalInspeccionAntiguaProps {
   open: boolean;
   onClose: () => void;
   onRegistrarInspeccion: () => void;
@@ -16,48 +11,25 @@ interface ModalInspeccionObligatoriaProps {
   fechaInspeccion: string
 }
 
-const ModalInspeccionAntigua: React.FC<ModalInspeccionObligatoriaProps> = memo(({ open, onClose, onRegistrarInspeccion, diffDias, fechaInspeccion }) => (
-  <Dialog
+const ModalInspeccionAntigua: React.FC<ModalInspeccionAntiguaProps> = memo(({ open, onClose, onRegistrarInspeccion, diffDias, fechaInspeccion }) => (
+  <ModalAviso
     open={open}
     onClose={onClose}
-    PaperProps={{ sx: { borderRadius: 3, minWidth: 600, maxWidth: 700 } }}
-  >
-    <DialogContent sx={{ bgcolor: '#eaf6fb', borderRadius: 2, p: 0 }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', p: 3, pb: 2 }}>
-        <FactCheckIcon color="primary" sx={{ fontSize: 48, mr: 2, mt: 0.5 }} />
-        <Box sx={{ flex: 1 }}>
-          <Typography variant="h5" fontWeight="bold" color="primary" sx={{ mb: 1 }}>
-            INSPECCIÓN ANTIGUA
-          </Typography>
-          <Typography sx={{ fontSize: 16, color: '#222', mb: 1 }}>
-            La última inspección ({fechaInspeccion}) de este vehiculo es muy antigua. Debe realizar una nueva inspección antes de reubicar.
-          </Typography>
-          <Typography sx={{ fontSize: 15, color: '#1976d2', mb: 1 }}>
-            Acción: Reubicar neumático
-          </Typography>
-        </Box>
-        <img
-          src="/assets/inspeccionVehiculo.png"
-          alt="Inspección Vehículo"
-          style={{ width: 70, height: 70, marginLeft: 16, marginTop: 4, borderRadius: 8 }}
-        />
-      </Box>
-    </DialogContent>
-    <DialogActions sx={{ p: 3, backgroundColor: '#eaf6fb', justifyContent: 'flex-end', gap: 2 }}>
-
-      <ButtonCustom
-        onClick={onClose}
-      >
-        Cerrar
-      </ButtonCustom>
-      <ButtonCustom
-        variant={'teal'}
-        onClick={onRegistrarInspeccion}
-      >
-        Registrar nueva inspección
-      </ButtonCustom>
-    </DialogActions>
-  </Dialog>
+    tono="azul"
+    icono={<CalendarX2 className="h-5 w-5 sm:h-6 sm:w-6" />}
+    titulo="INSPECCIÓN ANTIGUA"
+    mensaje={`La última inspección (${fechaInspeccion}) de este vehículo es muy antigua. Debe realizar una nueva inspección antes de reubicar.`}
+    detalle="Acción: Reubicar neumático"
+    imagen="/assets/inspeccionVehiculo.png"
+    acciones={
+      <>
+        <ButtonCustom onClick={onClose}>Cerrar</ButtonCustom>
+        <ButtonCustom variant="teal" onClick={onRegistrarInspeccion}>
+          Registrar nueva inspección
+        </ButtonCustom>
+      </>
+    }
+  />
 ));
 
 export default ModalInspeccionAntigua;

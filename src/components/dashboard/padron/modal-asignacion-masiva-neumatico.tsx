@@ -66,7 +66,9 @@ const MotivoFila = ({ motivo }: { motivo?: string }) => (
 
 /**
  * Regla de negocio: POSICION solo condiciona el campo TORQUE.
- * - POS01-POS04: TORQUE obligatorio, rango 110-160 Nm.
+ * - Posiciones montadas: TORQUE obligatorio, dentro del rango del tipo de vehículo
+ *   (moto 30-90 N·m, camioneta y camión 110-160). El backend lo valida por placa según
+ *   su cantidad de neumáticos, así que un mismo Excel puede mezclar tipos.
  * - RES01 (repuesto): TORQUE deshabilitado, forzado a 0, sin validación de rango.
  * REMANENTE, PRESION y FECHA_ASIGNACION son obligatorios y se validan igual en ambos casos.
  */
@@ -102,7 +104,7 @@ const TablaNeumaticosPlaca = ({ neumaticos, mostrarMotivo }: { neumaticos: Neuma
             <th className="text-left font-semibold px-3 py-2">
               <span
                 className="inline-flex items-center gap-1"
-                title="Obligatorio y validado (110-160 Nm) solo en POS01-POS04. En RES01 se deshabilita y se guarda como 0."
+                title="Obligatorio en las posiciones montadas, dentro del rango del tipo de vehículo (moto 30-90 N·m; camioneta y camión 110-160). En el repuesto (RES01) se deshabilita y se guarda como 0."
               >
                 Torque
                 <Info size={11} className="text-slate-300" />
@@ -244,8 +246,6 @@ const descargarReporte = (resultado: ResultadoProcesamiento) => {
   XLSXStyle.utils.book_append_sheet(wb, ws, 'Reporte');
   XLSXStyle.writeFile(wb, 'GESNEU_REPORTE-ASIGNACION-MASIVA.xlsx');
 };
-
-const POSICIONES: Posicion[] = ['POS01', 'POS02', 'POS03', 'POS04', 'RES01'];
 
 export const ModalAsignacionMasivaNeumatico = ({ open, onClose, onSuccess }: ModalAsignacionMasivaNeumaticoProps) => {
   const [paso, setPaso] = useState<PasoModal>('carga');

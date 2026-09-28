@@ -27,7 +27,6 @@ import { ModalVentaNeumatico } from '@/components/dashboard/padron/modal-venta-n
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Button as ButtonCustom } from '@/components/ui/button';
 import { ClipboardText } from '@phosphor-icons/react';
-import { ModalAsignacionCamiones } from '@/components/dashboard/padron/modal-asignacion-camiones';
 
 export default function Page(): React.JSX.Element {
 
@@ -41,7 +40,6 @@ export default function Page(): React.JSX.Element {
   const [modalReubicarVisible, setModalReubicarVisible] = useState(false);
   const [modalAsignacionMasivaVisible, setModalAsignacionMasivaVisible] = useState(false);
   const [modalVenta, setModalVenta] = useState(false);
-  const [modalAsignacionCamiones, setModalAsignacionCamiones] = useState(false);
 
   const [talleresSelected, setTalleresSelected] = useState<string[]>([]);
   const [marcasSelected, setMarcasSelected] = useState<string[]>([]);
@@ -231,13 +229,6 @@ export default function Page(): React.JSX.Element {
                   >
                     <TrendingUpDown />
                     Reubicar Neumáticos
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => setModalAsignacionCamiones(true)}
-                    disabled={loading || isLoadingCustomers}
-                  >
-                    <Replace />
-                    Asignar para Camiones
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
               </DropdownMenuContent>
@@ -501,16 +492,6 @@ export default function Page(): React.JSX.Element {
           <ModalVentaNeumatico
             open={modalVenta}
             onClose={() => setModalVenta(false)}
-            onSuccess={() => customersRefetch()}
-          />
-        )
-      }
-
-      {
-        modalAsignacionCamiones && (
-          <ModalAsignacionCamiones
-            open={modalAsignacionCamiones}
-            onClose={() => setModalAsignacionCamiones(false)}
             onSuccess={() => customersRefetch()}
           />
         )

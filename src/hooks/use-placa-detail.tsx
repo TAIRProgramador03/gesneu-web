@@ -29,6 +29,8 @@ export interface VehiculoMain {
   ID_SUPERVISOR: string;
   TIPO_TERRENO: string;
   RETEN: string;
+  /** Cantidad de neumáticos del vehículo — define qué posiciones existen (2 moto, 5 auto, 7 camión). */
+  CANTIDAD_NEUMATICOS?: number;
   mensaje?: null | string
 }
 

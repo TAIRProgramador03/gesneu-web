@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useMemo, memo } from 'react';
 import {
-  Dialog, DialogContent, Typography, Button, Stack, Box, Card, TextField,
+  Dialog, DialogContent, Typography, Stack, Box, Card,
   DialogTitle,
-  Chip
+  Chip, useMediaQuery, useTheme
 } from '@mui/material';
-import { DndContext, DragEndEvent, DragStartEvent, useDraggable, useDroppable } from '@dnd-kit/core';
 import DiagramaVehiculo from '../../../styles/theme/components/DiagramaVehiculo';
 import { Neumatico, Vehiculo, User } from '../../../types/types';
 import {
@@ -12,13 +11,14 @@ import {
   getUltimaFechaInspeccionPorPlaca
 } from '../../../api/Neumaticos';
 import { toast } from 'sonner';
-import Image from 'next/image';
 import { convertToDateHuman } from '@/lib/utils';
-import { LoadingButton } from '@/components/ui/loading-button';
 import { Button as ButtonCustom } from '@/components/ui/button';
 import { LoadingButton2 } from '@/components/ui/loading-button2';
-import { BadgeAlert, ClipboardList } from 'lucide-react';
+import { ArrowLeftRight, BadgeAlert, Car, ClipboardList, MapPinned, Repeat2, X } from 'lucide-react';
+import { obtenerConfiguracionNeumaticos } from '@/utils/configuraciones-neumaticos';
 import { ModalInformacionReubicacion } from './modal-informacion-reubicacion';
+import { Field, FieldLabel } from '@/components/ui/field';
+import { Textarea } from '@/components/ui/textarea';
 
 interface ModalReubicarProps {
   open: boolean;
@@ -60,8 +60,6 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = memo(({
   // Estados para formulario
   const [observacion, setObservacion] = useState<string>('');
 
-  // Estado para controlar neumático en zona temporal (solo uno a la vez)
-  const [neumaticoEnZonaTemporal, setNeumaticoEnZonaTemporal] = useState<Neumatico | null>(null);
 
   // Estado para forzar re-renderización visual
   const [refreshKey, setRefreshKey] = useState(0);
@@ -71,6 +69,13 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = memo(({
 
   // Estado para mapa de posiciones ocupadas
   const [posicionesOcupadas, setPosicionesOcupadas] = useState<Map<string, Neumatico>>(new Map());
+
+  // En pantallas chicas arrastrar es poco práctico: se usa un panel de posiciones con botones
+  // (sacar / colocar / mover) que ejecuta exactamente las mismas operaciones que el drag&drop.
+  const theme = useTheme();
+  const esPantallaChica = useMediaQuery(theme.breakpoints.down('lg'));
+  // Reubicación por selección: se elige la posición de origen y luego la de destino.
+  const [posicionSeleccionada, setPosicionSeleccionada] = useState<string | null>(null);
 
   // Inicializar state cuando se abre el modal
   useEffect(() => {
@@ -138,8 +143,8 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = memo(({
       }));
       setDiagramaData(initialDiagramaData);
 
-      // Limpiar zona temporal y observación cuando se abre el modal
-      setNeumaticoEnZonaTemporal(null);
+      // Limpiar selección y observación cuando se abre el modal
+      setPosicionSeleccionada(null);
       setObservacion('');
     }
   }, [open]);
@@ -210,145 +215,52 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = memo(({
 
   };
 
-  // Handler para drop de neumático
-  const handleDropNeumatico = (neumatico: Neumatico, posicion: string) => {
+  /**
+   * Mueve el neumático de `origen` a `destino`. Si el destino está ocupado, ambos
+   * intercambian posición. El payload se arma comparando el estado inicial con el
+   * final, así que un intercambio genera los dos movimientos correspondientes.
+   */
+  const intercambiarPosiciones = (origen: string, destino: string) => {
+    if (!origen || !destino || origen === destino) return;
 
-    if (posicion === '') {
-      // Moviendo a zona temporal - solo permitir si no hay otro neumático
-      if (neumaticoEnZonaTemporal) {
-        toast.warning('Solo puede haber un neumático en la zona de reubicación a la vez.');
-        return;
-      }
+    const neuOrigen = neumaticosAsignadosState.find(n => n.POSICION === origen);
+    if (!neuOrigen) return;
 
-      if (neumatico.POSICION) {
-        // Mover neumático a zona temporal y liberar su posición
-        setNeumaticoEnZonaTemporal({ ...neumatico });
+    const neuDestino = neumaticosAsignadosState.find(n => n.POSICION === destino);
+    const codigoOrigen = neuOrigen.CODIGO_NEU || neuOrigen.CODIGO;
+    const codigoDestino = neuDestino ? (neuDestino.CODIGO_NEU || neuDestino.CODIGO) : null;
 
-        // Remover el neumático de su posición actual
-        const nuevosNeumaticos = neumaticosAsignadosState.filter(n =>
-          (n.CODIGO_NEU || n.CODIGO) !== (neumatico.CODIGO_NEU || neumatico.CODIGO)
-        );
-        actualizarEstados(nuevosNeumaticos);
+    const nuevosNeumaticos = neumaticosAsignadosState.map(n => {
+      const codigo = n.CODIGO_NEU || n.CODIGO;
+      if (codigo === codigoOrigen) return { ...n, POSICION: destino };
+      if (codigoDestino && codigo === codigoDestino) return { ...n, POSICION: origen };
+      return n;
+    });
 
-      }
-    }
+    actualizarEstados(nuevosNeumaticos);
   };
 
-  // Handler para fin de arrastre
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
+  /** Primer clic elige el neumático a mover; el segundo, su destino. */
+  const handleClickPosicion = (posicion: string) => {
+    if (!posicion) return;
 
-    if (!over) {
-      return;
-    }
-
-    const activeId = active.id as string;
-    const overId = over.id as string;
-    const activeData = active.data.current as Neumatico & { from?: string } | undefined;
-
-
-    // CASO 1: Movimiento desde zona temporal a una posición  
-    const codigoZonaTemporal = neumaticoEnZonaTemporal ? (neumaticoEnZonaTemporal.CODIGO_NEU || neumaticoEnZonaTemporal.CODIGO) : null;
-    // Verificar si viene de zona temporal: el activeId puede ser "zona-temporal-{codigo}" o solo el código
-    const esDesdeZonaTemporal = !!neumaticoEnZonaTemporal && (
-      activeId.toString().startsWith('zona-temporal-') ||
-      activeId.toString() === `zona-temporal-${codigoZonaTemporal}` ||
-      (neumaticoEnZonaTemporal.CODIGO_NEU || neumaticoEnZonaTemporal.CODIGO) === activeId ||
-      activeData?.POSICION === 'zona-temporal' ||
-      (activeData?.CODIGO_NEU || activeData?.CODIGO) === codigoZonaTemporal
-    );
-
-    if (esDesdeZonaTemporal) {
-
-      if (overId.startsWith('POS') || overId.startsWith('RES')) {
-        // Verificar si la posición de destino está ocupada
-        const neumaticoEnDestino = neumaticosAsignadosState.find(n => n.POSICION === overId);
-
-        if (neumaticoEnDestino) {
-          toast.warning(`La posición ${overId} ya está ocupada por ${neumaticoEnDestino.CODIGO_NEU || neumaticoEnDestino.CODIGO}`)
-          return;
-        }
-        // Eliminar cualquier instancia previa de este neumático (por código)
-        const codigo = neumaticoEnZonaTemporal.CODIGO_NEU || neumaticoEnZonaTemporal.CODIGO;
-        const nuevosNeumaticos = [
-          ...neumaticosAsignadosState.filter(n => (n.CODIGO_NEU || n.CODIGO) !== codigo),
-          { ...neumaticoEnZonaTemporal, POSICION: overId }
-        ];
-
-        actualizarEstados(nuevosNeumaticos);
-        setNeumaticoEnZonaTemporal(null);
-
+    if (!posicionSeleccionada) {
+      const ocupada = neumaticosAsignadosState.find(n => n.POSICION === posicion);
+      if (!ocupada) {
+        toast.info('Selecciona primero el neumático que quieres mover.');
         return;
       }
+      setPosicionSeleccionada(posicion);
       return;
     }
 
-    // CASO 2: Movimiento desde posición a zona temporal
-    if (overId === 'neumaticos-por-rotar') {
-
-      // Intentar obtener el neumático desde active.data.current primero (viene del diagrama)
-      let neumatico: Neumatico | undefined;
-      if (activeData) {
-        neumatico = activeData as Neumatico;
-      } else {
-        // Fallback: buscar en el estado por código o posición
-        neumatico = neumaticosAsignadosState.find(n =>
-          (n.CODIGO_NEU || n.CODIGO) === activeId ||
-          n.POSICION === activeId ||
-          (n.CODIGO_NEU || n.CODIGO || n.POSICION) === activeId
-        );
-      }
-
-      if (neumatico) {
-        handleDropNeumatico(neumatico, '');
-      }
+    if (posicionSeleccionada === posicion) {
+      setPosicionSeleccionada(null);
       return;
     }
 
-    // CASO 3: Movimiento directo entre posiciones (sin zona temporal)
-    if (overId.startsWith('POS') || overId.startsWith('RES')) {
-
-      // Intentar obtener el neumático desde active.data.current primero (viene del diagrama)
-      let neumatico: Neumatico | undefined;
-      if (activeData) {
-        neumatico = activeData as Neumatico;
-      } else {
-        // Fallback: buscar en el estado por código o posición
-        neumatico = neumaticosAsignadosState.find(n =>
-          (n.CODIGO_NEU || n.CODIGO) === activeId ||
-          n.POSICION === activeId
-        );
-      }
-
-      if (!neumatico) {
-        return;
-      }
-
-      const codigoNeumatico = neumatico.CODIGO_NEU || neumatico.CODIGO;
-
-      // Verificar si la posición de destino está ocupada por OTRO neumático
-      const neumaticoEnDestino = neumaticosAsignadosState.find(n =>
-        n.POSICION === overId && (n.CODIGO_NEU || n.CODIGO) !== codigoNeumatico
-      );
-
-      if (neumaticoEnDestino) {
-        toast.warning(`La posición ${overId} ya está ocupada por ${neumaticoEnDestino.CODIGO_NEU || neumaticoEnDestino.CODIGO}`)
-        return;
-      }
-
-      // Realizar el movimiento directo - actualizar solo el neumático correcto
-      const nuevosNeumaticos = neumaticosAsignadosState.map(n => {
-        const codigoN = n.CODIGO_NEU || n.CODIGO;
-        if (codigoN === codigoNeumatico) {
-          return { ...n, POSICION: overId };
-        }
-        return n;
-      });
-
-      actualizarEstados(nuevosNeumaticos);
-      return;
-    }
-
+    intercambiarPosiciones(posicionSeleccionada, posicion);
+    setPosicionSeleccionada(null);
   };
 
   const handleReturnNormalizedPayload = (dateUltimaInspeccion: string) => {
@@ -435,7 +347,6 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = memo(({
   }
 
   const verifyClickToConfirm = (): boolean => {
-    if (neumaticoEnZonaTemporal) return false
     if (!fechaUltimaInspeccion) return false
     const normalizedPayloadArray = handleReturnNormalizedPayload(fechaUltimaInspeccion);
     if (!normalizedPayloadArray) return false
@@ -561,30 +472,118 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = memo(({
 
   // Función para manejar cierre del modal
   const handleClose = () => {
-    setNeumaticoEnZonaTemporal(null); // Limpiar zona temporal
+    setPosicionSeleccionada(null);
     onClose();
   };
 
+  // Posiciones del vehículo (catálogo por cantidad de neumáticos; si no llega, las que ya existían).
+  const posicionesVehiculo = useMemo(() => {
+    const config = obtenerConfiguracionNeumaticos(vehiculo?.cantidad_neumaticos);
+    if (config) return config.posiciones.map(p => p.codigo);
+    return Object.keys(initialAssignedMap).sort();
+  }, [vehiculo?.cantidad_neumaticos, initialAssignedMap]);
+
+  const neumaticoSeleccionado = posicionSeleccionada
+    ? neumaticosAsignadosState.find(n => n.POSICION === posicionSeleccionada)
+    : undefined;
+
+  /** Lista de posiciones: elegir origen y luego destino (mueve o intercambia). */
+  const panelPosiciones = (
+    <div className="w-full">
+      {neumaticoSeleccionado ? (
+        <div className="mb-3 flex items-center gap-2 rounded-xl border-2 border-violet-300 bg-linear-to-br from-violet-50 via-white to-violet-50 p-3">
+          <span className="shrink-0 rounded-md bg-violet-600 px-2 py-1 text-xs font-bold text-white">{posicionSeleccionada}</span>
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-bold text-slate-800">
+              {neumaticoSeleccionado.CODIGO_NEU || neumaticoSeleccionado.CODIGO}
+              <span className="ml-2 text-xs font-normal text-slate-500">{neumaticoSeleccionado.MARCA}</span>
+            </p>
+            <p className="text-[11px] text-slate-500">Elige la posición de destino. Si está ocupada, se intercambian.</p>
+          </div>
+          <ButtonCustom variant="ghost" size="sm" onClick={() => setPosicionSeleccionada(null)} title="Cancelar">
+            <X className="h-3.5 w-3.5" />
+          </ButtonCustom>
+        </div>
+      ) : (
+        <p className="mb-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-500">
+          Elige el neumático que quieres mover —desde el diagrama o esta lista— y luego su posición de destino.
+        </p>
+      )}
+
+      <div className="flex flex-col gap-1.5">
+        {posicionesVehiculo.map((pos) => {
+          const neu = neumaticosAsignadosState.find(n => n.POSICION === pos);
+          const ocupada = Boolean(neu);
+          const esOrigen = posicionSeleccionada === pos;
+
+          return (
+            <div
+              key={pos}
+              className={`flex items-center gap-2.5 rounded-lg border px-3 py-2 transition-colors ${esOrigen ? 'border-violet-300 bg-violet-50' : ocupada ? 'border-slate-200 bg-white' : 'border-dashed border-slate-200 bg-slate-50/60'
+                }`}
+            >
+              <span className={`shrink-0 rounded-md px-2 py-1 text-xs font-bold ${ocupada ? 'bg-violet-600 text-white' : 'bg-slate-200 text-slate-500'}`}>
+                {pos}
+              </span>
+
+              <div className="min-w-0 flex-1">
+                {ocupada ? (
+                  <>
+                    <p className="truncate text-sm font-semibold text-slate-800">{neu!.CODIGO_NEU || neu!.CODIGO}</p>
+                    <p className="truncate text-xs text-slate-500">{neu!.MARCA || '—'}</p>
+                  </>
+                ) : (
+                  <p className="text-sm text-slate-400">Libre</p>
+                )}
+              </div>
+
+              <div className="flex shrink-0 items-center gap-1">
+                {esOrigen ? (
+                  <ButtonCustom variant="ghost" size="sm" onClick={() => setPosicionSeleccionada(null)}>
+                    <X className="h-3.5 w-3.5" />
+                    Cancelar
+                  </ButtonCustom>
+                ) : posicionSeleccionada ? (
+                  <ButtonCustom variant="indigo" size="sm" onClick={() => handleClickPosicion(pos)}>
+                    {ocupada ? <Repeat2 className="h-3.5 w-3.5" /> : null}
+                    {ocupada ? 'Intercambiar' : 'Mover aquí'}
+                  </ButtonCustom>
+                ) : ocupada ? (
+                  <ButtonCustom variant="outline" size="sm" onClick={() => setPosicionSeleccionada(pos)}>
+                    Mover
+                  </ButtonCustom>
+                ) : (
+                  <span className="px-2 text-xs text-slate-300">—</span>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth
+      fullScreen={esPantallaChica}
       PaperProps={{
-        sx: { borderRadius: 3, overflow: 'hidden' }
+        sx: { borderRadius: { xs: 0, lg: 3 }, overflow: 'hidden' }
       }}
     >
 
       <Box sx={{ height: 4, background: 'linear-gradient(90deg, #3b82f6 0%, #6366f1 100%)' }} />
 
-      <DialogTitle sx={{ pb: 1.5, pt: 2, display: 'flex', alignItems: 'center', gap: 1.5, borderBottom: '1px solid', borderColor: 'divider' }}>
+      <DialogTitle sx={{ pb: 1.5, pt: 2, px: { xs: 2, md: 3 }, display: 'flex', alignItems: 'center', gap: 1.5, borderBottom: '1px solid', borderColor: 'divider' }}>
         <Box sx={{
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          width: 40, height: 40, borderRadius: 2,
+          width: { xs: 34, md: 40 }, height: { xs: 34, md: 40 }, borderRadius: 2,
           background: 'linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%)',
           flexShrink: 0,
         }}>
           <ClipboardList size={20} className="text-blue-600" />
         </Box>
-        <Box sx={{ flex: 1 }}>
-          <Typography variant="h6" fontWeight={700} lineHeight={1.2}>
+        <Box sx={{ flex: 1, minWidth: 0 }}>
+          <Typography variant="h6" fontWeight={700} lineHeight={1.2} sx={{ fontSize: { xs: 16, md: 20 } }}>
             Registrar Reubicación de Neumáticos
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.4 }}>
@@ -595,164 +594,100 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = memo(({
               sx={{ fontWeight: 700, fontSize: 12, bgcolor: '#f1f5f9', color: '#334155', letterSpacing: 0.5 }}
             />
           </Box>
-          <Typography variant="caption" className='text-amber-600' sx={{ display: 'block', mt: 1, fontStyle: 'italic' }}>
+          <Typography variant="caption" className='text-amber-600' sx={{ display: 'block', mt: 1, fontStyle: 'italic', fontSize: { xs: 10.5, md: 12 }, lineHeight: 1.35 }}>
             <span className='font-bold'>Nota: </span>
-            Arrastra un neumático reubicable y mueve a placer las demás posiciones. <b>No se puede dejar posiciones vacías</b>.
+            Elige un neumático y luego su posición de destino: si esa posición está ocupada, ambos <b>se intercambian</b>.
           </Typography>
         </Box>
-      </DialogTitle>
-      <DialogContent>
-        <DndContext
-          // onDragStart={(event: DragStartEvent) => {
-          //   console.log('[DndContext] 🚀 DRAG START - activeId:', event.active.id, 'data:', event.active.data.current);
-          // }}
-          onDragEnd={handleDragEnd}
+
+        <ButtonCustom
+          variant="ghost"
+          size="icon"
+          onClick={handleClose}
+          title="Cerrar"
+          aria-label="Cerrar"
+          className="shrink-0 self-start text-slate-400 hover:text-slate-700"
         >
-          <Stack direction="row" spacing={2}>
+          <X className="h-4 w-4" />
+        </ButtonCustom>
+      </DialogTitle>
+      <DialogContent sx={{ px: { xs: 1.5, md: 3 } }}>
+          <Stack direction={{ xs: 'column-reverse', lg: 'row' }} spacing={2}>
             <Stack direction="column" spacing={2} sx={{
-              flex: 1, width: '350px',
-              maxWidth: 400, minWidth: 320,
+              flex: 1, width: { xs: '100%', lg: '350px' },
+              maxWidth: { xs: '100%', lg: 400 }, minWidth: { xs: 0, lg: 320 },
               marginTop: '10px'
             }}>
               {/* Card de información del vehículo */}
               <Card sx={{
-                p: 2, boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)',
-                maxWidth: 400, minWidth: 320, width: '100%'
+                p: { xs: 1.5, md: 2 }, boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)',
+                maxWidth: { xs: '100%', lg: 400 }, minWidth: { xs: 0, lg: 320 }, width: '100%'
               }}>
-                <Box>
-                  <Typography variant="h6" fontWeight="bold" gutterBottom>
-                    Datos del Vehículo
-                  </Typography>
-                  {vehiculo ? (
-                    <Stack direction="row" spacing={4} alignItems="flex-start" sx={{ mb: 1 }}>
-                      <Box>
-                        <Typography variant="caption" color="text.secondary">Marca</Typography>
-                        <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                          {vehiculo.marca}
-                        </Typography>
-                      </Box>
-                      <Box>
-                        <Typography variant="caption" color="text.secondary">Modelo</Typography>
-                        <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                          {vehiculo.modelo}
-                        </Typography>
-                      </Box>
-                      {vehiculo.proyecto && (
-                        <Box>
-                          <Typography variant="caption" color="text.secondary">Proyecto</Typography>
-                          <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                            {vehiculo.proyecto}
-                          </Typography>
-                        </Box>
-                      )}
-                    </Stack>
-                  ) : (
-                    <Typography variant="body2" color="text.secondary">
-                      No hay datos del vehículo.
-                    </Typography>
-                  )}
-                </Box>
+                {vehiculo ? (
+                  <div className="flex items-center gap-3 rounded-xl border border-blue-100 bg-linear-to-br from-blue-50 via-white to-indigo-50 px-4 py-3">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-linear-to-br from-blue-500 to-indigo-600 shadow-sm shadow-blue-200">
+                      <Car className="h-5 w-5 text-white" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-semibold text-slate-900">
+                        {[vehiculo.marca, vehiculo.modelo, vehiculo.anio].filter(Boolean).join(' · ')}
+                      </p>
+                      <div className="mt-0.5 flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-slate-500">
+                        {[vehiculo.color, vehiculo.proyecto, vehiculo.operacion]
+                          .filter(Boolean)
+                          .map((dato, i) => <span key={i}>{dato}</span>)}
+                      </div>
+                    </div>
+                    {vehiculo?.kilometro !== undefined && (
+                      <div className="shrink-0 rounded-lg bg-white/70 px-3 py-1.5 text-right shadow-sm">
+                        <p className="text-[10px] font-semibold uppercase tracking-wide text-blue-400">Kilometraje</p>
+                        <p className="text-sm font-bold text-blue-900">{vehiculo.kilometro.toLocaleString()} km</p>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <p className="text-sm text-slate-500">No hay datos del vehículo.</p>
+                )}
               </Card>
               {/* Error al registrar la reubicación: Error al registrar la reubicación: No se puede guardar: las posiciones RES01 quedarían vacías. Asigna neumáticos a estas posiciones antes de guardar. */}
               {/* Card para REUBICAR */}
               <Card sx={{
-                p: 2, boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)',
-                maxWidth: 400, minWidth: 320, width: '100%'
+                p: { xs: 1.5, md: 2 }, boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)',
+                maxWidth: { xs: '100%', lg: 400 }, minWidth: { xs: 0, lg: 320 }, width: '100%'
               }}>
-                <Box sx={{ display: 'flex', alignItems: 'flex-end', mb: 1, gap: 2 }}>
-                  <Box>
-                    <Typography variant="caption" color="text.secondary">Fecha última inspección:</Typography>
-                    <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                <div className="mb-3 flex items-center gap-2 rounded-lg border border-violet-100 bg-violet-50/60 px-3 py-2">
+                  <MapPinned className="h-4 w-4 shrink-0 text-violet-500" />
+                  <div className="min-w-0">
+                    <p className="text-[11px] font-semibold uppercase tracking-wide text-violet-400 leading-tight">Fecha última inspección</p>
+                    <p className="truncate text-sm font-semibold text-violet-900">
                       {convertToDateHuman(fechaUltimaInspeccion) || 'Sin registro'}
-                    </Typography>
-                  </Box>
-                </Box>
+                    </p>
+                  </div>
+                </div>
 
-                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 2 }}>
-                  <Box sx={{ display: 'flex', flexDirection: 'column', minWidth: '100%', flex: 1, height: 100 }}>
-                    <TextField
-                      label="Motivo de la reubicación"
-                      size="small"
-                      multiline
+                <div className="flex flex-col items-start gap-3">
+                  <Field className="w-full">
+                    <FieldLabel htmlFor="motivo-reubicacion">Motivo de la reubicación</FieldLabel>
+                    <Textarea
+                      id="motivo-reubicacion"
                       value={observacion}
                       onChange={(e) => setObservacion(e.target.value)}
-                      sx={{ minWidth: '100%', width: '100%', flex: 1 }}
-                      InputProps={{
-                        sx: { height: '100%', alignItems: 'flex-start' }
-                      }}
+                      placeholder="Ej. Rotación programada, desgaste irregular..."
+                      className="min-h-18 resize-none"
                     />
-                  </Box>
-                  <Box sx={{ position: 'relative' }}>
-                    <Typography variant="subtitle2" sx={{ mb: 1, textAlign: 'center', fontWeight: 'bold' }}>
-                      Zona de Reubicación
-                    </Typography>
+                  </Field>
 
-                    {/* Área de drop solo cuando está vacía */}
-                    {!neumaticoEnZonaTemporal && (
-                      <DropNeumaticosPorRotar onDropNeumatico={(neu) => handleDropNeumatico(neu, '')}>
-                        <Box sx={{
-                          mt: 0, display: 'flex', justifyContent: 'center', alignItems: 'center',
-                          minHeight: 120, height: 120, width: '230px', maxWidth: '230px',
-                          mx: 0, p: 1,
-                        }}>
-                          <Typography variant="body2" color="text.secondary" sx={{ p: 2, fontStyle: 'italic', textAlign: 'center' }}>
-                            Arrastre un neumático aquí para reubicarlo
-                            <br />
-                            <Typography variant="caption" color="text.secondary">
-                              (Solo uno a la vez)
-                            </Typography>
-                          </Typography>
-                        </Box>
-                      </DropNeumaticosPorRotar>
-                    )}
+                  <div className="w-full">
+                    <div className="mb-2 flex items-center justify-center gap-1.5">
+                      <ArrowLeftRight className="h-3.5 w-3.5 text-violet-500" />
+                      <p className="text-sm font-semibold text-slate-700">Posiciones del vehículo</p>
+                    </div>
 
-                    {/* Neumático en zona temporal - renderizado idéntico a desasignación */}
-                    {neumaticoEnZonaTemporal && (
-                      <Box sx={{
-                        minHeight: 150,
-                        width: '250px', // Mismo ancho que en desasignación
-                        display: 'flex',
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        justifyContent: 'flex-start',
-                        position: 'relative',
-                        border: '1px solid #bdbdbd',
-                        borderRadius: 2,
-                        background: '#fafafa',
-                        p: 1,
-                        gap: 1,
-                        flexWrap: 'wrap',
-                      }}>
-                        <Box sx={{
-                          display: 'flex',
-                          flexDirection: 'column',
-                          alignItems: 'center',
-                          minWidth: 70,
-                          maxWidth: 70, // Ancho fijo para cada neumático
-                          position: 'relative',
-                        }}>
-                          <Box sx={{
-                            position: 'relative',
-                            zIndex: 20, // Asegurar que el neumático esté por encima
-                            pointerEvents: 'auto', // Asegurar que reciba eventos
-                          }}>
-                            <DraggableNeumatico
-                              neumatico={{
-                                ...neumaticoEnZonaTemporal,
-                                POSICION: 'zona-temporal' // Identificar que está en zona temporal
-                              }}
-                            />
-                          </Box>
-                          <Box sx={{ pointerEvents: 'none' }}> {/* Evitar que NeumaticoInfo capture eventos */}
-                            <NeumaticoInfo neumatico={neumaticoEnZonaTemporal} />
-                          </Box>
-                        </Box>
-                      </Box>
-                    )}
-                  </Box>
-                </Box>
+                    {panelPosiciones}
+                  </div>
+                </div>
 
-                <div className='flex gap-2 mt-4'>
+                <div className='mt-4 flex flex-col-reverse gap-2 sm:flex-row [&>button]:w-full sm:[&>button]:w-auto'>
                   <ButtonCustom
                     onClick={handleClose}
                   >
@@ -811,164 +746,40 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = memo(({
 
             {/* Columna derecha: Diagrama del vehículo */}
             <Card sx={{
-              flex: 0.5, p: 2, position: 'relative',
+              flex: { lg: 0.5 }, p: 2,
               boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)',
-              maxWidth: 400, minWidth: 320, width: '100%',
-              marginTop: '10px'
+              maxWidth: { xs: '100%', sm: 420, lg: 320 }, minWidth: { xs: 0, lg: 290 },
+              mx: { xs: 'auto', lg: 0 }, width: '100%',
+              marginTop: '10px',
+              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1
             }}>
-              <Box sx={{ position: 'relative', width: '370px', height: '430px' }}>
-                <DiagramaVehiculo
-                  key={`diagrama-live-${refreshKey}-${Date.now()}`}
-                  neumaticosAsignados={(() => {
-                    // USAR DATOS SINCRONIZADOS DIRECTOS
-                    const dataWithForce = diagramaData.map((n, idx) => ({
-                      ...n,
-                      _forceRender: Date.now() + idx // Garantizar nueva referencia
-                    }));
-                    return dataWithForce;
-                  })() as any}
-                  layout="modal"
-                  tipoModal="mantenimiento"
-                  onPosicionClick={(() => { }) as any}
-                  fromMantenimientoModal={true}
-                  placa={placa}
-                />
-
-                <Image src='/assets/placa.png' alt='Placa' width={130} height={60} style={{
-                  objectFit: 'contain',
-                  position: 'absolute',
-                  top: '0px',
-                  right: '75px',
-                  zIndex: 2,
-                  pointerEvents: 'none'
-                }}
-                />
-
-                {/* Texto de placa */}
-                <Box sx={{
-                  position: 'absolute', top: '16px', right: '85px', zIndex: 3,
-                  color: 'black', padding: '2px 8px', borderRadius: '5px',
-                  fontFamily: 'Arial, sans-serif', fontWeight: 'bold',
-                  fontSize: '24px', textAlign: 'center',
-                }}>
-                  {placa}
-                </Box>
-              </Box>
+              <div className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-slate-400">
+                <MapPinned className="h-3.5 w-3.5" />
+                Posiciones
+              </div>
+              <DiagramaVehiculo
+                key={`diagrama-live-${refreshKey}-${Date.now()}`}
+                neumaticosAsignados={(() => {
+                  // USAR DATOS SINCRONIZADOS DIRECTOS
+                  const dataWithForce = diagramaData.map((n, idx) => ({
+                    ...n,
+                    _forceRender: Date.now() + idx // Garantizar nueva referencia
+                  }));
+                  return dataWithForce;
+                })() as any}
+                layout="modal"
+                tipoModal="mantenimiento"
+                anchoMax={150}
+                posicionResaltada={posicionSeleccionada ?? undefined}
+                onPosicionClick={(_neu: any, codigoPosicion: string) => handleClickPosicion(codigoPosicion)}
+                fromMantenimientoModal={true}
+                placa={placa}
+                cantidadNeumaticos={vehiculo?.cantidad_neumaticos}
+              />
             </Card>
           </Stack>
-        </DndContext>
       </DialogContent>
     </Dialog>
-  );
-});
-
-// Componente para neumático draggable
-export const DraggableNeumatico: React.FC<{ neumatico: Neumatico }> = memo(({ neumatico }) => {
-  // Usar un ID único que incluya la posición para evitar conflictos
-  const baseId = neumatico.CODIGO_NEU || neumatico.CODIGO || 'neumatico-' + Math.random();
-  const dragId = neumatico.POSICION === 'zona-temporal'
-    ? `zona-temporal-${baseId}`
-    : baseId;
-
-  // Determinar la posición real - si es 'zona-temporal', usar eso explícitamente
-  const posicionReal = neumatico.POSICION === 'zona-temporal' ? 'zona-temporal' : (neumatico.POSICION || 'zona-temporal');
-
-  // Memoizar el data para asegurar que se actualice cuando cambie el neumático
-  const draggableData = React.useMemo(() => ({
-    ...neumatico,
-    POSICION: posicionReal, // Usar la posición real (zona-temporal si está ahí)
-    from: posicionReal
-  }), [neumatico, posicionReal]);
-
-  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
-    id: dragId,
-    data: draggableData,
-  });
-
-
-  const style = {
-    display: 'flex',
-    flexDirection: 'column' as const,
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: 28,
-    height: 62,
-    borderRadius: '11px',
-    background: '#fff',
-    border: isDragging ? '2px solid #2196f3' : '2px solid #bdbdbd',
-    boxShadow: isDragging ? '0 0 12px #2196f3' : '0 5px 7px #bbb',
-    margin: '0 auto',
-    cursor: 'grab',
-    opacity: isDragging ? 0.7 : 1,
-    transition: 'box-shadow 0.2s, border 0.2s, opacity 0.2s',
-    position: 'relative' as const,
-    zIndex: neumatico.POSICION === 'zona-temporal' ? 10 : 'auto', // Asegurar que el neumático en zona temporal esté por encima
-  };
-
-  return (
-    <div
-      ref={setNodeRef}
-      style={{
-        ...style,
-        transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined
-      }}
-      {...listeners}
-      {...attributes}
-    >
-      <img
-        src={'/assets/neumatico-new.png'}
-        alt="Neumático"
-        style={{
-          width: 28,
-          height: 77,
-          objectFit: 'contain',
-          filter: isDragging ? 'brightness(0.8)' : undefined,
-          pointerEvents: 'none', // Permitir que los eventos pasen al div padre
-        }}
-      />
-    </div>
-  );
-});
-
-// Componente para mostrar información de neumático
-const NeumaticoInfo: React.FC<{ neumatico: Neumatico }> = memo(({ neumatico }) => (
-  <>
-    <Typography variant="caption" fontWeight="bold" sx={{ mt: 0.5, fontSize: 11, textAlign: 'center', width: '100%' }}>
-      {neumatico.CODIGO_NEU || neumatico.CODIGO || 'Sin código'}
-    </Typography>
-    <br />
-    <Typography variant="caption" sx={{ fontSize: 10, color: '#888', textAlign: 'center', width: '100%' }}>
-      {neumatico.MARCA || ''}
-    </Typography>
-  </>
-));
-
-// Dropzone para neumáticos
-export const DropNeumaticosPorRotar: React.FC<{
-  onDropNeumatico: (neu: Neumatico) => void;
-  children: React.ReactNode
-}> = memo(({ onDropNeumatico, children }) => {
-  const { setNodeRef, isOver, active } = useDroppable({ id: 'neumaticos-por-rotar' });
-
-  return (
-    <Box
-      ref={setNodeRef}
-      sx={{
-        minHeight: 120,
-        width: '250px',
-        maxWidth: '100%',
-        background: isOver ? '#e8f5e8' : '#fafafa',
-        border: isOver ? '2px solid #4caf50' : '1px solid #bdbdbd',
-        borderRadius: 2,
-        p: 1,
-        transition: 'background 0.2s, border 0.2s',
-        overflow: 'auto',
-        position: 'relative',
-        zIndex: 1,
-      }}
-    >
-      {children}
-    </Box>
   );
 });
 

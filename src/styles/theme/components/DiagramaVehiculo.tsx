@@ -1,16 +1,20 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
 import { useDroppable, useDraggable } from '@dnd-kit/core';
-// import ModalMantenimientoNeu from '../../../components/dashboard/integrations/modal-mantenimientoNeu'; // Eliminado
-import ModalInpeccionNeu from '../../../components/dashboard/integrations/modal-inspeccion-neu';
 import { useEffect, useState } from 'react';
-import { obtenerUltimosMovimientosPorCodigo } from '../../../api/Neumaticos';
-import { calcularKmRecorrido, MovimientoNeumatico } from './calculo-km-recorrido';
 import { obtenerInfoDesgaste } from '../../../utils/tire-utils';
-import axios from 'axios';
-import { Customer } from '@/components/dashboard/customer/customers-table';
+import {
+    obtenerConfiguracionNeumaticos,
+    type ConfiguracionNeumaticos,
+    type LadoPosicion,
+    type PosicionNeumatico as PosicionCatalogo,
+} from '../../../utils/configuraciones-neumaticos';
+import { obtenerConfiguracionImagen, type MarcadorImagen } from '../../../utils/posiciones-imagen-vehiculo';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { SteeringWheel } from '@phosphor-icons/react/dist/ssr/SteeringWheel';
+import { WarningCircle } from '@phosphor-icons/react/dist/ssr/WarningCircle';
+import { CheckCircle } from 'lucide-react';
 
 interface Neumatico {
     POSICION: string;
@@ -21,8 +25,6 @@ interface Neumatico {
     ID_MOVIMIENTO?: number | string;
     TIPO_MOVIMIENTO?: string;
     PRESION_AIRE?: string | number;
-    KM_ULTIMA_INSPECCION?: string | number;
-    KM_ASIGNACION?: string | number;
     KM_TOTAL_VIDA?: string | number;
     REMANENTE?: string | number;
 }
@@ -30,58 +32,184 @@ interface Neumatico {
 interface DiagramaVehiculoProps {
     neumaticosAsignados: any;
     layout?: 'dashboard' | 'modal';
-    tipoModal?: 'inspeccion' | 'mantenimiento'; // NUEVO: para distinguir el modal
-    editable?: boolean; // <-- Agregado para permitir la prop editable
-    onDragEnd?: (event: any) => void; // <-- Agregado para permitir la prop onDragEnd
-    posicionResaltada?: string; // <-- Agregado para resaltar posiciones
+    tipoModal?: 'inspeccion' | 'mantenimiento';
+    editable?: boolean;
+    onDragEnd?: (event: any) => void;
+    posicionResaltada?: string;
+    /** Cantidad de neumáticos del vehículo (CANTIDAD_NEUMATICOS) — determina la configuración de posiciones a dibujar. */
+    cantidadNeumaticos?: number | string | null;
+    /** Códigos de posición ya guardados/completados (ej. inspección local pendiente de enviar) — se marcan con un check. */
+    posicionesCompletadas?: string[];
+    /** Ancho máximo del contenedor en px — sobrescribe el valor por defecto de `layout`/`tipoModal` para instancias que necesiten un diagrama más compacto. */
+    anchoMax?: number;
 }
 
-// Layouts diferenciados para dashboard, modalInspeccion y modalMantenimiento
-const posiciones = {
-    dashboard: [
-        { key: 'POS01', top: '38px', left: '333px' },
-        { key: 'POS02', top: '38px', left: '228px' },
-        { key: 'POS03', top: '211px', left: '333px' },
-        { key: 'POS04', top: '211px', left: '228px' },
-        { key: 'RES01', top: '284px', left: '264px' },
-    ],
-    modalInspeccion: [
-        { key: 'POS01', top: '124px', left: '145px' },
-        { key: 'POS02', top: '124px', left: '45px' },
-        { key: 'POS03', top: '288px', left: '145px' },
-        { key: 'POS04', top: '288px', left: '45px' },
-        { key: 'RES01', top: '359px', left: '79px' },
-    ],
-    modalMantenimiento: [
-        { key: 'POS01', top: '115px', left: '268px' },
-        { key: 'POS02', top: '115px', left: '168px' },
-        { key: 'POS03', top: '279px', left: '268px' },
-        { key: 'POS04', top: '279px', left: '168px' },
-        { key: 'RES01', top: '348px', left: '202px' },
-    ],
+// Ancho máximo por contexto — el alto se deriva del contenido (imagen o filas).
+const CONTENEDOR = {
+    dashboard: { width: 150 },
+    modalInspeccion: { width: 150 },
+    modalMantenimiento: { width: 320 },
 };
 
-const DiagramaVehiculo: React.FC<DiagramaVehiculoProps & { onPosicionClick?: (neumatico: Neumatico | undefined) => void; onMantenimientoClick?: () => void; fromMantenimientoModal?: boolean; placa?: string; }> = React.memo(({ neumaticosAsignados = [], layout = 'dashboard', tipoModal, onPosicionClick, fromMantenimientoModal, placa, posicionResaltada, ...props }) => {
-    // Selección de layout según tipoModal
-    let pos;
-    if (layout === 'modal') {
-        if (tipoModal === 'mantenimiento') {
-            pos = posiciones.modalMantenimiento;
-        } else {
-            pos = posiciones.modalInspeccion;
+const LADO_LABEL: Record<string, string> = { IZQ: 'Izq', DER: 'Der', CENTRO: '' };
+
+// Colores del marcador por estado — mismos umbrales que utils/tire-utils.ts
+const ESTADO_COLORES: Record<string, { fill: string; stroke: string }> = {
+    ok: { fill: '#e6f4ea', stroke: '#2e7d32' },
+    warn: { fill: '#fbf3d9', stroke: '#c9a227' },
+    crit: { fill: '#fbe6e6', stroke: '#d32f2f' },
+    neutral: { fill: '#eef2f6', stroke: '#94a3b8' },
+};
+
+function conAlpha(hex: string, alpha: number): string {
+    const valor = hex.replace('#', '');
+    const r = parseInt(valor.substring(0, 2), 16);
+    const g = parseInt(valor.substring(2, 4), 16);
+    const b = parseInt(valor.substring(4, 6), 16);
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+function estadoDesdeDesgaste(color: string): keyof typeof ESTADO_COLORES {
+    if (color === 'red') return 'crit';
+    if (color === 'yellow') return 'warn';
+    if (color === 'green' || color === 'lightgreen') return 'ok';
+    return 'neutral';
+}
+
+/** Estado/lógica compartida entre el chip de fila (Grid) y el marcador sobre imagen. */
+function useEstadoMarcador(keyPos: string, neumatico: any | undefined, posicionResaltada?: string) {
+    const { setNodeRef: setDropRef, isOver } = useDroppable({ id: keyPos });
+    const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
+        id: neumatico ? (neumatico.CODIGO_NEU || neumatico.CODIGO || neumatico.POSICION) : keyPos,
+        disabled: !neumatico,
+        data: neumatico ? { ...neumatico, from: keyPos } : undefined,
+    });
+
+    const infoDesgaste = neumatico
+        ? obtenerInfoDesgaste({
+            REMANENTE: neumatico.REMANENTE,
+            REMANENTE_ORIGINAL: (neumatico as any).REMANENTE_ORIGINAL,
+            ESTADO: neumatico.ESTADO,
+        })
+        : { porcentajeDesgaste: 0, color: 'transparent' as const, bgColor: 'transparent' };
+
+    const esResaltada = posicionResaltada === keyPos;
+    const esTemporal = (neumatico as any)?.TIPO_MOVIMIENTO === 'TEMPORAL';
+    const estado = esTemporal ? 'neutral' : estadoDesdeDesgaste(infoDesgaste.color);
+    const colores = ESTADO_COLORES[estado];
+
+    const combinedRef = (node: HTMLDivElement | null) => {
+        setNodeRef(node);
+        setDropRef(node);
+    };
+
+    const [kmRecorrido, setKmRecorrido] = useState<string>('—');
+    useEffect(() => {
+        if (!neumatico) {
+            setKmRecorrido('—');
+            return;
         }
-    } else {
-        pos = posiciones.dashboard;
+        if (neumatico.KM_TOTAL_VIDA !== undefined && neumatico.KM_TOTAL_VIDA !== null) {
+            setKmRecorrido(Number(neumatico.KM_TOTAL_VIDA).toLocaleString() + ' km');
+        } else {
+            setKmRecorrido('—');
+        }
+    }, [neumatico]);
+
+    return { combinedRef, attributes, listeners, isDragging, isOver, colores, esTemporal, esResaltada, kmRecorrido };
+}
+
+function TooltipPosicion({ keyPos, esRepuesto, neumatico, kmRecorrido }: {
+    keyPos: string;
+    esRepuesto: boolean;
+    neumatico: any | undefined;
+    kmRecorrido: string;
+}) {
+    return (
+        <TooltipContent>
+            <ul>
+                <li>Posición: {keyPos}{esRepuesto ? ' (repuesto)' : ''}</li>
+                {neumatico && (
+                    <>
+                        <li>Neumático: {neumatico.CODIGO_NEU || neumatico.CODIGO}</li>
+                        {neumatico.REMANENTE && <li>Remanente: {neumatico.REMANENTE}mm</li>}
+                        {neumatico.ESTADO && <li>Estado: {neumatico.ESTADO}%</li>}
+                        {neumatico.PRESION_AIRE && <li>Presión: {neumatico.PRESION_AIRE} psi</li>}
+                        <li>Km recorrido: {kmRecorrido}</li>
+                    </>
+                )}
+            </ul>
+        </TooltipContent>
+    );
+}
+
+interface FilaLayout {
+    etiqueta: string;
+    posiciones: PosicionCatalogo[];
+}
+
+interface DiagramaLayout {
+    filas: FilaLayout[];
+    chipW: number;
+    chipH: number;
+}
+
+/**
+ * Agrupa el catálogo de posiciones en filas por eje (+ una fila final de
+ * repuestos) y calcula el tamaño de chip que mejor entra en el ancho
+ * disponible según la fila más cargada (ej. eje trasero doble = 4 chips).
+ * Se usa como respaldo genérico (cantidades sin imagen mapeada) y para la
+ * fila de repuestos que acompaña a la silueta con imagen.
+ */
+function calcularLayoutFilas(posiciones: PosicionCatalogo[], contW: number, soloEtiqueta?: string): DiagramaLayout {
+    const ejes: number[] = [];
+    posiciones.forEach((p) => {
+        if (p.eje !== null && !ejes.includes(p.eje)) ejes.push(p.eje);
+    });
+    ejes.sort((a, b) => a - b);
+
+    const filas: FilaLayout[] = soloEtiqueta
+        ? [{ etiqueta: soloEtiqueta, posiciones }]
+        : ejes.map((eje) => ({ etiqueta: `EJE ${eje}`, posiciones: posiciones.filter((p) => p.eje === eje) }));
+
+    const maxChipsEnFila = Math.max(1, ...filas.map((f) => f.posiciones.length));
+    const labelWidth = 40;
+    const rowGap = 8;
+    const chipGap = 6;
+    const paddingContenedor = 24; // '14px 12px' del contenedor: 12px a cada lado
+    const margenSeguridad = 4;
+    const disponible = contW - paddingContenedor - labelWidth - rowGap - margenSeguridad;
+    const chipW = Math.max(34, Math.min(56, (disponible - (maxChipsEnFila - 1) * chipGap) / maxChipsEnFila));
+    const chipH = Math.max(34, chipW * 0.86);
+
+    return { filas, chipW, chipH };
+}
+
+const DiagramaVehiculo: React.FC<
+    DiagramaVehiculoProps & {
+        /** Click en una posición. `codigoPosicion` llega siempre (incluso si la posición está vacía). */
+        onPosicionClick?: (neumatico: Neumatico | undefined, codigoPosicion: string) => void;
+        onMantenimientoClick?: () => void;
+        fromMantenimientoModal?: boolean;
+        placa?: string;
     }
-    // Eliminar useMemo para evitar cache y forzar procesamiento inmediato
+> = React.memo(({ neumaticosAsignados = [], layout = 'dashboard', tipoModal, onPosicionClick, placa, posicionResaltada, cantidadNeumaticos, posicionesCompletadas, anchoMax, ...props }) => {
+    const contenedor = anchoMax
+        ? { width: anchoMax }
+        : layout === 'dashboard'
+            ? CONTENEDOR.dashboard
+            : tipoModal === 'mantenimiento'
+                ? CONTENEDOR.modalMantenimiento
+                : CONTENEDOR.modalInspeccion;
+
+    const configuracion = obtenerConfiguracionNeumaticos(cantidadNeumaticos);
+    const configuracionImagen = obtenerConfiguracionImagen(cantidadNeumaticos);
+
     const neumaticosFiltrados = (() => {
         if (tipoModal === 'mantenimiento') {
-
-            const result = neumaticosAsignados.filter((n: any) => n.TIPO_MOVIMIENTO !== 'BAJA DEFINITIVA');
-            return result;
+            return neumaticosAsignados.filter((n: any) => n.TIPO_MOVIMIENTO !== 'BAJA DEFINITIVA');
         }
 
-        // Para otros casos, mantener el filtrado original
         const porPosicion = new Map<string, Neumatico>();
         for (const n of neumaticosAsignados) {
             if (n.TIPO_MOVIMIENTO === 'BAJA DEFINITIVA') continue;
@@ -101,433 +229,521 @@ const DiagramaVehiculo: React.FC<DiagramaVehiculoProps & { onPosicionClick?: (ne
             }
         }
 
-        const result = Array.from(porCodigo.values());
-        return result;
+        return Array.from(porCodigo.values());
     })();
 
-    const placaModal = placa || '';
-    const neumaticosAsignadosModal = neumaticosAsignados.map((n: any) => ({
-        ...n,
-        CODIGO: n.CODIGO ?? '', // Forzar string
-    }));
+    if (!configuracion) {
+        return (
+            <Box
+                sx={{
+                    width: contenedor.width,
+                    minHeight: 120,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 1,
+                    textAlign: 'center',
+                    color: 'text.secondary',
+                    border: '1px dashed',
+                    borderColor: 'divider',
+                    borderRadius: 2,
+                    padding: 2,
+                }}
+            >
+                <WarningCircle size={24} weight="bold" color="#c9a227" />
+                <Typography variant="caption">
+                    Configuración de neumáticos no soportada{cantidadNeumaticos ? ` (${cantidadNeumaticos})` : ''}.
+                    Contacta a soporte.
+                </Typography>
+            </Box>
+        );
+    }
+
+    const repuestos = configuracion.posiciones.filter((p) => p.repuesto);
+
+    // --- Silueta con imagen real (moto/auto/camión con coordenadas medidas) ---
+    if (configuracionImagen) {
+        // Un repuesto con marcador propio sobre la imagen ya no va en la fila aparte.
+        const codigosEnImagen = new Set(configuracionImagen.marcadores.map((m) => m.codigo));
+        const repuestosSinImagen = repuestos.filter((p) => !codigosEnImagen.has(p.codigo));
+        const repuestosLayout = repuestosSinImagen.length > 0 ? calcularLayoutFilas(repuestosSinImagen, contenedor.width, 'REP.') : null;
+        // Las etiquetas IZQ/DER se dibujan fuera de la silueta — se les reserva margen
+        // a los costados sin achicar la imagen (el ancho total del componente crece).
+        const margenEtiquetaLateral = 78;
+        return (
+            <Box sx={{ width: '100%', maxWidth: contenedor.width + margenEtiquetaLateral * 2, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px', pt: '26px', pb: '34px' }}>
+                <Box
+                    sx={{
+                        position: 'relative',
+                        width: '100%',
+                        maxWidth: contenedor.width,
+                        aspectRatio: `${configuracionImagen.anchoNatural} / ${configuracionImagen.altoNatural}`,
+                    }}
+                >
+                    <Box
+                        sx={{
+                            position: 'absolute',
+                            inset: 0,
+                            borderRadius: 2,
+                            overflow: 'hidden',
+                            border: '1px solid',
+                            borderColor: 'divider',
+                            background: '#fff',
+                        }}
+                    >
+                        <Box
+                            component="img"
+                            src={configuracionImagen.imagen}
+                            alt=""
+                            draggable={false}
+                            sx={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain', userSelect: 'none', pointerEvents: 'none' }}
+                        />
+                    </Box>
+                    {configuracionImagen.marcadores.map((marcador) => {
+                        const neumatico = neumaticosFiltrados.find((n: any) => (n.POSICION_NEU || n.POSICION) === marcador.codigo);
+                        return (
+                            <MarcadorImagenNeumatico
+                                key={marcador.codigo}
+                                marcador={marcador}
+                                anchoNatural={configuracionImagen.anchoNatural}
+                                altoNatural={configuracionImagen.altoNatural}
+                                neumatico={neumatico}
+                                onPosicionClick={onPosicionClick}
+                                posicionResaltada={posicionResaltada}
+                                completada={posicionesCompletadas?.includes(marcador.codigo) ?? false}
+                            />
+                        );
+                    })}
+                </Box>
+
+                {repuestosLayout && (
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <Typography
+                            sx={{ width: 40, flexShrink: 0, fontSize: '10px', fontWeight: 700, letterSpacing: '0.4px', color: 'text.secondary', fontFamily: 'monospace' }}
+                        >
+                            {repuestosLayout.filas[0].etiqueta}
+                        </Typography>
+                        <Box sx={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                            {repuestosLayout.filas[0].posiciones.map((p) => {
+                                const neumatico = neumaticosFiltrados.find((n: any) => (n.POSICION_NEU || n.POSICION) === p.codigo);
+                                return (
+                                    <PosicionNeumatico
+                                        key={p.codigo}
+                                        keyPos={p.codigo}
+                                        lado={p.lado}
+                                        width={repuestosLayout.chipW}
+                                        height={repuestosLayout.chipH}
+                                        esRepuesto
+                                        neumatico={neumatico}
+                                        onPosicionClick={onPosicionClick}
+                                        posicionResaltada={posicionResaltada}
+                                        completada={posicionesCompletadas?.includes(p.codigo) ?? false}
+                                    />
+                                );
+                            })}
+                        </Box>
+                    </Box>
+                )}
+            </Box>
+        );
+    }
+
+    // --- Respaldo genérico: filas por eje (cantidades sin imagen mapeada) ---
+    const diagramaCompleto = calcularLayoutFilas(configuracion.posiciones.filter((p) => !p.repuesto), contenedor.width);
+    const filasConRepuesto = repuestos.length > 0
+        ? [...diagramaCompleto.filas, { etiqueta: 'REP.', posiciones: repuestos }]
+        : diagramaCompleto.filas;
 
     return (
-        <>
-            {/* Renderizado del diagrama */}
-            <Box
-                sx={
-                    layout === 'dashboard'
-                        ? { position: 'relative', width: '262px', height: '365px' }
-                        : { position: 'relative', width: '370px', height: '430px' }
-                }
-            >
-                {/* Imagen base diferente según tipoModal */}
-                <img
-                    src={
-                        tipoModal === 'mantenimiento'
-                            ? '/assets/car-diagram.png'
-                            : '/assets/car-diagram.png'
-                    }
-                    alt="Base"
-                    style={
-                        layout === 'dashboard'
-                            ? {
-                                width: '468px',
-                                height: '400px',
-                                objectFit: 'contain',
-                                position: 'absolute',
-                                top: '-30px',
-                                left: '162px',
-                                zIndex: 1,
-                                pointerEvents: 'none',
-                            }
-                            : tipoModal === 'mantenimiento'
-                                ? {
-                                    width: '260px',
-                                    height: '380px',
-                                    objectFit: 'contain',
-                                    position: 'absolute',
-                                    top: '50px',
-                                    left: '100px',
-                                    zIndex: 1,
-                                    pointerEvents: 'none',
-                                }
-                                : {
-                                    width: '250px',
-                                    height: '380px',
-                                    objectFit: 'contain',
-                                    position: 'absolute',
-                                    top: '60px',
-                                    left: '-17px',
-                                    zIndex: 1,
-                                    pointerEvents: 'none',
-                                }
-                    }
-                />
-
-                {pos.map(({ key, top, left }) => {
-                    const neumatico = neumaticosFiltrados.find((n: any) => (n.POSICION_NEU || n.POSICION) === key);
-                    return (
-                        <PosicionNeumatico
-                            key={`${key}-${neumatico ? (neumatico.CODIGO_NEU || neumatico.CODIGO) : 'empty'}-${Date.now()}`}
-                            keyPos={key}
-                            top={top}
-                            left={left}
-                            neumatico={neumatico}
-                            layout={layout}
-                            tipoModal={tipoModal}
-                            onPosicionClick={onPosicionClick}
-                            posicionResaltada={posicionResaltada}
-                            placa={placa}
-                        />
-                    );
-                })}
-            </Box>
-        </>
+        <Box
+            sx={{
+                width: '100%',
+                maxWidth: contenedor.width,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '10px',
+                border: '1px solid',
+                borderColor: 'divider',
+                borderRadius: 2,
+                padding: '14px 12px',
+                background: '#fff',
+            }}
+        >
+            {filasConRepuesto.map((fila) => (
+                <Box key={fila.etiqueta} sx={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Typography
+                        sx={{
+                            width: 40,
+                            flexShrink: 0,
+                            fontSize: '10px',
+                            fontWeight: 700,
+                            letterSpacing: '0.4px',
+                            color: 'text.secondary',
+                            fontFamily: 'monospace',
+                        }}
+                    >
+                        {fila.etiqueta}
+                    </Typography>
+                    <Box sx={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                        {fila.posiciones.map((p) => {
+                            const neumatico = neumaticosFiltrados.find((n: any) => (n.POSICION_NEU || n.POSICION) === p.codigo);
+                            return (
+                                <PosicionNeumatico
+                                    key={p.codigo}
+                                    keyPos={p.codigo}
+                                    lado={p.lado}
+                                    width={diagramaCompleto.chipW}
+                                    height={diagramaCompleto.chipH}
+                                    esRepuesto={p.repuesto}
+                                    neumatico={neumatico}
+                                    onPosicionClick={onPosicionClick}
+                                    posicionResaltada={posicionResaltada}
+                                    completada={posicionesCompletadas?.includes(p.codigo) ?? false}
+                                />
+                            );
+                        })}
+                    </Box>
+                </Box>
+            ))}
+        </Box>
     );
 });
 
-// Nuevo componente hijo para cada posición
+/** Marcador de fila (layout Grid genérico / fila de repuestos bajo la imagen). */
 const PosicionNeumatico: React.FC<{
     keyPos: string;
-    top: string;
-    left: string;
+    lado: LadoPosicion | null;
+    width: number;
+    height: number;
+    esRepuesto: boolean;
     neumatico: any | undefined;
-    layout: 'dashboard' | 'modal';
-    tipoModal?: 'inspeccion' | 'mantenimiento';
-    onPosicionClick?: (neumatico: Neumatico | undefined) => void;
+    onPosicionClick?: (neumatico: Neumatico | undefined, codigoPosicion: string) => void;
     posicionResaltada?: string;
-    placa?: string | undefined
-}> = React.memo(({ keyPos, top, left, neumatico, layout, tipoModal, onPosicionClick, posicionResaltada, placa = '' }) => {
-    // Drop target para cada posición
-    const { setNodeRef: setDropRef, isOver } = useDroppable({ id: keyPos });
-    // Siempre ejecuta el hook, pero solo activa el draggable si hay neumático
-    const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
-        id: neumatico ? (neumatico.CODIGO_NEU || neumatico.CODIGO || neumatico.POSICION) : keyPos,
-        disabled: !neumatico,
-        data: neumatico ? { ...neumatico, from: keyPos } : undefined,
-    });
-    // Usar función centralizada para obtener información de desgaste
-    const infoDesgaste = neumatico ? obtenerInfoDesgaste({
-        REMANENTE: neumatico.REMANENTE,
-        REMANENTE_ORIGINAL: (neumatico as any).REMANENTE_ORIGINAL,
-        ESTADO: neumatico.ESTADO
-    }) : { porcentajeDesgaste: 0, color: 'transparent' as const, bgColor: 'transparent' };
+    completada?: boolean;
+}> = React.memo(({ keyPos, lado, width, height, esRepuesto, neumatico, onPosicionClick, posicionResaltada, completada }) => {
+    const { combinedRef, attributes, listeners, isDragging, isOver, colores, esTemporal, esResaltada, kmRecorrido } =
+        useEstadoMarcador(keyPos, neumatico, posicionResaltada);
 
-    // Determinar si esta posición debe resaltarse
-    const esResaltada = posicionResaltada === keyPos;
-
-    let bgColor = 'transparent';
-    if (esResaltada) {
-        bgColor = '#ffeb3b'; // Amarillo brillante para resaltar
-    } else if ((neumatico as any)?.TIPO_MOVIMIENTO === 'TEMPORAL') {
-        bgColor = '#00ACC1'; // Turquesa: neumático recién asignado, sin inspección aún
-    } else {
-        bgColor = infoDesgaste.bgColor;
-    }
-    // Unir refs de draggable y droppable
-    const combinedRef = (node: HTMLDivElement | null) => {
-        setNodeRef(node);
-        setDropRef(node);
-    };
-    // Estado para km recorrido
-    const [kmRecorrido, setKmRecorrido] = useState<string>('—');
-    // Refrescar kmRecorrido cuando cambien los datos del neumático (props)
-    useEffect(() => {
-        fetchKm();
-
-    }, [neumatico?.CODIGO, neumatico?.CODIGO_NEU]);
-    useEffect(() => {
-        fetchKm();
-
-    }, [JSON.stringify(neumatico)]);
-    useEffect(() => {
-        const refrescarKm = () => {
-            fetchKm();
-        };
-        window.addEventListener('actualizar-diagrama-vehiculo', refrescarKm);
-        return () => {
-            window.removeEventListener('actualizar-diagrama-vehiculo', refrescarKm);
-        };
-    }, [neumatico?.CODIGO, neumatico?.CODIGO_NEU]);
-
-
-
-    // Nueva función para obtener el historial y calcular km recorrido
-    const fetchKm = React.useCallback(async () => {
-        if (!neumatico) {
-            setKmRecorrido('—');
-            return;
-        }
-
-        // PRIORIDAD: Usar KM_TOTAL_VIDA que viene directo de NEU_CABECERA
-        if (neumatico.KM_TOTAL_VIDA !== undefined && neumatico.KM_TOTAL_VIDA !== null) {
-            const val = Number(neumatico.KM_TOTAL_VIDA);
-            setKmRecorrido(val.toLocaleString() + ' km');
-            // Si queremos que compruebe historial si es 0, podriamos hacer val > 0 check.
-            // Pero el usuario quiere ver lo que hay en BD. Si BD es 0, mostramos 0.
-            return;
-        }
-
-        const codigo = neumatico.CODIGO || neumatico.CODIGO_NEU;
-        if (!codigo) {
-            setKmRecorrido('—');
-            return;
-        }
-    }, [neumatico]);
-    // Estilos personalizados para REPUESTO
-    const isReserva = keyPos === 'RES01';
-    const boxStyles = isReserva
-        ? {
-            position: 'absolute',
-            top,
-            left,
-            zIndex: 2,
-            width: '60px',
-            height: '29px',
-            borderRadius: '6px',
-            backgroundColor: isOver ? '#e0f7fa' : bgColor,
-            border: isOver ? '2px solid #388e3c' : esResaltada ? '3px solid #ff5722' : '2px solid transparent',
-            animation: esResaltada ? 'pulso 1s infinite' : 'none',
-            '@keyframes pulso': {
-                '0%': { transform: 'scale(1)', boxShadow: '0 0 0 0 rgba(255, 87, 34, 0.7)' },
-                '50%': { transform: 'scale(1.05)', boxShadow: '0 0 0 10px rgba(255, 87, 34, 0)' },
-                '100%': { transform: 'scale(1)', boxShadow: '0 0 0 0 rgba(255, 87, 34, 0)' },
-            },
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontWeight: 'bold',
-            color: '#222',
-            fontSize: 18,
-            cursor: neumatico ? 'grab' : 'pointer',
-            transition: 'box-shadow 0.2s, background 0.2s, border 0.2s',
-            boxShadow: neumatico && isDragging ? `0 0 8px 2px ${bgColor}` : neumatico ? `0 0 8px 2px ${bgColor}` : 'none',
-            opacity: neumatico && isDragging ? 0.5 : 1,
-            userSelect: 'none',
-            outline: neumatico && isDragging ? '2px solid #388e3c' : 'none',
-        }
-        : {
-            position: 'absolute',
-            top,
-            left,
-            zIndex: 2,
-            width: layout === 'modal' ? '25px' : '26px',
-            height: layout === 'modal' ? '58px' : '61px',
-            borderRadius: '15px',
-            backgroundColor: isOver ? '#e0f7fa' : bgColor,
-            border: isOver ? '2px solid #388e3c' : esResaltada ? '3px solid #ff5722' : '2px solid transparent',
-            animation: esResaltada ? 'pulso 1s infinite' : 'none',
-            '@keyframes pulso': {
-                '0%': { transform: 'scale(1)', boxShadow: '0 0 0 0 rgba(255, 87, 34, 0.7)' },
-                '50%': { transform: 'scale(1.05)', boxShadow: '0 0 0 10px rgba(255, 87, 34, 0)' },
-                '100%': { transform: 'scale(1)', boxShadow: '0 0 0 0 rgba(255, 87, 34, 0)' },
-            },
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontWeight: 'bold',
-            color: '#222',
-            fontSize: 18,
-            cursor: neumatico ? 'grab' : 'pointer',
-            transition: 'box-shadow 0.2s, background 0.2s, border 0.2s',
-            boxShadow: neumatico && isDragging ? `0 0 8px 2px ${bgColor}` : neumatico ? `0 0 8px 2px ${bgColor}` : 'none',
-            opacity: neumatico && isDragging ? 0.5 : 1,
-            userSelect: 'none',
-            outline: neumatico && isDragging ? '2px solid #388e3c' : 'none',
-        };
+    const subEtiqueta = esRepuesto ? 'repuesto' : lado ? LADO_LABEL[lado] : '';
 
     return (
-        <>
-            <Tooltip>
-                <TooltipTrigger asChild>
-                    <Box
-                        ref={combinedRef}
-                        key={keyPos}
-                        aria-label={neumatico ? `Arrastrar neumático ${neumatico.CODIGO_NEU || neumatico.CODIGO}` : undefined}
-                        {...attributes}
-                        {...(neumatico ? listeners : {})}
-                        sx={boxStyles}
-                        onClick={() => onPosicionClick && onPosicionClick(neumatico ? { ...neumatico, POSICION: keyPos } : undefined)}
-                    >
-                        <span style={{ fontWeight: 'bold', fontSize: isReserva ? '15px' : '13px', color: `#fff`, pointerEvents: 'none' }}>
-                            {isReserva ? 'RES' : keyPos.replace('POS', '')}
-                        </span>
-                    </Box>
-
-                </TooltipTrigger>
-                <TooltipContent>
-                    <ul>
-                        <li>Posición: {keyPos}</li>
-                        {
-                            neumatico && (
-                                <>
-                                    <li>Neumático: {neumatico.CODIGO_NEU || neumatico.CODIGO}</li>
-                                    {neumatico.REMANENTE && <li>Remanente: {neumatico.REMANENTE}mm</li>}
-                                    {neumatico.ESTADO && <li>Estado: {neumatico.ESTADO}%</li>}
-                                </>
-                            )
-                        }
-                    </ul>
-                </TooltipContent>
-            </Tooltip>
-            {/* Insignia fija: POS01 = posición del conductor */}
-            {keyPos === 'POS01' && (
+        <Tooltip>
+            <TooltipTrigger asChild>
                 <Box
+                    ref={combinedRef}
+                    aria-label={neumatico ? `Arrastrar neumático ${neumatico.CODIGO_NEU || neumatico.CODIGO}` : undefined}
+                    {...(neumatico ? attributes : {})}
+                    {...(neumatico ? listeners : {})}
+                    onClick={() => onPosicionClick && onPosicionClick(neumatico ? { ...neumatico, POSICION: keyPos } : undefined, keyPos)}
                     sx={{
-                        position: 'absolute',
-                        top: `calc(${top} - 34px)`,
-                        left: `calc(${left} - 32px)`,
-                        zIndex: 6,
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '4px',
-                        background: 'linear-gradient(135deg, #1976d2, #1565c0)',
-                        color: '#fff',
-                        borderRadius: '999px',
-                        padding: '4px 10px 4px 6px',
-                        fontSize: '11px',
-                        fontWeight: 700,
-                        letterSpacing: '0.3px',
-                        boxShadow: '0 2px 8px rgba(25,118,210,0.45)',
-                        pointerEvents: 'none',
-                        whiteSpace: 'nowrap',
-                        animation: 'conductorGlow 2.2s ease-in-out infinite',
-                        '@keyframes conductorGlow': {
-                            '0%, 100%': { boxShadow: '0 2px 8px rgba(25,118,210,0.45)' },
-                            '50%': { boxShadow: '0 2px 14px rgba(25,118,210,0.9)' },
+                        position: 'relative',
+                        width,
+                        height,
+                        borderRadius: '10px',
+                        backgroundColor: isOver ? '#e0f7fa' : colores.fill,
+                        border: `2.5px solid ${isOver ? '#388e3c' : colores.stroke}`,
+                        borderStyle: esTemporal ? 'dashed' : 'solid',
+                        outline: esResaltada ? '3px dashed #f59e0b' : 'none',
+                        outlineOffset: '3px',
+                        animation: esResaltada ? 'diagramaResaltada 1.1s ease-in-out infinite' : 'none',
+                        '@keyframes diagramaResaltada': {
+                            '0%, 100%': { opacity: 1 },
+                            '50%': { opacity: 0.55 },
                         },
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '1px',
+                        fontWeight: 700,
+                        color: '#1e293b',
+                        fontFamily: 'monospace',
+                        cursor: neumatico ? 'grab' : 'pointer',
+                        transition: 'background 0.15s, border 0.15s',
+                        opacity: neumatico && isDragging ? 0.55 : 1,
+                        userSelect: 'none',
                     }}
                 >
-                    <SteeringWheel size={14} weight="fill" />
-                    CONDUCTOR
+                    <Box component="span" sx={{ fontSize: Math.max(9, width * 0.22), lineHeight: 1 }}>
+                        {keyPos}
+                    </Box>
+                    {subEtiqueta && (
+                        <Box
+                            component="span"
+                            sx={{
+                                fontSize: Math.max(7, width * 0.15),
+                                fontWeight: 500,
+                                color: '#64748b',
+                                lineHeight: 1,
+                                textTransform: 'uppercase',
+                            }}
+                        >
+                            {subEtiqueta}
+                        </Box>
+                    )}
+
+                    {esTemporal && (
+                        <Box
+                            sx={{
+                                position: 'absolute',
+                                top: -4,
+                                right: -4,
+                                width: 9,
+                                height: 9,
+                                borderRadius: '50%',
+                                background: '#5fd4a0',
+                                border: '1.5px solid #fff',
+                            }}
+                        />
+                    )}
+
+                    {completada && (
+                        <Box
+                            sx={{
+                                position: 'absolute',
+                                top: -6,
+                                right: -6,
+                                zIndex: 7,
+                                width: 16,
+                                height: 16,
+                                borderRadius: '50%',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                background: '#16a34a',
+                                border: '1.5px solid #fff',
+                                boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
+                                pointerEvents: 'none',
+                            }}
+                        >
+                            <CheckCircle size={11} color="#fff" strokeWidth={3} />
+                        </Box>
+                    )}
+
+                    {/* Insignia fija: POS01 = posición del conductor */}
+                    {keyPos === 'POS01' && (
+                        <Box
+                            sx={{
+                                position: 'absolute',
+                                top: -20,
+                                left: '50%',
+                                transform: 'translateX(-50%)',
+                                zIndex: 6,
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '3px',
+                                background: 'linear-gradient(135deg, #1976d2, #1565c0)',
+                                color: '#fff',
+                                borderRadius: '999px',
+                                padding: '2px 7px 2px 5px',
+                                fontSize: '8px',
+                                fontWeight: 700,
+                                letterSpacing: '0.2px',
+                                boxShadow: '0 2px 6px rgba(25,118,210,0.45)',
+                                pointerEvents: 'none',
+                                whiteSpace: 'nowrap',
+                            }}
+                        >
+                            <SteeringWheel size={9} weight="fill" />
+                            CONDUCTOR
+                        </Box>
+                    )}
                 </Box>
-            )}
-            {/* Mostrar presión de aire en dashboard y en modal de mantenimiento */}
-            {(layout === 'dashboard' || (layout === 'modal' && tipoModal === 'mantenimiento')) && neumatico && neumatico.PRESION_AIRE !== undefined && neumatico.PRESION_AIRE !== null && neumatico.PRESION_AIRE !== '' && (
-                keyPos === 'RES01' ? (
+            </TooltipTrigger>
+            <TooltipPosicion keyPos={keyPos} esRepuesto={esRepuesto} neumatico={neumatico} kmRecorrido={kmRecorrido} />
+        </Tooltip>
+    );
+});
+
+/** Marcador que "sombrea" la rueda dibujada en la imagen del vehículo. */
+const MarcadorImagenNeumatico: React.FC<{
+    marcador: MarcadorImagen;
+    anchoNatural: number;
+    altoNatural: number;
+    neumatico: any | undefined;
+    onPosicionClick?: (neumatico: Neumatico | undefined, codigoPosicion: string) => void;
+    posicionResaltada?: string;
+    completada?: boolean;
+}> = React.memo(({ marcador, anchoNatural, altoNatural, neumatico, onPosicionClick, posicionResaltada, completada }) => {
+    const keyPos = marcador.codigo;
+    const { combinedRef, attributes, listeners, isDragging, isOver, colores, esTemporal, esResaltada, kmRecorrido } =
+        useEstadoMarcador(keyPos, neumatico, posicionResaltada);
+
+    const leftPct = ((marcador.x - marcador.w / 2) / anchoNatural) * 100;
+    const topPct = ((marcador.y - marcador.h / 2) / altoNatural) * 100;
+    const widthPct = (marcador.w / anchoNatural) * 100;
+    const heightPct = (marcador.h / altoNatural) * 100;
+    // Sin override explícito, la etiqueta sigue al lado de la rueda (el repuesto va abajo).
+    const posicionEtiqueta = marcador.etiqueta ?? marcador.lado ?? 'ABAJO';
+    // Si el override manda a un costado una rueda que no está en ese costado (ej. la moto,
+    // con ambas ruedas al centro), la etiqueta se ancla al borde del diagrama en vez de
+    // pegarse al marcador: si no, quedaría encima de la silueta.
+    const etiquetaAlBorde = marcador.etiqueta !== undefined && marcador.etiqueta !== marcador.lado;
+    // Distancias en % del ancho del marcador (su caja es el bloque contenedor de la etiqueta).
+    const hastaBordeIzq = ((leftPct + widthPct) / widthPct) * 100;
+    const hastaBordeDer = ((100 - leftPct) / widthPct) * 100;
+
+    return (
+        <Tooltip>
+            <TooltipTrigger asChild>
+                <Box
+                    ref={combinedRef}
+                    aria-label={neumatico ? `Arrastrar neumático ${neumatico.CODIGO_NEU || neumatico.CODIGO}` : undefined}
+                    {...(neumatico ? attributes : {})}
+                    {...(neumatico ? listeners : {})}
+                    onClick={() => onPosicionClick && onPosicionClick(neumatico ? { ...neumatico, POSICION: keyPos } : undefined, keyPos)}
+                    sx={{
+                        position: 'absolute',
+                        left: `${leftPct}%`,
+                        top: `${topPct}%`,
+                        width: `${widthPct}%`,
+                        height: `${heightPct}%`,
+                        borderRadius: '18%',
+                        backgroundColor: isOver ? conAlpha('#388e3c', 0.55) : conAlpha(colores.stroke, 0.5),
+                        border: `2.5px solid ${isOver ? '#388e3c' : colores.stroke}`,
+                        borderStyle: esTemporal ? 'dashed' : 'solid',
+                        outline: esResaltada ? '3px dashed #f59e0b' : 'none',
+                        outlineOffset: '2px',
+                        animation: esResaltada ? 'diagramaResaltadaBorde 1.1s ease-in-out infinite' : 'none',
+                        '@keyframes diagramaResaltadaBorde': {
+                            '0%, 100%': { outlineColor: '#f59e0b' },
+                            '50%': { outlineColor: '#fde68a' },
+                        },
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: neumatico ? 'grab' : 'pointer',
+                        userSelect: 'none',
+                        zIndex: 2,
+                    }}
+                >
                     <Box
+                        component="span"
                         sx={{
-                            position: 'absolute',
-                            top: `calc(${top} + 30px)`,
-                            left: `calc(${left} + -13px)`,
-                            zIndex: 3,
-                            background: '#f5f5f5',
-                            borderRadius: '6px',
-                            padding: '2px 10px',
-                            fontSize: '13px',
-                            color: '#1976d2',
-                            fontWeight: 600,
-                            boxShadow: '0 1px 4px rgba(0,0,0,0.10)',
+                            fontSize: 'clamp(10px, 6cqw, 13px)',
+                            fontWeight: 800,
+                            color: '#fff',
+                            fontFamily: 'monospace',
+                            textShadow: '0 1px 2px rgba(0,0,0,0.85)',
                             pointerEvents: 'none',
-                            minWidth: '85px',
-                            textAlign: 'center',
-                            border: '1px solid #b9b9b9',
+                            whiteSpace: 'nowrap',
                         }}
                     >
-                        {` ${neumatico.REMANENTE} mm`}
+                        {keyPos.startsWith('RES') ? `R${keyPos.slice(3)}` : keyPos.replace(/^POS/, '')}
                     </Box>
-                ) : (
-                    <Box
-                        sx={{
-                            position: 'absolute',
-                            top: `calc(${top} + 5px)`,
-                            left:
-                                keyPos === 'POS01' || keyPos === 'POS03'
-                                    ? `calc(${left} + 30px)` // Derecha para POS01 y POS03
-                                    : `calc(${left} - 90px)`, // Izquierda para POS02 y POS04
-                            zIndex: 3,
-                            background: '#f5f5f5',
-                            borderRadius: '6px',
-                            padding: '2px 10px',
-                            fontSize: '13px',
-                            color: '#1976d2',
-                            fontWeight: 600,
-                            boxShadow: '0 1px 4px rgba(0,0,0,0.10)',
-                            pointerEvents: 'none',
-                            minWidth: '85px',
-                            textAlign: 'center',
-                            border: '1px solid #b9b9b9',
-                        }}
-                    >
-                        {` ${neumatico.REMANENTE} mm`}
-                    </Box>
-                )
-            )}
-            {layout === 'dashboard' && (
-                <>
-                    {/* Cuadro para POS01, POS02, POS03, POS04 */}
-                    {(keyPos === 'POS01' || keyPos === 'POS02' || keyPos === 'POS03' || keyPos === 'POS04') && (
+
+                    {esTemporal && (
                         <Box
                             sx={{
                                 position: 'absolute',
-                                top: keyPos === 'POS01' ? '75px'
-                                    : keyPos === 'POS02' ? '75px'
-                                        : keyPos === 'POS03' ? '250px'
-                                            : '250px',
-                                left: keyPos === 'POS01' || keyPos === 'POS03' ? '385px' : '1px',
-                                width: '200px',
-                                minHeight: '90px',
-                                // border: '1px solid #ededed',
-                                borderRadius: '20px',
-                                background: '#fdfdfd',
-                                color: '#d32f2f',
-                                fontWeight: 500,
-                                fontSize: '14px',
-                                padding: '10px 12px',
-                                zIndex: 4,
-                                display: 'flex',
-                                flexDirection: 'column',
-                                justifyContent: 'flex-start',
-                                alignItems: 'flex-start',
-                                pointerEvents: 'none',
+                                top: -4,
+                                right: -4,
+                                width: 9,
+                                height: 9,
+                                borderRadius: '50%',
+                                background: '#5fd4a0',
+                                border: '1.5px solid #fff',
                             }}
-                        >
-                            <span style={{ color: '#d32f2f', fontWeight: 500 }}>
-                                {keyPos}: {neumatico ? (neumatico.CODIGO_NEU || neumatico.CODIGO) : '—'}
-                            </span>
-                            <span style={{ color: '#222', fontWeight: 500, marginTop: 4 }}>
-                                Km recorrido: {kmRecorrido}
-                            </span>
-                        </Box>
+                        />
                     )}
-                    {/* Cuadro para REPUESTO */}
-                    {keyPos === 'RES01' && (
+
+                    {completada && (
                         <Box
                             sx={{
                                 position: 'absolute',
-                                top: '340px',
-                                left: '195px',
-                                width: '190px',
-                                minHeight: '90px',
-                                // border: '1px solid #ededed',
-                                borderRadius: '20px',
-                                background: '#fdfdfd',
-                                color: '#d32f2f',
-                                fontWeight: 500,
-                                fontSize: '14px',
-                                padding: '10px 12px',
-                                zIndex: 4,
+                                top: -6,
+                                right: -6,
+                                zIndex: 7,
+                                width: 16,
+                                height: 16,
+                                borderRadius: '50%',
                                 display: 'flex',
-                                flexDirection: 'column',
-                                justifyContent: 'flex-start',
-                                alignItems: 'flex-start',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                background: '#16a34a',
+                                border: '1.5px solid #fff',
+                                boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
                                 pointerEvents: 'none',
                             }}
                         >
-                            <span style={{ color: '#d32f2f', fontWeight: 500 }}>
-                                {keyPos}: {neumatico ? (neumatico.CODIGO_NEU || neumatico.CODIGO) : '—'}
-                            </span>
-                            <span style={{ color: '#222', fontWeight: 500, marginTop: 4 }}>
-                                Km recorrido: {kmRecorrido}
-                            </span>
+                            <CheckCircle size={11} color="#fff" strokeWidth={3} />
                         </Box>
                     )}
-                </>
-            )}
-        </>
+
+                    {/* Insignia fija: POS01 = posición del conductor */}
+                    {keyPos === 'POS01' && (
+                        <Box
+                            sx={{
+                                position: 'absolute',
+                                top: -22,
+                                left: '50%',
+                                transform: 'translateX(-50%)',
+                                zIndex: 6,
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '3px',
+                                background: 'linear-gradient(135deg, #1976d2, #1565c0)',
+                                color: '#fff',
+                                borderRadius: '999px',
+                                padding: '2px 7px 2px 5px',
+                                fontSize: '8px',
+                                fontWeight: 700,
+                                letterSpacing: '0.2px',
+                                boxShadow: '0 2px 6px rgba(25,118,210,0.45)',
+                                pointerEvents: 'none',
+                                whiteSpace: 'nowrap',
+                            }}
+                        >
+                            <SteeringWheel size={9} weight="fill" />
+                            CONDUCTOR
+                        </Box>
+                    )}
+
+                    {/* Etiqueta fija de remanente/km — visible siempre (los supervisores capturan el diagrama en foto, no pasan el mouse).
+                        IZQ/DER van a los costados (fuera de la silueta, para no tapar la rueda/pilar); el repuesto se queda abajo. */}
+                    {neumatico && (
+                        <Box
+                            sx={{
+                                position: 'absolute',
+                                ...(posicionEtiqueta === 'IZQ'
+                                    ? { top: '50%', right: etiquetaAlBorde ? `${hastaBordeIzq}%` : '100%', transform: 'translate(-6px, -50%)' }
+                                    : posicionEtiqueta === 'DER'
+                                        ? { top: '50%', left: etiquetaAlBorde ? `${hastaBordeDer}%` : '100%', transform: 'translate(6px, -50%)' }
+                                        : posicionEtiqueta === 'ARRIBA'
+                                            ? { bottom: '100%', left: '50%', transform: 'translate(-50%, -5px)' }
+                                            : { top: '100%', left: '50%', transform: 'translate(-50%, 5px)' }),
+                                zIndex: 5,
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                gap: '2px',
+                                background: 'linear-gradient(135deg, #27272a, #18181b)',
+                                borderRadius: '7px',
+                                padding: '4px 7px',
+                                boxShadow: '0 3px 8px rgba(0, 0, 0, 0.4)',
+                                border: `1px solid ${conAlpha(colores.stroke, 0.7)}`,
+                                whiteSpace: 'nowrap',
+                                pointerEvents: 'none',
+                            }}
+                        >
+                            <Box component="span" sx={{ fontSize: '9px', fontWeight: 700, color: '#cbd5e1', fontFamily: 'monospace', letterSpacing: '0.2px' }}>
+                                {neumatico.CODIGO_NEU || neumatico.CODIGO || '—'}
+                            </Box>
+                            <Box component="span" sx={{ width: '100%', height: '1px', background: 'rgba(255,255,255,0.14)' }} />
+                            <Box component="span" sx={{ fontSize: '10px', fontWeight: 800, color: '#fff', fontFamily: 'monospace', letterSpacing: '0.2px' }}>
+                                {neumatico.REMANENTE ?? '—'}mm
+                            </Box>
+                            <Box component="span" sx={{ width: '100%', height: '1px', background: 'rgba(255,255,255,0.14)' }} />
+                            <Box component="span" sx={{ fontSize: '9px', fontWeight: 600, color: '#94a3b8', fontFamily: 'monospace' }}>
+                                {kmRecorrido}
+                            </Box>
+                        </Box>
+                    )}
+                </Box>
+            </TooltipTrigger>
+            <TooltipPosicion keyPos={keyPos} esRepuesto={marcador.repuesto ?? false} neumatico={neumatico} kmRecorrido={kmRecorrido} />
+        </Tooltip>
     );
 });
 

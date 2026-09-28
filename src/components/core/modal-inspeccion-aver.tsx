@@ -1,26 +1,21 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
-import WarningIcon from '@mui/icons-material/Warning';
-import WarningAmberIcon from '@mui/icons-material/WarningAmber';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import { CalendarCheck2, TriangleAlert } from 'lucide-react';
 import { convertToDateHuman } from '@/lib/utils';
 import { Button as ButtonCustom } from '@/components/ui/button';
 
 interface ModalInspeccionAverProps {
     open: boolean;
     ultimaInspeccionFecha?: string; // Fecha de la última inspección
-    esInspeccionHoy?: boolean; // Si la última inspección fue hoy (7/7/2025)
+    esInspeccionHoy?: boolean; // Si la última inspección fue hoy
     onClose: () => void;
     onContinue: () => void;
     onCloseMain?: () => void; // Para cerrar el modal principal de inspección
-    advertenciaCantidadNeumaticos?: number; // Nueva prop para advertencia de cantidad
-    onAbrirAsignacion?: () => void; // Nueva prop para abrir modal de asignación
+    advertenciaCantidadNeumaticos?: number; // Advertencia de cantidad de neumáticos
+    onAbrirAsignacion?: () => void; // Para abrir el modal de asignación
 }
 
 const ModalInspeccionAver: React.FC<ModalInspeccionAverProps> = ({
@@ -33,135 +28,108 @@ const ModalInspeccionAver: React.FC<ModalInspeccionAverProps> = ({
     advertenciaCantidadNeumaticos,
     onAbrirAsignacion,
 }) => {
-    // Centralizar la lógica del botón 'Ir a asignar neumáticos'
     const handleIrAsignacion = () => {
         if (onAbrirAsignacion) onAbrirAsignacion();
     };
 
-    // Si la inspección fue hoy, no cerrar automáticamente, solo mostrar el mensaje
-    // useEffect(() => {
-    //     if (open && esInspeccionHoy) {
-    //         // Mostrar un mensaje breve y cerrar
-    //         setTimeout(() => {
-    //             onClose();
-    //         }, 1500); // Darle tiempo al usuario de ver el mensaje
-    //     }
-    // }, [open, esInspeccionHoy, onClose]);
+    const esAdvertenciaCantidad = advertenciaCantidadNeumaticos !== undefined;
+    const tieneContenido = esAdvertenciaCantidad || Boolean(ultimaInspeccionFecha);
+
+    const titulo = esAdvertenciaCantidad
+        ? 'ADVERTENCIA'
+        : esInspeccionHoy
+            ? 'INSPECCIÓN YA REALIZADA'
+            : 'ADVERTENCIA';
+
+    const mensaje = esAdvertenciaCantidad
+        ? `Faltan ${advertenciaCantidadNeumaticos} neumáticos asignados para poder inspeccionar.`
+        : `La última inspección fue el ${convertToDateHuman(ultimaInspeccionFecha ?? '')}.`;
+
+    const cerrarTodo = () => {
+        onClose();
+        onCloseMain?.();
+    };
 
     return (
         <Dialog
             open={open}
             onClose={() => { }} // Desactivar cierre por clic afuera
-            disableEscapeKeyDown // Desactivar cierre con tecla Escape
+            disableEscapeKeyDown
+            maxWidth="sm"
+            fullWidth
             PaperProps={{
                 sx: {
                     borderRadius: 3,
-                    minWidth: 600,
-                    maxWidth: 700,
-                }
+                    overflow: 'hidden',
+                    m: { xs: 2, sm: 4 },
+                    width: 'calc(100% - 32px)',
+                    maxWidth: { xs: '100%', sm: 620 },
+                },
             }}
         >
-            <DialogContent sx={{
-                bgcolor: advertenciaCantidadNeumaticos !== undefined ? '#fff3cd' : (ultimaInspeccionFecha ? '#fff3cd' : undefined),
-                borderRadius: 2,
-                p: 0
-            }}>
-                {
-                    advertenciaCantidadNeumaticos !== undefined ? (
-                        <Box sx={{ display: 'flex', alignItems: 'center', p: 3, pb: 2 }}>
-                            <WarningAmberIcon color="warning" sx={{ fontSize: 48, mr: 2, mt: 0.5 }} />
-                            <Box sx={{ flex: 1 }}>
-                                <Typography variant="h5" fontWeight="bold" color="warning.main" sx={{ mb: 1 }}>
-                                    ADVERTENCIA
-                                </Typography>
-                                <Typography sx={{ fontSize: 16, color: '#222' }}>
-                                    Faltan {advertenciaCantidadNeumaticos} neumáticos asignados para poder inspeccionar.
-                                </Typography>
-                            </Box>
-                        </Box>
-                    ) : ultimaInspeccionFecha && (
-                        <Box sx={{ display: 'flex', alignItems: 'center', p: 3, pb: 2 }}>
-                            <WarningAmberIcon color="warning" sx={{ fontSize: 48, mr: 2, mt: 0.5 }} />
-                            <Box sx={{ flex: 1 }}>
-                                <Typography variant="h5" fontWeight="bold" color="warning.main" sx={{ mb: 1 }}>
-                                    {esInspeccionHoy ? 'INSPECCIÓN YA REALIZADA' : 'ADVERTENCIA'}
-                                </Typography>
-                                <Typography sx={{ fontSize: 16, color: '#222' }}>
-                                    La última inspección fue el {convertToDateHuman(ultimaInspeccionFecha)}.
-                                </Typography>
-                            </Box>
-                            <Box sx={{ ml: 2, display: 'flex', alignItems: 'center', height: '100%' }}>
-                                <img src="/assets/inpeccion_tire.png" alt="Inspección" style={{ width: 72, height: 72 }} />
-                            </Box>
-                        </Box>
-                    )
+            <Box sx={{ height: 4, background: 'linear-gradient(90deg, #f59e0b 0%, #f97316 100%)' }} />
 
-                    // : (
-                    //     <Box sx={{ p: 3, pb: 2 }}>
-                    //         <Typography>Este vehículo ya tiene inspecciones previas.</Typography>
-                    //     </Box>
-                    // )
-                }
+            <DialogContent sx={{ bgcolor: '#fffbeb', p: { xs: 2.5, sm: 3 } }}>
+                {tieneContenido && (
+                    <div className="flex items-start gap-3 sm:gap-4">
+                        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-amber-400 to-orange-500 text-white shadow-md shadow-amber-200 sm:h-12 sm:w-12">
+                            {esInspeccionHoy && !esAdvertenciaCantidad
+                                ? <CalendarCheck2 className="h-5 w-5 sm:h-6 sm:w-6" />
+                                : <TriangleAlert className="h-5 w-5 sm:h-6 sm:w-6" />}
+                        </span>
+
+                        <div className="min-w-0 flex-1">
+                            <p className="text-base font-extrabold tracking-wide text-amber-700 sm:text-lg">
+                                {titulo}
+                            </p>
+                            <p className="mt-1 text-sm text-slate-700 sm:text-base">
+                                {mensaje}
+                            </p>
+                        </div>
+
+                        {/* Ilustración: sólo cuando hay espacio de sobra */}
+                        {!esAdvertenciaCantidad && (
+                            <Box sx={{ display: { xs: 'none', sm: 'flex' }, alignItems: 'center', flexShrink: 0 }}>
+                                <img src="/assets/inpeccion_tire.png" alt="" style={{ width: 68, height: 68 }} />
+                            </Box>
+                        )}
+                    </div>
+                )}
             </DialogContent>
 
-            {advertenciaCantidadNeumaticos !== undefined ? (
-                <DialogActions sx={{ p: 3, backgroundColor: '#fff3cd', justifyContent: 'flex-end', gap: 2 }}>
-                    <ButtonCustom
-                        onClick={onClose}
-                    >
-                        Cerrar
-                    </ButtonCustom>
-                    {onAbrirAsignacion && (
-                        <ButtonCustom
-                            variant={'primary'}
-                            onClick={handleIrAsignacion}
-                        >
-                            Ir a asignar neumáticos
-                        </ButtonCustom>
-                    )}
-                </DialogActions>
-            )
-                : esInspeccionHoy === true ? (
-                    <DialogActions sx={{ p: 3, backgroundColor: ultimaInspeccionFecha ? '#fff3cd' : undefined, justifyContent: 'flex-end' }}>
-                        <ButtonCustom
-                            onClick={() => {
-                                onClose();
-                                onCloseMain?.();
-                            }}
-                        >
-                            Cerrar
-                        </ButtonCustom>
-                    </DialogActions>
-                )
-                    : esInspeccionHoy === false ? (
-
-                        // !esInspeccionHoy && (
-                        <DialogActions sx={{
-                            p: 3,
-                            backgroundColor: ultimaInspeccionFecha ? '#fff3cd' : undefined,
-                            justifyContent: 'flex-end',
-                            gap: 2
-                        }}
-                        >
-                            <ButtonCustom
-                                onClick={() => {
-                                    onClose();
-                                    onCloseMain?.();
-                                }}
-                            >
-                                Cerrar
+            <DialogActions
+                sx={{
+                    bgcolor: '#fffbeb',
+                    px: { xs: 2.5, sm: 3 },
+                    pb: { xs: 2.5, sm: 3 },
+                    pt: 0,
+                    gap: 1.5,
+                    flexDirection: { xs: 'column-reverse', sm: 'row' },
+                    alignItems: { xs: 'stretch', sm: 'center' },
+                    justifyContent: 'flex-end',
+                    '& > button': { width: { xs: '100%', sm: 'auto' }, m: '0 !important' },
+                }}
+            >
+                {esAdvertenciaCantidad ? (
+                    <>
+                        <ButtonCustom onClick={onClose}>Cerrar</ButtonCustom>
+                        {onAbrirAsignacion && (
+                            <ButtonCustom variant="primary" onClick={handleIrAsignacion}>
+                                Ir a asignar neumáticos
                             </ButtonCustom>
-
-                            <ButtonCustom
-                                onClick={onContinue}
-                                variant={'warning'}
-                            >
-                                Registrar nueva inspección
-                            </ButtonCustom>
-                        </DialogActions>
-                        // )
-                    ) : null
-            }
+                        )}
+                    </>
+                ) : esInspeccionHoy === true ? (
+                    <ButtonCustom onClick={cerrarTodo}>Cerrar</ButtonCustom>
+                ) : esInspeccionHoy === false ? (
+                    <>
+                        <ButtonCustom onClick={cerrarTodo}>Cerrar</ButtonCustom>
+                        <ButtonCustom onClick={onContinue} variant="warning">
+                            Registrar nueva inspección
+                        </ButtonCustom>
+                    </>
+                ) : null}
+            </DialogActions>
         </Dialog>
     );
 };

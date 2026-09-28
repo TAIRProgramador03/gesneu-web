@@ -69,6 +69,7 @@ const ModalAvertAsigNeu: React.FC<ModalAvertAsigNeuProps> = ({ open, onClose, on
             <DialogActions sx={{ justifyContent: 'center' }}>
 
                 <ButtonCustom
+                    variant="ghost"
                     onClick={onClose}
                 >
                     Cancelar

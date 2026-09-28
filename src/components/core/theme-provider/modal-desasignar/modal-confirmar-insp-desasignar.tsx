@@ -1,11 +1,6 @@
 import React, { memo } from 'react';
-import Dialog from '@mui/material/Dialog';
-import DialogContent from '@mui/material/DialogContent';
-import DialogActions from '@mui/material/DialogActions';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
-import Box from '@mui/material/Box';
-import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import { CalendarCheck, CircleCheck, TriangleAlert } from 'lucide-react';
+import ModalAviso, { type TonoAviso } from '@/components/core/modal-aviso';
 import { Button as ButtonCustom } from '@/components/ui/button';
 
 interface ModalConfirmarInspDesasignarProps {
@@ -14,7 +9,7 @@ interface ModalConfirmarInspDesasignarProps {
     diasDiferencia?: number;
     onClose: () => void;
     onRegistrarInspeccion: () => void;
-    onContinuarDesasignacion: () => void; // Propiedad para continuar la desasignación
+    onContinuarDesasignacion: () => void;
 }
 
 const ModalConfirmarInspDesasignar: React.FC<ModalConfirmarInspDesasignarProps> = memo(({
@@ -25,86 +20,63 @@ const ModalConfirmarInspDesasignar: React.FC<ModalConfirmarInspDesasignarProps> 
     onRegistrarInspeccion,
     onContinuarDesasignacion,
 }) => {
-    // Lógica adaptada
-    const esMuyAntigua = diasDiferencia > 4;
-    const esReciente = diasDiferencia >= 1 && diasDiferencia <= 4;
+    // Regla del sistema: vale hoy y los 3 días anteriores. Desde el 4º día hay que reinspeccionar.
+    // Mismo umbral que usa el flujo de reubicación (diffDias >= 4).
+    const esMuyAntigua = diasDiferencia >= 4;
     const esHoy = diasDiferencia === 0;
 
-    // Título
-    let titulo = 'CONFIRMAR INSPECCIÓN';
-    if (esMuyAntigua) titulo = 'INSPECCIÓN REQUERIDA';
-    else if (esHoy) titulo = 'INSPECCIÓN RECIENTE';
-
-    // Formatear fecha
     let fechaFormateada = fechaUltimaInspeccion;
     if (/^\d{4}-\d{2}-\d{2}$/.test(fechaUltimaInspeccion)) {
         const [y, m, d] = fechaUltimaInspeccion.split('-');
-        const dia = d.padStart(2, '0');
-        const mes = m.padStart(2, '0');
-        fechaFormateada = `${dia}/${mes}/${y}`;
+        fechaFormateada = `${d.padStart(2, '0')}/${m.padStart(2, '0')}/${y}`;
     }
 
-    // Mensaje
+    let titulo = 'CONFIRMAR INSPECCIÓN';
     let mensaje = `La última inspección fue el ${fechaFormateada}. ¿Desea continuar con esa fecha o realizar una nueva inspección?`;
-    if (esMuyAntigua) mensaje = `La última inspección (${fechaFormateada}) es demasiado antigua. Debe registrar una nueva inspección para continuar.`;
-    else if (esHoy) mensaje = `Ya se realizó una inspección hoy (${fechaFormateada}). ¿Desea continuar con la desasignación?`;
+    let tono: TonoAviso = 'ambar';
+    let icono = <CalendarCheck className="h-5 w-5" />;
 
-    // Colores
-    const fondo = esMuyAntigua ? '#ffebee' : esReciente ? '#fff3cd' : esHoy ? '#e8f5e8' : '#fffbe6';
-    const colorIcono = esMuyAntigua ? 'error' : esReciente ? 'warning' : esHoy ? 'success' : 'warning';
-    const colorTitulo = esMuyAntigua ? 'error.main' : esReciente ? 'warning.main' : esHoy ? 'success.main' : 'warning.main';
+    if (esMuyAntigua) {
+        titulo = 'INSPECCIÓN REQUERIDA';
+        mensaje = `La última inspección (${fechaFormateada}) es demasiado antigua. Debe registrar una nueva inspección para continuar.`;
+        tono = 'rojo';
+        icono = <TriangleAlert className="h-5 w-5" />;
+    } else if (esHoy) {
+        titulo = 'INSPECCIÓN RECIENTE';
+        mensaje = `Ya se realizó una inspección hoy (${fechaFormateada}). ¿Desea continuar con la desasignación?`;
+        tono = 'azul';
+        icono = <CircleCheck className="h-5 w-5" />;
+    }
 
     return (
-        <Dialog
+        <ModalAviso
             open={open}
             onClose={onClose}
-            PaperProps={{ sx: { borderRadius: 3, minWidth: 600, maxWidth: 700, zIndex: 9999 } }}
-        >
-            <DialogContent sx={{ bgcolor: fondo, borderRadius: 2, p: 0 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', p: 3, pb: 2 }}>
-                    <WarningAmberIcon color={colorIcono} sx={{ fontSize: 48, mr: 2, mt: 0.5 }} />
-                    <Box sx={{ flex: 1 }}>
-                        <Typography variant="h5" fontWeight="bold" color={colorTitulo} sx={{ mb: 1 }}>
-                            {titulo}
-                        </Typography>
-                        <Typography sx={{ fontSize: 16, color: '#222', mb: 1 }}>
-                            {mensaje}
-                        </Typography>
-                        <Typography sx={{ fontSize: 15, color: '#1976d2', mb: 1 }}>
-                            Acción: Desasignar neumático
-                        </Typography>
-                    </Box>
-                    <img
-                        src="/assets/inspeccionVehiculo.png"
-                        alt="Inspección Vehículo"
-                        style={{ width: 70, height: 70, marginLeft: 16, marginTop: 4, borderRadius: 8 }}
-                    />
-                </Box>
-            </DialogContent>
-            <DialogActions sx={{ p: 3, backgroundColor: fondo, justifyContent: 'flex-end', gap: 2 }}>
-
-                <ButtonCustom
-                    onClick={onClose}
-                >
-                    Cerrar
-                </ButtonCustom>
-                <ButtonCustom
-                    variant={'teal'}
-                    onClick={onRegistrarInspeccion}
-                >
-                    Registrar nueva inspección
-                </ButtonCustom>
-                {!esMuyAntigua && (
-                    <ButtonCustom
-                        variant={'primary'}
-                        onClick={onContinuarDesasignacion}
-                    >
-                        Continuar desasignación
+            tono={tono}
+            icono={icono}
+            titulo={titulo}
+            mensaje={mensaje}
+            detalle="Acción: Desasignar neumático"
+            imagen="/assets/inspeccionVehiculo.png"
+            acciones={
+                <>
+                    <ButtonCustom onClick={onClose}>
+                        Cerrar
                     </ButtonCustom>
-                )}
-            </DialogActions>
-        </Dialog>
+                    <ButtonCustom variant="teal" onClick={onRegistrarInspeccion}>
+                        Registrar nueva inspección
+                    </ButtonCustom>
+                    {!esMuyAntigua && (
+                        <ButtonCustom variant="primary" onClick={onContinuarDesasignacion}>
+                            Continuar desasignación
+                        </ButtonCustom>
+                    )}
+                </>
+            }
+        />
     );
 });
+
+ModalConfirmarInspDesasignar.displayName = 'ModalConfirmarInspDesasignar';
 
 export default ModalConfirmarInspDesasignar;

@@ -1,1077 +1,1058 @@
-import React, { useState, useEffect, useMemo, useRef, memo } from 'react';
-import {
-  Dialog, DialogContent, Typography, Button, Stack, Box, Card, TextField, MenuItem,
-  DialogActions,
-  DialogTitle,
-  Chip
-} from '@mui/material';
-import { DndContext, DragEndEvent, useDraggable, useDroppable } from '@dnd-kit/core';
-import DiagramaVehiculo from '../../../styles/theme/components/DiagramaVehiculo';
-import { Neumatico, Vehiculo, User } from '../../../types/types';
+'use client';
 
-// Extender la interfaz para incluir la nueva propiedad
-interface NeumaticoExtendido extends Neumatico {
-  enAreaDesasignacion?: boolean;
-}
+import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import Box from '@mui/material/Box';
+import Card from '@mui/material/Card';
+import Chip from '@mui/material/Chip';
+import Stack from '@mui/material/Stack';
+import Typography from '@mui/material/Typography';
+import { useMediaQuery, useTheme } from '@mui/material';
+import { useQuery } from '@tanstack/react-query';
+import { ColumnDef } from '@tanstack/react-table';
+import Link from 'next/link';
 import {
-  registrarDesasignacionNeumatico,
-  getUltimaFechaInspeccionPorPlaca,
-  desasignarConReemplazo
-} from '../../../api/Neumaticos';
-import { CheckCircle, ClipboardList, RotateCcw, TriangleAlertIcon } from 'lucide-react';
+    ArrowLeft, ArrowRight, ArrowUpDown, Check, CircleAlert, CircleMinus, ClipboardList,
+    MousePointerClick, Pencil, RotateCcw, Search, Trash2, TriangleAlert, Undo2, X,
+} from 'lucide-react';
 import { toast } from 'sonner';
-import Image from 'next/image';
+
+import DiagramaVehiculo from '../../../styles/theme/components/DiagramaVehiculo';
+import ModalInputsNeu from './modal-inputs-neu';
+import { desasignarConReemplazo, getUltimaFechaInspeccionPorPlaca, obtenerNeumaticosDisponibles } from '../../../api/Neumaticos';
+import { Neumatico, Vehiculo } from '../../../types/types';
+import { obtenerConfiguracionNeumaticos } from '@/utils/configuraciones-neumaticos';
 import { convertToDateHuman } from '@/lib/utils';
-import { LoadingButton } from '@/components/ui/loading-button';
 import { Button as ButtonCustom } from '@/components/ui/button';
 import { LoadingButton2 } from '@/components/ui/loading-button2';
+import { DataTableNeumaticos } from '@/components/ui/data-table/data-table';
+import { EsRecuperadoBadge } from '@/components/ui/EsRecuperadoBadge';
+import { LinearProgressItem } from '@/components/ui/LinearProgress';
+import { Field, FieldLabel } from '@/components/ui/field';
+import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface ModalDesasignarProps {
-  open: boolean;
-  onClose: () => void;
-  onSuccess?: () => void; // Callback solo cuando la acción se completa exitosamente
-  neumaticosAsignados: Neumatico[];
-  placa: string;
-  vehiculo?: Vehiculo;
-  kilometraje: number;
-  user?: User;
-  onAbrirInspeccion?: () => void;
-  onAbrirAsignacion?: (data: { cachedNeumaticosAsignados: Neumatico[]; posicionesVacias: string[] }) => void; // Callback para abrir modal de asignación con datos cacheados
-  onReceiveTemporaryAssignments?: (callback: (asignaciones: any[]) => void) => void; // Callback para registrar receptor de asignaciones temporales
-  asignacionesTemporalesExternas?: any[]; // Asignaciones temporales desde modal de asignación
-  enTransito: boolean,
-  taller?: string;
+    open: boolean;
+    onClose: () => void;
+    /** Solo se dispara cuando la operación se guardó correctamente. */
+    onSuccess?: () => void;
+    neumaticosAsignados: Neumatico[];
+    placa: string;
+    vehiculo?: Vehiculo;
+    kilometraje: number;
+    enTransito: boolean;
+    taller?: string;
 }
 
-export const ModalDesasignar: React.FC<ModalDesasignarProps> = React.memo(({
-  open,
-  onClose,
-  onSuccess,
-  neumaticosAsignados,
-  placa,
-  vehiculo,
-  kilometraje,
-  onAbrirInspeccion,
-  onAbrirAsignacion,
-  onReceiveTemporaryAssignments,
-  asignacionesTemporalesExternas = [],
-  enTransito,
-  taller
-}) => {
-  
-  
-  const [neumaticosAsignadosState, setNeumaticosAsignadosState] = useState<NeumaticoExtendido[]>([]);
-  const [initialAssignedMap, setInitialAssignedMap] = useState<Record<string, Neumatico>>({});
-  const [fechaUltimaInspeccion, setFechaUltimaInspeccion] = useState<any>(null);
+/** Reemplazo elegido para una posición liberada, con sus datos de instalación ya capturados. */
+interface Reemplazo {
+    neumatico: any;
+    REMANENTE: number;
+    PRESION_AIRE: number;
+    TORQUE_APLICADO: number;
+    FECHA_ASIGNACION: string;
+}
 
-  // Estados para neumáticos seleccionados y formulario
-  const [neumaticosSeleccionados, setNeumaticoSeleccionados] = useState<Neumatico[]>([]);
-  const [ultimaPosicionDesasignada, setUltimaPosicionDesasignada] = useState<string>('');
-  const [posicionResaltada, setPosicionResaltada] = useState<string>('');
-  const [accion, setAccion] = useState<string>('');
-  const [tipoAccion, setTipoAccion] = useState<string>('');
-  const [observacion, setObservacion] = useState<string>('');
+const ACCIONES = [
+    { valor: 'RECUPERADO', etiqueta: 'Recuperado' },
+    { valor: 'BAJA DEFINITIVA', etiqueta: 'Baja definitiva' },
+];
 
-  // Estado para asignaciones temporales (NO guardadas en BD)
-  const [asignacionesTemporales, setAsignacionesTemporales] = useState<any[]>([]);
+const TIPOS_BAJA = [
+    { valor: 'DESGASTE NORMAL', etiqueta: 'Desgaste normal' },
+    { valor: 'DESGASTE IRREGULAR', etiqueta: 'Desgaste irregular' },
+    { valor: 'RECOBRO', etiqueta: 'Recobro' },
+    { valor: 'SINIESTRO', etiqueta: 'Siniestro' },
+    { valor: 'FALLA DE FABRICA', etiqueta: 'Falla de fábrica' },
+];
 
-  // Ref para rastrear si ya se inicializó y evitar loops
-  const prevOpenRef = React.useRef(false);
-  const prevNeumaticosAsignadosRef = React.useRef<Neumatico[]>([]);
+const PASOS = ['Qué sale', 'Qué entra', 'Confirmar'];
+const TOPE_TARJETAS = 40;
 
-  // Inicializar state cuando se abre el modal o cuando cambian los neumáticos asignados
-  useEffect(() => {
-    // Solo ejecutar si el modal se abrió o si los neumáticos asignados realmente cambiaron
-    const neumaticosCambiaron = JSON.stringify(prevNeumaticosAsignadosRef.current) !== JSON.stringify(neumaticosAsignados);
-    const modalSeAbrio = open && !prevOpenRef.current;
+const codigoDe = (neumatico: any): string => neumatico?.CODIGO ?? neumatico?.CODIGO_NEU ?? '';
+const posicionDe = (neumatico: any): string => neumatico?.POSICION ?? neumatico?.POSICION_NEU ?? '';
 
-    if (open && neumaticosAsignados && (modalSeAbrio || neumaticosCambiaron)) {
+/**
+ * Mismos criterios que validaba `handleConfirm` del antiguo modal de asignación:
+ * ningún dato vacío ni en cero, con la excepción del torque en el repuesto.
+ */
+const datosCompletos = (r: Reemplazo | undefined, posicion: string): boolean => {
+    if (!r) return false;
+    const valido = (v: any) => v !== null && v !== undefined && v !== '' && !isNaN(Number(v)) && Number(v) !== 0;
+    if (!r.FECHA_ASIGNACION) return false;
+    if (!valido(r.REMANENTE)) return false;
+    if (!valido(r.PRESION_AIRE)) return false;
+    if (posicion === 'RES01') return true;
+    return valido(r.TORQUE_APLICADO);
+};
 
-      // Obtener los códigos de los neumáticos que están actualmente en el área de desasignación
-      const codigosEnAreaDesasignacion = new Set<string>();
-      neumaticosSeleccionados.forEach(n => {
-        const codigo = n.CODIGO_NEU || n.CODIGO;
-        if (codigo) {
-          codigosEnAreaDesasignacion.add(codigo);
-        }
-      });
+/* ------------------------------------------------------------------ */
+/* Subcomponentes a nivel de módulo (definición estable entre renders) */
+/* ------------------------------------------------------------------ */
 
-      // IMPORTANTE: Usar los datos tal cual vienen, sin procesamiento adicional
-      // Los datos ya vienen filtrados y agrupados correctamente desde page.tsx
-      setNeumaticosAsignadosState(prev => {
-        const neumaticosConEstado = neumaticosAsignados.map(n => {
-          const codigo = n.CODIGO_NEU || n.CODIGO;
-          const yaEstabaEnArea = codigosEnAreaDesasignacion.has(codigo || '');
-          // Si el neumático ya estaba en el área de desasignación, mantenerlo ahí
-          // Si no, verificar si está en el estado anterior
-          const estadoAnterior = prev.find(est =>
-            (est.CODIGO_NEU || est.CODIGO) === codigo
-          );
-          return {
-            ...n,
-            enAreaDesasignacion: yaEstabaEnArea || (estadoAnterior?.enAreaDesasignacion ?? false)
-          };
-        });
-        return neumaticosConEstado;
-      });
-
-      // Crear mapa inicial - incluir TODAS las posiciones (POS01-POS04 y RES01)
-      // Agrupar por posición y quedarse con el más reciente si hay duplicados
-      const mapa: Record<string, Neumatico> = {};
-      const porPosicion = new Map<string, Neumatico>();
-
-      neumaticosAsignados.forEach(neu => {
-        const posicion = neu.POSICION || neu.POSICION_NEU;
-        if (posicion && (posicion.startsWith('POS') || posicion === 'RES01')) {
-          const existente = porPosicion.get(posicion);
-          // Si no existe o este es más reciente, actualizar
-          if (!existente || (neu.ID_MOVIMIENTO || 0) > (existente.ID_MOVIMIENTO || 0)) {
-            porPosicion.set(posicion, { ...neu });
-          }
-        }
-      });
-
-      // Llenar el mapa con los neumáticos más recientes por posición
-      porPosicion.forEach((neu, pos) => {
-        mapa[pos] = neu;
-      });
-
-
-      setInitialAssignedMap(mapa);
-
-      // Actualizar referencias
-      prevNeumaticosAsignadosRef.current = neumaticosAsignados;
-    } else if (!open && prevOpenRef.current) {
-      // Resetear estado cuando se cierra el modal (solo si estaba abierto antes)
-      setNeumaticoSeleccionados([]);
-      setUltimaPosicionDesasignada('');
-      setAccion('');
-      setObservacion('');
-      setPosicionResaltada('');
-      setAsignacionesTemporales([]); // Limpiar asignaciones temporales
-
-      // Limpiar también el estado de enAreaDesasignacion
-      setNeumaticosAsignadosState(prev =>
-        prev.map(n => ({ ...n, enAreaDesasignacion: false }))
-      );
-
-      // Resetear referencias
-      prevNeumaticosAsignadosRef.current = [];
-    }
-
-    // Actualizar referencia del estado del modal
-    prevOpenRef.current = open;
-  }, [open, neumaticosAsignados]);
-
-  // Sincronizar asignaciones temporales externas con estado interno
-  useEffect(() => {
-    if (asignacionesTemporalesExternas && asignacionesTemporalesExternas.length > 0) {
-      setAsignacionesTemporales(asignacionesTemporalesExternas);
-
-      // Actualizar diagrama para mostrar asignaciones temporales visualmente
-      setNeumaticosAsignadosState(prev => {
-        const nuevoEstado = [...prev];
-
-        asignacionesTemporalesExternas.forEach((asig: any) => {
-          // Buscar si ya existe un neumático en esa posición
-          const index = nuevoEstado.findIndex(n =>
-            (n.POSICION || n.POSICION_NEU) === asig.Posicion
-          );
-
-          // Crear objeto de neumático temporal para mostrar en diagrama
-          // Se incluye REMANENTE (el valor recién ingresado) para mostrarlo en el diagrama.
-          // No pinta de rojo porque DiagramaVehiculo fuerza el color turquesa cuando
-          // TIPO_MOVIMIENTO === 'TEMPORAL', sin importar REMANENTE.
-          const neumaticoTemporal: any = {
-            CODIGO: asig.CodigoNeumatico?.toString(),
-            CODIGO_NEU: asig.CodigoNeumatico?.toString(),
-            POSICION: asig.Posicion,
-            POSICION_NEU: asig.Posicion,
-            REMANENTE: asig.Remanente,
-            PRESION_AIRE: asig.PresionAire,
-            TORQUE_APLICADO: asig.TorqueAplicado,
-            TIPO_MOVIMIENTO: 'TEMPORAL', // Marcador para identificar asignaciones temporales
-            enAreaDesasignacion: false
-          };
-
-          if (index >= 0) {
-            // Reemplazar neumático existente
-            nuevoEstado[index] = neumaticoTemporal;
-          } else {
-            // Agregar nuevo neumático
-            nuevoEstado.push(neumaticoTemporal);
-          }
-        });
-
-        return nuevoEstado;
-      });
-    }
-  }, [asignacionesTemporalesExternas]);
-
-  // Obtener fecha de última inspección
-  useEffect(() => {
-    if (open && placa) {
-      obtenerYSetearUltimaInspeccionPorPlaca(placa).then(fecha => {
-        if (fecha) {
-          setFechaUltimaInspeccion(fecha);
-        }
-      });
-    }
-  }, [open, placa]);
-
-  // Handler para click en posición del diagrama
-  const handlePosicionClick = (neumatico: Neumatico | undefined) => {
-    if (neumatico && neumatico.POSICION) {
-      // Bloquear neumáticos temporales (recién asignados desde modal de asignación)
-      if ((neumatico as any).TIPO_MOVIMIENTO === 'TEMPORAL') {
-        return;
-      }
-
-      // Bloquear nuevas desasignaciones cuando ya hay asignaciones temporales pendientes
-      if (asignacionesTemporales.length > 0) {
-        toast.info('Ya hay neumáticos pendientes de asignación. Usa "Restaurar" para empezar de nuevo.')
-        return;
-      }
-
-      // Verificar si ya está seleccionado o en área de desasignación
-      const yaSeleccionado = neumaticosSeleccionados.find(n =>
-        (n.CODIGO_NEU || n.CODIGO) === (neumatico.CODIGO_NEU || neumatico.CODIGO)
-      );
-
-      const neumaticoEnEstado = neumaticosAsignadosState.find(n =>
-        (n.CODIGO_NEU || n.CODIGO) === (neumatico.CODIGO_NEU || neumatico.CODIGO)
-      );
-
-      if (!yaSeleccionado && !(neumaticoEnEstado?.enAreaDesasignacion)) {
-        setNeumaticoSeleccionados(prev => [...prev, neumatico]);
-        setUltimaPosicionDesasignada(neumatico.POSICION);
-
-        // Actualizar estado para mostrar que está en área de desasignación
-        setNeumaticosAsignadosState(prev =>
-          prev.map((n: NeumaticoExtendido) =>
-            (n.CODIGO_NEU || n.CODIGO) === (neumatico.CODIGO_NEU || neumatico.CODIGO)
-              ? { ...n, enAreaDesasignacion: true }
-              : n
-          )
-        );
-      }
-    }
-  };
-
-  // Handler para drop de neumático - simplificado ya que handleDragEnd maneja la lógica principal
-  const handleDropNeumatico = (neumatico: Neumatico, posicion: string) => {
-    // La lógica principal se maneja en handleDragEnd
-  };
-
-  // Handler para click en neumático del área de desasignación para resaltar su posición original
-  const handleClickNeumaticoArea = (neumatico: Neumatico) => {
-    const posicionOriginal = neumatico.POSICION || neumatico.POSICION_NEU || '';
-
-    // Resaltar la posición por 3 segundos
-    setPosicionResaltada(posicionOriginal);
-    setTimeout(() => {
-      setPosicionResaltada('');
-    }, 3000);
-  };
-
-  // Handler para limpiar todo y volver al estado inicial
-  const handleLimpiar = () => {
-    setNeumaticoSeleccionados([]);
-    setAsignacionesTemporales([]);
-    setAccion('');
-    setObservacion('');
-    setTipoAccion('');
-    // Restaurar diagrama al estado original sin temporales ni marcas de desasignación
-    setNeumaticosAsignadosState(
-      neumaticosAsignados.map(n => ({ ...n, enAreaDesasignacion: false }))
+const Paso: React.FC<{ indice: number; actual: number; etiqueta: string; onClick: () => void }> = ({ indice, actual, etiqueta, onClick }) => {
+    const completado = indice < actual;
+    const activo = indice === actual;
+    return (
+        <button
+            type="button"
+            onClick={onClick}
+            disabled={indice > actual}
+            className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold transition-colors ${activo ? 'bg-blue-600 text-white' : completado ? 'text-blue-700 hover:bg-blue-50' : 'text-slate-400'
+                } ${indice > actual ? 'cursor-default' : 'cursor-pointer'}`}
+        >
+            <span className={`flex h-4.5 w-4.5 items-center justify-center rounded-full text-[10px] font-bold ${activo ? 'bg-white/25 text-white' : completado ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-400'
+                }`}>
+                {completado ? <Check className="h-3 w-3" /> : indice + 1}
+            </span>
+            <span className="hidden sm:inline">{etiqueta}</span>
+        </button>
     );
-  };
+};
 
-  // Handler para fin de arrastre
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
+/** Fila del paso 1: un neumático instalado, con el botón para marcarlo o devolverlo. */
+const FilaInstalado: React.FC<{
+    posicion: string;
+    neumatico: any | undefined;
+    marcado: boolean;
+    bloqueado: boolean;
+    onToggle: () => void;
+}> = ({ posicion, neumatico, marcado, bloqueado, onToggle }) => (
+    <div className={`flex items-center gap-2.5 rounded-xl border px-3 py-2 transition-colors ${marcado ? 'border-red-200 bg-red-50/70' : neumatico ? 'border-slate-200 bg-white' : 'border-dashed border-slate-200 bg-slate-50/60'
+        }`}>
+        <span className={`shrink-0 rounded-md px-2 py-1 font-mono text-[11px] font-extrabold ${marcado ? 'bg-red-600 text-white' : neumatico ? 'bg-violet-600 text-white' : 'bg-slate-200 text-slate-500'
+            }`}>
+            {posicion}
+        </span>
 
-    if (!over) {
-      return;
-    }
+        <div className="min-w-0 flex-1">
+            {neumatico ? (
+                <>
+                    <p className={`truncate text-sm font-bold ${marcado ? 'text-red-700 line-through' : 'text-slate-800'}`}>
+                        {codigoDe(neumatico)}
+                    </p>
+                    <p className="truncate text-xs text-slate-500">
+                        {[neumatico.MARCA, neumatico.MEDIDA].filter(Boolean).join(' · ') || '—'}
+                        {neumatico.REMANENTE ? ` · ${neumatico.REMANENTE} mm` : ''}
+                    </p>
+                </>
+            ) : (
+                <p className="text-sm italic text-slate-400">Sin neumático</p>
+            )}
+        </div>
 
-    const activeId = active.id as string;
-    const overId = over.id as string;
-    const activeData = active.data.current as NeumaticoExtendido & { from?: string } | undefined;
+        {neumatico && (
+            <ButtonCustom
+                variant={marcado ? 'lime' : 'destructive'}
+                size="sm"
+                onClick={onToggle}
+                disabled={bloqueado}
+                className="shrink-0"
+                title={bloqueado ? 'Quita primero los reemplazos elegidos para cambiar la selección' : undefined}
+            >
+                {marcado ? <><Undo2 className="h-3.5 w-3.5" />Devolver</> : <><CircleMinus className="h-3.5 w-3.5" />Sacar</>}
+            </ButtonCustom>
+        )}
+    </div>
+);
 
+/** Tarjeta del paso 2: una posición liberada y su reemplazo (o el botón para elegirlo). */
+const TarjetaPosicionLiberada: React.FC<{
+    posicion: string;
+    reemplazo: Reemplazo | undefined;
+    esObjetivo: boolean;
+    onElegir: () => void;
+    onEditar: () => void;
+    onQuitar: () => void;
+}> = ({ posicion, reemplazo, esObjetivo, onElegir, onEditar, onQuitar }) => (
+    <div className={`rounded-xl border px-3 py-2.5 transition-colors ${esObjetivo ? 'border-indigo-300 bg-indigo-50/70 ring-1 ring-indigo-200'
+        : reemplazo ? 'border-emerald-200 bg-emerald-50/50' : 'border-dashed border-amber-300 bg-amber-50/50'
+        }`}>
+        <div className="flex items-center gap-2.5">
+            <span className="shrink-0 rounded-md bg-violet-600 px-2 py-1 font-mono text-[11px] font-extrabold text-white">
+                {posicion}
+            </span>
 
-    // Encontrar el neumático que se está moviendo
-    // Primero intentar desde active.data.current (viene del diagrama)
-    let neumatico: NeumaticoExtendido | undefined;
-    if (activeData) {
-      neumatico = activeData as NeumaticoExtendido;
-    } else {
-      // Fallback: buscar en el estado por código o posición
-      neumatico = neumaticosAsignadosState.find(n =>
-        (n.CODIGO_NEU || n.CODIGO) === activeId ||
-        n.POSICION === activeId ||
-        (n.CODIGO_NEU || n.CODIGO || n.POSICION) === activeId
-      );
-    }
+            <div className="min-w-0 flex-1">
+                {reemplazo ? (
+                    <>
+                        <p className="truncate text-sm font-bold text-slate-800">{codigoDe(reemplazo.neumatico)}</p>
+                        <p className="truncate text-xs text-slate-500">
+                            {[reemplazo.neumatico.MARCA, reemplazo.neumatico.MEDIDA].filter(Boolean).join(' · ') || '—'}
+                        </p>
+                    </>
+                ) : (
+                    <p className="text-xs font-medium text-amber-700">
+                        {esObjetivo ? 'Elige un neumático de la lista →' : 'Falta el reemplazo'}
+                    </p>
+                )}
+            </div>
 
-    if (!neumatico) {
-      return;
-    }
+            {reemplazo ? (
+                <div className="flex shrink-0 gap-1">
+                    <ButtonCustom variant="ghost" size="icon" onClick={onEditar} title="Editar datos">
+                        <Pencil className="h-3.5 w-3.5" />
+                    </ButtonCustom>
+                    <ButtonCustom variant="ghost" size="icon" onClick={onQuitar} title="Quitar reemplazo" className="text-red-500 hover:text-red-700">
+                        <Trash2 className="h-3.5 w-3.5" />
+                    </ButtonCustom>
+                </div>
+            ) : (
+                <ButtonCustom variant={esObjetivo ? 'indigo' : 'teal'} size="sm" onClick={onElegir} className="shrink-0">
+                    {esObjetivo ? 'Eligiendo…' : 'Elegir'}
+                </ButtonCustom>
+            )}
+        </div>
 
-    if (overId === 'neumaticos-por-desasignar') {
-      // Agregar neumático a la lista de seleccionados para desasignar
-      const codigoNeumatico = neumatico.CODIGO_NEU || neumatico.CODIGO;
+        {reemplazo && (
+            <div className="mt-2 grid grid-cols-3 gap-1.5">
+                {[
+                    { label: 'Reman.', valor: reemplazo.REMANENTE, unidad: 'mm' },
+                    { label: 'Presión', valor: reemplazo.PRESION_AIRE, unidad: 'psi' },
+                    { label: 'Torque', valor: reemplazo.TORQUE_APLICADO, unidad: 'N·m' },
+                ].map((d) => (
+                    <div key={d.label} className="rounded-lg border border-slate-200/70 bg-white px-2 py-1">
+                        <p className="text-[9px] font-bold uppercase tracking-wide text-slate-400">{d.label}</p>
+                        <p className="text-xs font-bold text-slate-700">
+                            {d.valor}<span className="ml-0.5 text-[9px] font-semibold text-slate-400">{d.unidad}</span>
+                        </p>
+                    </div>
+                ))}
+            </div>
+        )}
+    </div>
+);
 
-      // Bloquear neumáticos temporales (recién asignados desde modal de asignación)
-      if ((neumatico as any).TIPO_MOVIMIENTO === 'TEMPORAL') {
-        toast.warning('Este neumático está pendiente de asignación y no puede ser desasignado.')
-        return;
-      }
+/** Estado de selección compartido con la tabla de disponibles (columnas estables). */
+interface SeleccionContextValue {
+    codigosUsados: Record<string, string>;
+    onSeleccionar: (neumatico: any) => void;
+    hayObjetivo: boolean;
+}
 
-      // Bloquear nuevas desasignaciones cuando ya hay asignaciones temporales pendientes
-      if (asignacionesTemporales.length > 0) {
-        toast.info('Ya hay neumáticos pendientes de asignación. Usa "Restaurar" para empezar de nuevo.')
-        return;
-      }
+const SeleccionContext = React.createContext<SeleccionContextValue>({
+    codigosUsados: {},
+    onSeleccionar: () => { },
+    hayObjetivo: false,
+});
 
-      const yaSeleccionado = neumaticosSeleccionados.find(n =>
-        (n.CODIGO_NEU || n.CODIGO) === codigoNeumatico
-      );
+const CeldaSeleccion: React.FC<{ neumatico: any }> = ({ neumatico }) => {
+    const { codigosUsados, onSeleccionar, hayObjetivo } = React.useContext(SeleccionContext);
+    const posicionUsada = codigosUsados[codigoDe(neumatico)];
 
-      const estadoActual = neumaticosAsignadosState.find(n =>
-        (n.CODIGO_NEU || n.CODIGO) === codigoNeumatico
-      );
-
-      if (!yaSeleccionado && !estadoActual?.enAreaDesasignacion) {
-        // Agregar a la lista de seleccionados
-        setNeumaticoSeleccionados(prev => [...prev, neumatico]);
-        setUltimaPosicionDesasignada(neumatico.POSICION || '');
-
-        // Marcar como en área de desasignación
-        setNeumaticosAsignadosState(prev =>
-          prev.map((n: NeumaticoExtendido) => {
-            const esEsteNeumatico = (n.CODIGO_NEU || n.CODIGO) === codigoNeumatico;
-            const nuevoEstado = esEsteNeumatico ? { ...n, enAreaDesasignacion: true } : n;
-            return nuevoEstado;
-          })
+    if (posicionUsada) {
+        return (
+            <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">
+                <Check className="h-3.5 w-3.5" />
+                En {posicionUsada}
+            </span>
         );
-
-      }
-    } else if (overId.startsWith('POS') || overId === 'RES01') {
-      // Si se suelta en una posición del vehículo (POS01-POS04 o RES01), remover del área de desasignación
-      const codigoNeumatico = neumatico.CODIGO_NEU || neumatico.CODIGO;
-      const posicionOriginal = neumatico.POSICION || neumatico.POSICION_NEU || '';
-
-      // Bloquear si la posición destino tiene un neumático TEMPORAL (recién asignado)
-      // Esto aplica incluso si es la posición original del neumático arrastrado
-      const temporalEnDestino = neumaticosAsignadosState.find(n =>
-        (n.POSICION === overId || n.POSICION_NEU === overId) &&
-        (n.CODIGO_NEU || n.CODIGO) !== codigoNeumatico &&
-        (n as any).TIPO_MOVIMIENTO === 'TEMPORAL'
-      );
-
-      if (temporalEnDestino) {
-        toast.warning(`La posición ${overId} ya tiene un neumático asignado. No se puede mover el neumático desasignado aquí.`)
-        return;
-      }
-
-      // Verificar si la posición de destino está reservada por un neumático en área de desasignación
-      const posicionReservadaEnArea = neumaticosAsignadosState.find(n =>
-        (n.POSICION === overId || n.POSICION_NEU === overId) &&
-        (n.CODIGO_NEU || n.CODIGO) !== codigoNeumatico &&
-        n.enAreaDesasignacion
-      );
-
-      if (posicionReservadaEnArea) {
-        toast.warning(`La posición ${overId} está reservada (neumático pendiente de desasignación)`)
-        return;
-      }
-
-      // Verificar si la posición de destino está ocupada por OTRO neumático (no el mismo)
-      // Solo considerar ocupada si hay un neumático que NO está en área de desasignación
-      const neumaticoEnDestino = neumaticosAsignadosState.find(n =>
-        (n.POSICION === overId || n.POSICION_NEU === overId) &&
-        (n.CODIGO_NEU || n.CODIGO) !== codigoNeumatico &&
-        !n.enAreaDesasignacion
-      );
-
-      // Si la posición destino es la posición original del neumático, permitir siempre
-      const esPosicionOriginal = overId === posicionOriginal;
-
-      // Si hay un neumático en destino que NO está en área de desasignación Y no es la posición original, bloquear
-      if (neumaticoEnDestino && !esPosicionOriginal) {
-        toast.info(`La posición ${overId} ya está ocupada por ${neumaticoEnDestino.CODIGO_NEU || neumaticoEnDestino.CODIGO}`)
-        return;
-      }
-
-      // Desmarcar como en área de desasignación y actualizar posición
-      setNeumaticosAsignadosState(prev =>
-        prev.map((n: NeumaticoExtendido) => {
-          const esEsteNeumatico = (n.CODIGO_NEU || n.CODIGO) === codigoNeumatico;
-          const nuevoEstado = esEsteNeumatico
-            ? { ...n, enAreaDesasignacion: false, POSICION: overId, POSICION_NEU: overId }
-            : n;
-
-          return nuevoEstado;
-        })
-      );
-
-      // Remover de la lista de seleccionados
-      setNeumaticoSeleccionados(prev => {
-        const nuevaLista = prev.filter(n => (n.CODIGO_NEU || n.CODIGO) !== codigoNeumatico);
-        return nuevaLista;
-      });
     }
-  };
 
-  // Función para detectar posiciones vacías después de desasignar
-  const detectarPosicionesVacias = (): string[] => {
-    // Posiciones que deben estar siempre ocupadas (POS01-POS04 y RES01)
-    const posicionesRequeridas = ['POS01', 'POS02', 'POS03', 'POS04', 'RES01'];
+    return (
+        <ButtonCustom variant="teal" size="sm" onClick={() => onSeleccionar(neumatico)} disabled={!hayObjetivo}>
+            <MousePointerClick className="h-3.5 w-3.5" />
+            Elegir
+        </ButtonCustom>
+    );
+};
 
-    // Obtener los códigos de los neumáticos que están en el área de desasignación
-    const codigosEnAreaDesasignacion = new Set<string>();
-    neumaticosSeleccionados.forEach(n => {
-      const codigo = n.CODIGO_NEU || n.CODIGO;
-      if (codigo) {
-        codigosEnAreaDesasignacion.add(codigo);
-      }
+const columnasDisponibles: ColumnDef<any>[] = [
+    {
+        id: 'SELECCION',
+        header: 'Acción',
+        cell: ({ row }) => <CeldaSeleccion neumatico={row.original} />,
+    },
+    {
+        accessorKey: 'CODIGO',
+        header: ({ column }) => (
+            <ButtonCustom variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+                Código
+                <ArrowUpDown className="ml-2 h-4 w-4" />
+            </ButtonCustom>
+        ),
+        cell: ({ row }) => (
+            <Link href={`/padron/neumatico/${row.original.CODIGO}`} target="_blank" className="text-blue-600 underline">
+                {row.original.CODIGO}
+            </Link>
+        ),
+    },
+    { accessorKey: 'MARCA', header: 'Marca' },
+    { accessorKey: 'DISEÑO', header: 'Diseño' },
+    {
+        accessorKey: 'REMANENTE',
+        header: ({ column }) => (
+            <ButtonCustom variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+                Remanente
+                <ArrowUpDown className="ml-2 h-4 w-4" />
+            </ButtonCustom>
+        ),
+    },
+    { accessorKey: 'MEDIDA', header: 'Medida' },
+    {
+        accessorKey: 'FECHA_REGISTRO',
+        header: 'Envío',
+        cell: ({ row }) => convertToDateHuman(row.original.FECHA_REGISTRO),
+    },
+    {
+        accessorKey: 'RECUPERADO',
+        header: 'Recuperado',
+        cell: ({ row }) => <EsRecuperadoBadge esRecuperado={row.original.RECUPERADO ?? false} />,
+    },
+    {
+        accessorKey: 'ESTADO',
+        header: 'Estado',
+        cell: ({ row }) => <LinearProgressItem estado={row.original.ESTADO ?? 0} width="100px" />,
+    },
+];
+
+/** Tarjeta de disponible — reemplaza a la tabla en móvil/tablet. */
+const TarjetaDisponible: React.FC<{
+    neumatico: any;
+    posicionUsada?: string;
+    habilitado: boolean;
+    onElegir: () => void;
+}> = ({ neumatico, posicionUsada, habilitado, onElegir }) => {
+    const codigo = codigoDe(neumatico);
+    return (
+        <div className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white px-3 py-2.5">
+            <div className="min-w-0 flex-1">
+                <Link href={`/padron/neumatico/${codigo}`} target="_blank" className="text-sm font-bold text-[#167bd9] underline underline-offset-2">
+                    {codigo}
+                </Link>
+                <p className="mt-0.5 truncate text-xs text-slate-500">
+                    {[neumatico.MARCA, neumatico.DISEÑO, neumatico.MEDIDA].filter(Boolean).join(' · ') || '—'}
+                </p>
+            </div>
+
+            <div className="shrink-0 text-center">
+                <p className="text-sm font-bold leading-none text-slate-700">
+                    {neumatico.REMANENTE ?? '—'}<span className="ml-0.5 text-[10px]">mm</span>
+                </p>
+                <p className="mt-0.5 text-[10px] uppercase tracking-wide text-slate-400">remanente</p>
+            </div>
+
+            {posicionUsada ? (
+                <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">
+                    <Check className="h-3.5 w-3.5" />
+                    {posicionUsada}
+                </span>
+            ) : (
+                <ButtonCustom variant="teal" size="sm" onClick={onElegir} disabled={!habilitado} className="shrink-0">
+                    Elegir
+                </ButtonCustom>
+            )}
+        </div>
+    );
+};
+
+/* ------------------------------------------------------------------ */
+
+export const ModalDesasignar: React.FC<ModalDesasignarProps> = memo(({
+    open, onClose, onSuccess, neumaticosAsignados, placa, vehiculo, kilometraje, enTransito, taller,
+}) => {
+    const theme = useTheme();
+    const esPantallaChica = useMediaQuery(theme.breakpoints.down('lg'));
+
+    const [paso, setPaso] = useState(0);
+    /** posición -> neumático marcado para salir */
+    const [marcados, setMarcados] = useState<Record<string, any>>({});
+    const [accion, setAccion] = useState('');
+    const [tipoAccion, setTipoAccion] = useState('');
+    const [observacion, setObservacion] = useState('');
+    /** posición liberada -> reemplazo elegido */
+    const [reemplazos, setReemplazos] = useState<Record<string, Reemplazo>>({});
+    const [posicionObjetivo, setPosicionObjetivo] = useState<string | null>(null);
+    const [inputsPara, setInputsPara] = useState<{ posicion: string; neumatico: any } | null>(null);
+    const [fechaUltimaInspeccion, setFechaUltimaInspeccion] = useState<string>('');
+    const [busqueda, setBusqueda] = useState('');
+
+    const { data: disponibles = [] } = useQuery({
+        queryKey: ['neumaticos-disponibles-con-bajas'],
+        queryFn: () => obtenerNeumaticosDisponibles('desasignacion'),
+        staleTime: 0,
+        enabled: open,
     });
 
-    // Agrupar neumáticos por posición para verificar si TODOS los de una posición están desasignados
-    // Usar neumaticosAsignadosState si tiene datos, si no usar el prop neumaticosAsignados
-    const neumaticosParaProcesar = neumaticosAsignadosState.length > 0
-      ? neumaticosAsignadosState
-      : neumaticosAsignados;
+    // Catálogo de posiciones del vehículo: nunca una lista fija (moto 2, auto 5, camión 7).
+    const posiciones = useMemo(
+        () => obtenerConfiguracionNeumaticos(vehiculo?.cantidad_neumaticos)?.posiciones.map(p => p.codigo)
+            ?? ['POS01', 'POS02', 'POS03', 'POS04', 'RES01'],
+        [vehiculo?.cantidad_neumaticos]
+    );
 
-    const neumaticosPorPosicion = new Map<string, Array<{ codigo: string; enArea: boolean }>>();
-
-    neumaticosParaProcesar.forEach((n: any) => {
-      const pos = n.POSICION || n.POSICION_NEU;
-      if (pos && (pos.startsWith('POS') || pos === 'RES01')) {
-        const codigo = n.CODIGO_NEU || n.CODIGO || '';
-        // Si estamos usando neumaticosAsignadosState, verificar enAreaDesasignacion
-        // Si estamos usando el prop, verificar si el código está en el área de desasignación
-        const estaEnArea = neumaticosAsignadosState.length > 0
-          ? (n.enAreaDesasignacion || codigosEnAreaDesasignacion.has(codigo))
-          : codigosEnAreaDesasignacion.has(codigo);
-
-        if (!neumaticosPorPosicion.has(pos)) {
-          neumaticosPorPosicion.set(pos, []);
+    /** Neumático activo por posición, según lo que llegó del backend. */
+    const instaladoPorPosicion = useMemo(() => {
+        const mapa: Record<string, any> = {};
+        for (const n of neumaticosAsignados ?? []) {
+            if (n.TIPO_MOVIMIENTO === 'BAJA DEFINITIVA') continue;
+            const pos = posicionDe(n);
+            if (!pos) continue;
+            const previo = mapa[pos];
+            if (!previo || ((n as any).ID_MOVIMIENTO ?? 0) > (previo.ID_MOVIMIENTO ?? 0)) mapa[pos] = n;
         }
-        neumaticosPorPosicion.get(pos)!.push({ codigo, enArea: estaEnArea });
-      }
-    });
+        return mapa;
+    }, [neumaticosAsignados]);
 
-    // Una posición está ocupada si tiene AL MENOS UN neumático que NO está en área de desasignación
-    const posicionesOcupadas = new Set<string>();
-    neumaticosPorPosicion.forEach((neumaticos, pos) => {
-      const tieneNeumaticoActivo = neumaticos.some(n => !n.enArea);
-      if (tieneNeumaticoActivo) {
-        posicionesOcupadas.add(pos);
-      }
-    });
+    const posicionesLiberadas = useMemo(
+        () => posiciones.filter(pos => Boolean(marcados[pos])),
+        [posiciones, marcados]
+    );
 
-    // Encontrar las posiciones que quedarán vacías
-    const posicionesVacias = posicionesRequeridas.filter(pos => !posicionesOcupadas.has(pos));
+    const codigosUsados = useMemo(() => {
+        const mapa: Record<string, string> = {};
+        Object.entries(reemplazos).forEach(([pos, r]) => { mapa[codigoDe(r.neumatico)] = pos; });
+        return mapa;
+    }, [reemplazos]);
 
-    return posicionesVacias;
-  };
+    // El diagrama muestra el estado resultante: sin los que salen, con los reemplazos ya elegidos.
+    const neumaticosEnDiagrama = useMemo(() => {
+        const resultado: any[] = [];
+        posiciones.forEach(pos => {
+            const reemplazo = reemplazos[pos];
+            if (reemplazo) {
+                resultado.push({
+                    ...reemplazo.neumatico,
+                    POSICION: pos,
+                    POSICION_NEU: pos,
+                    REMANENTE: reemplazo.REMANENTE,
+                    PRESION_AIRE: reemplazo.PRESION_AIRE,
+                    TORQUE_APLICADO: reemplazo.TORQUE_APLICADO,
+                    TIPO_MOVIMIENTO: 'TEMPORAL',
+                });
+                return;
+            }
+            if (marcados[pos]) return; // sale: la posición queda vacía
+            const actual = instaladoPorPosicion[pos];
+            if (actual) resultado.push({ ...actual, POSICION: pos, POSICION_NEU: pos });
+        });
+        return resultado;
+    }, [posiciones, reemplazos, marcados, instaladoPorPosicion]);
 
-  // Handler para guardar desasignación
-  const handleGuardarDesasignacion = async () => {
-    // 1. Validar observación obligatoria
-    if (!observacion || observacion.trim() === '') {
-      toast.warning('La observación es obligatoria. Por favor, ingresa una observación.')
-      return;
-    }
+    const todasCubiertas = posicionesLiberadas.length > 0
+        && posicionesLiberadas.every(pos => datosCompletos(reemplazos[pos], pos));
 
-    // 2. Validar que haya neumáticos seleccionados
-    if (neumaticosSeleccionados.length === 0) {
-      toast.warning('Selecciona al menos un neumático para desasignar.')
-      return;
-    }
+    const paso1Completo = posicionesLiberadas.length > 0
+        && accion !== ''
+        && (accion !== 'BAJA DEFINITIVA' || tipoAccion !== '')
+        && observacion.trim() !== '';
 
-    // 3. Validar que haya acción seleccionada
-    if (!accion) {
-      toast.warning('Selecciona una acción para la desasignación.')
-      return;
-    }
+    // Reset total al abrir: el modal nunca arrastra estado de una sesión anterior.
+    useEffect(() => {
+        if (!open) return;
+        setPaso(0);
+        setMarcados({});
+        setAccion('');
+        setTipoAccion('');
+        setObservacion('');
+        setReemplazos({});
+        setPosicionObjetivo(null);
+        setInputsPara(null);
+        setBusqueda('');
+    }, [open]);
 
-    if (accion.trim() === 'BAJA DEFINITIVA') {
-      if (tipoAccion.trim() === '') {
-        toast.error('No se puede desasignar: Seleccionar un tipo de baja definitiva.', {
-          duration: 4000
-        })
-        return;
-      }
-    }
+    useEffect(() => {
+        if (!open || !placa) return;
+        let cancelado = false;
+        getUltimaFechaInspeccionPorPlaca(placa)
+            .then((res: any) => {
+                if (cancelado) return;
+                setFechaUltimaInspeccion(res?.fecha_registro ?? res?.FECHA_REGISTRO ?? '');
+            })
+            .catch(() => { if (!cancelado) setFechaUltimaInspeccion(''); });
+        return () => { cancelado = true; };
+    }, [open, placa]);
 
-    // 4. Validar inspección previa
-    if (!fechaUltimaInspeccion || isNaN(new Date(fechaUltimaInspeccion).getTime())) {
-      toast.error('No se puede desasignar: primero debe existir una inspección válida para este neumático.', {
-        duration: 6000
-      })
-      return;
-    }
+    // En el paso 2 la posición a cubrir se elige sola: siempre apunta a la primera pendiente,
+    // así en móvil no hay que subir hasta la lista de posiciones antes de tocar un neumático.
+    useEffect(() => {
+        if (paso !== 1) return;
+        if (posicionObjetivo && !reemplazos[posicionObjetivo]) return;
+        const siguiente = posicionesLiberadas.find(pos => !reemplazos[pos]);
+        setPosicionObjetivo(siguiente ?? null);
+    }, [paso, posicionObjetivo, reemplazos, posicionesLiberadas]);
 
-    try {
-      // Asignaciones temporales son OBLIGATORIAS para guardar la desasignación
-      if (asignacionesTemporales.length === 0) {
-        toast.error('Debes asignar neumáticos de reemplazo antes de guardar la desasignación. Usa el botón "Asignar Neumáticos".', {
-          duration: 6000
-        })
-        return;
-      }
+    const toggleMarcado = useCallback((pos: string) => {
+        const instalado = instaladoPorPosicion[pos];
+        if (!instalado) return;
+        setMarcados(prev => (
+            prev[pos]
+                ? Object.fromEntries(Object.entries(prev).filter(([clave]) => clave !== pos))
+                : { ...prev, [pos]: instalado }
+        ));
+        // Al dejar de sacar un neumático, su reemplazo pierde sentido.
+        setReemplazos(prev => (
+            prev[pos] ? Object.fromEntries(Object.entries(prev).filter(([clave]) => clave !== pos)) : prev
+        ));
+        setPosicionObjetivo(null);
+    }, [instaladoPorPosicion]);
 
-      // **FLUJO ÚNICO**: Usar endpoint /api/desasignar-con-reemplazo
-      if (asignacionesTemporales.length > 0) {
+    const handleClickPosicion = useCallback((_n: any, codigoPosicion: string) => {
+        if (paso === 0) {
+            toggleMarcado(codigoPosicion);
+            return;
+        }
+        if (paso === 1 && posicionesLiberadas.includes(codigoPosicion) && !reemplazos[codigoPosicion]) {
+            setPosicionObjetivo(codigoPosicion);
+        }
+    }, [paso, toggleMarcado, posicionesLiberadas, reemplazos]);
 
-        // Preparar desasignaciones
+    const elegirNeumatico = useCallback((neumatico: any) => {
+        if (!posicionObjetivo) {
+            toast.warning('Primero elige la posición que vas a cubrir.');
+            return;
+        }
+        const codigo = codigoDe(neumatico);
+        const yaUsado = codigosUsados[codigo];
+        if (yaUsado && yaUsado !== posicionObjetivo) {
+            toast.warning(`Ese neumático ya está asignado a ${yaUsado}.`);
+            return;
+        }
+        setInputsPara({ posicion: posicionObjetivo, neumatico });
+    }, [posicionObjetivo, codigosUsados]);
+
+    const handleInputsSubmit = useCallback((data: { Odometro: number; Remanente: number; PresionAire: number; TorqueAplicado: number; FechaAsignacion: string }) => {
+        if (!inputsPara) return;
+        setReemplazos(prev => ({
+            ...prev,
+            [inputsPara.posicion]: {
+                neumatico: inputsPara.neumatico,
+                REMANENTE: data.Remanente,
+                PRESION_AIRE: data.PresionAire,
+                TORQUE_APLICADO: data.TorqueAplicado,
+                FECHA_ASIGNACION: data.FechaAsignacion,
+            },
+        }));
+        setInputsPara(null);
+    }, [inputsPara]);
+
+    const quitarReemplazo = useCallback((pos: string) => {
+        setReemplazos(prev => Object.fromEntries(Object.entries(prev).filter(([clave]) => clave !== pos)));
+    }, []);
+
+    const reiniciar = useCallback(() => {
+        setPaso(0);
+        setMarcados({});
+        setAccion('');
+        setTipoAccion('');
+        setObservacion('');
+        setReemplazos({});
+        setPosicionObjetivo(null);
+    }, []);
+
+    const resultadosBusqueda = useMemo(() => {
+        const texto = busqueda.trim().toLowerCase();
+        if (!texto) return disponibles as any[];
+        return (disponibles as any[]).filter(n =>
+            [codigoDe(n), n.MARCA, n.DISEÑO, n.MEDIDA].filter(Boolean).some((v: any) => String(v).toLowerCase().includes(texto))
+        );
+    }, [disponibles, busqueda]);
+
+    const seleccionContextValue = useMemo<SeleccionContextValue>(() => ({
+        codigosUsados,
+        onSeleccionar: elegirNeumatico,
+        hayObjetivo: Boolean(posicionObjetivo),
+    }), [codigosUsados, elegirNeumatico, posicionObjetivo]);
+
+    const handleGuardar = async () => {
+        if (observacion.trim() === '') {
+            toast.warning('La observación es obligatoria. Por favor, ingresa una observación.');
+            return;
+        }
+        if (posicionesLiberadas.length === 0) {
+            toast.warning('Selecciona al menos un neumático para desasignar.');
+            return;
+        }
+        if (!accion) {
+            toast.warning('Selecciona una acción para la desasignación.');
+            return;
+        }
+        if (accion === 'BAJA DEFINITIVA' && tipoAccion.trim() === '') {
+            toast.error('No se puede desasignar: Seleccionar un tipo de baja definitiva.', { duration: 4000 });
+            return;
+        }
+        if (!fechaUltimaInspeccion || isNaN(new Date(fechaUltimaInspeccion).getTime())) {
+            toast.error('No se puede desasignar: primero debe existir una inspección válida para este neumático.', { duration: 6000 });
+            return;
+        }
+        const faltantes = posicionesLiberadas.filter(pos => !datosCompletos(reemplazos[pos], pos));
+        if (faltantes.length > 0) {
+            toast.error(`Faltan los datos del reemplazo en: ${faltantes.join(', ')}.`, { duration: 6000 });
+            return;
+        }
+        // Todos los reemplazos comparten la fecha de la última inspección; se verifica por si acaso.
+        const fechas = new Set(posicionesLiberadas.map(pos => reemplazos[pos].FECHA_ASIGNACION));
+        if (fechas.size > 1) {
+            toast.error('Todos los neumáticos de reemplazo deben tener la misma fecha de asignación.', { duration: 6000 });
+            return;
+        }
 
         const kilometroActual = kilometraje ?? 0;
-        const desasignaciones = [];
-        for (const neumaticoSeleccionado of neumaticosSeleccionados) {
-          let posicionInicial = neumaticoSeleccionado.POSICION || neumaticoSeleccionado.POSICION_NEU || '';
 
-          if (!posicionInicial) {
-            const codigo = neumaticoSeleccionado.CODIGO_NEU || neumaticoSeleccionado.CODIGO;
-            const posValida = Object.keys(initialAssignedMap).find(
-              key => (initialAssignedMap[key]?.CODIGO_NEU || initialAssignedMap[key]?.CODIGO) === codigo
+        const desasignaciones = posicionesLiberadas
+            .filter(pos => /^POS\d{2}$/.test(pos) || pos === 'RES01')
+            .map(pos => ({
+                CODIGO: codigoDe(marcados[pos]),
+                TIPO_MOVIMIENTO: accion,
+                TIPO_BAJA: accion === 'BAJA DEFINITIVA' ? tipoAccion : null,
+                OBSERVACION: observacion,
+                KILOMETRO: kilometroActual,
+                REMANENTE: marcados[pos].REMANENTE,
+                COD_SUPERVISOR: vehiculo?.cod_supervisor,
+                ID_OPERACION: vehiculo?.id_operacion,
+                POSICION: pos,
+                TRANSITO: enTransito,
+                TALLER: taller,
+            }));
+
+        const asignaciones = posicionesLiberadas.map(pos => {
+            const r = reemplazos[pos];
+            return {
+                CodigoNeumatico: codigoDe(r.neumatico),
+                Remanente: r.REMANENTE,
+                PresionAire: r.PRESION_AIRE,
+                TorqueAplicado: r.TORQUE_APLICADO,
+                Placa: placa.trim(),
+                Posicion: pos,
+                FechaRegistro: r.FECHA_ASIGNACION,
+                FechaAsignacion: r.FECHA_ASIGNACION,
+                Odometro: kilometroActual,
+                COD_SUPERVISOR: vehiculo?.cod_supervisor,
+                ID_OPERACION: vehiculo?.id_operacion,
+                EnTransito: enTransito,
+                Taller: taller,
+            };
+        });
+
+        try {
+            const data = await desasignarConReemplazo({ desasignaciones, asignaciones });
+            toast.success(
+                data?.mensaje || `${desasignaciones.length} desasignación(es) y ${asignaciones.length} asignación(es) registradas correctamente.`,
+                { position: 'top-right', duration: 6000 }
             );
-            if (posValida) {
-              posicionInicial = posValida;
+            onSuccess?.();
+            onClose();
+        } catch (error: any) {
+            const errData = error?.response?.data;
+            const mensajeError = errData?.error || errData?.detalle || error?.message || 'Error desconocido';
+            const detalle = errData?.error && errData?.detalle ? ` — ${errData.detalle}` : '';
+            toast.error(`${mensajeError}`, { description: detalle, duration: 6000 });
+        } finally {
+        }
+    };
+
+    const avanzar = () => {
+        if (paso === 0) {
+            if (!paso1Completo) {
+                toast.warning('Marca al menos un neumático y completa acción y observación.');
+                return;
             }
-          }
-
-          if (!posicionInicial || (!/^POS\d{2}$/.test(posicionInicial) && posicionInicial !== 'RES01')) {
-            continue;
-          }
-
-          desasignaciones.push({
-            CODIGO: neumaticoSeleccionado.CODIGO_NEU || neumaticoSeleccionado.CODIGO,
-            TIPO_MOVIMIENTO: accion,
-            TIPO_BAJA: accion === 'BAJA DEFINITIVA' ? tipoAccion : null,
-            OBSERVACION: observacion,
-            KILOMETRO: kilometroActual,
-            REMANENTE: neumaticoSeleccionado.REMANENTE,
-            COD_SUPERVISOR: vehiculo?.cod_supervisor,
-            ID_OPERACION: vehiculo?.id_operacion,
-            POSICION: neumaticoSeleccionado.POSICION || neumaticoSeleccionado.POSICION_NEU,
-            TRANSITO: enTransito,
-            TALLER: taller
-          });
+            setPaso(1);
+            return;
         }
+        if (paso === 1) {
+            if (!todasCubiertas) {
+                toast.warning('Cada posición liberada necesita su neumático de reemplazo.');
+                return;
+            }
+            setPaso(2);
+        }
+    };
 
-        let asignacionesTempo = asignacionesTemporales.map((asi: any) => ({
-          ...asi,
-          Odometro: kilometroActual,
-          COD_SUPERVISOR: vehiculo?.cod_supervisor,
-          ID_OPERACION: vehiculo?.id_operacion,
-          FechaAsignacion: asi.FechaRegistro,
-          EnTransito: enTransito,
-          Taller: taller
-        }))
+    /* ---------------------------- Render ---------------------------- */
 
-        // Enviar asignaciones + desasignaciones juntas
-        const payload = {
-          desasignaciones,
-          asignaciones: asignacionesTempo
-        };
-
-        const data = await desasignarConReemplazo(payload);
-
-        toast.success(data?.mensaje || `${neumaticosSeleccionados.length} desasignación(es) y ${asignacionesTempo.length} asignación(es) registradas correctamente.`, {
-          position: 'top-right',
-          duration: 6000
-        })
-
-        // Limpiar asignaciones temporales
-        setAsignacionesTemporales([]);
-      }
-
-      // Actualizar estado local para todos los neumáticos procesados
-      setNeumaticosAsignadosState(prev =>
-        prev.map(n => {
-          const esDesasignado = neumaticosSeleccionados.find(ns =>
-            (ns.CODIGO_NEU || ns.CODIGO) === (n.CODIGO_NEU || n.CODIGO)
-          );
-          return esDesasignado
-            ? { ...n, POSICION: '', TIPO_MOVIMIENTO: accion }
-            : n;
-        })
-      );
-
-      setNeumaticoSeleccionados([]);
-      setAccion('');
-      setTipoAccion('');
-      setObservacion('');
-
-      // Solo llamar onSuccess cuando la acción se completa exitosamente
-      if (onSuccess) {
-        onSuccess();
-      }
-      onClose();
-    } catch (error: any) {
-      const errData = error?.response?.data;
-      const mensajeError = errData?.error || errData?.detalle || error?.message || 'Error desconocido';
-      const detalle = errData?.error && errData?.detalle ? ` — ${errData.detalle}` : '';
-      toast.error(`${mensajeError}`, {
-        description: detalle,
-        duration: 6000,
-      })
-    }
-  };
-
-  // Posiciones que quedaron vacías por la desasignación actual
-  const posicionesVaciasActuales = detectarPosicionesVacias();
-  // Verificar si todas las posiciones vacías ya tienen asignación temporal
-  const todasPosicionesVaciasAsignadas = posicionesVaciasActuales.length === 0 ||
-    posicionesVaciasActuales.every(pos => asignacionesTemporales.some((a: any) => a.Posicion === pos));
-
-  return (
-    <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth
-      PaperProps={{
-        sx: { borderRadius: 3, overflow: 'hidden' }
-      }}
-    >
-
-      <Box sx={{ height: 4, background: 'linear-gradient(90deg, #3b82f6 0%, #6366f1 100%)' }} />
-
-      <DialogTitle sx={{ pb: 1.5, pt: 2, display: 'flex', alignItems: 'center', gap: 1.5, borderBottom: '1px solid', borderColor: 'divider' }}>
-        <Box sx={{
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          width: 40, height: 40, borderRadius: 2,
-          background: 'linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%)',
-          flexShrink: 0,
-        }}>
-          <ClipboardList size={20} className="text-blue-600" />
-        </Box>
-        <Box sx={{ flex: 1 }}>
-          <Typography variant="h6" fontWeight={700} lineHeight={1.2}>
-            Desasignación de Neumáticos
-          </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.4 }}>
-            <Typography variant="body2" color="text.secondary">Vehículo:</Typography>
-            <Chip
-              label={placa}
-              size="small"
-              sx={{ fontWeight: 700, fontSize: 12, bgcolor: '#f1f5f9', color: '#334155', letterSpacing: 0.5 }}
+    const panelDiagrama = (
+        <Card sx={{
+            // pb extra: la etiqueta del repuesto cuelga por debajo del diagrama y se recortaba.
+            p: 2, pb: 5, borderRadius: 2.5, border: '1px solid #e2e8f0',
+            maxWidth: { xs: '100%', sm: 420, lg: 330 }, minWidth: { xs: 0, lg: 300 },
+            display: 'flex', flexDirection: 'column', alignItems: 'center',
+        }} elevation={0}>
+            <div className="mb-1 flex w-full items-center justify-between gap-2">
+                <span className="text-xs font-bold uppercase tracking-wide text-slate-500">Posiciones</span>
+                <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-500">
+                    {placa}
+                </span>
+            </div>
+            <p className="mb-2 w-full text-[11px] leading-snug text-slate-400">
+                {paso === 0
+                    ? 'Haz clic en una rueda para marcarla como saliente.'
+                    : paso === 1
+                        ? 'Haz clic en una posición vacía para cubrirla.'
+                        : 'Así quedará el vehículo al guardar.'}
+            </p>
+            <DiagramaVehiculo
+                neumaticosAsignados={neumaticosEnDiagrama}
+                layout="modal"
+                tipoModal="mantenimiento"
+                anchoMax={150}
+                cantidadNeumaticos={vehiculo?.cantidad_neumaticos}
+                posicionResaltada={posicionObjetivo ?? undefined}
+                onPosicionClick={handleClickPosicion}
             />
-          </Box>
-          <Typography variant="caption" className='text-amber-600' sx={{ display: 'block', mt: 1, fontStyle: 'italic' }}>
-            <span className='font-bold'>Nota: </span>
-            Arrastra los neumáticos a desasignar. Luego, deberás asignarle nuevos neumáticos; <b>las posiciones no pueden quedar vacías</b>.
-          </Typography>
-        </Box>
-      </DialogTitle>
+        </Card>
+    );
 
-
-      <DialogContent>
-        <DndContext onDragEnd={handleDragEnd}>
-          <Stack direction="row" spacing={2}>
-            <Stack direction="column" spacing={2} sx={{ flex: 1, width: '1px', marginTop: '10px' }}>
-              {/* Card de información del vehículo */}
-              <Card sx={{ p: 2, boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)' }}>
-                <Box>
-                  <Typography variant="h6" fontWeight="bold" gutterBottom>
-                    Datos del Vehículo
-                  </Typography>
-                  {vehiculo ? (
-                    <Stack direction="row" spacing={4} alignItems="flex-start" sx={{ mb: 1 }}>
-                      <Box>
-                        <Typography variant="caption" color="text.secondary">Marca</Typography>
-                        <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                          {vehiculo.marca}
-                        </Typography>
-                      </Box>
-                      <Box>
-                        <Typography variant="caption" color="text.secondary">Modelo</Typography>
-                        <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                          {vehiculo.modelo}
-                        </Typography>
-                      </Box>
-                      {vehiculo.proyecto && (
-                        <Box>
-                          <Typography variant="caption" color="text.secondary">Proyecto</Typography>
-                          <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                            {vehiculo.proyecto}
-                          </Typography>
-                        </Box>
-                      )}
-                    </Stack>
-                  ) : (
-                    <Typography variant="body2" color="text.secondary">
-                      No hay datos del vehículo.
-                    </Typography>
-                  )}
-                </Box>
-              </Card>
-
-              <Card sx={{ p: 2, boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)' }}>
-                <ButtonCustom
-                  variant={'warning'}
-                  onClick={handleLimpiar}
-                  disabled={neumaticosSeleccionados.length === 0 && asignacionesTemporales.length === 0 && !accion && !observacion}
-                  size="icon"
-                >
-                  <RotateCcw />
-                </ButtonCustom>
-                <Box sx={{ display: 'flex', alignItems: 'flex-end', mb: 1, gap: 2 }}>
-                  <Box>
-                    <Typography variant="caption" color="text.secondary">Fecha última inspección</Typography>
-                    <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                      {convertToDateHuman(fechaUltimaInspeccion) || 'Sin registro'}
-                    </Typography>
-                  </Box>
-                </Box>
-
-                <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', gap: 2 }}>
-                  <Box sx={{ flexDirection: 'column', gap: 1, minWidth: 220, flex: 1, height: 260 }}>
-                    <TextField
-                      select
-                      label="Acción"
-                      size="small"
-                      value={accion}
-                      onChange={(e) => setAccion(e.target.value)}
-                      sx={{ minWidth: 220, flex: 0.4, marginBottom: '14px', marginTop: '10px' }}
-                    >
-                      <MenuItem value="RECUPERADO">Recuperado</MenuItem>
-                      <MenuItem value="BAJA DEFINITIVA">Baja Definitiva</MenuItem>
-                    </TextField>
-
-                    {
-                      accion === 'BAJA DEFINITIVA' && (
-                        <TextField
-                          select
-                          label="Tipo de baja"
-                          size="small"
-                          value={tipoAccion}
-                          onChange={(e) => setTipoAccion(e.target.value)}
-                          sx={{ minWidth: 220, flex: 0.4, marginBottom: '14px' }}
-                        >
-                          <MenuItem value="DESGASTE NORMAL">Desgaste normal</MenuItem>
-                          <MenuItem value="DESGASTE IRREGULAR">Desgaste irregular</MenuItem>
-                          <MenuItem value="RECOBRO">Recobro</MenuItem>
-                          <MenuItem value="SINIESTRO">Siniestro</MenuItem>
-                          <MenuItem value="FALLA DE FABRICA">Falla de fábrica</MenuItem>
-                        </TextField>
-                      )
-                    }
-
-                    <Textarea placeholder="Escribe la observación..."
-                      className='h-15 mb-4'
-                      value={observacion}
-                      onChange={(e) => setObservacion(e.target.value)}
-                    />
-
-                    {
-                      // const tienePosicionesVacias = posicionesVaciasActuales.length > 0;
-                      posicionesVaciasActuales.length > 0 && (
-                        <Box
-                          sx={{
-                            marginTop: '8px',
-                            marginBottom: '8px',
-                            p: 1.5,
-                            bgcolor: todasPosicionesVaciasAsignadas ? 'success.lighter' : 'warning.lighter',
-                            border: '1px solid',
-                            borderColor: todasPosicionesVaciasAsignadas ? 'success.main' : 'warning.main',
-                            borderRadius: 1,
-                            maxWidth: 350,
-                            mb: 1
-                          }}
-                        >
-                          <Typography
-                            variant="caption"
-                            color={todasPosicionesVaciasAsignadas ? 'success.dark' : 'warning.dark'}
-                            sx={{ fontWeight: 500 }}
-                          >
-                            {todasPosicionesVaciasAsignadas
-                              ? (
-                                <div className='flex gap-2 items-center'>
-                                  <CheckCircle width={15} />
-                                  <span>
-                                    {`Posiciones cubiertas: ${posicionesVaciasActuales.join(', ')}`}
-                                  </span>
-                                </div>
-                              )
-                              : (
-                                <div className='flex gap-2 items-center'>
-                                  <TriangleAlertIcon width={28} />
-                                  <span>
-                                    {`Debes asignar nuevos neumáticos en: ${posicionesVaciasActuales.filter(pos => !asignacionesTemporales.some((a: any) => a.Posicion === pos)).join(', ')}`}
-                                  </span>
-                                </div>
-                              )
-                            }
-                          </Typography>
-                        </Box>
-                      )}
-
-                  </Box>
-
-                  <Box sx={{ position: 'relative', width: '420px' }}>
-                    <DropNeumaticosPorDesasignar onDropNeumatico={(neu) => handleDropNeumatico(neu, '')}>
-                      <Box sx={{
-                        mt: 0, display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start',
-                        height: 150, width: '420px', // Tamaño fijo para 4 neumáticos horizontales aumentado
-                        mx: 0, p: 1, gap: 1, // Gap entre neumáticos
-                        flexWrap: 'wrap', // Permite wrap si hay más de 4
-                      }}>
-                        {neumaticosSeleccionados.length > 0 ? (
-                          neumaticosSeleccionados.map((neumatico, index) => (
-                            <Box key={neumatico.CODIGO_NEU || neumatico.CODIGO || index}
-                              sx={{
-                                display: 'flex', flexDirection: 'column', alignItems: 'center',
-                                minWidth: 70, maxWidth: 70, // Ancho fijo para cada neumático
-                              }}>
-                              <DraggableNeumatico neumatico={neumatico} />
-                              <NeumaticoInfo neumatico={neumatico} />
-                            </Box>
-                          ))
-                        ) : (
-                          <Typography variant="body2" color="text.secondary" sx={{
-                            width: '100%', textAlign: 'center', fontStyle: 'italic'
-                          }}>
-                            Arrastra neumáticos aquí para desasignar
-                          </Typography>
-                        )}
-                      </Box>
-                    </DropNeumaticosPorDesasignar>
-                  </Box>
-                </Box>
-              </Card>
-            </Stack>
-
-            {/* Columna derecha: Diagrama del vehículo */}
-            <Card sx={{
-              flex: 0.5, p: 2, position: 'relative',
-              boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)',
-              maxWidth: 400, minWidth: 420, width: '100%',
-              marginTop: '10px'
-            }}>
-              <Box sx={{ position: 'relative', width: '370px', height: '430px' }}>
-                <DiagramaVehiculo
-                  key={`diagrama-live-${Date.now()}`}
-                  // posicionResaltada={posicionResaltada}
-                  neumaticosAsignados={neumaticosAsignadosState.filter(n => !n.enAreaDesasignacion) as any}
-                  layout="modal"
-                  tipoModal="mantenimiento"
-                  onPosicionClick={handlePosicionClick as any}
-                  fromMantenimientoModal={true}
-                  placa={placa}
-                />
-                <Image src='/assets/placa.png' alt='Placa' width={130} height={60} style={{
-                  objectFit: 'contain',
-                  position: 'absolute',
-                  top: '10px',
-                  right: '75px',
-                  zIndex: 2,
-                  pointerEvents: 'none'
-                }}
-                />
-                {/* Texto de placa */}
-                <Box sx={{
-                  position: 'absolute', top: '28px', right: '84px', zIndex: 3,
-                  color: 'black', padding: '2px 8px', borderRadius: '5px',
-                  fontFamily: 'Arial, sans-serif', fontWeight: 'bold',
-                  fontSize: '24px', textAlign: 'center',
-                }}>
-                  {placa}
-                </Box>
-              </Box>
+    const panelPaso1 = (
+        <Stack spacing={2} sx={{ minWidth: 0, flex: 1 }}>
+            <Card sx={{ p: 2, borderRadius: 2.5, border: '1px solid #e2e8f0' }} elevation={0}>
+                <p className="mb-2 text-sm font-semibold text-slate-700">
+                    Neumáticos instalados
+                    <span className="ml-2 rounded-full bg-red-50 px-2 py-0.5 text-[11px] font-bold text-red-600">
+                        {posicionesLiberadas.length} marcado{posicionesLiberadas.length === 1 ? '' : 's'}
+                    </span>
+                </p>
+                <div className="flex flex-col gap-1.5">
+                    {posiciones.map(pos => (
+                        <FilaInstalado
+                            key={pos}
+                            posicion={pos}
+                            neumatico={instaladoPorPosicion[pos]}
+                            marcado={Boolean(marcados[pos])}
+                            bloqueado={Boolean(reemplazos[pos])}
+                            onToggle={() => toggleMarcado(pos)}
+                        />
+                    ))}
+                </div>
             </Card>
-          </Stack>
-        </DndContext>
-      </DialogContent>
 
-      <DialogActions sx={{ px: 3, py: 1.5, borderTop: '1px solid', borderColor: 'divider' }}>
-        <ButtonCustom onClick={onClose} >
-          Cerrar
-        </ButtonCustom>
+            <Card sx={{ p: 2, borderRadius: 2.5, border: '1px solid #e2e8f0' }} elevation={0}>
+                <p className="mb-2 text-sm font-semibold text-slate-700">Motivo de la salida</p>
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                    <Field>
+                        <FieldLabel htmlFor="accion-desasignar">Acción</FieldLabel>
+                        <Select value={accion} onValueChange={(v) => { setAccion(v); if (v !== 'BAJA DEFINITIVA') setTipoAccion(''); }}>
+                            <SelectTrigger id="accion-desasignar">
+                                <SelectValue placeholder="Selecciona una acción" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {ACCIONES.map(a => <SelectItem key={a.valor} value={a.valor}>{a.etiqueta}</SelectItem>)}
+                            </SelectContent>
+                        </Select>
+                    </Field>
 
-        {
-          neumaticosSeleccionados.length !== 0 && accion && todasPosicionesVaciasAsignadas && (
-            <LoadingButton2
-              variant={'primary'}
-              onClick={handleGuardarDesasignacion}
-              disabled={neumaticosSeleccionados.length === 0 || !accion || !todasPosicionesVaciasAsignadas}
+                    {accion === 'BAJA DEFINITIVA' && (
+                        <Field>
+                            <FieldLabel htmlFor="tipo-baja">Tipo de baja</FieldLabel>
+                            <Select value={tipoAccion} onValueChange={setTipoAccion}>
+                                <SelectTrigger id="tipo-baja">
+                                    <SelectValue placeholder="Selecciona el tipo" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {TIPOS_BAJA.map(t => <SelectItem key={t.valor} value={t.valor}>{t.etiqueta}</SelectItem>)}
+                                </SelectContent>
+                            </Select>
+                        </Field>
+                    )}
+                </div>
+
+                <Field className="mt-3">
+                    <FieldLabel htmlFor="observacion-desasignar">Observación</FieldLabel>
+                    <Textarea
+                        id="observacion-desasignar"
+                        placeholder="Escribe la observación..."
+                        className="h-20"
+                        value={observacion}
+                        onChange={(e) => setObservacion(e.target.value)}
+                    />
+                </Field>
+            </Card>
+        </Stack>
+    );
+
+    const listaDisponibles = (
+        <>
+            <div className="mb-2 flex items-center gap-2">
+                <div className="relative flex-1">
+                    <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
+                    <Input
+                        placeholder="Buscar por código, marca, medida…"
+                        value={busqueda}
+                        onChange={(e) => setBusqueda(e.target.value)}
+                        className="h-9 pl-8"
+                    />
+                </div>
+                <span className="shrink-0 rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-bold text-slate-500">
+                    {resultadosBusqueda.length}
+                </span>
+            </div>
+            <div className="flex flex-col gap-1.5">
+                {resultadosBusqueda.slice(0, TOPE_TARJETAS).map((n: any) => (
+                    <TarjetaDisponible
+                        key={codigoDe(n)}
+                        neumatico={n}
+                        posicionUsada={codigosUsados[codigoDe(n)]}
+                        habilitado={Boolean(posicionObjetivo)}
+                        onElegir={() => elegirNeumatico(n)}
+                    />
+                ))}
+                {resultadosBusqueda.length === 0 && (
+                    <p className="py-8 text-center text-sm text-slate-400">Sin neumáticos disponibles.</p>
+                )}
+                {resultadosBusqueda.length > TOPE_TARJETAS && (
+                    <p className="py-2 text-center text-[11px] text-slate-400">
+                        Mostrando {TOPE_TARJETAS} de {resultadosBusqueda.length} — refina la búsqueda para ver más.
+                    </p>
+                )}
+            </div>
+        </>
+    );
+
+    const panelPaso2 = (
+        <Stack spacing={2} sx={{ minWidth: 0, flex: 1 }}>
+            <Card sx={{ p: 2, borderRadius: 2.5, border: '1px solid #e2e8f0' }} elevation={0}>
+                <div className="mb-2 flex items-center justify-between gap-2">
+                    <p className="text-sm font-semibold text-slate-700">Posiciones a cubrir</p>
+                    <span className={`rounded-full px-2 py-0.5 text-[11px] font-bold ${todasCubiertas ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}`}>
+                        {Object.keys(reemplazos).length}/{posicionesLiberadas.length}
+                    </span>
+                </div>
+                <div className="flex flex-col gap-1.5">
+                    {posicionesLiberadas.map(pos => (
+                        <TarjetaPosicionLiberada
+                            key={pos}
+                            posicion={pos}
+                            reemplazo={reemplazos[pos]}
+                            esObjetivo={posicionObjetivo === pos}
+                            onElegir={() => setPosicionObjetivo(pos)}
+                            onEditar={() => setInputsPara({ posicion: pos, neumatico: reemplazos[pos].neumatico })}
+                            onQuitar={() => quitarReemplazo(pos)}
+                        />
+                    ))}
+                </div>
+            </Card>
+
+            <Card sx={{ p: 2, borderRadius: 2.5, border: '1px solid #e2e8f0', minWidth: 0 }} elevation={0}>
+                <p className="mb-2 text-sm font-semibold text-slate-700">
+                    Neumáticos disponibles
+                    {posicionObjetivo ? (
+                        <span className="ml-2 text-xs font-normal text-indigo-600">
+                            Eligiendo para <b>{posicionObjetivo}</b>
+                        </span>
+                    ) : (
+                        <span className="ml-2 text-xs font-normal text-emerald-600">
+                            Todas las posiciones están cubiertas.
+                        </span>
+                    )}
+                </p>
+                {esPantallaChica ? listaDisponibles : (
+                    <Box sx={{ minWidth: 0 }}>
+                        <SeleccionContext.Provider value={seleccionContextValue}>
+                            <DataTableNeumaticos columns={columnasDisponibles} data={resultadosBusqueda} type="pagination" filters />
+                        </SeleccionContext.Provider>
+                    </Box>
+                )}
+            </Card>
+        </Stack>
+    );
+
+    const panelPaso3 = (
+        <Stack spacing={2} sx={{ minWidth: 0, flex: 1 }}>
+            <Card sx={{ p: 2, borderRadius: 2.5, border: '1px solid #fecaca', bgcolor: '#fef2f2' }} elevation={0}>
+                <p className="mb-2 flex items-center gap-1.5 text-sm font-bold text-red-700">
+                    <CircleMinus className="h-4 w-4" />
+                    Salen del vehículo ({posicionesLiberadas.length})
+                </p>
+                <div className="flex flex-col gap-1.5">
+                    {posicionesLiberadas.map(pos => (
+                        <div key={pos} className="flex items-center gap-2.5 rounded-lg border border-red-200 bg-white px-3 py-2">
+                            <span className="shrink-0 rounded-md bg-red-600 px-2 py-1 font-mono text-[11px] font-extrabold text-white">{pos}</span>
+                            <div className="min-w-0 flex-1">
+                                <p className="truncate text-sm font-bold text-slate-800">{codigoDe(marcados[pos])}</p>
+                                <p className="truncate text-xs text-slate-500">
+                                    {[marcados[pos].MARCA, marcados[pos].MEDIDA].filter(Boolean).join(' · ') || '—'}
+                                </p>
+                            </div>
+                            <span className="shrink-0 rounded-full border border-red-200 bg-red-50 px-2 py-0.5 text-[10px] font-bold text-red-700">
+                                {accion === 'BAJA DEFINITIVA' ? tipoAccion || 'BAJA' : accion}
+                            </span>
+                        </div>
+                    ))}
+                </div>
+            </Card>
+
+            <Card sx={{ p: 2, borderRadius: 2.5, border: '1px solid #bbf7d0', bgcolor: '#f0fdf4' }} elevation={0}>
+                <p className="mb-2 flex items-center gap-1.5 text-sm font-bold text-emerald-700">
+                    <Check className="h-4 w-4" />
+                    Entran al vehículo ({posicionesLiberadas.length})
+                </p>
+                <div className="flex flex-col gap-1.5">
+                    {posicionesLiberadas.map(pos => {
+                        const r = reemplazos[pos];
+                        return (
+                            <div key={pos} className="rounded-lg border border-emerald-200 bg-white px-3 py-2">
+                                <div className="flex items-center gap-2.5">
+                                    <span className="shrink-0 rounded-md bg-emerald-600 px-2 py-1 font-mono text-[11px] font-extrabold text-white">{pos}</span>
+                                    <div className="min-w-0 flex-1">
+                                        <p className="truncate text-sm font-bold text-slate-800">{codigoDe(r?.neumatico)}</p>
+                                        <p className="truncate text-xs text-slate-500">
+                                            {[r?.neumatico?.MARCA, r?.neumatico?.MEDIDA].filter(Boolean).join(' · ') || '—'}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="mt-1.5 flex flex-wrap gap-1.5 text-[11px] font-semibold text-slate-600">
+                                    <span className="rounded bg-slate-100 px-1.5 py-0.5">{r?.REMANENTE} mm</span>
+                                    <span className="rounded bg-slate-100 px-1.5 py-0.5">{r?.PRESION_AIRE} psi</span>
+                                    <span className="rounded bg-slate-100 px-1.5 py-0.5">{r?.TORQUE_APLICADO} N·m</span>
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+            </Card>
+
+            <Card sx={{ p: 2, borderRadius: 2.5, border: '1px solid #e2e8f0' }} elevation={0}>
+                <p className="text-[10px] font-bold uppercase tracking-wide text-slate-400">Observación</p>
+                <p className="mt-0.5 whitespace-pre-wrap text-sm text-slate-700">{observacion}</p>
+                <div className="mt-2 flex flex-wrap gap-3 text-xs text-slate-500">
+                    <span><b className="text-slate-700">Kilometraje:</b> {Number(kilometraje ?? 0).toLocaleString()} km</span>
+                    <span><b className="text-slate-700">Última inspección:</b> {convertToDateHuman(fechaUltimaInspeccion) || 'Sin registro'}</span>
+                </div>
+            </Card>
+        </Stack>
+    );
+
+    return (
+        <>
+            <Dialog
+                open={open}
+                onClose={onClose}
+                maxWidth="lg"
+                fullWidth
+                fullScreen={esPantallaChica}
+                PaperProps={{ sx: { borderRadius: { xs: 0, lg: 3 }, overflow: 'hidden' } }}
             >
-              Registrar Desasignación y Asignación
-            </LoadingButton2>
-          )
-        }
+                <Box sx={{ height: 4, background: 'linear-gradient(90deg, #3b82f6 0%, #6366f1 100%)' }} />
 
-        {onAbrirAsignacion && (() => {
-          const tienePosicionesVacias = posicionesVaciasActuales.length > 0;
-          const tieneAccionYObservacion = accion.trim() !== '' && observacion.trim() !== '';
-          const siEsBajaDefinitiva = accion.trim() === 'BAJA DEFINITIVA' && tipoAccion.trim() !== '';
+                <DialogTitle sx={{ pb: 1.5, pt: 2, px: { xs: 2, md: 3 }, display: 'flex', alignItems: 'flex-start', gap: 1.5, borderBottom: '1px solid', borderColor: 'divider' }}>
+                    <Box sx={{
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        width: { xs: 34, md: 40 }, height: { xs: 34, md: 40 }, borderRadius: 2,
+                        background: 'linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%)', flexShrink: 0,
+                    }}>
+                        <ClipboardList size={20} className="text-blue-600" />
+                    </Box>
 
-          return (
-            <>
-              {/* Botón Asignar Neumáticos */}
+                    <Box sx={{ flex: 1, minWidth: 0 }}>
+                        <Typography variant="h6" fontWeight={700} lineHeight={1.2} sx={{ fontSize: { xs: 16, md: 20 } }}>
+                            Desasignación de Neumáticos
+                        </Typography>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.4, flexWrap: 'wrap' }}>
+                            <Typography variant="body2" color="text.secondary">Vehículo:</Typography>
+                            <Chip label={placa} size="small" sx={{ fontWeight: 700, fontSize: 12, bgcolor: '#f1f5f9', color: '#334155', letterSpacing: 0.5 }} />
+                            {vehiculo?.marca && (
+                                <Typography variant="caption" color="text.secondary">
+                                    {[vehiculo.marca, vehiculo.modelo].filter(Boolean).join(' · ')}
+                                </Typography>
+                            )}
+                        </Box>
+                        <div className="mt-1.5 flex items-center gap-1">
+                            {PASOS.map((etiqueta, i) => (
+                                <React.Fragment key={etiqueta}>
+                                    {i > 0 && <span className="h-px w-3 bg-slate-200 sm:w-5" />}
+                                    <Paso indice={i} actual={paso} etiqueta={etiqueta} onClick={() => { if (i < paso) setPaso(i); }} />
+                                </React.Fragment>
+                            ))}
+                        </div>
+                    </Box>
 
-              {
-                tienePosicionesVacias && tieneAccionYObservacion && (accion.trim() !== 'BAJA DEFINITIVA' || siEsBajaDefinitiva) &&
-                (
-                  <ButtonCustom
-                    variant={'teal'}
-                    disabled={!tienePosicionesVacias || !tieneAccionYObservacion}
-                    onClick={() => {
-                      // Agrupar por posición y quedarse con el más reciente (mayor ID_MOVIMIENTO)
-                      const neumaticosNoDesasignados = neumaticosAsignadosState.filter(n => !n.enAreaDesasignacion);
+                    <ButtonCustom variant="ghost" size="icon" onClick={onClose} title="Cerrar" aria-label="Cerrar" className="shrink-0 text-slate-400 hover:text-slate-700">
+                        <X className="h-4 w-4" />
+                    </ButtonCustom>
+                </DialogTitle>
+                <DialogContent sx={{ pt: 2.5, px: { xs: 1.5, md: 3 }, bgcolor: '#f8fafc' }}>
+                    <div className='mt-3'></div>
+                    {paso === 0 && posicionesLiberadas.length === 0 && (
+                        <div className="mb-2.5 flex items-start gap-2 rounded-xl border border-blue-100 bg-blue-50/70 px-3 py-2.5">
+                            <CircleAlert className="mt-0.5 h-4 w-4 shrink-0 text-blue-500" />
+                            <p className="text-xs leading-snug text-blue-800">
+                                Marca los neumáticos que salen del vehículo. Después tendrás que cubrir cada posición
+                                liberada con un reemplazo: <b>las posiciones no pueden quedar vacías</b>.
+                            </p>
+                        </div>
+                    )}
 
-                      const neumaticosPorPosicion = new Map<string, typeof neumaticosNoDesasignados[0]>();
-                      neumaticosNoDesasignados.forEach(n => {
-                        const pos = (n.POSICION_NEU || n.POSICION);
-                        if (pos) {
-                          const existente = neumaticosPorPosicion.get(pos);
-                          if (!existente || (n.ID_MOVIMIENTO || 0) > (existente.ID_MOVIMIENTO || 0)) {
-                            neumaticosPorPosicion.set(pos, n);
-                          }
-                        }
-                      });
+                    <Stack direction={{ xs: 'column-reverse', lg: 'row' }} spacing={2} alignItems={{ xs: 'stretch', lg: 'flex-start' }}>
+                        {paso === 0 ? panelPaso1 : paso === 1 ? panelPaso2 : panelPaso3}
+                        <Box sx={{ display: 'flex', justifyContent: 'center', flexShrink: 0 }}>
+                            {panelDiagrama}
+                        </Box>
+                    </Stack>
+                </DialogContent>
 
-                      const neumaticosActuales = Array.from(neumaticosPorPosicion.values()).map(n => {
-                        const pos = n.POSICION_NEU || n.POSICION;
-                        return {
-                          ...n,
-                          POSICION: pos,
-                          POSICION_NEU: pos
-                        };
-                      });
-                      onAbrirAsignacion({
-                        cachedNeumaticosAsignados: neumaticosActuales,
-                        posicionesVacias: posicionesVaciasActuales
-                      });
-                    }}
-                  >
-                    Asignar Neumáticos
-                  </ButtonCustom>
-                )
-              }
-            </>
-          );
-        })()}
+                <DialogActions sx={{
+                    px: { xs: 2, md: 3 }, py: 1.5, borderTop: '1px solid', borderColor: 'divider', gap: 1.5,
+                    flexDirection: { xs: 'column-reverse', sm: 'row' },
+                    alignItems: { xs: 'stretch', sm: 'center' },
+                    '& > button': { width: { xs: '100%', sm: 'auto' }, m: '0 !important' },
+                }}>
+                    <ButtonCustom
+                        variant="warning"
+                        onClick={reiniciar}
+                        disabled={posicionesLiberadas.length === 0 && accion === '' && observacion.trim() === ''}
+                    >
+                        <RotateCcw className="h-4 w-4" />
+                        Restaurar
+                    </ButtonCustom>
 
-      </DialogActions>
+                    <Box sx={{ flex: { sm: 1 } }} />
 
-    </Dialog >
-  );
+                    {paso > 0 && (
+                        <ButtonCustom variant="outline" onClick={() => setPaso(paso - 1)}>
+                            <ArrowLeft className="h-4 w-4" />
+                            Atrás
+                        </ButtonCustom>
+                    )}
+
+                    {paso < 2 ? (
+                        <ButtonCustom
+                            variant="primary"
+                            onClick={avanzar}
+                            disabled={paso === 0 ? !paso1Completo : !todasCubiertas}
+                        >
+                            Siguiente
+                            <ArrowRight className="h-4 w-4" />
+                        </ButtonCustom>
+                    ) : (
+                        <LoadingButton2
+                            variant="primary"
+                            icon={<Check />}
+                            disabled={!todasCubiertas}
+                            onClick={handleGuardar}
+                        >
+                            Registrar desasignación
+                        </LoadingButton2>
+                    )}
+                </DialogActions>
+            </Dialog>
+
+            {inputsPara && (
+                <ModalInputsNeu
+                    cantidadNeumaticos={vehiculo?.cantidad_neumaticos}
+                    open
+                    onClose={() => setInputsPara(null)}
+                    onSubmit={handleInputsSubmit}
+                    initialRemanente={Number(reemplazos[inputsPara.posicion]?.REMANENTE ?? inputsPara.neumatico?.REMANENTE ?? 0)}
+                    initialOdometro={typeof kilometraje === 'number' ? kilometraje : 0}
+                    initialPresionAire={Number(reemplazos[inputsPara.posicion]?.PRESION_AIRE ?? 0)}
+                    initialTorqueAplicado={Number(reemplazos[inputsPara.posicion]?.TORQUE_APLICADO ?? 0)}
+                    initialFechaAsignacion={reemplazos[inputsPara.posicion]?.FECHA_ASIGNACION ?? ''}
+                    fechaRegistroNeumatico={inputsPara.neumatico?.FECHA_REGISTRO ?? ''}
+                    esRecuperado={inputsPara.neumatico?.RECUPERADO ?? false}
+                    fechaRecuperado={inputsPara.neumatico?.FECHA_RECUPERADO ?? null}
+                    fechaFija={fechaUltimaInspeccion}
+                    position={inputsPara.posicion}
+                />
+            )}
+        </>
+    );
 });
 
-// Componente para neumático draggable
-export const DraggableNeumatico: React.FC<{ neumatico: Neumatico }> = memo(({ neumatico }) => {
-  const dragId = neumatico.CODIGO_NEU || neumatico.CODIGO || neumatico.POSICION || 'neumatico-' + Math.random();
-
-  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
-    id: dragId,
-    data: { ...neumatico, from: neumatico.POSICION || 'area-desasignacion' },
-  });
-
-  const style = {
-    display: 'flex',
-    flexDirection: 'column' as const,
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: 28,
-    height: 62,
-    borderRadius: '11px',
-    background: '#fff',
-    border: isDragging ? '2px solid #2196f3' : '2px solid #bdbdbd',
-    boxShadow: isDragging ? '0 0 12px #2196f3' : '0 5px 7px #bbb',
-    margin: '0 auto 12px auto',
-    cursor: 'grab',
-    opacity: isDragging ? 0.7 : 1,
-    transition: 'box-shadow 0.2s, border 0.2s, opacity 0.2s',
-    position: 'relative' as const,
-  };
-
-  return (
-    <div
-      ref={setNodeRef}
-      style={{
-        ...style,
-        transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined
-      }}
-      {...listeners}
-      {...attributes}
-    >
-      <img
-        src={'/assets/neumatico-new.png'}
-        alt="Neumático"
-        style={{
-          width: 28,
-          height: 77,
-          objectFit: 'contain',
-          filter: isDragging ? 'brightness(0.8)' : undefined
-        }}
-      />
-    </div>
-  );
-});
-
-// Componente para mostrar información de neumático
-const NeumaticoInfo: React.FC<{ neumatico: Neumatico }> = memo(({ neumatico }) => (
-  <>
-    <Typography variant="caption" fontWeight="bold" sx={{ mt: 0.5, fontSize: 11, textAlign: 'center', width: '100%' }}>
-      {neumatico.CODIGO_NEU || neumatico.CODIGO || 'Sin código'}
-    </Typography>
-    <Typography variant="caption" sx={{ fontSize: 9, color: '#666', fontWeight: 'bold', textAlign: 'center', width: '100%' }}>
-      {neumatico.POSICION || neumatico.POSICION_NEU || ''}
-    </Typography>
-    <Typography variant="caption" sx={{ fontSize: 10, color: '#888', textAlign: 'center', width: '100%' }}>
-      {neumatico.MARCA || ''}
-    </Typography>
-  </>
-));
-
-// Dropzone para neumáticos por desasignar
-export const DropNeumaticosPorDesasignar: React.FC<{
-  onDropNeumatico: (neu: Neumatico) => void;
-  children: React.ReactNode
-}> = memo(({ onDropNeumatico, children }) => {
-  const { setNodeRef, isOver, active } = useDroppable({ id: 'neumaticos-por-desasignar' });
-
-  useEffect(() => {
-    if (isOver && active && active.data?.current) {
-      const neu = active.data.current as Neumatico;
-      if (neu && typeof neu.POSICION === 'string' && neu.POSICION) {
-        onDropNeumatico({ ...neu, POSICION: neu.POSICION });
-      }
-    }
-  }, [isOver, active, onDropNeumatico]);
-
-  return (
-    <Box
-      ref={setNodeRef}
-      sx={{
-        height: 150, // Altura fija aumentada
-        width: '420px', // Ancho fijo para 4 neumáticos
-        background: isOver ? '#e8f5e8' : '#fafafa',
-        border: isOver ? '2px solid #4caf50' : '1px solid #bdbdbd',
-        borderRadius: 2,
-        p: 1,
-        transition: 'background 0.2s, border 0.2s',
-        overflow: 'hidden', // Sin scroll
-      }}
-    >
-      {children}
-    </Box>
-  );
-});
-
-// Función auxiliar para obtener última inspección
-async function obtenerYSetearUltimaInspeccionPorPlaca(placa: string): Promise<string | null> {
-  if (!placa) return null;
-  try {
-    const fecha = await getUltimaFechaInspeccionPorPlaca(placa);
-    return fecha?.fecha_registro || null;
-  } catch (error) {
-    console.error('Error obteniendo la última inspección por placa:', error);
-    return null;
-  }
-}
+ModalDesasignar.displayName = 'ModalDesasignar';
 
 export default ModalDesasignar;

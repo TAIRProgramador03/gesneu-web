@@ -269,7 +269,9 @@ export const MapaTalleres = () => {
           <div style={{ fontSize: 11, fontWeight: 700, color: textSec, letterSpacing: '0.07em', marginBottom: 2 }}>
             RESUMEN NACIONAL
           </div>
-          <div style={{ height: 7, borderRadius: 3, background: trackBg, overflow: 'hidden', display: 'flex' }}>
+          {/* flexShrink 0: es hija directa del panel con scroll y, al tener overflow hidden,
+              el navegador le permite encogerse por debajo de su alto y la barra desaparecía. */}
+          <div style={{ height: 7, flexShrink: 0, borderRadius: 3, background: trackBg, overflow: 'hidden', display: 'flex' }}>
             <div style={{ width: `${(TOTAL_ASIG / TOTAL_FLOTA) * 100}%`, background: '#3B82F6' }} />
             <div style={{ width: `${(TOTAL_DISP / TOTAL_FLOTA) * 100}%`, background: '#22C55E' }} />
             <div style={{ width: `${(TOTAL_BAJA / TOTAL_FLOTA) * 100}%`, background: '#EF4444' }} />

@@ -48,6 +48,7 @@ export interface Vehiculo {
   kilometro?: number;
   cod_supervisor?: string,
   id_operacion?: number
+  cantidad_neumaticos?: number
 }
 
 export interface User {

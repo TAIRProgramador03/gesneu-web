@@ -2,10 +2,11 @@
 
 import * as React from 'react';
 import { ClipboardText } from '@phosphor-icons/react/dist/ssr/ClipboardText';
-import { columnsNeuAsignado, columnsNeuDisponible } from './columns';
+import { columnsNeuDisponible } from './columns';
 import { CompaniesFilters } from '@/components/dashboard/integrations/integrations-filters';
 import { Customer } from '@/components/dashboard/customer/customers-table';
-import { DataTableNeumaticos } from '@/components/ui/data-table/data-table';
+import { NeumaticosAsignadosCards } from '@/components/dashboard/integrations/NeumaticosAsignadosCards';
+import { obtenerConfiguracionNeumaticos } from '@/utils/configuraciones-neumaticos';
 import { Neumatico } from '@/types/types';
 import { Neumaticos, obtenerNeumaticosAsignadosPorPlaca, buscarVehiculoPorPlaca, obtenerCantidadAutosDisponibles, obtenerUltimosMovimientosPorPlaca, obtenerUltimosMovimientosPorCodigo, getUltimaFechaInspeccionPorPlaca, obtenerNeumaticosDisponibles, getFechasInspeccionVehicularPorPlaca } from '@/api/Neumaticos';
 import { toast } from 'sonner';
@@ -18,7 +19,6 @@ import DiagramaVehiculo from '@/styles/theme/components/DiagramaVehiculo';
 import ModalAdvertenciaDesasignacion from '@/components/core/theme-provider/modal-desasignar/modal-advertencia-desasignar';
 import ModalAdvertenciaReubicacion from '@/components/core/theme-provider/modal-reubicar/modal-advertencia-reubicacion';
 import ModalAsignacionNeu from '@/components/dashboard/integrations/modal-asignacion-neu';
-import ModalAsignacionNeuDesdeDesasignacion from '@/components/dashboard/integrations/modal-asignacion-neu-desde-desasignacion';
 import ModalConfirmarInspDesasignar from '@/components/core/theme-provider/modal-desasignar/modal-confirmar-insp-desasignar';
 import ModalConfirmarInspeccion from '@/components/core/theme-provider/modal-reubicar/modal-confirmar-inspeccion';
 import ModalDesasignar from '@/components/dashboard/integrations/modal-desasignar';
@@ -28,23 +28,57 @@ import ModalInspeccionAnterior from '@/components/core/theme-provider/modal-reub
 import ModalInspeccionAntigua from '@/components/core/theme-provider/modal-reubicar/modal-inspeccion-antigua';
 import ModalInspeccionObligatoria from '@/components/core/theme-provider/modal-reubicar/modal-inspeccion-obligatoria';
 import ModalReubicar from '@/components/dashboard/integrations/modal-reubicar';
-import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
-import { ArrowLeftRightIcon, BookMarked, EyeIcon, ListRestart, Replace } from 'lucide-react';
+import { ArrowLeftRightIcon, BookMarked, EyeIcon, ListRestart, MapPinCheckInside, Replace } from 'lucide-react';
 import { ModalVerInspecciones } from '@/components/dashboard/integrations/modal-ver-inspecciones';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Button as ButtonCustom } from '@/components/ui/button';
 import { LoadingButton2 } from '@/components/ui/loading-button2';
 import { ModalActualizarKilometraje } from '@/components/dashboard/integrations/modal-actualizar-kilometraje';
 import Link from 'next/link';
+import Chip from '@mui/material/Chip';
+import { EmptyStatePlaca } from '@/components/dashboard/integrations/empty-state-placa';
+import { diasDesdeFecha, parsearFechaLocal } from '@/lib/utils';
 
+/**
+ * Deja un solo movimiento por posición (el más reciente) y normaliza los campos que la API
+ * devuelve duplicados (CODIGO/CODIGO_NEU, POSICION/POSICION_NEU).
+ *
+ * Las posiciones válidas SIEMPRE salen de la configuración del vehículo: escribirlas a mano
+ * descarta en silencio las que no estén en la lista (una moto tiene 2 y un camión 7, no 5).
+ * Si el vehículo no trae una cantidad reconocida no se filtra nada: preferimos mostrar de más
+ * antes que esconder neumáticos que sí están asignados en base de datos.
+ */
+function normalizarAsignadosPorPosicion(
+  asignados: any[],
+  cantidadNeumaticos: number | string | null | undefined
+): any[] {
+  const configuracion = obtenerConfiguracionNeumaticos(cantidadNeumaticos);
+  const posicionesValidas = configuracion ? new Set(configuracion.posiciones.map(p => p.codigo)) : null;
+
+  const activos = (Array.isArray(asignados) ? asignados : []).filter(
+    (n: any) => n.TIPO_MOVIMIENTO !== 'BAJA DEFINITIVA' && n.TIPO_MOVIMIENTO !== 'RECUPERADO'
+  );
+
+  const porPosicion = new Map<string, any>();
+  activos.forEach((n: any) => {
+    const pos = n.POSICION_NEU || n.POSICION;
+    if (!pos || (posicionesValidas && !posicionesValidas.has(pos))) return;
+    const existente = porPosicion.get(pos);
+    if (!existente || (n.ID || 0) > (existente.ID || 0)) {
+      porPosicion.set(pos, n);
+    }
+  });
+
+  return Array.from(porPosicion.values()).map((n: any) => ({
+    ...n,
+    CODIGO: n.CODIGO || n.CODIGO_NEU,
+    CODIGO_NEU: n.CODIGO_NEU || n.CODIGO,
+    POSICION_NEU: n.POSICION_NEU || n.POSICION,
+    POSICION: n.POSICION || n.POSICION_NEU,
+  }));
+}
 
 export default function Page(): React.JSX.Element {
   const [bloqueoReubicacion, setBloqueoReubicacion] = useState(false);
@@ -69,13 +103,6 @@ export default function Page(): React.JSX.Element {
   const [openModal, setOpenModal] = React.useState(false);
   // Modal de inspección - ahora integrado con modal de advertencia centralizado
   const [openInspeccionModal, setOpenInspeccionModal] = React.useState(false);
-  // Modal de asignación desde desasignación
-  const [openModalAsignacionDesdeDesasignacion, setOpenModalAsignacionDesdeDesasignacion] = React.useState(false);
-  const [datosAsignacionDesdeDesasignacion, setDatosAsignacionDesdeDesasignacion] = React.useState<{
-    cachedNeumaticosAsignados: Neumatico[];
-    posicionesVacias: string[];
-  } | null>(null);
-  const [asignacionesTemporales, setAsignacionesTemporales] = React.useState<any[]>([]); // Asignaciones temporales desde modal asignación
   const [openMantenimientoModal, setOpenMantenimientoModal] = React.useState(false);
   const [modoMantenimiento, setModoMantenimiento] = React.useState<'REUBICAR' | 'DESASIGNAR' | null>(null);
   // const [loading, setLoading] = React.useState(false);
@@ -108,6 +135,7 @@ export default function Page(): React.JSX.Element {
     ID_SUPERVISOR: string;
     TIPO_TERRENO: string;
     RETEN: string;
+    CANTIDAD_NEUMATICOS?: number;
     mensaje?: null | string
   }
 
@@ -147,32 +175,7 @@ export default function Page(): React.JSX.Element {
 
         // Obtener neumáticos asignados desde la API
         const asignados = await obtenerNeumaticosAsignadosPorPlaca(placa);
-
-        // Filtrar solo los activos (excluir BAJA DEFINITIVA y RECUPERADO)
-        const neumaticosActivos = asignados.filter((n: any) =>
-          n.TIPO_MOVIMIENTO !== 'BAJA DEFINITIVA' && n.TIPO_MOVIMIENTO !== 'RECUPERADO'
-        );
-
-        // Agrupar por posición y quedarse con el más reciente (mayor ID_MOVIMIENTO)
-        const porPosicion = new Map<string, typeof neumaticosActivos[0]>();
-        neumaticosActivos.forEach((n: any) => {
-          const pos = n.POSICION_NEU || n.POSICION;
-          if (pos && ['POS01', 'POS02', 'POS03', 'POS04', 'RES01'].includes(pos)) {
-            const existente = porPosicion.get(pos);
-            if (!existente || (n.ID || 0) > (existente.ID || 0)) {
-              porPosicion.set(pos, n);
-            }
-          }
-        });
-
-        // Normalizar campos para consistencia
-        const movimientos = Array.from(porPosicion.values()).map((n: any) => ({
-          ...n,
-          CODIGO: n.CODIGO || n.CODIGO_NEU,
-          CODIGO_NEU: n.CODIGO_NEU || n.CODIGO,
-          POSICION_NEU: n.POSICION_NEU || n.POSICION,
-          POSICION: n.POSICION || n.POSICION_NEU
-        }));
+        const movimientos = normalizarAsignadosPorPosicion(asignados, vehiculoData.CANTIDAD_NEUMATICOS);
 
         setNeumaticosAsignados(movimientos);
         // Calcular el mayor kilometraje de los movimientos (tipado explícito)
@@ -243,33 +246,17 @@ export default function Page(): React.JSX.Element {
   const handleOpenModal = async () => {
     try {
       if (vehiculo) {
-        // VALIDACIÓN: Si ya hay 5 neumáticos asignados, no permitir abrir el modal
-        // El modal de asignación original solo es para vehículos sin neumáticos
+        // VALIDACIÓN: si el vehículo ya tiene todas sus posiciones ocupadas, no abrir el modal.
+        // El modal de asignación original solo es para vehículos sin neumáticos.
         const asignadosValidos = neumaticosAsignadosUnicos.filter(
           n => n.TIPO_MOVIMIENTO !== 'BAJA DEFINITIVA'
         );
-        if (asignadosValidos.length >= 5) {
+        const totalPosiciones = obtenerConfiguracionNeumaticos(vehiculo.CANTIDAD_NEUMATICOS)?.posiciones.length ?? 5;
+        if (asignadosValidos.length >= totalPosiciones) {
           toast.warning('Este vehículo ya tiene todos sus neumáticos asignados. El modal de asignación solo es para vehículos nuevos sin neumáticos.');
           return;
         }
 
-        const data = await obtenerNeumaticosAsignadosPorPlaca(vehiculo.PLACA);
-
-        // Agrupar por posición y quedarse con el más reciente (mayor ID_MOVIMIENTO)
-        const neumaticosPorPosicion = new Map<string, typeof data[0]>();
-        data.forEach((n: any) => {
-          const pos = n.POSICION_NEU;
-          if (pos && ['POS01', 'POS02', 'POS03', 'POS04', 'RES01'].includes(pos)) {
-            const existente = neumaticosPorPosicion.get(pos);
-            if (!existente || (n.ID || 0) > (existente.ID || 0)) {
-              neumaticosPorPosicion.set(pos, n);
-            }
-          }
-        });
-
-
-        // Pasar los neumáticos agrupados (solo el más reciente por posición)
-        // setAssignedNeumaticos(Array.from(neumaticosPorPosicion.values()));
         setOpenModal(true);
       } else {
         console.error('No hay un vehículo seleccionado.');
@@ -282,21 +269,6 @@ export default function Page(): React.JSX.Element {
 
   const handleCloseModal = () => {
     setOpenModal(false);
-  };
-
-  // Handler para abrir modal de asignación desde desasignación
-  const handleAbrirAsignacionDesdeDesasignacion = (data: { cachedNeumaticosAsignados: Neumatico[]; posicionesVacias: string[] }) => {
-    setDatosAsignacionDesdeDesasignacion(data);
-    setOpenModalAsignacionDesdeDesasignacion(true);
-  };
-
-  const handleCloseModalAsignacionDesdeDesasignacion = async () => {
-    setOpenModalAsignacionDesdeDesasignacion(false);
-    setDatosAsignacionDesdeDesasignacion(null);
-    // Limpiar asignaciones temporales al cerrar modal
-    setAsignacionesTemporales([]);
-    // NO refrescar datos aquí porque las asignaciones son temporales
-    // Solo se refrescarán cuando se guarde la desasignación
   };
 
   // Nuevo: manejar selección de vehículo desde el modal de todas las placas
@@ -316,32 +288,7 @@ export default function Page(): React.JSX.Element {
 
       // Obtener neumáticos asignados desde la API
       const asignados = await obtenerNeumaticosAsignadosPorPlaca(vehiculoSeleccionado.PLACA.trim());
-
-      // Filtrar solo los activos (excluir BAJA DEFINITIVA y RECUPERADO)
-      const neumaticosActivos = asignados.filter((n: any) =>
-        n.TIPO_MOVIMIENTO !== 'BAJA DEFINITIVA' && n.TIPO_MOVIMIENTO !== 'RECUPERADO'
-      );
-
-      // Agrupar por posición y quedarse con el más reciente (mayor ID_MOVIMIENTO)
-      const porPosicion = new Map<string, typeof neumaticosActivos[0]>();
-      neumaticosActivos.forEach((n: any) => {
-        const pos = n.POSICION_NEU || n.POSICION;
-        if (pos && ['POS01', 'POS02', 'POS03', 'POS04', 'RES01'].includes(pos)) {
-          const existente = porPosicion.get(pos);
-          if (!existente || (n.ID || 0) > (existente.ID || 0)) {
-            porPosicion.set(pos, n);
-          }
-        }
-      });
-
-      // Normalizar campos para consistencia
-      const movimientos = Array.from(porPosicion.values()).map((n: any) => ({
-        ...n,
-        CODIGO: n.CODIGO || n.CODIGO_NEU,
-        CODIGO_NEU: n.CODIGO_NEU || n.CODIGO,
-        POSICION_NEU: n.POSICION_NEU || n.POSICION,
-        POSICION: n.POSICION || n.POSICION_NEU
-      }));
+      const movimientos = normalizarAsignadosPorPosicion(asignados, vehiculoSeleccionado.CANTIDAD_NEUMATICOS);
 
       setNeumaticosAsignados(movimientos);
 
@@ -377,35 +324,8 @@ export default function Page(): React.JSX.Element {
     // Usar la misma API simple que las otras funciones
     obtenerNeumaticosAsignadosPorPlaca(vehiculo.PLACA)
       .then((asignados) => {
-        // Filtrar solo los activos (excluir BAJA DEFINITIVA y RECUPERADO)
-        const neumaticosActivos = asignados.filter((n: any) =>
-          n.TIPO_MOVIMIENTO !== 'BAJA DEFINITIVA' && n.TIPO_MOVIMIENTO !== 'RECUPERADO'
-        );
-
-        // Agrupar por posición y quedarse con el más reciente (mayor ID_MOVIMIENTO)
-        const porPosicion = new Map<string, typeof neumaticosActivos[0]>();
-        neumaticosActivos.forEach((n: any) => {
-          const pos = n.POSICION_NEU || n.POSICION;
-          if (pos && ['POS01', 'POS02', 'POS03', 'POS04', 'RES01'].includes(pos)) {
-            const existente = porPosicion.get(pos);
-            if (!existente || (n.ID || 0) > (existente.ID || 0)) {
-              porPosicion.set(pos, n);
-            }
-          }
-        });
-
-        // Normalizar campos para consistencia
-        // IMPORTANTE: Preservar todos los campos, especialmente ESTADO y REMANENTE
-        const neumaticosActuales = Array.from(porPosicion.values()).map((n: any) => ({
-          ...n, // Preservar todos los campos originales
-          CODIGO: n.CODIGO || n.CODIGO_NEU,
-          CODIGO_NEU: n.CODIGO_NEU || n.CODIGO,
-          POSICION_NEU: n.POSICION_NEU || n.POSICION,
-          POSICION: n.POSICION || n.POSICION_NEU,
-          ESTADO: n.ESTADO, // Preservar ESTADO (porcentaje de vida útil)
-          REMANENTE: n.REMANENTE, // Preservar REMANENTE (profundidad en mm o porcentaje)
-          REMANENTE_ORIGINAL: n.REMANENTE_ORIGINAL // Preservar REMANENTE_ORIGINAL del backend
-        }));
+        // El spread dentro del helper preserva todos los campos del backend (ESTADO, REMANENTE, etc.)
+        const neumaticosActuales = normalizarAsignadosPorPosicion(asignados, vehiculo.CANTIDAD_NEUMATICOS);
 
         setNeumaticosAsignados(neumaticosActuales);
       })
@@ -429,39 +349,8 @@ export default function Page(): React.JSX.Element {
 
       // Obtener neumáticos asignados desde la API
       const asignados = await obtenerNeumaticosAsignadosPorPlaca(vehiculo.PLACA);
+      const neumaticosFinales = normalizarAsignadosPorPosicion(asignados, vehiculo.CANTIDAD_NEUMATICOS);
 
-      // Filtrar solo los activos (excluir BAJA DEFINITIVA y RECUPERADO)
-      const neumaticosActivos = asignados.filter((n: any) =>
-        n.TIPO_MOVIMIENTO !== 'BAJA DEFINITIVA' && n.TIPO_MOVIMIENTO !== 'RECUPERADO'
-      );
-
-      // Agrupar por posición y quedarse con el más reciente (mayor ID_MOVIMIENTO)
-      const porPosicion = new Map<string, typeof neumaticosActivos[0]>();
-      neumaticosActivos.forEach((n: any) => {
-        const pos = n.POSICION_NEU || n.POSICION;
-        if (pos && ['POS01', 'POS02', 'POS03', 'POS04', 'RES01'].includes(pos)) {
-          const existente = porPosicion.get(pos);
-          if (!existente || (n.ID || 0) > (existente.ID || 0)) {
-            porPosicion.set(pos, n);
-          }
-        }
-      });
-
-      // Normalizar campos para consistencia
-      const neumaticosFinales = Array.from(porPosicion.values()).map((n: any) => ({
-        ...n,
-        CODIGO: n.CODIGO || n.CODIGO_NEU,
-        CODIGO_NEU: n.CODIGO_NEU || n.CODIGO,
-        POSICION_NEU: n.POSICION_NEU || n.POSICION,
-        POSICION: n.POSICION || n.POSICION_NEU,
-        ESTADO: n.ESTADO,
-        REMANENTE: n.REMANENTE,
-        REMANENTE_ORIGINAL: n.REMANENTE_ORIGINAL,
-        FECHA_ULTIMO_SUCESO: n.FECHA_ULTIMO_SUCESO // Ensure this is mapped
-      }));
-
-      // Log para debugging - ver qué valores de ESTADO están llegando
-      // ... (keep logs if needed, or reduce verbosity)
       setNeumaticosAsignados(neumaticosFinales);
       // Limpiar cache de fechas de registro para forzar recarga (though now we use direct field)
       setFechasRegistro({});
@@ -612,13 +501,6 @@ export default function Page(): React.JSX.Element {
     setOpenModalDesasignar(false);
   };
 
-  // --- Función para recibir asignaciones temporales ---
-  const handleTemporaryAssign = (asignaciones: any[]) => {
-    setAsignacionesTemporales(asignaciones);
-    setOpenModalAsignacionDesdeDesasignacion(false);
-  };
-  // ------------------------------------------------
-
   // --- Escuchar evento global para refrescar toda la página (neumáticos, vehículo, diagrama, etc) ---
   useEffect(() => {
     const handler = async () => {
@@ -636,11 +518,13 @@ export default function Page(): React.JSX.Element {
   // Estado para mostrar advertencia si ya hay 4 neumáticos asignados
 
   const handleOpenModalConRefresh = async () => {
-    // Si ya hay 5 neumáticos asignados (excluyendo solo baja definitiva), mostrar advertencia y no abrir modal
+    // Si el vehículo ya tiene todas sus posiciones ocupadas, avisar y no abrir el modal.
+    // El tope depende de su configuración (moto 2, auto 5, camión 7), no de un valor fijo.
     const asignadosValidos = neumaticosAsignadosUnicos.filter(
       n => n.TIPO_MOVIMIENTO !== 'BAJA DEFINITIVA');
-    if (asignadosValidos.length === 5) {
-      toast.warning('Ya hay 5 neumáticos asignados a este vehículo. Si desea reasignar, primero debe desasignar alguno.', {
+    const totalPosicionesVehiculo = obtenerConfiguracionNeumaticos(vehiculo?.CANTIDAD_NEUMATICOS)?.posiciones.length ?? 5;
+    if (asignadosValidos.length >= totalPosicionesVehiculo) {
+      toast.warning(`Ya hay ${totalPosicionesVehiculo} neumáticos asignados a este vehículo. Si desea reasignar, primero debe desasignar alguno.`, {
         duration: 7000,
         position: 'top-center'
       })
@@ -705,16 +589,12 @@ export default function Page(): React.JSX.Element {
           return;
         }
 
-        // Calcular diferencia de días
-        const [fYear, fMonth, fDay] = (fechasVehiculo?.FECHA_REGISTRO ?? '').split('-').map(Number);
-        const fechaObj = new Date(fYear, fMonth - 1, fDay); // local time, evita desfase de timezone
+        // Calcular diferencia de días (siempre en hora local: ver parsearFechaLocal)
+        const fechaObj = parsearFechaLocal(fechasVehiculo?.FECHA_REGISTRO);
         const hoy = new Date();
         hoy.setHours(0, 0, 0, 0);
 
-
-
-
-        const diffDias = Math.floor((hoy.getTime() - fechaObj.getTime()) / (1000 * 60 * 60 * 24));
+        const diffDias = diasDesdeFecha(fechasVehiculo?.FECHA_REGISTRO) ?? 0;
 
         setFechaUltimaInspeccion(fechasVehiculo?.FECHA_REGISTRO);
         setDiasDiferenciaInspeccion(diffDias);
@@ -728,7 +608,7 @@ export default function Page(): React.JSX.Element {
           return;
         } else {
 
-          if (fechaObj.getTime() !== hoy.getTime()) {
+          if (fechaObj?.getTime() !== hoy.getTime()) {
             setOpenModalInspeccionAnterior(true);
             return;
           }
@@ -762,14 +642,8 @@ export default function Page(): React.JSX.Element {
       try {
         const ultimaInspeccionFecha = await getUltimaFechaInspeccionPorPlaca(vehiculo.PLACA);
 
-        let diasDiferencia = null;
-        if (ultimaInspeccionFecha?.fecha_registro) {
-          const d1 = new Date(ultimaInspeccionFecha?.fecha_registro);
-          const d2 = new Date();
-          d1.setHours(0, 0, 0, 0);
-          d2.setHours(0, 0, 0, 0);
-          diasDiferencia = Math.floor((d2.getTime() - d1.getTime()) / (1000 * 60 * 60 * 24));
-        }
+        // Misma medición que en reubicar: días completos en hora local (ver parsearFechaLocal).
+        const diasDiferencia = diasDesdeFecha(ultimaInspeccionFecha?.fecha_registro);
 
         if (ultimaInspeccionFecha?.fecha_registro && diasDiferencia !== null) {
           // IMPORTANTE: Mantener la restricción original - abrir modal de confirmación primero
@@ -794,53 +668,68 @@ export default function Page(): React.JSX.Element {
       <CompaniesFilters
         onSearchChange={handleSearchChange}
         // projectName={vehiculo?.PROYECTO || '—'}
-        operationName={vehiculo?.OPERACION?.trim() || '—'}
         autosDisponiblesCount={autosDisponiblesCount}
         onVehiculoSeleccionado={handleVehiculoSeleccionado}
         transitoChecked={transitoActivo}
         onTransitoChange={setTransitoActivo}
         onReset={handleReset}
       />
-      <Stack direction="row" spacing={2}>
-        <Card sx={{
-          flex: 0.8,
-          p: 2,
-          position: 'relative',
-          maxHeight: '700px',
-          overflow: 'auto'
-        }}>
-          {/* <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={2}>
-          </Stack> */}
-
-          <Stack direction="row" alignItems="center" spacing={1.5} sx={{ flexWrap: 'nowrap' }}>
-            {vehiculo && (
-              <div className='flex gap-2 flex-wrap items-center'>
-                {/* Kilometraje */}
-                <Box
-                  sx={{
-                    // backgroundColor: '#e0f7fa',
-                    // borderRadius: '8px',
-                    // padding: '8px 16px',
-                    // fontWeight: 'bold',
-                    // color: 'black',
-                    // display: 'flex',
-                    // alignItems: 'center',
-                    // justifyContent: 'center',
-                    // boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
-                    // whiteSpace: 'nowrap',
-                    marginRight: '8px',
-                  }}
-                >
-                  <div className='bg-linear-to-r from-cyan-200 to-teal-200 rounded-lg py-2 px-4  font-bold'>
+      {!vehiculo ? (
+        <EmptyStatePlaca error={error} />
+      ) : (
+        <Stack spacing={2}>
+          {/* Encabezado: identidad del vehículo + acciones, en una sola fila dividida en dos
+              secciones cuyo ancho coincide con las columnas de Diagrama/Neumáticos de abajo. */}
+          <Card
+            sx={{
+              p: { xs: 2, md: 3 },
+              borderRadius: 3,
+              boxShadow: '0 6px 20px rgba(15, 23, 42, 0.06)',
+              border: '1px solid #eef2f6',
+            }}
+          >
+            <Stack
+              direction={{ xs: 'column', md: 'row' }}
+              alignItems={{ xs: 'flex-start', md: 'center' }}
+              spacing={2}
+            >
+              <Stack spacing={0.5} sx={{ flex: 0.8, width: '100%' }}>
+                <Stack direction="row" alignItems="center" spacing={1.5} flexWrap="wrap" useFlexGap>
+                  <Link href={`/padron/placa/${vehiculo.PLACA}`} target="_blank" style={{ textDecoration: 'underline' }}>
+                    <Typography variant="h5" fontWeight="bold" sx={{ color: '#167bd9' }}>
+                      {vehiculo.PLACA}
+                    </Typography>
+                  </Link>
+                  <div className='bg-linear-to-r from-cyan-200 to-teal-200 rounded-lg py-1.5 px-3 font-bold text-sm shadow-sm'>
                     {`${animatedKilometraje.toLocaleString()} km`}
                   </div>
-                </Box>
+                  {vehiculo.OPERACION?.trim() && (
+                    <Chip
+                      icon={<MapPinCheckInside size={14} />}
+                      label={vehiculo.OPERACION.trim()}
+                      size="small"
+                      sx={{
+                        background: '#f1f5f9',
+                        color: '#475569',
+                        fontWeight: 600,
+                        '& .MuiChip-icon': { color: '#64748b' },
+                      }}
+                    />
+                  )}
+                </Stack>
+                <Typography variant="body2" color="text.secondary">
+                  {[vehiculo.MARCA, vehiculo.MODELO, vehiculo.TIPO, vehiculo.COLOR, vehiculo.ANO].filter(Boolean).join(' · ')}
+                </Typography>
+              </Stack>
 
-                {/* <div className=''>
-                  {`${animatedKilometraje.toLocaleString()} km`}
-                </div> */}
-
-                {/* Opciones */}
+              <Stack
+                direction="row"
+                spacing={1.25}
+                flexWrap="wrap"
+                useFlexGap
+                justifyContent={{ xs: 'flex-start', md: 'flex-end' }}
+                sx={{ flex: 1.3, width: '100%' }}
+              >
                 <LoadingButton2
                   variant="teal"
                   onClick={handleOpenModalConRefresh}
@@ -905,136 +794,79 @@ export default function Page(): React.JSX.Element {
                     </DropdownMenuGroup>
                   </DropdownMenuContent>
                 </DropdownMenu>
+              </Stack>
+            </Stack>
+          </Card>
 
-                {/* {
-                  user?.usuario?.trim() === 'EGAMBOA' &&
-                  (<LoadingButton2
-                    onClick={() => setOpenActualizarKilometrajeModal(true)}
-                    disabled={user?.usuario?.trim() !== 'EGAMBOA' || neumaticosAsignadosUnicos.length === 0}
-                    icon={<ListRestart />}
-                  >
-                    Actualizar Kilometraje
-                  </LoadingButton2>)
-                } */}
+          <Stack direction={{ xs: 'column', md: 'row' }} spacing={2}>
+            {/* Diagrama de posiciones */}
+            <Card
+              sx={{
+                flex: 0.8,
+                p: { xs: 2, md: 3 },
+                borderRadius: 3,
+                boxShadow: '0 6px 20px rgba(15, 23, 42, 0.06)',
+                border: '1px solid #eef2f6',
+                display: 'flex',
+                flexDirection: 'column',
+              }}
+            >
+              <Typography variant="subtitle1" fontWeight="bold" sx={{ color: '#0f172a' }}>
+                Diagrama de posiciones
+              </Typography>
 
-              </div>
-            )}
+              <Stack direction="row" spacing={2} sx={{ mt: 1, mb: 2 }}>
+                {[
+                  { color: '#2e7d32', label: 'Óptimo' },
+                  { color: '#c9a227', label: 'Medio' },
+                  { color: '#d32f2f', label: 'Crítico' },
+                ].map((item) => (
+                  <Stack key={item.label} direction="row" alignItems="center" spacing={0.75}>
+                    <Box sx={{ width: 9, height: 9, borderRadius: '50%', background: item.color }} />
+                    <Typography variant="caption" color="text.secondary">{item.label}</Typography>
+                  </Stack>
+                ))}
+              </Stack>
+
+              <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                <DiagramaVehiculo
+                  layout="dashboard"
+                  cantidadNeumaticos={vehiculo?.CANTIDAD_NEUMATICOS}
+                  neumaticosAsignados={neumaticosAsignados}
+                />
+              </Box>
+            </Card>
+
+            {/* Tablas de neumáticos */}
+            <Card
+              sx={{
+                flex: 1.3,
+                p: { xs: 2, md: 3 },
+                borderRadius: 3,
+                boxShadow: '0 6px 20px rgba(15, 23, 42, 0.06)',
+                border: '1px solid #eef2f6',
+                position: 'relative',
+                maxHeight: '700px',
+                overflow: 'auto',
+              }}
+            >
+              <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
+                <Typography variant="subtitle1" fontWeight="bold" sx={{ color: '#0f172a' }}>
+                  Neumáticos instalados
+                </Typography>
+                <Chip
+                  label={`${neumaticosAsignadosUnicos.length} ${neumaticosAsignadosUnicos.length === 1 ? 'unidad' : 'unidades'}`}
+                  size="small"
+                  sx={{ background: '#eff6ff', color: '#1d4ed8', fontWeight: 700, fontSize: 11 }}
+                />
+              </Stack>
+
+              <NeumaticosAsignadosCards data={neumaticosAsignadosUnicos} />
+
+            </Card>
           </Stack>
-          <Box sx={{ mt: 2 }}>
-            <TableContainer component={Paper}>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell sx={{ backgroundColor: '#e0f7fa', fontWeight: 'bold', fontSize: '0.78rem' }}>Placa</TableCell>
-                    <TableCell sx={{ backgroundColor: '#e0f7fa', fontWeight: 'bold', fontSize: '0.78rem' }}>Marca</TableCell>
-                    <TableCell sx={{ backgroundColor: '#e0f7fa', fontWeight: 'bold', fontSize: '0.78rem' }}>Modelo</TableCell>
-                    <TableCell sx={{ backgroundColor: '#e0f7fa', fontWeight: 'bold', fontSize: '0.78rem' }}>Tipo</TableCell>
-                    <TableCell sx={{ backgroundColor: '#e0f7fa', fontWeight: 'bold', fontSize: '0.78rem' }}>Color</TableCell>
-                    <TableCell sx={{ backgroundColor: '#e0f7fa', fontWeight: 'bold', fontSize: '0.78rem' }}>Año</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {vehiculo ? (
-                    <TableRow>
-                      <TableCell>
-                        <Link href={`/padron/placa/${vehiculo.PLACA}`} target="_blank">{vehiculo.PLACA}</Link>
-                      </TableCell>
-                      <TableCell>{vehiculo.MARCA}</TableCell>
-                      <TableCell>{vehiculo.MODELO}</TableCell>
-                      <TableCell>{vehiculo.TIPO}</TableCell>
-                      <TableCell>{vehiculo.COLOR}</TableCell>
-                      <TableCell>{vehiculo.ANO}</TableCell>
-                    </TableRow>
-                  ) : (
-                    <TableRow>
-                      <TableCell colSpan={7} align="center">
-                        {error || 'Ingrese una placa para buscar.'}
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Box>
-
-          {/* Button para ver inspecciones */}
-          {/* {
-            vehiculo && (
-              <div className='flex justify-end'>
-                <LoadingButton
-                  variant="contained"
-                  color='info'
-                  onClick={() => setOpenVerInspecciones(true)}
-                  sx={{
-                    color: '#fff',
-                    textTransform: 'none',
-                    padding: '10px 16px',
-                    fontWeight: 500,
-                    boxShadow: '0px 1px 3px rgba(0, 0, 0, 0.1)',
-                    transition: 'all 0.2s ease-in-out',
-                    minWidth: 'auto',
-                    marginTop: '10px'
-                  }}
-                >
-                  <Eye size={20} />
-                </LoadingButton>
-              </div>
-            )
-          } */}
-
-          <Box sx={{ mt: 4, textAlign: 'left', position: 'relative', width: '262px', height: '365px' }}>
-            <DiagramaVehiculo
-              layout="dashboard"
-              neumaticosAsignados={
-                // neumaticosAsignadosUnicos
-                // .filter(n => typeof n.POSICION_NEU === 'string' && n.POSICION_NEU.length > 0 && n.TIPO_MOVIMIENTO !== 'BAJA DEFINITIVA')
-                // .map(n => ({
-                //   ...n,
-                //   POSICION: n.POSICION_NEU ?? '' // Garantiza que POSICION siempre sea string
-                // }))
-                neumaticosAsignados
-              }
-            />
-          </Box>
-
-        </Card>
-
-
-
-        <Card sx={{
-          flex: 1.3,
-          p: 2,
-          position: 'relative',
-          maxHeight: '700px', // Ajusta este valor según lo que necesites
-          overflow: 'auto'
-        }}>
-
-
-          <div className='flex'>
-            <Typography sx={{ mb: 2 }} className='border border-amber-400 bg-amber-50 text-amber-600 inline p-2 mt-2 mb-2 rounded-lg'>
-              Neumáticos instalados en esta unidad:
-            </Typography>
-          </div>
-
-          <DataTableNeumaticos columns={columnsNeuAsignado} data={neumaticosAsignadosUnicos} />
-
-          {/* Neúmaticos Disponibles */}
-          <div className='flex'>
-            <Typography sx={{ mt: 2 }} className='border border-green-400 bg-green-50 text-green-600 inline p-2 mt-2 mb-2 rounded-lg'>
-              <span className='font-bold'>
-                Disponibles:
-              </span>
-              <span className='font-normal'> &nbsp;
-                {`${neumaticosDisponiblesUseQuery.length.toLocaleString()} Neumáticos`}
-              </span>
-            </Typography>
-          </div>
-
-          <DataTableNeumaticos columns={columnsNeuDisponible} data={neumaticosDisponiblesUseQuery} type='pagination' filters={true} />
-
-        </Card>
-
-      </Stack>
+        </Stack>
+      )}
       <ModalAdvertenciaReubicacion
         open={openModalAdvertenciaReubicacion}
         onClose={() => setOpenModalAdvertenciaReubicacion(false)}
@@ -1170,6 +1002,7 @@ export default function Page(): React.JSX.Element {
         })()}
         placa={vehiculo?.PLACA ?? ''}
         kilometro={ultimoKilometroReal}
+        cantidadNeumaticos={vehiculo?.CANTIDAD_NEUMATICOS}
         onAssignedUpdate={async () => {
           await refreshAsignados();
           // Recargar movimientos históricos para actualizar el kilometraje
@@ -1221,7 +1054,8 @@ export default function Page(): React.JSX.Element {
               kilometro: vehiculo.KILOMETRAJE_GESNEU ? vehiculo.KILOMETRAJE_GESNEU : vehiculo.KILOMETRAJE,
               cod_supervisor: vehiculo.ID_SUPERVISOR,
               tipo_terreno: vehiculo.TIPO_TERRENO,
-              reten: vehiculo.RETEN
+              reten: vehiculo.RETEN,
+              cantidad_neumaticos: vehiculo.CANTIDAD_NEUMATICOS
             } : undefined}
             kilometroRealActual={ultimoKilometroReal}
             onSeleccionarNeumatico={() => { }}
@@ -1294,7 +1128,8 @@ export default function Page(): React.JSX.Element {
           operacion: vehiculo.OPERACION,
           id_operacion: vehiculo.ID_OPERACION,
           kilometro: vehiculo.KILOMETRAJE_GESNEU ? vehiculo.KILOMETRAJE_GESNEU : vehiculo.KILOMETRAJE,
-          cod_supervisor: vehiculo.ID_SUPERVISOR
+          cod_supervisor: vehiculo.ID_SUPERVISOR,
+          cantidad_neumaticos: vehiculo.CANTIDAD_NEUMATICOS
         } : undefined}
         user={user || undefined}
         onAbrirInspeccion={handleAbrirInspeccionDesdeMantenimiento}
@@ -1308,16 +1143,10 @@ export default function Page(): React.JSX.Element {
           <ModalDesasignar
             open={openMantenimientoModal && modoMantenimiento === 'DESASIGNAR'}
             onClose={() => {
-              // Limpiar asignaciones temporales al cerrar modal
-              setAsignacionesTemporales([]);
-              // Solo cerrar el modal, sin recargar datos
               setOpenMantenimientoModal(false);
               setModoMantenimiento(null);
             }}
             onSuccess={async () => {
-              // Limpiar asignaciones temporales después de guardar exitosamente
-              setAsignacionesTemporales([]);
-              // Recargar datos solo cuando la acción se completa exitosamente
               if (vehiculo?.PLACA) {
                 await Promise.all([refreshAsignados(), refreshVehiculo()]);
                 neumaticosDispobilesRefetch();
@@ -1344,53 +1173,16 @@ export default function Page(): React.JSX.Element {
               operacion: vehiculo.OPERACION,
               kilometro: vehiculo.KILOMETRAJE_GESNEU ? vehiculo.KILOMETRAJE_GESNEU : vehiculo.KILOMETRAJE,
               id_operacion: vehiculo.ID_OPERACION,
-              cod_supervisor: vehiculo.ID_SUPERVISOR
+              cod_supervisor: vehiculo.ID_SUPERVISOR,
+              cantidad_neumaticos: vehiculo.CANTIDAD_NEUMATICOS
             } : undefined}
             kilometraje={ultimoKilometroReal}
-            user={user || undefined}
-            onAbrirInspeccion={handleAbrirInspeccionDesdeMantenimiento}
-            onAbrirAsignacion={handleAbrirAsignacionDesdeDesasignacion}
-            asignacionesTemporalesExternas={asignacionesTemporales}
             enTransito={transitoActivo}
             taller={vehiculo?.TALLER}
           />
         )
       }
 
-      {/* Modal de Asignación desde Desasignación */}
-      {datosAsignacionDesdeDesasignacion && (
-        <ModalAsignacionNeuDesdeDesasignacion
-          open={openModalAsignacionDesdeDesasignacion}
-          onClose={handleCloseModalAsignacionDesdeDesasignacion}
-          data={
-            neumaticosDisponiblesUseQuery
-              ?.map((neumatico: any) => ({
-                ...neumatico,
-                CODIGO: neumatico.CODIGO,
-                DISEÑO: neumatico.DISEÑO ?? '',
-                FECHA_FABRICACION_COD: neumatico.FECHA_FABRICACION_COD ?? '',
-                COD_SUPERVISOR: vehiculo?.ID_SUPERVISOR,
-                ID_OPERACION: vehiculo?.ID_OPERACION
-              }))
-          }
-          cachedNeumaticosAsignados={datosAsignacionDesdeDesasignacion.cachedNeumaticosAsignados}
-          posicionesVacias={datosAsignacionDesdeDesasignacion.posicionesVacias}
-          placa={vehiculo?.PLACA ?? ''}
-          kilometro={ultimoKilometroReal}
-          onTemporaryAssign={handleTemporaryAssign}
-          onAssignedUpdate={async () => {
-            await refreshAsignados();
-            // Recargar movimientos históricos para actualizar el kilometraje
-            if (vehiculo?.PLACA) {
-              const movimientos = await obtenerUltimosMovimientosPorPlaca(vehiculo.PLACA);
-              setMovimientosHistoricos(Array.isArray(movimientos) ? movimientos : []);
-            }
-            setTimeout(async () => {
-              await refreshVehiculo();
-            }, 2500);
-          }}
-        />
-      )}
     </Stack>
   );
 }

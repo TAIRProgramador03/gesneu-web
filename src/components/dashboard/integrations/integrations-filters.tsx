@@ -13,15 +13,13 @@ import Stack from '@mui/material/Stack';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import ModalTodasPlacas from './modal-todas-placas';
-import Image from 'next/image';
-import { CarFront, MapPinCheckInside, RotateCcw } from 'lucide-react';
+import { CarFront, RotateCcw } from 'lucide-react';
 import { Checkbox as CheckBoxCustom } from "@/components/ui/checkbox"
 
 
 interface CompaniesFiltersProps {
   onSearchChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   // projectName: string;
-  operationName?: string;
   autosDisponiblesCount?: number;
   onVehiculoSeleccionado?: (vehiculo: any) => void;
   transitoChecked?: boolean;
@@ -29,7 +27,7 @@ interface CompaniesFiltersProps {
   onReset?: () => void;
 }
 
-export const CompaniesFilters = memo(({ onSearchChange, operationName, autosDisponiblesCount, onVehiculoSeleccionado, transitoChecked = false, onTransitoChange, onReset }: CompaniesFiltersProps): React.JSX.Element => {
+export const CompaniesFilters = memo(({ onSearchChange, autosDisponiblesCount, onVehiculoSeleccionado, transitoChecked = false, onTransitoChange, onReset }: CompaniesFiltersProps): React.JSX.Element => {
   const [openModal, setOpenModal] = React.useState(false);
   const [checkboxChecked, setCheckboxChecked] = React.useState(false);
   const [inputValue, setInputValue] = React.useState('');
@@ -245,14 +243,6 @@ export const CompaniesFilters = memo(({ onSearchChange, operationName, autosDisp
           }}
         >
           <div className='flex bg-linear-to-r from-gray-700 to-gray-600 p-3 gap-2 rounded-lg text-white flex-wrap'>
-            {operationName && operationName !== '—' && (
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <MapPinCheckInside />
-                <Typography variant="body2" >
-                  <Box component="span" sx={{ fontWeight: 'bold' }}>Operación: </Box> {operationName}
-                </Typography>
-              </Box>
-            )}
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <CarFront />
               <Typography variant="body2" >
@@ -260,40 +250,6 @@ export const CompaniesFilters = memo(({ onSearchChange, operationName, autosDisp
               </Typography>
             </Box>
           </div>
-
-          <Box sx={{ position: 'relative', display: 'inline-block', flexShrink: 0 }}>
-            <Box
-              component="div"
-              sx={{
-                width: 170,
-                display: 'block',
-              }}
-            >
-              <Image src='/assets/placa.png' alt='Placa' width={170} height={40} />
-            </Box >
-            {(inputValue.trim() !== '' || placaSeleccionada) && (
-              <Typography
-                variant="h6"
-                sx={{
-                  position: 'absolute',
-                  top: '55%',
-                  left: '52%',
-                  transform: 'translate(-50%, -50%)',
-                  color: 'black',
-                  fontWeight: 'bold',
-                  fontSize: 33,
-                  textShadow: '0 2px 8px #fff, 0 1px 0 #fff',
-                  fontFamily: 'Arial, sans-serif',
-                  pointerEvents: 'none',
-                  width: '100%',
-                  textAlign: 'center',
-                  letterSpacing: 2,
-                }}
-              >
-                {(inputValue.trim() || placaSeleccionada).toUpperCase()}
-              </Typography>
-            )}
-          </Box>
         </Stack>
       </Stack>
       {/* Modal para todas las placas */}
