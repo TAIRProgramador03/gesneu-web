@@ -52,52 +52,52 @@ function DesgasteTooltip({ active, payload, fleetAvg }: any) {
         <span className={`text-sm font-bold ${isDark ? 'text-white' : 'text-black'} mb-4`} >
           {codNeumatico}
         </span>
-        <span className='text-[10px] font-light'>
+        <span className='text-xs font-light'>
           &nbsp; {marca} &middot; {diseno} &middot; {medida}
         </span>
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16 }}>
-          <span style={{ fontSize: 12, color: isDark ? '#94a3b8' : '#64748b' }}>Taller actual</span>
-          <span style={{ fontSize: 12, fontWeight: 600, color: isDark ? '#f1f5f9' : '#1e293b' }}>{tallerActual}</span>
+          <span style={{ fontSize: '0.875rem', color: isDark ? '#94a3b8' : '#64748b' }}>Taller actual</span>
+          <span style={{ fontSize: '0.875rem', fontWeight: 600, color: isDark ? '#f1f5f9' : '#1e293b' }}>{tallerActual}</span>
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16 }}>
-          <span style={{ fontSize: 12, color: isDark ? '#94a3b8' : '#64748b' }}>Km. recorrido</span>
-          <span style={{ fontSize: 12, fontWeight: 600, color: isDark ? '#f1f5f9' : '#1e293b' }}>{kmTotales}</span>
+          <span style={{ fontSize: '0.875rem', color: isDark ? '#94a3b8' : '#64748b' }}>Km. recorrido</span>
+          <span style={{ fontSize: '0.875rem', fontWeight: 600, color: isDark ? '#f1f5f9' : '#1e293b' }}>{kmTotales}</span>
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16 }}>
-          <span style={{ fontSize: 12, color: isDark ? '#94a3b8' : '#64748b' }}>Tasa desgaste</span>
-          <span style={{ fontSize: 13, fontWeight: 700, color }}>{desgasteMilKms.toFixed(1)} mm/1000km</span>
+          <span style={{ fontSize: '0.875rem', color: isDark ? '#94a3b8' : '#64748b' }}>Tasa desgaste</span>
+          <span style={{ fontSize: '0.875rem', fontWeight: 700, color }}>{desgasteMilKms.toFixed(1)} mm/1000km</span>
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16 }}>
-          <span style={{ fontSize: 12, color: isDark ? '#94a3b8' : '#64748b' }}>Remanente montado</span>
-          <span style={{ fontSize: 12, fontWeight: 600, color: isDark ? '#f1f5f9' : '#1e293b' }}>{remanenteMontado}</span>
+          <span style={{ fontSize: '0.875rem', color: isDark ? '#94a3b8' : '#64748b' }}>Remanente montado</span>
+          <span style={{ fontSize: '0.875rem', fontWeight: 600, color: isDark ? '#f1f5f9' : '#1e293b' }}>{remanenteMontado}</span>
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16 }}>
-          <span style={{ fontSize: 12, color: isDark ? '#94a3b8' : '#64748b' }}>Remanente actual</span>
-          <span style={{ fontSize: 12, fontWeight: 600, color: isDark ? '#f1f5f9' : '#1e293b' }}>{remanenteActual}</span>
+          <span style={{ fontSize: '0.875rem', color: isDark ? '#94a3b8' : '#64748b' }}>Remanente actual</span>
+          <span style={{ fontSize: '0.875rem', fontWeight: 600, color: isDark ? '#f1f5f9' : '#1e293b' }}>{remanenteActual}</span>
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16 }}>
-          <span style={{ fontSize: 12, color: isDark ? '#94a3b8' : '#64748b' }}>Costo</span>
-          <span style={{ fontSize: 12, fontWeight: 600, color: isDark ? '#f1f5f9' : '#1e293b' }}>${costo}</span>
+          <span style={{ fontSize: '0.875rem', color: isDark ? '#94a3b8' : '#64748b' }}>Costo</span>
+          <span style={{ fontSize: '0.875rem', fontWeight: 600, color: isDark ? '#f1f5f9' : '#1e293b' }}>${costo}</span>
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16 }}>
-          <span style={{ fontSize: 12, color: isDark ? '#94a3b8' : '#64748b' }}>Costo * Km.</span>
-          <span style={{ fontSize: 12, fontWeight: 600, color: isDark ? '#f1f5f9' : '#1e293b' }}>${costoPorKm}</span>
+          <span style={{ fontSize: '0.875rem', color: isDark ? '#94a3b8' : '#64748b' }}>Costo * Km.</span>
+          <span style={{ fontSize: '0.875rem', fontWeight: 600, color: isDark ? '#f1f5f9' : '#1e293b' }}>${costoPorKm}</span>
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16 }}>
-          <span style={{ fontSize: 12, color: isDark ? '#94a3b8' : '#64748b' }}>Km. * mm</span>
-          <span style={{ fontSize: 12, fontWeight: 600, color: isDark ? '#f1f5f9' : '#1e293b' }}>{kmRemanente}</span>
+          <span style={{ fontSize: '0.875rem', color: isDark ? '#94a3b8' : '#64748b' }}>Km. * mm</span>
+          <span style={{ fontSize: '0.875rem', fontWeight: 600, color: isDark ? '#f1f5f9' : '#1e293b' }}>{kmRemanente}</span>
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16 }}>
-          <span style={{ fontSize: 12, color: isDark ? '#94a3b8' : '#64748b' }}>Tipo de baja:</span>
-          <span style={{ fontSize: 12, fontWeight: 600, color: isDark ? '#f1f5f9' : '#1e293b' }}>{tipoBaja}</span>
+          <span style={{ fontSize: '0.875rem', color: isDark ? '#94a3b8' : '#64748b' }}>Tipo de baja:</span>
+          <span style={{ fontSize: '0.875rem', fontWeight: 600, color: isDark ? '#f1f5f9' : '#1e293b' }}>{tipoBaja}</span>
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16 }}>
-          <span style={{ fontSize: 12, color: isDark ? '#94a3b8' : '#64748b' }}>Desgaste</span>
+          <span style={{ fontSize: '0.875rem', color: isDark ? '#94a3b8' : '#64748b' }}>Desgaste</span>
           <span style={{
-            fontSize: 11, fontWeight: 700, color,
+            fontSize: '0.75rem', fontWeight: 700, color,
             background: getTasaBg(desgasteMilKms),
             borderRadius: 4, padding: '1px 6px',
           }}>
@@ -105,8 +105,8 @@ function DesgasteTooltip({ active, payload, fleetAvg }: any) {
           </span>
         </div>
         {/* <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16, marginTop: 2, paddingTop: 6, borderTop: `1px solid ${isDark ? '#334155' : '#e2e8f0'}` }}>
-          <span style={{ fontSize: 11, color: isDark ? '#94a3b8' : '#64748b' }}>Promedio flota</span>
-          <span style={{ fontSize: 11, color: '#94a3b8' }}>{fleetAvg} mm/1000km</span>
+          <span style={{ fontSize: '0.75rem', color: isDark ? '#94a3b8' : '#64748b' }}>Promedio flota</span>
+          <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>{fleetAvg} mm/1000km</span>
         </div> */}
       </div>
     </div>
@@ -297,7 +297,7 @@ export const DesgasteNeumaticos = (): React.JSX.Element => {
             {desgasteNeumaticos.alertCount > 0 && (
               <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 8 }}>
                 <span style={{
-                  fontSize: 11, fontWeight: 700,
+                  fontSize: '0.75rem', fontWeight: 700,
                   color: '#EF4444',
                   background: '#EF444415',
                   border: '1px solid #EF444435',
@@ -319,7 +319,7 @@ export const DesgasteNeumaticos = (): React.JSX.Element => {
               ].map(({ color, label }) => (
                 <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                   <div style={{ width: 8, height: 8, borderRadius: 2, background: color, flexShrink: 0 }} />
-                  <span style={{ fontSize: 11, color: theme.palette.text.secondary }}>{label}</span>
+                  <span style={{ fontSize: '0.75rem', color: theme.palette.text.secondary }}>{label}</span>
                 </div>
               ))}
             </div>
@@ -336,7 +336,7 @@ export const DesgasteNeumaticos = (): React.JSX.Element => {
                   <XAxis
                     type="number"
                     domain={[0, 3.2]}
-                    tick={{ fontSize: 10, fill: theme.palette.text.secondary as string }}
+                    tick={{ fontSize: '0.75rem', fill: theme.palette.text.secondary as string }}
                     axisLine={false}
                     tickLine={false}
                   />
@@ -344,7 +344,7 @@ export const DesgasteNeumaticos = (): React.JSX.Element => {
                     type="category"
                     dataKey="codNeumatico"
                     width={72}
-                    tick={{ fontSize: 12, fill: theme.palette.text.primary as string, fontWeight: 700 }}
+                    tick={{ fontSize: '0.875rem', fill: theme.palette.text.primary as string, fontWeight: 700 }}
                     axisLine={false}
                     tickLine={false}
                   />
@@ -358,7 +358,7 @@ export const DesgasteNeumaticos = (): React.JSX.Element => {
                     label={{
                       value: `Prom. ${desgasteNeumaticos.fleetAvg}`,
                       position: 'insideTopRight',
-                      fontSize: 10,
+                      fontSize: '0.75rem',
                       fill: '#94a3b8',
                       dy: -4,
                     }}
@@ -377,10 +377,10 @@ export const DesgasteNeumaticos = (): React.JSX.Element => {
             {/* Footer */}
             <Divider sx={{ mt: 'auto' }} />
             <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 4px 12px' }}>
-              <span style={{ fontSize: 12, color: theme.palette.text.secondary }}>
+              <span style={{ fontSize: '0.875rem', color: theme.palette.text.secondary }}>
                 Promedio neumáticos
               </span>
-              <span style={{ fontSize: 13, fontWeight: 700, color: getTasaColor(desgasteNeumaticos.fleetAvg) }}>
+              <span style={{ fontSize: '0.875rem', fontWeight: 700, color: getTasaColor(desgasteNeumaticos.fleetAvg) }}>
                 {desgasteNeumaticos.fleetAvg} mm/1000km
               </span>
             </div>

@@ -88,13 +88,13 @@ export const KilometrajeChart = ({ historial, neu }: { historial: MovimientoHist
             <XAxis
               dataKey="id"
               tickFormatter={(id) => chartData.find((d) => d.id === id)?.fecha ?? String(id)}
-              tick={{ fontSize: 10, fill: "#9ca3af" }}
+              tick={{ fontSize: '0.75rem', fill: "#9ca3af" }}
               tickLine={false}
               axisLine={{ stroke: "#e5e7eb" }}
             />
             <YAxis
               domain={[0, maxY]}
-              tick={{ fontSize: 10, fill: "#9ca3af" }}
+              tick={{ fontSize: '0.75rem', fill: "#9ca3af" }}
               tickLine={false}
               axisLine={false}
               unit=" km"

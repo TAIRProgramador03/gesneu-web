@@ -63,12 +63,12 @@ const NeumaticoRow = React.memo(function NeumaticoRow({
       </div>
 
       <div className="hidden sm:flex flex-col items-center shrink-0">
-        <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">Vida útil</span>
+        <span className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Vida útil</span>
         <LinearProgressItem estado={neu.ESTADO} width="70px" />
       </div>
 
       <div className="text-right shrink-0 w-20">
-        <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide block">Costo</span>
+        <span className="text-xs font-semibold text-slate-400 uppercase tracking-wide block">Costo</span>
         <span className="text-sm font-bold text-slate-700">{formatCosto(neu.COSTO)}</span>
       </div>
     </div>
@@ -336,7 +336,7 @@ export const ModalVentaNeumatico = ({ open, onClose, onSuccess }: ModalVentaNeum
             </Typography>
             <Stack spacing={2}>
               <div>
-                <p style={{ fontSize: 11, fontWeight: 600, color: "#64748b", margin: "0 0 5px", textTransform: "uppercase", letterSpacing: ".05em" }}>
+                <p style={{ fontSize: '0.75rem', fontWeight: 600, color: "#64748b", margin: "0 0 5px", textTransform: "uppercase", letterSpacing: ".05em" }}>
                   Número de cotización <span className="text-rose-600">*</span>
                 </p>
                 <Input
@@ -346,7 +346,7 @@ export const ModalVentaNeumatico = ({ open, onClose, onSuccess }: ModalVentaNeum
                 />
               </div>
               <div>
-                <p style={{ fontSize: 11, fontWeight: 600, color: "#64748b", margin: "0 0 5px", textTransform: "uppercase", letterSpacing: ".05em" }}>
+                <p style={{ fontSize: '0.75rem', fontWeight: 600, color: "#64748b", margin: "0 0 5px", textTransform: "uppercase", letterSpacing: ".05em" }}>
                   Comentarios (opcional)
                 </p>
                 <Textarea

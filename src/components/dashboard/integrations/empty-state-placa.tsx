@@ -133,7 +133,7 @@ export function EmptyStatePlaca({ error }: EmptyStatePlacaProps): React.JSX.Elem
                                 background: `linear-gradient(135deg, ${paso.from}, ${paso.to})`,
                                 color: paso.color,
                                 fontWeight: 800,
-                                fontSize: 13,
+                                fontSize: '0.875rem',
                                 mb: 1.5,
                             }}
                         >

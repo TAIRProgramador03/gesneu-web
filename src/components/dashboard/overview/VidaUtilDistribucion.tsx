@@ -42,13 +42,13 @@ function VidaTooltip({ active, payload, total }: any) {
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
         <span style={{ width: 10, height: 10, borderRadius: 2, background: color, display: 'inline-block', flexShrink: 0 }} />
-        <span style={{ fontWeight: 700, fontSize: 13, color: isDark ? '#f1f5f9' : '#1e293b' }}>{rango}</span>
+        <span style={{ fontWeight: 700, fontSize: '0.875rem', color: isDark ? '#f1f5f9' : '#1e293b' }}>{rango}</span>
       </div>
-      <div style={{ fontSize: 11, color: isDark ? '#94a3b8' : '#64748b', marginBottom: 6 }}>{desc}</div>
-      <div style={{ fontSize: 13, color: isDark ? '#f1f5f9' : '#1e293b', fontWeight: 600 }}>
+      <div style={{ fontSize: '0.75rem', color: isDark ? '#94a3b8' : '#64748b', marginBottom: 6 }}>{desc}</div>
+      <div style={{ fontSize: '0.875rem', color: isDark ? '#f1f5f9' : '#1e293b', fontWeight: 600 }}>
         {cantidad} neumáticos
       </div>
-      <div style={{ fontSize: 11, color: isDark ? '#94a3b8' : '#64748b', marginTop: 2 }}>
+      <div style={{ fontSize: '0.75rem', color: isDark ? '#94a3b8' : '#64748b', marginTop: 2 }}>
         {((cantidad / total) * 100).toFixed(2)}% del total
       </div>
     </div>
@@ -170,12 +170,12 @@ export const VidaUtilDistribucion = (): React.JSX.Element => {
               >
                 <XAxis
                   dataKey="rango"
-                  tick={{ fontSize: 12, fill: theme.palette.text.secondary as string, fontWeight: 600 }}
+                  tick={{ fontSize: '0.875rem', fill: theme.palette.text.secondary as string, fontWeight: 600 }}
                   axisLine={{ stroke: theme.palette.divider }}
                   tickLine={false}
                 />
                 <YAxis
-                  tick={{ fontSize: 11, fill: theme.palette.text.secondary as string }}
+                  tick={{ fontSize: '0.75rem', fill: theme.palette.text.secondary as string }}
                   axisLine={false}
                   tickLine={false}
                 />
@@ -195,7 +195,7 @@ export const VidaUtilDistribucion = (): React.JSX.Element => {
                 <div key={item.rango} style={{ textAlign: 'center' }}>
                   <span style={{
                     display: 'inline-block',
-                    fontSize: 11,
+                    fontSize: '0.75rem',
                     fontWeight: 600,
                     color: item.color,
                     background: `${item.color}18`,

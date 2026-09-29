@@ -54,22 +54,22 @@ function DesgasteTooltip({ active, payload }: any) {
       boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
       fontFamily: 'inherit',
     }}>
-      <div style={{ fontWeight: 700, fontSize: 14, color: isDark ? '#f1f5f9' : '#1e293b', marginBottom: 8 }}>
+      <div style={{ fontWeight: 700, fontSize: '1rem', color: isDark ? '#f1f5f9' : '#1e293b', marginBottom: 8 }}>
         {placa}
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16 }}>
-          <span style={{ fontSize: 12, color: isDark ? '#94a3b8' : '#64748b' }}>Tasa desgaste</span>
-          <span style={{ fontSize: 13, fontWeight: 700, color }}>{tasa.toFixed(1)} mm/1000km</span>
+          <span style={{ fontSize: '0.875rem', color: isDark ? '#94a3b8' : '#64748b' }}>Tasa desgaste</span>
+          <span style={{ fontSize: '0.875rem', fontWeight: 700, color }}>{tasa.toFixed(1)} mm/1000km</span>
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16 }}>
-          <span style={{ fontSize: 12, color: isDark ? '#94a3b8' : '#64748b' }}>Neumáticos</span>
-          <span style={{ fontSize: 12, fontWeight: 600, color: isDark ? '#f1f5f9' : '#1e293b' }}>{neumaticos}</span>
+          <span style={{ fontSize: '0.875rem', color: isDark ? '#94a3b8' : '#64748b' }}>Neumáticos</span>
+          <span style={{ fontSize: '0.875rem', fontWeight: 600, color: isDark ? '#f1f5f9' : '#1e293b' }}>{neumaticos}</span>
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16 }}>
-          <span style={{ fontSize: 12, color: isDark ? '#94a3b8' : '#64748b' }}>Desgaste</span>
+          <span style={{ fontSize: '0.875rem', color: isDark ? '#94a3b8' : '#64748b' }}>Desgaste</span>
           <span style={{
-            fontSize: 11, fontWeight: 700, color,
+            fontSize: '0.75rem', fontWeight: 700, color,
             background: getTasaBg(tasa),
             borderRadius: 4, padding: '1px 6px',
           }}>
@@ -77,8 +77,8 @@ function DesgasteTooltip({ active, payload }: any) {
           </span>
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16, marginTop: 2, paddingTop: 6, borderTop: `1px solid ${isDark ? '#334155' : '#e2e8f0'}` }}>
-          <span style={{ fontSize: 11, color: isDark ? '#94a3b8' : '#64748b' }}>Promedio flota</span>
-          <span style={{ fontSize: 11, color: '#94a3b8' }}>{FLEET_AVG} mm/1000km</span>
+          <span style={{ fontSize: '0.75rem', color: isDark ? '#94a3b8' : '#64748b' }}>Promedio flota</span>
+          <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>{FLEET_AVG} mm/1000km</span>
         </div>
       </div>
     </div>
@@ -113,7 +113,7 @@ export const DesgasteVehiculos = (): React.JSX.Element => {
       {ALERT_COUNT > 0 && (
         <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 8 }}>
           <span style={{
-            fontSize: 11, fontWeight: 700,
+            fontSize: '0.75rem', fontWeight: 700,
             color: '#EF4444',
             background: '#EF444415',
             border: '1px solid #EF444435',
@@ -135,7 +135,7 @@ export const DesgasteVehiculos = (): React.JSX.Element => {
         ].map(({ color, label }) => (
           <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
             <div style={{ width: 8, height: 8, borderRadius: 2, background: color, flexShrink: 0 }} />
-            <span style={{ fontSize: 11, color: theme.palette.text.secondary }}>{label}</span>
+            <span style={{ fontSize: '0.75rem', color: theme.palette.text.secondary }}>{label}</span>
           </div>
         ))}
       </div>
@@ -152,7 +152,7 @@ export const DesgasteVehiculos = (): React.JSX.Element => {
             <XAxis
               type="number"
               domain={[0, 3.2]}
-              tick={{ fontSize: 10, fill: theme.palette.text.secondary as string }}
+              tick={{ fontSize: '0.75rem', fill: theme.palette.text.secondary as string }}
               axisLine={false}
               tickLine={false}
             />
@@ -160,7 +160,7 @@ export const DesgasteVehiculos = (): React.JSX.Element => {
               type="category"
               dataKey="placa"
               width={72}
-              tick={{ fontSize: 12, fill: theme.palette.text.primary as string, fontWeight: 700 }}
+              tick={{ fontSize: '0.875rem', fill: theme.palette.text.primary as string, fontWeight: 700 }}
               axisLine={false}
               tickLine={false}
             />
@@ -174,7 +174,7 @@ export const DesgasteVehiculos = (): React.JSX.Element => {
               label={{
                 value: `Prom. ${FLEET_AVG}`,
                 position: 'insideTopRight',
-                fontSize: 10,
+                fontSize: '0.75rem',
                 fill: '#94a3b8',
                 dy: -4,
               }}
@@ -193,10 +193,10 @@ export const DesgasteVehiculos = (): React.JSX.Element => {
       {/* Footer */}
       <Divider sx={{ mt: 'auto' }} />
       <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 4px 12px' }}>
-        <span style={{ fontSize: 12, color: theme.palette.text.secondary }}>
+        <span style={{ fontSize: '0.875rem', color: theme.palette.text.secondary }}>
           Promedio flota
         </span>
-        <span style={{ fontSize: 13, fontWeight: 700, color: getTasaColor(FLEET_AVG) }}>
+        <span style={{ fontSize: '0.875rem', fontWeight: 700, color: getTasaColor(FLEET_AVG) }}>
           {FLEET_AVG} mm/1000km
         </span>
       </div>

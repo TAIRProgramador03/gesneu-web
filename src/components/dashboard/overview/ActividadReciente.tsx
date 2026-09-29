@@ -69,7 +69,7 @@ const DIA_LABEL: Record<string, string> = { hoy: 'Hoy', ayer: 'Ayer', antes: 'DÃ
 function DaySeparator({ label, theme }: { label: string; theme: any }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 0 4px' }}>
-      <span style={{ fontSize: 11, fontWeight: 700, color: theme.palette.text.secondary, letterSpacing: '0.06em', whiteSpace: 'nowrap' }}>
+      <span style={{ fontSize: '0.75rem', fontWeight: 700, color: theme.palette.text.secondary, letterSpacing: '0.06em', whiteSpace: 'nowrap' }}>
         {label}
       </span>
       <div style={{ flex: 1, height: 1, background: theme.palette.divider }} />
@@ -97,7 +97,7 @@ export function ActividadReciente(): React.JSX.Element {
     <div style={{ padding: '16px 20px 0', display: 'flex', flexDirection: 'column' }}>
       {/* Sub-header: conteo + EN VIVO */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-        <span style={{ fontSize: 12, color: theme.palette.text.secondary }}>
+        <span style={{ fontSize: '0.875rem', color: theme.palette.text.secondary }}>
           {totalHoy} movimientos hoy
         </span>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -105,7 +105,7 @@ export function ActividadReciente(): React.JSX.Element {
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-60" style={{ backgroundColor: '#22C55E' }} />
             <span className="relative inline-flex rounded-full" style={{ width: 8, height: 8, backgroundColor: '#22C55E' }} />
           </span>
-          <span style={{ fontSize: 11, fontWeight: 700, color: '#22C55E', letterSpacing: '0.05em' }}>EN VIVO</span>
+          <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#22C55E', letterSpacing: '0.05em' }}>EN VIVO</span>
         </div>
       </div>
 
@@ -155,7 +155,7 @@ export function ActividadReciente(): React.JSX.Element {
                       <span className="animate-ping absolute inline-flex rounded-full opacity-40" style={{ width: 14, height: 14, backgroundColor: config.color }} />
                       <span
                         className="relative inline-flex items-center justify-center rounded-full text-white font-bold"
-                        style={{ width: 20, height: 20, backgroundColor: config.color, fontSize: 10, flexShrink: 0 }}
+                        style={{ width: 20, height: 20, backgroundColor: config.color, fontSize: '0.75rem', flexShrink: 0 }}
                       >
                         {config.simbolo}
                       </span>
@@ -168,7 +168,7 @@ export function ActividadReciente(): React.JSX.Element {
                         background: `${config.color}18`,
                         border: `1.5px solid ${config.color}50`,
                         color: config.color,
-                        fontSize: 10, fontWeight: 700,
+                        fontSize: '0.75rem', fontWeight: 700,
                       }}
                     >
                       {config.simbolo}
@@ -179,7 +179,7 @@ export function ActividadReciente(): React.JSX.Element {
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 1 }}>
                       <span style={{
-                        fontSize: 10, fontWeight: 700,
+                        fontSize: '0.75rem', fontWeight: 700,
                         color: config.color,
                         background: `${config.color}15`,
                         borderRadius: 3,
@@ -191,7 +191,7 @@ export function ActividadReciente(): React.JSX.Element {
                       </span>
                     </div>
                     <div style={{
-                      fontSize: 12, color: theme.palette.text.primary,
+                      fontSize: '0.875rem', color: theme.palette.text.primary,
                       whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
                     }}>
                       {getDescripcion(item)}
@@ -200,7 +200,7 @@ export function ActividadReciente(): React.JSX.Element {
 
                   {/* Tiempo */}
                   <span style={{
-                    fontSize: 11,
+                    fontSize: '0.75rem',
                     color: item.esReciente ? config.color : theme.palette.text.secondary,
                     fontWeight: item.esReciente ? 700 : 400,
                     whiteSpace: 'nowrap',
@@ -221,7 +221,7 @@ export function ActividadReciente(): React.JSX.Element {
         <button
           type="button"
           style={{
-            fontSize: 12,
+            fontSize: '0.875rem',
             color: theme.palette.text.secondary,
             cursor: 'pointer',
             background: 'none',

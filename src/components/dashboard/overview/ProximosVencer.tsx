@@ -35,15 +35,15 @@ export function ProximosVencer(): React.JSX.Element {
                 {/* Header row */}
                 <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 8 }}>
                   <div>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: item.color }}>
+                    <div style={{ fontSize: '0.875rem', fontWeight: 700, color: item.color }}>
                       {item.rango}
                     </div>
-                    <div style={{ fontSize: 11, color: theme.palette.text.secondary, marginTop: 1 }}>
+                    <div style={{ fontSize: '0.75rem', color: theme.palette.text.secondary, marginTop: 1 }}>
                       {item.subtitulo}
                     </div>
                   </div>
                   <div style={{ textAlign: 'right' }}>
-                    <span style={{ fontSize: 26, fontWeight: 800, color: item.color, lineHeight: 1 }}>
+                    <span style={{ fontSize: '1.625rem', fontWeight: 800, color: item.color, lineHeight: 1 }}>
                       {item.cantidad}
                     </span>
                   </div>
@@ -64,7 +64,7 @@ export function ProximosVencer(): React.JSX.Element {
                     transition: 'width 0.6s ease',
                   }} />
                 </div>
-                <div style={{ fontSize: 10, color: theme.palette.text.secondary, marginTop: 4, textAlign: 'right' }}>
+                <div style={{ fontSize: '0.75rem', color: theme.palette.text.secondary, marginTop: 4, textAlign: 'right' }}>
                   {pct.toFixed(0)}% del total
                 </div>
               </div>

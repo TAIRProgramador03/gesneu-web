@@ -53,10 +53,10 @@ function MarcasTooltip({ active, payload, total }: any) {
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
         <span style={{ width: 10, height: 10, borderRadius: 2, background: color, display: 'inline-block', flexShrink: 0 }} />
-        <span style={{ fontWeight: 700, fontSize: 13, color: isDark ? '#f1f5f9' : '#1e293b' }}>{name}</span>
+        <span style={{ fontWeight: 700, fontSize: '0.875rem', color: isDark ? '#f1f5f9' : '#1e293b' }}>{name}</span>
       </div>
-      <div style={{ fontSize: 13, color: isDark ? '#f1f5f9' : '#1e293b' }}>{value} neumáticos</div>
-      <div style={{ fontSize: 11, color: isDark ? '#94a3b8' : '#64748b', marginTop: 2 }}>
+      <div style={{ fontSize: '0.875rem', color: isDark ? '#f1f5f9' : '#1e293b' }}>{value} neumáticos</div>
+      <div style={{ fontSize: '0.75rem', color: isDark ? '#94a3b8' : '#64748b', marginTop: 2 }}>
         {((value / total) * 100).toFixed(2)}% del total
       </div>
     </div>
@@ -168,10 +168,10 @@ export const MarcasDonut = (): React.JSX.Element => {
                 textAlign: 'center',
                 pointerEvents: 'none',
               }}>
-                <div style={{ fontSize: 30, fontWeight: 700, color: theme.palette.text.primary, lineHeight: 1 }}>
+                <div style={{ fontSize: '1.875rem', fontWeight: 700, color: theme.palette.text.primary, lineHeight: 1 }}>
                   {cantidadesPorMarca.length}
                 </div>
-                <div style={{ fontSize: 10, color: theme.palette.text.secondary, marginTop: 4, letterSpacing: '0.06em' }}>
+                <div style={{ fontSize: '0.75rem', color: theme.palette.text.secondary, marginTop: 4, letterSpacing: '0.06em' }}>
                   MARCAS
                 </div>
               </div>
@@ -184,10 +184,10 @@ export const MarcasDonut = (): React.JSX.Element => {
                 return (
                   <div key={item.name} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                     <div style={{ width: 9, height: 9, borderRadius: 2, background: item.color, flexShrink: 0 }} />
-                    <span style={{ fontSize: 12, color: theme.palette.text.primary, flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <span style={{ fontSize: '0.875rem', color: theme.palette.text.primary, flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {item.name}
                     </span>
-                    <span style={{ fontSize: 11, color: theme.palette.text.secondary, flexShrink: 0 }}>
+                    <span style={{ fontSize: '0.75rem', color: theme.palette.text.secondary, flexShrink: 0 }}>
                       {pct}%
                     </span>
                   </div>

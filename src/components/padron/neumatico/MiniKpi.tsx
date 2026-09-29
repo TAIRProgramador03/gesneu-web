@@ -20,11 +20,11 @@ export const MiniKpi = ({
         {icon}
       </div>
       <div className="min-w-0">
-        <p className="text-[10px] font-semibold uppercase tracking-widest text-gray-400 leading-tight">
+        <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 leading-tight">
           {label}
         </p>
         <p className="text-base font-bold text-gray-900 leading-tight mt-0.5">{value}</p>
-        {sub && <p className="text-[10px] text-gray-400 mt-0.5">{sub}</p>}
+        {sub && <p className="text-xs text-gray-400 mt-0.5">{sub}</p>}
       </div>
     </div>
   )

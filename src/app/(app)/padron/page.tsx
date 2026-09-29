@@ -273,7 +273,7 @@ export default function Page(): React.JSX.Element {
 
         <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
           <Box sx={{ minWidth: 200, flex: 1, maxWidth: 280 }}>
-            <p style={{ fontSize: 11, fontWeight: 600, color: "#64748b", margin: "0 0 5px", textTransform: "uppercase", letterSpacing: ".05em" }}>
+            <p style={{ fontSize: '0.75rem', fontWeight: 600, color: "#64748b", margin: "0 0 5px", textTransform: "uppercase", letterSpacing: ".05em" }}>
               Taller(es)
             </p>
             <MultiSearchSelect
@@ -285,7 +285,7 @@ export default function Page(): React.JSX.Element {
             />
           </Box>
           <Box sx={{ minWidth: 200, flex: 1, maxWidth: 280 }}>
-            <p style={{ fontSize: 11, fontWeight: 600, color: "#64748b", margin: "0 0 5px", textTransform: "uppercase", letterSpacing: ".05em" }}>
+            <p style={{ fontSize: '0.75rem', fontWeight: 600, color: "#64748b", margin: "0 0 5px", textTransform: "uppercase", letterSpacing: ".05em" }}>
               Marca(s)
             </p>
             <MultiSearchSelect
@@ -297,7 +297,7 @@ export default function Page(): React.JSX.Element {
             />
           </Box>
           <Box sx={{ minWidth: 200, flex: 1, maxWidth: 280 }}>
-            <p style={{ fontSize: 11, fontWeight: 600, color: "#64748b", margin: "0 0 5px", textTransform: "uppercase", letterSpacing: ".05em" }}>
+            <p style={{ fontSize: '0.75rem', fontWeight: 600, color: "#64748b", margin: "0 0 5px", textTransform: "uppercase", letterSpacing: ".05em" }}>
               Diseño(s)
             </p>
             <MultiSearchSelect
@@ -309,7 +309,7 @@ export default function Page(): React.JSX.Element {
             />
           </Box>
           <Box sx={{ minWidth: 200, flex: 1, maxWidth: 280 }}>
-            <p style={{ fontSize: 11, fontWeight: 600, color: "#64748b", margin: "0 0 5px", textTransform: "uppercase", letterSpacing: ".05em" }}>
+            <p style={{ fontSize: '0.75rem', fontWeight: 600, color: "#64748b", margin: "0 0 5px", textTransform: "uppercase", letterSpacing: ".05em" }}>
               Medida(s)
             </p>
             <MultiSearchSelect
@@ -321,7 +321,7 @@ export default function Page(): React.JSX.Element {
             />
           </Box>
           <Box sx={{ minWidth: 200, flex: 1, maxWidth: 280 }}>
-            <p style={{ fontSize: 11, fontWeight: 600, color: "#64748b", margin: "0 0 5px", textTransform: "uppercase", letterSpacing: ".05em" }}>
+            <p style={{ fontSize: '0.75rem', fontWeight: 600, color: "#64748b", margin: "0 0 5px", textTransform: "uppercase", letterSpacing: ".05em" }}>
               Situación(es)
             </p>
             <MultiSearchSelect
@@ -333,7 +333,7 @@ export default function Page(): React.JSX.Element {
             />
           </Box>
           <Box sx={{ minWidth: 200, flex: 1, maxWidth: 280 }}>
-            <p style={{ fontSize: 11, fontWeight: 600, color: "#64748b", margin: "0 0 5px", textTransform: "uppercase", letterSpacing: ".05em" }}>
+            <p style={{ fontSize: '0.75rem', fontWeight: 600, color: "#64748b", margin: "0 0 5px", textTransform: "uppercase", letterSpacing: ".05em" }}>
               Recuperado
             </p>
             <SearchSelect

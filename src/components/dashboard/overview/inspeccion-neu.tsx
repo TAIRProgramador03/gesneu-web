@@ -83,7 +83,7 @@ function ChartSkeleton() {
         ))}
       </div>
       <div style={{ display: 'flex', gap: 10 }}>
-        {bars.map((_, i) => <Skeleton key={i} variant="text" animation="wave" sx={{ flex: 1, fontSize: 12 }} />)}
+        {bars.map((_, i) => <Skeleton key={i} variant="text" animation="wave" sx={{ flex: 1, fontSize: '0.875rem' }} />)}
       </div>
     </div>
   );
@@ -425,10 +425,10 @@ export const Sales = React.memo(({ sx }: SalesProps): React.JSX.Element => {
                   flexShrink: 0, display: 'inline-block',
                 }} />
                 {/* Nombre de placa */}
-                <span style={{ flex: 1, fontSize: 13 }}>{option}</span>
+                <span style={{ flex: 1, fontSize: '0.875rem' }}>{option}</span>
                 {/* Resumen de neumáticos: ■3 ■1 ■1 */}
                 {summary && (
-                  <span style={{ display: 'flex', gap: 5, alignItems: 'center', fontSize: 11 }}>
+                  <span style={{ display: 'flex', gap: 5, alignItems: 'center', fontSize: '0.75rem' }}>
                     {summary.good > 0 && (
                       <span style={{ display: 'flex', alignItems: 'center', gap: 2, color: ESTADO_COLORS.good }}>
                         <span style={{ width: 8, height: 8, borderRadius: 2, backgroundColor: ESTADO_COLORS.good, display: 'inline-block' }} />
@@ -525,7 +525,7 @@ function useChartOptions({ categories, chartHeight, lookupMapRef, filteredPlacas
     },
     dataLabels: {
       enabled: true,
-      style: { colors: ['#fff'], fontWeight: 700, fontSize: '13px' },
+      style: { colors: ['#fff'], fontWeight: 700, fontSize: '0.875rem' },
       dropShadow: { enabled: true, top: 1, left: 1, blur: 1, color: '#222', opacity: 0.5 },
       formatter: (val, opts) => {
         if (!val) return '';
@@ -578,7 +578,7 @@ function useChartOptions({ categories, chartHeight, lookupMapRef, filteredPlacas
       axisTicks: { color: theme.palette.divider, show: true },
       labels: {
         offsetY: 5,
-        style: { colors: theme.palette.text.secondary, fontWeight: 600, fontSize: '12px' },
+        style: { colors: theme.palette.text.secondary, fontWeight: 600, fontSize: '0.875rem' },
         rotate: 0,
         rotateAlways: false,
         trim: false,

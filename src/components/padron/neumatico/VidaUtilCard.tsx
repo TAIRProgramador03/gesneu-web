@@ -144,14 +144,14 @@ export const VidaUtilCard = ({ neu, historial }: { neu: NeumaticoBuscado; histor
         <div>
           <div className="flex items-center gap-2 mb-3">
             <div className="h-px flex-1 bg-gray-100" />
-            <h3 className="text-[10px] font-bold uppercase tracking-widest text-gray-400 px-2">
+            <h3 className="text-xs font-bold uppercase tracking-widest text-gray-400 px-2">
               Comparación remanente
             </h3>
             <div className="h-px flex-1 bg-gray-100" />
           </div>
           <ComparisonBar neu={neu} />
           {stats.mmDesgastados > 0 && (
-            <p className="text-center text-[10px] text-gray-400 mt-2">
+            <p className="text-center text-xs text-gray-400 mt-2">
               Desgaste total: <strong className="text-gray-600">{stats.mmDesgastados.toFixed(1)} mm</strong> consumidos
             </p>
           )}
@@ -162,13 +162,13 @@ export const VidaUtilCard = ({ neu, historial }: { neu: NeumaticoBuscado; histor
           <div>
             <div className="flex items-center gap-2 mb-3">
               <div className="h-px flex-1 bg-gray-100" />
-              <h3 className="text-[10px] font-bold uppercase tracking-widest text-gray-400 px-2">
+              <h3 className="text-xs font-bold uppercase tracking-widest text-gray-400 px-2">
                 Tendencia de desgaste
               </h3>
               <div className="h-px flex-1 bg-gray-100" />
             </div>
             <div className="rounded-xl border border-gray-100 bg-linear-to-br from-white to-gray-50/40 p-4">
-              <div className="flex items-center justify-between text-[10px] text-gray-400 mb-2">
+              <div className="flex items-center justify-between text-xs text-gray-400 mb-2">
                 <span>Primer registro</span>
                 <span>Último registro</span>
               </div>
@@ -178,7 +178,7 @@ export const VidaUtilCard = ({ neu, historial }: { neu: NeumaticoBuscado; histor
               />
               <div className="flex items-center justify-between text-xs mt-2">
                 <span className="font-semibold text-gray-600">{stats.remanenteSeries[0]} mm</span>
-                <div className="flex items-center gap-1 text-[10px] text-gray-400">
+                <div className="flex items-center gap-1 text-xs text-gray-400">
                   <Zap className="size-3" />
                   {stats.qtyInspecciones} inspecciones
                 </div>
@@ -197,7 +197,7 @@ export const VidaUtilCard = ({ neu, historial }: { neu: NeumaticoBuscado; histor
           <div>
             <div className="flex items-center gap-2 mb-3">
               <div className="h-px flex-1 bg-gray-100" />
-              <h3 className="text-[10px] font-bold uppercase tracking-widest text-gray-400 px-2">
+              <h3 className="text-xs font-bold uppercase tracking-widest text-gray-400 px-2">
                 Proyección de vida restante
               </h3>
               <div className="h-px flex-1 bg-gray-100" />
@@ -233,7 +233,7 @@ export const VidaUtilCard = ({ neu, historial }: { neu: NeumaticoBuscado; histor
                   )}>
                     ~{stats.diasRestantes} días restantes
                   </p>
-                  <p className="text-[10px] text-gray-400">
+                  <p className="text-xs text-gray-400">
                     al ritmo actual de desgaste ({stats.mmRestantes.toFixed(1)} mm restantes)
                     <br />(mínimo de {stats.REMANENTE_MINIMO} mm)
                   </p>
@@ -244,7 +244,7 @@ export const VidaUtilCard = ({ neu, historial }: { neu: NeumaticoBuscado; histor
               <div className="grid grid-cols-2 gap-2">
                 {stats.fechaEstimada && (
                   <div className="rounded-lg bg-white/80 border border-gray-100 px-3 py-2">
-                    <p className="text-[10px] uppercase tracking-wider text-gray-400">Fecha estimada</p>
+                    <p className="text-xs uppercase tracking-wider text-gray-400">Fecha estimada</p>
                     <p className="text-xs font-semibold text-gray-800">
                       {stats.fechaEstimada.toLocaleDateString("es-PE", {
                         day: "2-digit",
@@ -256,7 +256,7 @@ export const VidaUtilCard = ({ neu, historial }: { neu: NeumaticoBuscado; histor
                 )}
                 {stats.kmRestantes !== null && (
                   <div className="rounded-lg bg-white/80 border border-gray-100 px-3 py-2">
-                    <p className="text-[10px] uppercase tracking-wider text-gray-400">Km restantes</p>
+                    <p className="text-xs uppercase tracking-wider text-gray-400">Km restantes</p>
                     <p className="text-xs font-semibold text-gray-800">
                       ~{Math.round(stats.kmRestantes).toLocaleString("es-PE")} km
                     </p>

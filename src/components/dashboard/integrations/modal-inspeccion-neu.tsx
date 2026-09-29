@@ -101,7 +101,7 @@ interface ModalInpeccionNeuProps {
 /** Par etiqueta/valor de solo lectura — resumen del vehículo y datos de referencia de la posición. */
 const CampoVehiculo: React.FC<{ label: string; value: React.ReactNode }> = ({ label, value }) => (
   <div className="min-w-0">
-    <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-400 leading-tight">{label}</p>
+    <p className="text-xs font-semibold uppercase tracking-wide text-slate-400 leading-tight">{label}</p>
     <p className="truncate text-sm font-semibold text-slate-800">{value}</p>
   </div>
 );
@@ -975,7 +975,7 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
             <ClipboardList size={20} className="text-blue-600" />
           </Box>
           <Box sx={{ flex: 1, minWidth: 0 }}>
-            <Typography variant="h6" fontWeight={700} lineHeight={1.2} sx={{ fontSize: { xs: 16, md: 20 } }}>
+            <Typography variant="h6" fontWeight={700} lineHeight={1.2} sx={{ fontSize: { xs: '1rem', md: '1.25rem' } }}>
               Registrar Inspección de Neumáticos
             </Typography>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.4 }}>
@@ -983,10 +983,10 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
               <Chip
                 label={placa}
                 size="small"
-                sx={{ fontWeight: 700, fontSize: 12, bgcolor: '#f1f5f9', color: '#334155', letterSpacing: 0.5 }}
+                sx={{ fontWeight: 700, fontSize: '0.875rem', bgcolor: '#f1f5f9', color: '#334155', letterSpacing: 0.5 }}
               />
             </Box>
-            <Typography variant="caption" className='text-amber-600' sx={{ display: 'block', mt: 1, fontStyle: 'italic', fontSize: { xs: 10.5, md: 12 }, lineHeight: 1.35 }}>
+            <Typography variant="caption" className='text-amber-600' sx={{ display: 'block', mt: 1, fontStyle: 'italic', fontSize: { xs: '0.75rem', md: '0.875rem' }, lineHeight: 1.35 }}>
               <span className='font-bold'>Nota: </span>
               Para guardar temporalmente la inspección de cada neumático, debes darle click al boton <b>siguiente posición</b>.
             </Typography>
@@ -1009,7 +1009,7 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
             value={activeTab}
             onChange={(_, v) => setActiveTab(v)}
             variant={esPantallaChica ? 'fullWidth' : 'standard'}
-            sx={{ minHeight: 44, '& .MuiTab-root': { minHeight: 44, textTransform: 'none', fontWeight: 600, fontSize: { xs: 12.5, md: 13.5 } } }}
+            sx={{ minHeight: 44, '& .MuiTab-root': { minHeight: 44, textTransform: 'none', fontWeight: 600, fontSize: { xs: '0.875rem', md: '0.875rem' } } }}
           >
             <Tab value={0} label={esPantallaChica ? `1. Neumáticos (${inspeccionesPendientes.length}/${totalPosiciones})` : `1. Inspeccionar neumáticos (${inspeccionesPendientes.length}/${totalPosiciones})`} />
             <Tab value={1} label={esPantallaChica ? '2. Fecha y km' : '2. Fecha y kilometraje'} disabled={inspeccionesPendientes.length < totalPosiciones} />
@@ -1038,7 +1038,7 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
                     </div>
                     {vehiculo?.kilometro !== undefined && (
                       <div className="ml-auto shrink-0 rounded-lg bg-white/70 px-3 py-1.5 text-right shadow-sm">
-                        <p className="text-[10px] font-semibold uppercase tracking-wide text-blue-400">Kilometraje</p>
+                        <p className="text-xs font-semibold uppercase tracking-wide text-blue-400">Kilometraje</p>
                         <p className="text-sm font-bold text-blue-900">{initialOdometro.toLocaleString()} km</p>
                       </div>
                     )}
@@ -1072,7 +1072,7 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
                   {/* Referencia de solo lectura */}
                   <div className="mb-4 grid grid-cols-2 items-start gap-x-4 gap-y-3 border-b border-dashed border-violet-200 pb-4 sm:grid-cols-5">
                     <div className="min-w-0">
-                      <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-400 leading-tight">Posición</p>
+                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-400 leading-tight">Posición</p>
                       <span className="mt-0.5 inline-block rounded-md bg-violet-100 px-2 py-0.5 text-sm font-bold text-violet-700">
                         {formValues.posicion || '—'}
                       </span>

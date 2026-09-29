@@ -55,8 +55,8 @@ function acentoPorVida(pct: number) {
 function DetalleItem({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="min-w-0 rounded-lg border border-slate-200/70 bg-white px-3 py-2">
-      <p className="text-[10px] font-bold uppercase tracking-wide text-slate-400">{label}</p>
-      <div className="mt-0.5 truncate text-[13px] font-semibold text-slate-700">{value}</div>
+      <p className="text-xs font-bold uppercase tracking-wide text-slate-400">{label}</p>
+      <div className="mt-0.5 truncate text-sm font-semibold text-slate-700">{value}</div>
     </div>
   );
 }
@@ -119,7 +119,7 @@ export function NeumaticosAsignadosCards({ data }: { data: NeumaticoAsignadoCard
                 }`}
             >
               {/* Posición */}
-              <span className={`shrink-0 rounded-lg border px-2.5 py-1 font-mono text-[11px] font-extrabold tracking-wide ${acento.chip}`}>
+              <span className={`shrink-0 rounded-lg border px-2.5 py-1 font-mono text-xs font-extrabold tracking-wide ${acento.chip}`}>
                 {n.POSICION_NEU || '—'}
               </span>
 
@@ -140,7 +140,7 @@ export function NeumaticosAsignadosCards({ data }: { data: NeumaticoAsignadoCard
 
               {/* Fecha de asignación — sólo en pantallas anchas, para equilibrar el header */}
               <span className="hidden shrink-0 text-right lg:block">
-                <span className="block text-[10px] uppercase tracking-wide text-slate-400">asignado</span>
+                <span className="block text-xs uppercase tracking-wide text-slate-400">asignado</span>
                 <span className="mt-0.5 block text-xs font-semibold text-slate-600">
                   {n.FECHA_ASIGNACION ? convertToDateHuman(n.FECHA_ASIGNACION) : '—'}
                 </span>
@@ -151,11 +151,11 @@ export function NeumaticosAsignadosCards({ data }: { data: NeumaticoAsignadoCard
 
               {/* Remanente */}
               <span className="shrink-0 text-center">
-                <span className={`block text-[15px] font-extrabold leading-none ${acento.texto}`}>
+                <span className={`block text-base font-extrabold leading-none ${acento.texto}`}>
                   {remanente}
-                  <span className="ml-0.5 text-[10px] font-bold">mm</span>
+                  <span className="ml-0.5 text-xs font-bold">mm</span>
                 </span>
-                <span className="mt-0.5 block text-[10px] uppercase tracking-wide text-slate-400">remanente</span>
+                <span className="mt-0.5 block text-xs uppercase tracking-wide text-slate-400">remanente</span>
               </span>
 
               {/* Vida útil */}
@@ -166,7 +166,7 @@ export function NeumaticosAsignadosCards({ data }: { data: NeumaticoAsignadoCard
                     style={{ width: `${Math.min(100, Math.max(0, vida))}%` }}
                   />
                 </span>
-                <span className={`mt-1 block text-[10px] font-bold ${acento.texto}`}>{vida}% vida</span>
+                <span className={`mt-1 block text-xs font-bold ${acento.texto}`}>{vida}% vida</span>
               </span>
 
               <span

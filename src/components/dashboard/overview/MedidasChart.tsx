@@ -35,14 +35,14 @@ function MedidasTooltip({ active, payload, label }: any) {
       boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
       fontFamily: 'inherit', minWidth: 190,
     }}>
-      <div style={{ fontWeight: 700, fontSize: 13, color: isDark ? '#f1f5f9' : '#1e293b', marginBottom: 8, fontFamily: 'monospace' }}>
+      <div style={{ fontWeight: 700, fontSize: '0.875rem', color: isDark ? '#f1f5f9' : '#1e293b', marginBottom: 8, fontFamily: 'monospace' }}>
         {label}
       </div>
       {payload.map((p: any) => (
         <div key={p.name} style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
           <span style={{ width: 8, height: 8, borderRadius: 2, background: p.fill, display: 'inline-block', flexShrink: 0 }} />
-          <span style={{ fontSize: 12, color: isDark ? '#94a3b8' : '#64748b', flex: 1 }}>{p.name}</span>
-          <span style={{ fontSize: 12, fontWeight: 700, color: isDark ? '#f1f5f9' : '#1e293b' }}>{p.value}</span>
+          <span style={{ fontSize: '0.875rem', color: isDark ? '#94a3b8' : '#64748b', flex: 1 }}>{p.name}</span>
+          <span style={{ fontSize: '0.875rem', fontWeight: 700, color: isDark ? '#f1f5f9' : '#1e293b' }}>{p.value}</span>
         </div>
       ))}
       <div style={{
@@ -50,8 +50,8 @@ function MedidasTooltip({ active, payload, label }: any) {
         marginTop: 6, paddingTop: 6,
         display: 'flex', justifyContent: 'space-between',
       }}>
-        <span style={{ fontSize: 12, color: isDark ? '#94a3b8' : '#64748b' }}>Total</span>
-        <span style={{ fontSize: 13, fontWeight: 700, color: isDark ? '#f1f5f9' : '#1e293b' }}>{total}</span>
+        <span style={{ fontSize: '0.875rem', color: isDark ? '#94a3b8' : '#64748b' }}>Total</span>
+        <span style={{ fontSize: '0.875rem', fontWeight: 700, color: isDark ? '#f1f5f9' : '#1e293b' }}>{total}</span>
       </div>
     </div>
   );
@@ -158,7 +158,7 @@ export const MedidasChart = (): React.JSX.Element => {
               {[{ color: COLOR_DISP, label: 'Disponibles' }, { color: COLOR_ASIG, label: 'Asignados' }, { color: COLOR_BAJ, label: 'Bajas' }].map(({ color, label }) => (
                 <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
                   <div style={{ width: 10, height: 10, borderRadius: 2, background: color }} />
-                  <span style={{ fontSize: 12, color: theme.palette.text.secondary }}>{label}</span>
+                  <span style={{ fontSize: '0.875rem', color: theme.palette.text.secondary }}>{label}</span>
                 </div>
               ))}
             </div>
@@ -173,7 +173,7 @@ export const MedidasChart = (): React.JSX.Element => {
                 >
                   <XAxis
                     type="number"
-                    tick={{ fontSize: 10, fill: theme.palette.text.secondary as string }}
+                    tick={{ fontSize: '0.75rem', fill: theme.palette.text.secondary as string }}
                     axisLine={false}
                     tickLine={false}
                   />
@@ -181,7 +181,7 @@ export const MedidasChart = (): React.JSX.Element => {
                     type="category"
                     dataKey="medida"
                     width={104}
-                    tick={{ fontSize: 11, fill: theme.palette.text.primary as string, fontWeight: 600, fontFamily: 'monospace' }}
+                    tick={{ fontSize: '0.75rem', fill: theme.palette.text.primary as string, fontWeight: 600, fontFamily: 'monospace' }}
                     axisLine={false}
                     tickLine={false}
                   />

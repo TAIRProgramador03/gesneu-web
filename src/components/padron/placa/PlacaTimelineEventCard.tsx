@@ -76,11 +76,11 @@ function NeuRow({ neu, tipo }: { neu: NeumaticoDelHistorial; tipo: number }) {
   return (
     <div className="rounded-lg bg-gray-50 p-2.5 space-y-1.5">
       <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-        <span className={cn('text-[11px] font-bold rounded px-2 py-0.5 shrink-0', accent.badge)}>
+        <span className={cn('text-xs font-bold rounded px-2 py-0.5 shrink-0', accent.badge)}>
           {neu.CODIGO_NEUMATICO}
         </span>
         {tipo === 4 && neu.POSICION_ANTERIOR_EN_VEHICULO && neu.POSICION_NUEVA_EN_VEHICULO ? (
-          <div className="flex items-center gap-1.5 text-[11px] text-gray-500 min-w-0">
+          <div className="flex items-center gap-1.5 text-xs text-gray-500 min-w-0">
             <span className="flex items-center gap-1 text-gray-400">
               <MapPin className="size-3 shrink-0" />
               <span className="truncate">{neu.POSICION_ANTERIOR_EN_VEHICULO}</span>
@@ -92,7 +92,7 @@ function NeuRow({ neu, tipo }: { neu: NeumaticoDelHistorial; tipo: number }) {
             </span>
           </div>
         ) : posDisplay ? (
-          <span className="flex items-center gap-1 text-[11px] text-gray-500">
+          <span className="flex items-center gap-1 text-xs text-gray-500">
             <MapPin className="size-3 shrink-0" />
             {posDisplay}
           </span>
@@ -100,32 +100,32 @@ function NeuRow({ neu, tipo }: { neu: NeumaticoDelHistorial; tipo: number }) {
 
         <div className="flex items-center gap-2 ml-auto shrink-0">
           {neu.KM_RECORRIDOS_EN_ETAPA !== null && (
-            <span className="flex items-center gap-1 text-[10px] text-gray-500">
+            <span className="flex items-center gap-1 text-xs text-gray-500">
               <Route className="size-3" />
               {neu.KM_RECORRIDOS_EN_ETAPA} km
             </span>
           )}
           {neu.REMANENTE_MEDIDO_MM !== null && (
-            <span className="flex items-center gap-1 text-[10px] text-gray-500">
+            <span className="flex items-center gap-1 text-xs text-gray-500">
               <Gauge className="size-3" />
               {neu.REMANENTE_MEDIDO_MM} mm
             </span>
           )}
           {neu.PRESION_AIRE_PSI !== null && (
-            <span className="flex items-center gap-1 text-[10px] text-gray-500">
+            <span className="flex items-center gap-1 text-xs text-gray-500">
               <Wind className="size-3" />
               {neu.PRESION_AIRE_PSI} PSI
             </span>
           )}
           {neu.TORQUE_APLICADO_NM !== null && (
-            <span className="flex items-center gap-1 text-[10px] text-gray-500">
+            <span className="flex items-center gap-1 text-xs text-gray-500">
               <Wrench className="size-3" />
               {neu.TORQUE_APLICADO_NM} nm
             </span>
           )}
           {neu.PORCENTAJE_VIDA_UTIL !== null && (
             <span className={cn(
-              'text-[10px] font-semibold rounded-full px-1.5',
+              'text-xs font-semibold rounded-full px-1.5',
               neu.PORCENTAJE_VIDA_UTIL < 39 ? 'bg-red-50 text-red-600' :
                 neu.PORCENTAJE_VIDA_UTIL < 79 ? 'bg-amber-50 text-amber-600' :
                   'bg-green-50 text-green-600'
@@ -136,7 +136,7 @@ function NeuRow({ neu, tipo }: { neu: NeumaticoDelHistorial; tipo: number }) {
         </div>
       </div>
       {obs && (
-        <div className="flex items-start gap-1 text-[10px] text-gray-400 pl-1">
+        <div className="flex items-start gap-1 text-xs text-gray-400 pl-1">
           <MessageSquare className="size-3 shrink-0 mt-px" />
           <span className="italic">{obs}</span>
         </div>
@@ -188,7 +188,7 @@ export const PlacaTimelineEventCard = ({ mov, isLast }: { mov: MovimientoAgrupad
 
               <div className="flex items-center gap-2 shrink-0">
                 {!expanded && (
-                  <span className={cn('hidden sm:inline-flex items-center gap-1 text-[10px] rounded-full px-2 py-0.5', accent.chip)}>
+                  <span className={cn('hidden sm:inline-flex items-center gap-1 text-xs rounded-full px-2 py-0.5', accent.chip)}>
                     <CircleDot className="size-3" />
                     {mov.NEUMATICOS.length} neumático{mov.NEUMATICOS.length !== 1 ? 's' : ''}
                   </span>
@@ -204,31 +204,31 @@ export const PlacaTimelineEventCard = ({ mov, isLast }: { mov: MovimientoAgrupad
                 <div className="flex flex-wrap gap-3 mt-3 mb-3">
 
                   {mov.KILOMETRAJE && (
-                    <div className="flex items-center gap-1 rounded-full bg-blue-50 px-2 py-0.5 text-[11px] font-medium text-blue-600">
+                    <div className="flex items-center gap-1 rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-600">
                       <Gauge className="size-3" />
                       <span>{Number(mov.KILOMETRAJE).toLocaleString('es-PE')} km</span>
                     </div>
                   )}
                   {mov.TERRENO && (
-                    <div className="flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700">
+                    <div className="flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700">
                       <Mountain className="size-3" />
                       <span>{mov.TERRENO}</span>
                     </div>
                   )}
                   {mov.CONDICION && (
-                    <div className="flex items-center gap-1 rounded-full bg-orange-50 px-2 py-0.5 text-[11px] font-medium text-orange-600">
+                    <div className="flex items-center gap-1 rounded-full bg-orange-50 px-2 py-0.5 text-xs font-medium text-orange-600">
                       <Activity className="size-3" />
                       <span>{mov.CONDICION}</span>
                     </div>
                   )}
                   {mov.TALLER_ASIGNADO && (
-                    <div className="flex items-center gap-1 rounded-full bg-violet-50 px-2 py-0.5 text-[11px] font-medium text-violet-600">
+                    <div className="flex items-center gap-1 rounded-full bg-violet-50 px-2 py-0.5 text-xs font-medium text-violet-600">
                       <Building2 className="size-3" />
                       <span>{mov.TALLER_ASIGNADO}</span>
                     </div>
                   )}
                   {mov.USUARIO_REGISTRADOR?.trim() && (
-                    <div className="flex items-center gap-1 rounded-full bg-gray-100 px-2 py-0.5 text-[11px] font-medium text-gray-600">
+                    <div className="flex items-center gap-1 rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">
                       <User className="size-3" />
                       <span>{mov.USUARIO_REGISTRADOR.trim()}</span>
                     </div>

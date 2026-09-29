@@ -30,7 +30,7 @@ const DatoResumen: React.FC<{ icono: React.ReactNode; label: string; valor: Reac
       {icono}
     </span>
     <div className="min-w-0">
-      <p className="text-[10px] font-bold uppercase tracking-wide text-blue-400">{label}</p>
+      <p className="text-xs font-bold uppercase tracking-wide text-blue-400">{label}</p>
       <p className="truncate text-sm font-bold text-slate-800">{valor}</p>
     </div>
   </div>
@@ -39,13 +39,13 @@ const DatoResumen: React.FC<{ icono: React.ReactNode; label: string; valor: Reac
 /** Medida individual dentro de la tarjeta de un neumático. */
 const Medida: React.FC<{ icono: React.ReactNode; label: string; valor: React.ReactNode; unidad: string }> = ({ icono, label, valor, unidad }) => (
   <div className="rounded-lg border border-slate-200/70 bg-white px-2.5 py-1.5">
-    <p className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide text-slate-400">
+    <p className="flex items-center gap-1 text-xs font-bold uppercase tracking-wide text-slate-400">
       {icono}
       {label}
     </p>
     <p className="mt-0.5 text-sm font-bold text-slate-700">
       {valor ?? '—'}
-      <span className="ml-0.5 text-[10px] font-semibold text-slate-400">{unidad}</span>
+      <span className="ml-0.5 text-xs font-semibold text-slate-400">{unidad}</span>
     </p>
   </div>
 );
@@ -78,7 +78,7 @@ export const ModalInformacionReubicacion = ({ open, fechaReubicacion, neumaticos
           <ShieldCheck size={20} className="text-blue-600" />
         </Box>
         <Box sx={{ flex: 1, minWidth: 0 }}>
-          <Typography variant="h6" fontWeight={700} lineHeight={1.2} sx={{ fontSize: { xs: 16, md: 20 } }}>
+          <Typography variant="h6" fontWeight={700} lineHeight={1.2} sx={{ fontSize: { xs: '1rem', md: '1.25rem' } }}>
             Reconfirmar Reubicación
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.4, flexWrap: 'wrap' }}>
@@ -86,10 +86,10 @@ export const ModalInformacionReubicacion = ({ open, fechaReubicacion, neumaticos
             <Chip
               label={placa}
               size="small"
-              sx={{ fontWeight: 700, fontSize: 12, bgcolor: '#f1f5f9', color: '#334155', letterSpacing: 0.5 }}
+              sx={{ fontWeight: 700, fontSize: '0.875rem', bgcolor: '#f1f5f9', color: '#334155', letterSpacing: 0.5 }}
             />
           </Box>
-          <Typography variant="caption" className='text-amber-600' sx={{ display: 'block', mt: 1, fontStyle: 'italic', fontSize: { xs: 10.5, md: 12 }, lineHeight: 1.35 }}>
+          <Typography variant="caption" className='text-amber-600' sx={{ display: 'block', mt: 1, fontStyle: 'italic', fontSize: { xs: '0.75rem', md: '0.875rem' }, lineHeight: 1.35 }}>
             <span className='font-bold'>Nota: </span>
             Revisa que cada neumático quede en la posición correcta. Al pulsar <b>Registrar Reubicación</b> se guardarán definitivamente.
           </Typography>
@@ -149,7 +149,7 @@ export const ModalInformacionReubicacion = ({ open, fechaReubicacion, neumaticos
                       </p>
                     </div>
                     {!seMueve && (
-                      <span className="shrink-0 rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[10px] font-bold text-slate-500">
+                      <span className="shrink-0 rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-xs font-bold text-slate-500">
                         SIN CAMBIO
                       </span>
                     )}
@@ -158,15 +158,15 @@ export const ModalInformacionReubicacion = ({ open, fechaReubicacion, neumaticos
                   {/* Lo que importa revisar: de qué posición sale y a cuál entra */}
                   <div className="mt-2.5 grid grid-cols-[1fr_auto_1fr] items-center gap-2 rounded-lg border border-slate-200/70 bg-white px-2.5 py-2">
                     <div className="text-center">
-                      <p className="text-[10px] font-bold uppercase tracking-wide text-slate-400">Desde</p>
-                      <span className="mt-0.5 inline-block rounded-md bg-slate-200 px-2 py-1 font-mono text-[11px] font-extrabold text-slate-600">
+                      <p className="text-xs font-bold uppercase tracking-wide text-slate-400">Desde</p>
+                      <span className="mt-0.5 inline-block rounded-md bg-slate-200 px-2 py-1 font-mono text-xs font-extrabold text-slate-600">
                         {neu.PosicionOrigen || '—'}
                       </span>
                     </div>
                     <ArrowRight className={`h-5 w-5 justify-self-center ${seMueve ? 'text-violet-500' : 'text-slate-300'}`} />
                     <div className="text-center">
-                      <p className="text-[10px] font-bold uppercase tracking-wide text-violet-400">Hacia</p>
-                      <span className={`mt-0.5 inline-block rounded-md px-2 py-1 font-mono text-[11px] font-extrabold text-white ${seMueve ? 'bg-violet-600' : 'bg-slate-400'}`}>
+                      <p className="text-xs font-bold uppercase tracking-wide text-violet-400">Hacia</p>
+                      <span className={`mt-0.5 inline-block rounded-md px-2 py-1 font-mono text-xs font-extrabold text-white ${seMueve ? 'bg-violet-600' : 'bg-slate-400'}`}>
                         {neu.PosicionDestino || '—'}
                       </span>
                     </div>

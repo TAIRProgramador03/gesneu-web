@@ -70,11 +70,11 @@ export function CollapsibleCard({
             </div>
           )}
           <div style={{ textAlign: 'left' }}>
-            <div style={{ fontSize: 14, fontWeight: 700, color: theme.palette.text.primary as string, lineHeight: 1.3 }}>
+            <div style={{ fontSize: '1rem', fontWeight: 700, color: theme.palette.text.primary as string, lineHeight: 1.3 }}>
               {title}
             </div>
             {subtitle && (
-              <div style={{ fontSize: 11, color: theme.palette.text.secondary as string, marginTop: 2 }}>
+              <div style={{ fontSize: '0.75rem', color: theme.palette.text.secondary as string, marginTop: 2 }}>
                 {subtitle}
               </div>
             )}

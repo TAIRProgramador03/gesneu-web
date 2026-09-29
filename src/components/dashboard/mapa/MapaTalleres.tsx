@@ -165,13 +165,13 @@ export const MapaTalleres = () => {
                   width: 80, height: 80, borderRadius: '50%',
                   background: `${color}0C`, pointerEvents: 'none',
                 }} />
-                <div style={{ fontSize: 10, fontWeight: 700, color: textSec, letterSpacing: '0.07em', marginBottom: 4 }}>
+                <div style={{ fontSize: '0.75rem', fontWeight: 700, color: textSec, letterSpacing: '0.07em', marginBottom: 4 }}>
                   {label.toUpperCase()}
                 </div>
-                <div style={{ fontSize: 26, fontWeight: 800, color: textPri, lineHeight: 1, marginBottom: 3 }}>
+                <div style={{ fontSize: '1.625rem', fontWeight: 800, color: textPri, lineHeight: 1, marginBottom: 3 }}>
                   {value}
                 </div>
-                <div style={{ fontSize: 11, color: textSec, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                <div style={{ fontSize: '0.75rem', color: textSec, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                   {sub}
                 </div>
               </div>
@@ -224,21 +224,21 @@ export const MapaTalleres = () => {
                   eventHandlers={{ click: () => handleSelect(idConcat) }}
                 >
                   <Tooltip direction="top" offset={[0, -(radius + 4)]} permanent={selected} sticky={false}>
-                    <span style={{ fontWeight: 700, fontSize: 12 }}>{taller.TALLER}</span>
+                    <span style={{ fontWeight: 700, fontSize: '0.875rem' }}>{taller.TALLER}</span>
                     <br />
-                    <span style={{ fontSize: 11, color: '#64748b' }}>{taller.CANTIDAD_NEUMATICOS} neumáticos</span>
+                    <span style={{ fontSize: '0.75rem', color: '#64748b' }}>{taller.CANTIDAD_NEUMATICOS} neumáticos</span>
                   </Tooltip>
 
                   <Popup minWidth={200}>
                     <div style={{ fontFamily: 'inherit' }}>
-                      <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 2, color: '#1e293b' }}>
+                      <div style={{ fontWeight: 700, fontSize: '1rem', marginBottom: 2, color: '#1e293b' }}>
                         {taller.TALLER}
                       </div>
-                      {/* <div style={{ fontSize: 11, color: '#64748b', marginBottom: 10 }}>
+                      {/* <div style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: 10 }}>
                         {taller.ciudad} · Zona {taller.zona}
                         Lima · Zona Metropolitana
                       </div> */}
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', rowGap: 4, columnGap: 16, fontSize: 12 }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', rowGap: 4, columnGap: 16, fontSize: '0.875rem' }}>
                         <span style={{ color: '#64748b' }}>Total neumáticos</span>
                         <span style={{ fontWeight: 700, textAlign: 'right' }}>{taller.CANTIDAD_NEUMATICOS}</span>
                         <span style={{ color: '#3B82F6' }}>Asignados</span>
@@ -266,7 +266,7 @@ export const MapaTalleres = () => {
           style={{ background: cardBg, border: `1px solid ${border}` }}>
 
           {/* Resumen nacional */}
-          <div style={{ fontSize: 11, fontWeight: 700, color: textSec, letterSpacing: '0.07em', marginBottom: 2 }}>
+          <div style={{ fontSize: '0.75rem', fontWeight: 700, color: textSec, letterSpacing: '0.07em', marginBottom: 2 }}>
             RESUMEN NACIONAL
           </div>
           {/* flexShrink 0: es hija directa del panel con scroll y, al tener overflow hidden,
@@ -284,15 +284,15 @@ export const MapaTalleres = () => {
             ] as { color: string; label: string; value: number }[]).map(({ color, label, value }) => (
               <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                 <div style={{ width: 8, height: 8, borderRadius: 2, background: color }} />
-                <span style={{ fontSize: 11, color: textSec }}>{label}</span>
-                <span style={{ fontSize: 12, fontWeight: 700, color: textPri }}>{value}</span>
+                <span style={{ fontSize: '0.75rem', color: textSec }}>{label}</span>
+                <span style={{ fontSize: '0.875rem', fontWeight: 700, color: textPri }}>{value}</span>
               </div>
             ))}
           </div>
 
           <Divider sx={{ my: 0.5 }} />
 
-          <div style={{ fontSize: 11, fontWeight: 700, color: textSec, letterSpacing: '0.07em', marginBottom: 4 }}>
+          <div style={{ fontSize: '0.75rem', fontWeight: 700, color: textSec, letterSpacing: '0.07em', marginBottom: 4 }}>
             TALLERES — click para hacer zoom
           </div>
 
@@ -334,11 +334,11 @@ export const MapaTalleres = () => {
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 3 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
                       <div style={{ width: 9, height: 9, borderRadius: '50%', background: color, flexShrink: 0 }} />
-                      <span style={{ fontSize: 12, fontWeight: 700, color: textPri, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      <span style={{ fontSize: '0.875rem', fontWeight: 700, color: textPri, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {taller.TALLER}
                       </span>
                     </div>
-                    <span style={{ fontSize: 14, fontWeight: 800, color: textPri, flexShrink: 0, marginLeft: 6 }}>
+                    <span style={{ fontSize: '1rem', fontWeight: 800, color: textPri, flexShrink: 0, marginLeft: 6 }}>
                       {taller.CANTIDAD_NEUMATICOS}
                     </span>
                   </div>
@@ -348,9 +348,9 @@ export const MapaTalleres = () => {
                     <div style={{ width: `${(taller.NEUMATICOS_BAJAS / taller.CANTIDAD_NEUMATICOS) * 100}%`, background: '#EF4444' }} />
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
-                    <span style={{ fontSize: 10, color: '#3B82F6' }}>{taller.NEUMATICOS_ASIGNADOS} asig.</span>
-                    <span style={{ fontSize: 10, color: '#22C55E' }}>{taller.NEUMATICOS_DISPONIBLES} disp.</span>
-                    <span style={{ fontSize: 10, color: '#EF4444' }}>{taller.NEUMATICOS_BAJAS} baja</span>
+                    <span style={{ fontSize: '0.75rem', color: '#3B82F6' }}>{taller.NEUMATICOS_ASIGNADOS} asig.</span>
+                    <span style={{ fontSize: '0.75rem', color: '#22C55E' }}>{taller.NEUMATICOS_DISPONIBLES} disp.</span>
+                    <span style={{ fontSize: '0.75rem', color: '#EF4444' }}>{taller.NEUMATICOS_BAJAS} baja</span>
                   </div>
                 </div>
               );
@@ -358,7 +358,7 @@ export const MapaTalleres = () => {
 
           <Divider sx={{ my: 0.5 }} />
 
-          <div style={{ fontSize: 11, fontWeight: 700, color: textSec, letterSpacing: '0.07em', marginBottom: 4 }}>
+          <div style={{ fontSize: '0.75rem', fontWeight: 700, color: textSec, letterSpacing: '0.07em', marginBottom: 4 }}>
             LEYENDA — tamaño = neumáticos totales
           </div>
           {([
@@ -368,7 +368,7 @@ export const MapaTalleres = () => {
           ] as { color: string; label: string }[]).map(({ color, label }) => (
             <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
               <div style={{ width: 10, height: 10, borderRadius: '50%', background: color, flexShrink: 0 }} />
-              <span style={{ fontSize: 11, color: textSec }}>{label}</span>
+              <span style={{ fontSize: '0.75rem', color: textSec }}>{label}</span>
             </div>
           ))}
         </div>

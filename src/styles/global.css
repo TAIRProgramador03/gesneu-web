@@ -38,6 +38,14 @@
   } */
 
 html {
+  /* Base de todos los tamaños en rem (MUI y Tailwind). Se subió de los 16px por
+     defecto del navegador porque al 100% de zoom el texto quedaba muy chico.
+     Para agrandar o achicar el texto de toda la app, cambiar SOLO este número.
+
+     NO usar `zoom` en el body para agrandar todo: rompe el posicionamiento de
+     los menús, selects y popovers de Radix (se dibujan desplazados por el factor
+     de zoom y pueden quedar fuera de la pantalla). Probado y descartado. */
+  font-size: 18px;
   height: 100%;
   overflow: hidden;
   scroll-behavior: smooth;

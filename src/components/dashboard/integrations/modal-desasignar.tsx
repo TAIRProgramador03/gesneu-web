@@ -106,7 +106,7 @@ const Paso: React.FC<{ indice: number; actual: number; etiqueta: string; onClick
             className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold transition-colors ${activo ? 'bg-blue-600 text-white' : completado ? 'text-blue-700 hover:bg-blue-50' : 'text-slate-400'
                 } ${indice > actual ? 'cursor-default' : 'cursor-pointer'}`}
         >
-            <span className={`flex h-4.5 w-4.5 items-center justify-center rounded-full text-[10px] font-bold ${activo ? 'bg-white/25 text-white' : completado ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-400'
+            <span className={`flex h-4.5 w-4.5 items-center justify-center rounded-full text-xs font-bold ${activo ? 'bg-white/25 text-white' : completado ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-400'
                 }`}>
                 {completado ? <Check className="h-3 w-3" /> : indice + 1}
             </span>
@@ -125,7 +125,7 @@ const FilaInstalado: React.FC<{
 }> = ({ posicion, neumatico, marcado, bloqueado, onToggle }) => (
     <div className={`flex items-center gap-2.5 rounded-xl border px-3 py-2 transition-colors ${marcado ? 'border-red-200 bg-red-50/70' : neumatico ? 'border-slate-200 bg-white' : 'border-dashed border-slate-200 bg-slate-50/60'
         }`}>
-        <span className={`shrink-0 rounded-md px-2 py-1 font-mono text-[11px] font-extrabold ${marcado ? 'bg-red-600 text-white' : neumatico ? 'bg-violet-600 text-white' : 'bg-slate-200 text-slate-500'
+        <span className={`shrink-0 rounded-md px-2 py-1 font-mono text-xs font-extrabold ${marcado ? 'bg-red-600 text-white' : neumatico ? 'bg-violet-600 text-white' : 'bg-slate-200 text-slate-500'
             }`}>
             {posicion}
         </span>
@@ -174,7 +174,7 @@ const TarjetaPosicionLiberada: React.FC<{
         : reemplazo ? 'border-emerald-200 bg-emerald-50/50' : 'border-dashed border-amber-300 bg-amber-50/50'
         }`}>
         <div className="flex items-center gap-2.5">
-            <span className="shrink-0 rounded-md bg-violet-600 px-2 py-1 font-mono text-[11px] font-extrabold text-white">
+            <span className="shrink-0 rounded-md bg-violet-600 px-2 py-1 font-mono text-xs font-extrabold text-white">
                 {posicion}
             </span>
 
@@ -217,9 +217,9 @@ const TarjetaPosicionLiberada: React.FC<{
                     { label: 'Torque', valor: reemplazo.TORQUE_APLICADO, unidad: 'N·m' },
                 ].map((d) => (
                     <div key={d.label} className="rounded-lg border border-slate-200/70 bg-white px-2 py-1">
-                        <p className="text-[9px] font-bold uppercase tracking-wide text-slate-400">{d.label}</p>
+                        <p className="text-xs font-bold uppercase tracking-wide text-slate-400">{d.label}</p>
                         <p className="text-xs font-bold text-slate-700">
-                            {d.valor}<span className="ml-0.5 text-[9px] font-semibold text-slate-400">{d.unidad}</span>
+                            {d.valor}<span className="ml-0.5 text-xs font-semibold text-slate-400">{d.unidad}</span>
                         </p>
                     </div>
                 ))}
@@ -332,9 +332,9 @@ const TarjetaDisponible: React.FC<{
 
             <div className="shrink-0 text-center">
                 <p className="text-sm font-bold leading-none text-slate-700">
-                    {neumatico.REMANENTE ?? '—'}<span className="ml-0.5 text-[10px]">mm</span>
+                    {neumatico.REMANENTE ?? '—'}<span className="ml-0.5 text-xs">mm</span>
                 </p>
-                <p className="mt-0.5 text-[10px] uppercase tracking-wide text-slate-400">remanente</p>
+                <p className="mt-0.5 text-xs uppercase tracking-wide text-slate-400">remanente</p>
             </div>
 
             {posicionUsada ? (
@@ -675,11 +675,11 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = memo(({
         }} elevation={0}>
             <div className="mb-1 flex w-full items-center justify-between gap-2">
                 <span className="text-xs font-bold uppercase tracking-wide text-slate-500">Posiciones</span>
-                <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-500">
+                <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-bold text-slate-500">
                     {placa}
                 </span>
             </div>
-            <p className="mb-2 w-full text-[11px] leading-snug text-slate-400">
+            <p className="mb-2 w-full text-xs leading-snug text-slate-400">
                 {paso === 0
                     ? 'Haz clic en una rueda para marcarla como saliente.'
                     : paso === 1
@@ -703,7 +703,7 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = memo(({
             <Card sx={{ p: 2, borderRadius: 2.5, border: '1px solid #e2e8f0' }} elevation={0}>
                 <p className="mb-2 text-sm font-semibold text-slate-700">
                     Neumáticos instalados
-                    <span className="ml-2 rounded-full bg-red-50 px-2 py-0.5 text-[11px] font-bold text-red-600">
+                    <span className="ml-2 rounded-full bg-red-50 px-2 py-0.5 text-xs font-bold text-red-600">
                         {posicionesLiberadas.length} marcado{posicionesLiberadas.length === 1 ? '' : 's'}
                     </span>
                 </p>
@@ -777,7 +777,7 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = memo(({
                         className="h-9 pl-8"
                     />
                 </div>
-                <span className="shrink-0 rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-bold text-slate-500">
+                <span className="shrink-0 rounded-full bg-slate-100 px-2.5 py-1 text-xs font-bold text-slate-500">
                     {resultadosBusqueda.length}
                 </span>
             </div>
@@ -795,7 +795,7 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = memo(({
                     <p className="py-8 text-center text-sm text-slate-400">Sin neumáticos disponibles.</p>
                 )}
                 {resultadosBusqueda.length > TOPE_TARJETAS && (
-                    <p className="py-2 text-center text-[11px] text-slate-400">
+                    <p className="py-2 text-center text-xs text-slate-400">
                         Mostrando {TOPE_TARJETAS} de {resultadosBusqueda.length} — refina la búsqueda para ver más.
                     </p>
                 )}
@@ -808,7 +808,7 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = memo(({
             <Card sx={{ p: 2, borderRadius: 2.5, border: '1px solid #e2e8f0' }} elevation={0}>
                 <div className="mb-2 flex items-center justify-between gap-2">
                     <p className="text-sm font-semibold text-slate-700">Posiciones a cubrir</p>
-                    <span className={`rounded-full px-2 py-0.5 text-[11px] font-bold ${todasCubiertas ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}`}>
+                    <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${todasCubiertas ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}`}>
                         {Object.keys(reemplazos).length}/{posicionesLiberadas.length}
                     </span>
                 </div>
@@ -861,14 +861,14 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = memo(({
                 <div className="flex flex-col gap-1.5">
                     {posicionesLiberadas.map(pos => (
                         <div key={pos} className="flex items-center gap-2.5 rounded-lg border border-red-200 bg-white px-3 py-2">
-                            <span className="shrink-0 rounded-md bg-red-600 px-2 py-1 font-mono text-[11px] font-extrabold text-white">{pos}</span>
+                            <span className="shrink-0 rounded-md bg-red-600 px-2 py-1 font-mono text-xs font-extrabold text-white">{pos}</span>
                             <div className="min-w-0 flex-1">
                                 <p className="truncate text-sm font-bold text-slate-800">{codigoDe(marcados[pos])}</p>
                                 <p className="truncate text-xs text-slate-500">
                                     {[marcados[pos].MARCA, marcados[pos].MEDIDA].filter(Boolean).join(' · ') || '—'}
                                 </p>
                             </div>
-                            <span className="shrink-0 rounded-full border border-red-200 bg-red-50 px-2 py-0.5 text-[10px] font-bold text-red-700">
+                            <span className="shrink-0 rounded-full border border-red-200 bg-red-50 px-2 py-0.5 text-xs font-bold text-red-700">
                                 {accion === 'BAJA DEFINITIVA' ? tipoAccion || 'BAJA' : accion}
                             </span>
                         </div>
@@ -887,7 +887,7 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = memo(({
                         return (
                             <div key={pos} className="rounded-lg border border-emerald-200 bg-white px-3 py-2">
                                 <div className="flex items-center gap-2.5">
-                                    <span className="shrink-0 rounded-md bg-emerald-600 px-2 py-1 font-mono text-[11px] font-extrabold text-white">{pos}</span>
+                                    <span className="shrink-0 rounded-md bg-emerald-600 px-2 py-1 font-mono text-xs font-extrabold text-white">{pos}</span>
                                     <div className="min-w-0 flex-1">
                                         <p className="truncate text-sm font-bold text-slate-800">{codigoDe(r?.neumatico)}</p>
                                         <p className="truncate text-xs text-slate-500">
@@ -895,7 +895,7 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = memo(({
                                         </p>
                                     </div>
                                 </div>
-                                <div className="mt-1.5 flex flex-wrap gap-1.5 text-[11px] font-semibold text-slate-600">
+                                <div className="mt-1.5 flex flex-wrap gap-1.5 text-xs font-semibold text-slate-600">
                                     <span className="rounded bg-slate-100 px-1.5 py-0.5">{r?.REMANENTE} mm</span>
                                     <span className="rounded bg-slate-100 px-1.5 py-0.5">{r?.PRESION_AIRE} psi</span>
                                     <span className="rounded bg-slate-100 px-1.5 py-0.5">{r?.TORQUE_APLICADO} N·m</span>
@@ -907,7 +907,7 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = memo(({
             </Card>
 
             <Card sx={{ p: 2, borderRadius: 2.5, border: '1px solid #e2e8f0' }} elevation={0}>
-                <p className="text-[10px] font-bold uppercase tracking-wide text-slate-400">Observación</p>
+                <p className="text-xs font-bold uppercase tracking-wide text-slate-400">Observación</p>
                 <p className="mt-0.5 whitespace-pre-wrap text-sm text-slate-700">{observacion}</p>
                 <div className="mt-2 flex flex-wrap gap-3 text-xs text-slate-500">
                     <span><b className="text-slate-700">Kilometraje:</b> {Number(kilometraje ?? 0).toLocaleString()} km</span>
@@ -939,12 +939,12 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = memo(({
                     </Box>
 
                     <Box sx={{ flex: 1, minWidth: 0 }}>
-                        <Typography variant="h6" fontWeight={700} lineHeight={1.2} sx={{ fontSize: { xs: 16, md: 20 } }}>
+                        <Typography variant="h6" fontWeight={700} lineHeight={1.2} sx={{ fontSize: { xs: '1rem', md: '1.25rem' } }}>
                             Desasignación de Neumáticos
                         </Typography>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.4, flexWrap: 'wrap' }}>
                             <Typography variant="body2" color="text.secondary">Vehículo:</Typography>
-                            <Chip label={placa} size="small" sx={{ fontWeight: 700, fontSize: 12, bgcolor: '#f1f5f9', color: '#334155', letterSpacing: 0.5 }} />
+                            <Chip label={placa} size="small" sx={{ fontWeight: 700, fontSize: '0.875rem', bgcolor: '#f1f5f9', color: '#334155', letterSpacing: 0.5 }} />
                             {vehiculo?.marca && (
                                 <Typography variant="caption" color="text.secondary">
                                     {[vehiculo.marca, vehiculo.modelo].filter(Boolean).join(' · ')}

@@ -42,7 +42,7 @@ const PosicionBadge = ({ posicion }: { posicion: Posicion }) => {
   const esRepuesto = posicion === 'RES01';
   return (
     <span className={cn(
-      "inline-flex items-center rounded-md px-2 py-0.5 text-[11px] font-semibold ring-1 ring-inset whitespace-nowrap",
+      "inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold ring-1 ring-inset whitespace-nowrap",
       esRepuesto ? "bg-purple-50 text-purple-700 ring-purple-200" : "bg-blue-50 text-blue-700 ring-blue-200"
     )}>
       {posicion}
@@ -80,7 +80,7 @@ const TorqueCell = ({ neu, dense }: { neu: NeumaticoMasivo; dense?: boolean }) =
         title="RES01: torque deshabilitado, forzado a 0 y sin validación de rango."
         className={cn(
           "inline-flex items-center gap-1 rounded-md bg-slate-100 px-1.5 py-0.5 font-medium text-slate-400 ring-1 ring-inset ring-slate-200",
-          dense ? "text-[11px]" : "text-[10px]"
+          dense ? "text-xs" : "text-xs"
         )}
       >
         No aplica
@@ -96,7 +96,7 @@ const TablaNeumaticosPlaca = ({ neumaticos, mostrarMotivo }: { neumaticos: Neuma
     <div className="hidden md:block overflow-x-auto">
       <table className="w-full text-xs">
         <thead>
-          <tr className="text-slate-400 uppercase tracking-wide text-[10px]">
+          <tr className="text-slate-400 uppercase tracking-wide text-xs">
             <th className="text-left font-semibold px-3 py-2">Código</th>
             <th className="text-left font-semibold px-3 py-2">Posición</th>
             <th className="text-left font-semibold px-3 py-2">Remanente</th>
@@ -138,27 +138,27 @@ const TablaNeumaticosPlaca = ({ neumaticos, mostrarMotivo }: { neumaticos: Neuma
         <div key={neu.codigo} className="rounded-md border border-slate-100 bg-slate-50 p-2.5 text-xs">
           <div className="grid grid-cols-2 gap-x-2 gap-y-1.5">
             <div>
-              <div className="text-[10px] uppercase text-slate-400">Código</div>
+              <div className="text-xs uppercase text-slate-400">Código</div>
               <div className="font-mono font-medium text-slate-700">{neu.codigo}</div>
             </div>
             <div>
-              <div className="text-[10px] uppercase text-slate-400">Posición</div>
+              <div className="text-xs uppercase text-slate-400">Posición</div>
               <PosicionBadge posicion={neu.posicion} />
             </div>
             <div>
-              <div className="text-[10px] uppercase text-slate-400">Remanente</div>
+              <div className="text-xs uppercase text-slate-400">Remanente</div>
               <div className="text-slate-600">{neu.remanente} mm</div>
             </div>
             <div>
-              <div className="text-[10px] uppercase text-slate-400">Presión</div>
+              <div className="text-xs uppercase text-slate-400">Presión</div>
               <div className="text-slate-600">{neu.presion} psi</div>
             </div>
             <div>
-              <div className="text-[10px] uppercase text-slate-400">Torque</div>
+              <div className="text-xs uppercase text-slate-400">Torque</div>
               <TorqueCell neu={neu} dense />
             </div>
             <div>
-              <div className="text-[10px] uppercase text-slate-400">F. Asignación</div>
+              <div className="text-xs uppercase text-slate-400">F. Asignación</div>
               <div className="text-slate-600">{formatFechaCorta(neu.fechaAsignacion)}</div>
             </div>
           </div>
@@ -511,7 +511,7 @@ export const ModalAsignacionMasivaNeumatico = ({ open, onClose, onSuccess }: Mod
                     </div>
                     <div className="min-w-0">
                       <div className="text-xl font-bold text-indigo-700 leading-tight">{totalPlacas}</div>
-                      <div className="text-[11px] font-medium text-indigo-500/80 leading-tight">Total procesadas</div>
+                      <div className="text-xs font-medium text-indigo-500/80 leading-tight">Total procesadas</div>
                     </div>
                   </div>
 
@@ -521,7 +521,7 @@ export const ModalAsignacionMasivaNeumatico = ({ open, onClose, onSuccess }: Mod
                     </div>
                     <div className="min-w-0">
                       <div className="text-xl font-bold text-emerald-700 leading-tight">{resultado.aprobadas.length}</div>
-                      <div className="text-[11px] font-medium text-emerald-600/80 leading-tight">Aprobadas</div>
+                      <div className="text-xs font-medium text-emerald-600/80 leading-tight">Aprobadas</div>
                     </div>
                   </div>
 
@@ -531,7 +531,7 @@ export const ModalAsignacionMasivaNeumatico = ({ open, onClose, onSuccess }: Mod
                     </div>
                     <div className="min-w-0">
                       <div className="text-xl font-bold text-red-700 leading-tight">{resultado.rechazadas.length}</div>
-                      <div className="text-[11px] font-medium text-red-500/80 leading-tight">Rechazadas</div>
+                      <div className="text-xs font-medium text-red-500/80 leading-tight">Rechazadas</div>
                     </div>
                   </div>
 
@@ -541,7 +541,7 @@ export const ModalAsignacionMasivaNeumatico = ({ open, onClose, onSuccess }: Mod
                     </div>
                     <div className="min-w-0">
                       <div className={cn("text-xl font-bold leading-tight", exitoTono.text)}>{porcentajeExito}%</div>
-                      <div className={cn("text-[11px] font-medium leading-tight opacity-80", exitoTono.text)}>Éxito</div>
+                      <div className={cn("text-xs font-medium leading-tight opacity-80", exitoTono.text)}>Éxito</div>
                     </div>
                   </div>
                 </div>
@@ -588,7 +588,7 @@ export const ModalAsignacionMasivaNeumatico = ({ open, onClose, onSuccess }: Mod
                       >
                         <div className="flex items-center gap-2">
                           <span className="text-sm font-semibold text-slate-800">{fila.placa}</span>
-                          <span className="inline-flex items-center rounded-md bg-slate-100 px-1.5 py-0.5 text-[11px] font-medium text-slate-600 ring-1 ring-inset ring-slate-200">
+                          <span className="inline-flex items-center rounded-md bg-slate-100 px-1.5 py-0.5 text-xs font-medium text-slate-600 ring-1 ring-inset ring-slate-200">
                             {fila.kilometraje.toLocaleString('es-PE')} km
                           </span>
                         </div>
@@ -629,7 +629,7 @@ export const ModalAsignacionMasivaNeumatico = ({ open, onClose, onSuccess }: Mod
                           <span className={cn("text-sm font-semibold", fila.arrastrada ? "text-slate-600" : "text-slate-800")}>
                             {fila.placa}
                           </span>
-                          <span className="inline-flex items-center rounded-md bg-slate-100 px-1.5 py-0.5 text-[11px] font-medium text-slate-600 ring-1 ring-inset ring-slate-200">
+                          <span className="inline-flex items-center rounded-md bg-slate-100 px-1.5 py-0.5 text-xs font-medium text-slate-600 ring-1 ring-inset ring-slate-200">
                             {fila.kilometraje.toLocaleString('es-PE')} km
                           </span>
                         </div>

@@ -66,13 +66,13 @@ export const RemanenteChart = ({ historial, neu }: { historial: MovimientoHistor
             <XAxis
               dataKey="id"
               tickFormatter={(id) => chartData.find((d) => d.id === id)?.fecha ?? String(id)}
-              tick={{ fontSize: 10, fill: "#9ca3af" }}
+              tick={{ fontSize: '0.75rem', fill: "#9ca3af" }}
               tickLine={false}
               axisLine={{ stroke: "#e5e7eb" }}
             />
             <YAxis
               domain={[0, maxY]}
-              tick={{ fontSize: 10, fill: "#9ca3af" }}
+              tick={{ fontSize: '0.75rem', fill: "#9ca3af" }}
               tickLine={false}
               axisLine={false}
               unit=" mm"
@@ -87,7 +87,7 @@ export const RemanenteChart = ({ historial, neu }: { historial: MovimientoHistor
               label={{
                 value: `Mínimo ${REMANENTE_MINIMO} mm`,
                 position: "insideBottomRight",
-                fontSize: 10,
+                fontSize: '0.75rem',
                 fill: "#ef4444",
               }}
             />
@@ -101,7 +101,7 @@ export const RemanenteChart = ({ historial, neu }: { historial: MovimientoHistor
                 label={{
                   value: `Montado ${original} mm`,
                   position: "insideTopRight",
-                  fontSize: 10,
+                  fontSize: '0.75rem',
                   fill: "#94a3b8",
                 }}
               />

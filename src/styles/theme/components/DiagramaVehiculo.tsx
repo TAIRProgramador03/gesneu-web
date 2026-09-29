@@ -320,7 +320,7 @@ const DiagramaVehiculo: React.FC<
                 {repuestosLayout && (
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <Typography
-                            sx={{ width: 40, flexShrink: 0, fontSize: '10px', fontWeight: 700, letterSpacing: '0.4px', color: 'text.secondary', fontFamily: 'monospace' }}
+                            sx={{ width: 40, flexShrink: 0, fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.4px', color: 'text.secondary', fontFamily: 'monospace' }}
                         >
                             {repuestosLayout.filas[0].etiqueta}
                         </Typography>
@@ -376,7 +376,7 @@ const DiagramaVehiculo: React.FC<
                         sx={{
                             width: 40,
                             flexShrink: 0,
-                            fontSize: '10px',
+                            fontSize: '0.75rem',
                             fontWeight: 700,
                             letterSpacing: '0.4px',
                             color: 'text.secondary',
@@ -537,7 +537,9 @@ const PosicionNeumatico: React.FC<{
                                 color: '#fff',
                                 borderRadius: '999px',
                                 padding: '2px 7px 2px 5px',
-                                fontSize: '8px',
+                                // Se mantiene pequeño a propósito: es una marca de orientación, no un dato
+                                // que se lea de lejos. Al escalarlo tapaba la etiqueta de la posición POS01.
+                                fontSize: '0.55rem',
                                 fontWeight: 700,
                                 letterSpacing: '0.2px',
                                 boxShadow: '0 2px 6px rgba(25,118,210,0.45)',
@@ -676,7 +678,7 @@ const MarcadorImagenNeumatico: React.FC<{
                         <Box
                             sx={{
                                 position: 'absolute',
-                                top: -22,
+                                top: -44,
                                 left: '50%',
                                 transform: 'translateX(-50%)',
                                 zIndex: 6,
@@ -687,7 +689,7 @@ const MarcadorImagenNeumatico: React.FC<{
                                 color: '#fff',
                                 borderRadius: '999px',
                                 padding: '2px 7px 2px 5px',
-                                fontSize: '8px',
+                                fontSize: '0.60rem',
                                 fontWeight: 700,
                                 letterSpacing: '0.2px',
                                 boxShadow: '0 2px 6px rgba(25,118,210,0.45)',
@@ -695,7 +697,7 @@ const MarcadorImagenNeumatico: React.FC<{
                                 whiteSpace: 'nowrap',
                             }}
                         >
-                            <SteeringWheel size={9} weight="fill" />
+                            <SteeringWheel size={14} weight="fill" />
                             CONDUCTOR
                         </Box>
                     )}
@@ -718,24 +720,24 @@ const MarcadorImagenNeumatico: React.FC<{
                                 flexDirection: 'column',
                                 alignItems: 'center',
                                 gap: '2px',
-                                background: 'linear-gradient(135deg, #27272a, #18181b)',
+                                background: 'linear-gradient(135deg, #f8fafc, #eef2f6)',
                                 borderRadius: '7px',
                                 padding: '4px 7px',
-                                boxShadow: '0 3px 8px rgba(0, 0, 0, 0.4)',
-                                border: `1px solid ${conAlpha(colores.stroke, 0.7)}`,
+                                boxShadow: '0 2px 6px rgba(15, 23, 42, 0.18)',
+                                border: `1px solid ${conAlpha(colores.stroke, 0.85)}`,
                                 whiteSpace: 'nowrap',
                                 pointerEvents: 'none',
                             }}
                         >
-                            <Box component="span" sx={{ fontSize: '9px', fontWeight: 700, color: '#cbd5e1', fontFamily: 'monospace', letterSpacing: '0.2px' }}>
+                            <Box component="span" sx={{ fontSize: '0.75rem', fontWeight: 700, color: '#475569', fontFamily: 'monospace', letterSpacing: '0.2px' }}>
                                 {neumatico.CODIGO_NEU || neumatico.CODIGO || '—'}
                             </Box>
-                            <Box component="span" sx={{ width: '100%', height: '1px', background: 'rgba(255,255,255,0.14)' }} />
-                            <Box component="span" sx={{ fontSize: '10px', fontWeight: 800, color: '#fff', fontFamily: 'monospace', letterSpacing: '0.2px' }}>
+                            <Box component="span" sx={{ width: '100%', height: '1px', background: 'rgba(15, 23, 42, 0.12)' }} />
+                            <Box component="span" sx={{ fontSize: '0.75rem', fontWeight: 800, color: '#0f172a', fontFamily: 'monospace', letterSpacing: '0.2px' }}>
                                 {neumatico.REMANENTE ?? '—'}mm
                             </Box>
-                            <Box component="span" sx={{ width: '100%', height: '1px', background: 'rgba(255,255,255,0.14)' }} />
-                            <Box component="span" sx={{ fontSize: '9px', fontWeight: 600, color: '#94a3b8', fontFamily: 'monospace' }}>
+                            <Box component="span" sx={{ width: '100%', height: '1px', background: 'rgba(15, 23, 42, 0.12)' }} />
+                            <Box component="span" sx={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b', fontFamily: 'monospace' }}>
                                 {kmRecorrido}
                             </Box>
                         </Box>

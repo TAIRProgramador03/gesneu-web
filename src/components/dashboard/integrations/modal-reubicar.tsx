@@ -498,7 +498,7 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = memo(({
               {neumaticoSeleccionado.CODIGO_NEU || neumaticoSeleccionado.CODIGO}
               <span className="ml-2 text-xs font-normal text-slate-500">{neumaticoSeleccionado.MARCA}</span>
             </p>
-            <p className="text-[11px] text-slate-500">Elige la posición de destino. Si está ocupada, se intercambian.</p>
+            <p className="text-xs text-slate-500">Elige la posición de destino. Si está ocupada, se intercambian.</p>
           </div>
           <ButtonCustom variant="ghost" size="sm" onClick={() => setPosicionSeleccionada(null)} title="Cancelar">
             <X className="h-3.5 w-3.5" />
@@ -583,7 +583,7 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = memo(({
           <ClipboardList size={20} className="text-blue-600" />
         </Box>
         <Box sx={{ flex: 1, minWidth: 0 }}>
-          <Typography variant="h6" fontWeight={700} lineHeight={1.2} sx={{ fontSize: { xs: 16, md: 20 } }}>
+          <Typography variant="h6" fontWeight={700} lineHeight={1.2} sx={{ fontSize: { xs: '1rem', md: '1.25rem' } }}>
             Registrar Reubicación de Neumáticos
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.4 }}>
@@ -591,10 +591,10 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = memo(({
             <Chip
               label={placa}
               size="small"
-              sx={{ fontWeight: 700, fontSize: 12, bgcolor: '#f1f5f9', color: '#334155', letterSpacing: 0.5 }}
+              sx={{ fontWeight: 700, fontSize: '0.875rem', bgcolor: '#f1f5f9', color: '#334155', letterSpacing: 0.5 }}
             />
           </Box>
-          <Typography variant="caption" className='text-amber-600' sx={{ display: 'block', mt: 1, fontStyle: 'italic', fontSize: { xs: 10.5, md: 12 }, lineHeight: 1.35 }}>
+          <Typography variant="caption" className='text-amber-600' sx={{ display: 'block', mt: 1, fontStyle: 'italic', fontSize: { xs: '0.75rem', md: '0.875rem' }, lineHeight: 1.35 }}>
             <span className='font-bold'>Nota: </span>
             Elige un neumático y luego su posición de destino: si esa posición está ocupada, ambos <b>se intercambian</b>.
           </Typography>
@@ -640,7 +640,7 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = memo(({
                     </div>
                     {vehiculo?.kilometro !== undefined && (
                       <div className="shrink-0 rounded-lg bg-white/70 px-3 py-1.5 text-right shadow-sm">
-                        <p className="text-[10px] font-semibold uppercase tracking-wide text-blue-400">Kilometraje</p>
+                        <p className="text-xs font-semibold uppercase tracking-wide text-blue-400">Kilometraje</p>
                         <p className="text-sm font-bold text-blue-900">{vehiculo.kilometro.toLocaleString()} km</p>
                       </div>
                     )}
@@ -658,7 +658,7 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = memo(({
                 <div className="mb-3 flex items-center gap-2 rounded-lg border border-violet-100 bg-violet-50/60 px-3 py-2">
                   <MapPinned className="h-4 w-4 shrink-0 text-violet-500" />
                   <div className="min-w-0">
-                    <p className="text-[11px] font-semibold uppercase tracking-wide text-violet-400 leading-tight">Fecha última inspección</p>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-violet-400 leading-tight">Fecha última inspección</p>
                     <p className="truncate text-sm font-semibold text-violet-900">
                       {convertToDateHuman(fechaUltimaInspeccion) || 'Sin registro'}
                     </p>

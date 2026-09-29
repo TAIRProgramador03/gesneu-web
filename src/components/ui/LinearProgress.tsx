@@ -34,7 +34,7 @@ export const LinearProgressItem = ({ estado, width = '180px' }: { estado: number
           left: 0, right: 0, top: 0, bottom: 0,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           color: (estado < 79) ? '#000' : '#fff',
-          fontWeight: 'bold', fontSize: 13, letterSpacing: 0.5,
+          fontWeight: 'bold', fontSize: '0.875rem', letterSpacing: 0.5,
           textShadow: '0 1px 2px rgba(255,255,255,0.15)'
         }}
       >

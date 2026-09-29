@@ -206,9 +206,9 @@ const TarjetaDisponible: React.FC<{
             <div className="shrink-0 text-center">
                 <p className="text-sm font-bold leading-none text-slate-700">
                     {neumatico.REMANENTE ?? '—'}
-                    <span className="ml-0.5 text-[10px]">mm</span>
+                    <span className="ml-0.5 text-xs">mm</span>
                 </p>
-                <p className="mt-0.5 text-[10px] uppercase tracking-wide text-slate-400">remanente</p>
+                <p className="mt-0.5 text-xs uppercase tracking-wide text-slate-400">remanente</p>
             </div>
 
             {posicionAsignada ? (
@@ -265,7 +265,7 @@ const FilaPosicion: React.FC<{
             </div>
 
             {ocupada && !completo && (
-                <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-700">
+                <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-700">
                     <CircleAlert className="h-3 w-3" />
                     Faltan datos
                 </span>
@@ -720,7 +720,7 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
     const tarjetaSeleccionado = neumaticoSeleccionado ? (
         <div className="mb-3 rounded-xl border border-indigo-200 bg-linear-to-br from-indigo-50 via-white to-violet-50 p-3">
             <div className="flex items-center gap-2">
-                <span className="text-[11px] font-semibold uppercase tracking-wide text-indigo-400">Seleccionado</span>
+                <span className="text-xs font-semibold uppercase tracking-wide text-indigo-400">Seleccionado</span>
                 <p className="min-w-0 flex-1 truncate text-sm font-semibold text-slate-800">
                     {codigoDe(neumaticoSeleccionado)}
                     <span className="ml-2 font-normal text-slate-500">{neumaticoSeleccionado.MARCA}</span>
@@ -868,7 +868,7 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
                     <ClipboardList size={20} className="text-blue-600" />
                 </Box>
                 <Box sx={{ flex: 1, minWidth: 0 }}>
-                    <Typography variant="h6" fontWeight={700} lineHeight={1.2} sx={{ fontSize: { xs: 16, md: 20 } }}>
+                    <Typography variant="h6" fontWeight={700} lineHeight={1.2} sx={{ fontSize: { xs: '1rem', md: '1.25rem' } }}>
                         Asignación de Neumáticos
                     </Typography>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.4, flexWrap: 'wrap' }}>
@@ -876,10 +876,10 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
                         <Chip
                             label={placa}
                             size="small"
-                            sx={{ fontWeight: 700, fontSize: 12, bgcolor: '#f1f5f9', color: '#334155', letterSpacing: 0.5 }}
+                            sx={{ fontWeight: 700, fontSize: '0.875rem', bgcolor: '#f1f5f9', color: '#334155', letterSpacing: 0.5 }}
                         />
                     </Box>
-                    <Typography variant="caption" className='text-amber-600' sx={{ display: 'block', mt: 1, fontStyle: 'italic', fontSize: { xs: 10.5, md: 12 }, lineHeight: 1.35 }}>
+                    <Typography variant="caption" className='text-amber-600' sx={{ display: 'block', mt: 1, fontStyle: 'italic', fontSize: { xs: '0.75rem', md: '0.875rem' }, lineHeight: 1.35 }}>
                         <span className='font-bold'>Nota: </span>
                         Selecciona un neumático de la lista y envíalo a una posición. Al asignarlo se solicitarán los datos de instalación. <b>Las {posiciones.length} posiciones son obligatorias</b>.
                     </Typography>
@@ -905,7 +905,7 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
                             value={tabMovil}
                             onChange={(_e, v) => setTabMovil(v)}
                             variant="fullWidth"
-                            sx={{ minHeight: 42, '& .MuiTab-root': { minHeight: 42, textTransform: 'none', fontWeight: 700, fontSize: 13 } }}
+                            sx={{ minHeight: 42, '& .MuiTab-root': { minHeight: 42, textTransform: 'none', fontWeight: 700, fontSize: '0.875rem' } }}
                         >
                             <Tab value={0} label={`1. Vehículo (${totalAsignados}/${posiciones.length})`} />
                             <Tab value={1} label={posicionDestino ? `2. Elegir para ${posicionDestino}` : '2. Neumáticos'} />

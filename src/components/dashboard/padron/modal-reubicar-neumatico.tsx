@@ -303,7 +303,7 @@ export const ModalReubicarNeumatico = ({ open, onClose, onSuccess }: ModalReubic
 
                           {/* Taller */}
                           <div className="flex flex-col items-center">
-                            <span className="font-light italic text-[10px] text-slate-700  truncate">
+                            <span className="font-light italic text-xs text-slate-700  truncate">
                               {neu.PROYECTO_ACTUAL}
                             </span>
                           </div>
@@ -374,7 +374,7 @@ export const ModalReubicarNeumatico = ({ open, onClose, onSuccess }: ModalReubic
             </div>
 
             <Box sx={{ minWidth: 200, flex: 1, maxWidth: 280 }}>
-              <p style={{ fontSize: 11, fontWeight: 600, color: "#64748b", margin: "0 0 5px", textTransform: "uppercase", letterSpacing: ".05em" }}>
+              <p style={{ fontSize: '0.75rem', fontWeight: 600, color: "#64748b", margin: "0 0 5px", textTransform: "uppercase", letterSpacing: ".05em" }}>
                 Taller destino:
               </p>
               <SearchSelect
@@ -445,7 +445,7 @@ export const ModalReubicarNeumatico = ({ open, onClose, onSuccess }: ModalReubic
                         </div>
 
                         <div className="flex flex-col items-center">
-                          <span className="font-light italic text-[10px]  text-slate-700  truncate">{neu.proyecto}</span>
+                          <span className="font-light italic text-xs  text-slate-700  truncate">{neu.proyecto}</span>
                         </div>
 
                         <div className="flex items-center justify-center">

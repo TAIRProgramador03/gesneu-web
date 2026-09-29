@@ -86,7 +86,7 @@ function StatPill({ label, value, accent, muted }: StatPillProps) {
     >
       <span className="w-1 rounded-full" style={{ background: accent }} />
       <div className="flex flex-col justify-center">
-        <span className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: isDark ? '#64748b' : '#94a3b8' }}>{label}</span>
+        <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: isDark ? '#64748b' : '#94a3b8' }}>{label}</span>
         <span className="text-xl font-extrabold leading-tight tabular-nums" style={{ color: muted ? theme.palette.text.primary : accent }}>
           {value}
         </span>
@@ -118,10 +118,10 @@ function DonutTooltip({ active, payload, total }: any) {
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
         <span style={{ width: 10, height: 10, borderRadius: 2, background: color, display: 'inline-block', flexShrink: 0 }} />
-        <span style={{ fontWeight: 700, fontSize: 13, color: isDark ? '#f1f5f9' : '#1e293b' }}>{name}</span>
+        <span style={{ fontWeight: 700, fontSize: '0.875rem', color: isDark ? '#f1f5f9' : '#1e293b' }}>{name}</span>
       </div>
-      <div style={{ fontSize: 13, color: isDark ? '#f1f5f9' : '#1e293b' }}>{value} vehiculos</div>
-      <div style={{ fontSize: 11, color: isDark ? '#94a3b8' : '#64748b', marginTop: 2 }}>
+      <div style={{ fontSize: '0.875rem', color: isDark ? '#f1f5f9' : '#1e293b' }}>{value} vehiculos</div>
+      <div style={{ fontSize: '0.75rem', color: isDark ? '#94a3b8' : '#64748b', marginTop: 2 }}>
         {((value / total) * 100).toFixed(2)}% del total
       </div>
     </div>
@@ -138,9 +138,9 @@ function TerrenoTooltip({ active, payload }: { active?: boolean; payload?: { pay
       background: isDark ? '#1e293b' : '#fff',
       border: `1px solid ${isDark ? '#334155' : '#e2e8f0'}`,
       color: theme.palette.text.primary as string, borderRadius: 10, padding: "10px 14px",
-      fontSize: 12, boxShadow: "0 8px 24px rgba(0,0,0,.25)", minWidth: 160,
+      fontSize: '0.875rem', boxShadow: "0 8px 24px rgba(0,0,0,.25)", minWidth: 160,
     }}>
-      <p style={{ margin: "0 0 6px", fontWeight: 700, fontSize: 13 }}>{d.TIPO_TERRENO}</p>
+      <p style={{ margin: "0 0 6px", fontWeight: 700, fontSize: '0.875rem' }}>{d.TIPO_TERRENO}</p>
       <div style={{ display: "flex", justifyContent: "space-between", gap: 16, marginBottom: 3 }}>
         <span style={{ color: theme.palette.text.secondary as string }}>Neumáticos</span><span style={{ fontWeight: 600 }}>{d.QTY_NEUMATICOS_BAJA}</span>
       </div>
@@ -161,9 +161,9 @@ function MotivoTooltip({ active, payload }: { active?: boolean; payload?: { payl
       background: isDark ? '#1e293b' : '#fff',
       border: `1px solid ${isDark ? '#334155' : '#e2e8f0'}`,
       color: theme.palette.text.primary as string, borderRadius: 10, padding: "10px 14px",
-      fontSize: 12, boxShadow: "0 8px 24px rgba(0,0,0,.25)", minWidth: 160,
+      fontSize: '0.875rem', boxShadow: "0 8px 24px rgba(0,0,0,.25)", minWidth: 160,
     }}>
-      <p style={{ margin: "0 0 6px", fontWeight: 700, fontSize: 13 }}>{d.TIPO_BAJA}</p>
+      <p style={{ margin: "0 0 6px", fontWeight: 700, fontSize: '0.875rem' }}>{d.TIPO_BAJA}</p>
       <div style={{ display: "flex", justifyContent: "space-between", gap: 16, marginBottom: 3 }}>
         <span style={{ color: theme.palette.text.secondary as string }}>Neumáticos</span><span style={{ fontWeight: 600 }}>{d.QTY_NEUMATICOS_BAJA}</span>
       </div>
@@ -200,7 +200,7 @@ function DatePicker({ value, onChange, placeholder = "Seleccionar" }: DatePicker
             width: "100%", display: "flex", alignItems: "center", gap: 8,
             padding: "8px 12px", borderRadius: 8,
             border: `1.5px solid ${activo ? acento : (isDark ? '#334155' : '#e2e8f0')}`,
-            fontSize: 13, background: isDark ? '#1e293b' : '#fff', cursor: "pointer", textAlign: "left",
+            fontSize: '0.875rem', background: isDark ? '#1e293b' : '#fff', cursor: "pointer", textAlign: "left",
             color: activo ? theme.palette.text.primary : theme.palette.text.secondary, boxSizing: "border-box",
           }}
         >
@@ -317,11 +317,11 @@ export default function ReporteNeumaticoBaja() {
             }}>
               <BarChart2 size={18} color="#fff" strokeWidth={2.5} />
             </div>
-            <h1 style={{ fontSize: 22, fontWeight: 700, color: theme.palette.text.primary, margin: 0, letterSpacing: "-0.4px" }}>
+            <h1 style={{ fontSize: '1.375rem', fontWeight: 700, color: theme.palette.text.primary, margin: 0, letterSpacing: "-0.4px" }}>
               Reporte de neumáticos en baja
             </h1>
           </div>
-          <p style={{ fontSize: 13, color: theme.palette.text.secondary, margin: 0 }}>
+          <p style={{ fontSize: '0.875rem', color: theme.palette.text.secondary, margin: 0 }}>
             Análisis de rendimiento y costo por kilómetro (C.K) de neumáticos retirados del sistema.
           </p>
         </div>
@@ -334,10 +334,10 @@ export default function ReporteNeumaticoBaja() {
       }}
       >
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-          <span style={{ fontSize: 13, fontWeight: 600, color: theme.palette.text.primary }}>Filtros:</span>
+          <span style={{ fontSize: '0.875rem', fontWeight: 600, color: theme.palette.text.primary }}>Filtros:</span>
           {hayFiltrosActivos && (
             <button onClick={limpiarFiltros} style={{
-              fontSize: 12, color: "#ef4444", background: "none", border: "none",
+              fontSize: '0.875rem', color: "#ef4444", background: "none", border: "none",
               cursor: "pointer", fontWeight: 500,
             }}>
               Limpiar todo
@@ -346,7 +346,7 @@ export default function ReporteNeumaticoBaja() {
         </div>
 
         <div style={{ marginBottom: 14 }}>
-          <p style={{ fontSize: 11, fontWeight: 600, color: theme.palette.text.secondary, margin: "0 0 8px", textTransform: "uppercase", letterSpacing: ".05em" }}>
+          <p style={{ fontSize: '0.75rem', fontWeight: 600, color: theme.palette.text.secondary, margin: "0 0 8px", textTransform: "uppercase", letterSpacing: ".05em" }}>
             Taller(es)
           </p>
           <MultiSearchSelect
@@ -360,7 +360,7 @@ export default function ReporteNeumaticoBaja() {
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 12 }}>
           <div>
-            <p style={{ fontSize: 11, fontWeight: 600, color: theme.palette.text.secondary, margin: "0 0 5px", textTransform: "uppercase", letterSpacing: ".05em" }}>
+            <p style={{ fontSize: '0.75rem', fontWeight: 600, color: theme.palette.text.secondary, margin: "0 0 5px", textTransform: "uppercase", letterSpacing: ".05em" }}>
               Marca(s)
             </p>
             <MultiSearchSelect
@@ -372,7 +372,7 @@ export default function ReporteNeumaticoBaja() {
             />
           </div>
           <div>
-            <p style={{ fontSize: 11, fontWeight: 600, color: theme.palette.text.secondary, margin: "0 0 5px", textTransform: "uppercase", letterSpacing: ".05em" }}>
+            <p style={{ fontSize: '0.75rem', fontWeight: 600, color: theme.palette.text.secondary, margin: "0 0 5px", textTransform: "uppercase", letterSpacing: ".05em" }}>
               Diseño(s)
             </p>
             <MultiSearchSelect
@@ -384,11 +384,11 @@ export default function ReporteNeumaticoBaja() {
             />
           </div>
           <div>
-            <p style={{ fontSize: 11, fontWeight: 600, color: theme.palette.text.secondary, margin: "0 0 5px", textTransform: "uppercase", letterSpacing: ".05em" }}>Fecha desde</p>
+            <p style={{ fontSize: '0.75rem', fontWeight: 600, color: theme.palette.text.secondary, margin: "0 0 5px", textTransform: "uppercase", letterSpacing: ".05em" }}>Fecha desde</p>
             <DatePicker value={fechaInicio} onChange={setFechaInicio} placeholder="Todas" />
           </div>
           <div>
-            <p style={{ fontSize: 11, fontWeight: 600, color: theme.palette.text.secondary, margin: "0 0 5px", textTransform: "uppercase", letterSpacing: ".05em" }}>Fecha hasta</p>
+            <p style={{ fontSize: '0.75rem', fontWeight: 600, color: theme.palette.text.secondary, margin: "0 0 5px", textTransform: "uppercase", letterSpacing: ".05em" }}>Fecha hasta</p>
             <DatePicker value={fechaFin} onChange={setFechaFin} placeholder="Todas" />
           </div>
         </div>
@@ -409,8 +409,8 @@ export default function ReporteNeumaticoBaja() {
           {/* Header + stats */}
           <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: 16, marginBottom: 18 }}>
             <div>
-              <p style={{ fontSize: 15, fontWeight: 700, color: theme.palette.text.primary, margin: 0 }}>Distribución vehicular</p>
-              <p style={{ fontSize: 12, color: theme.palette.text.secondary, margin: "2px 0 0" }}>Vehículos con neumáticos dados de baja según terreno de operación</p>
+              <p style={{ fontSize: '1rem', fontWeight: 700, color: theme.palette.text.primary, margin: 0 }}>Distribución vehicular</p>
+              <p style={{ fontSize: '0.875rem', color: theme.palette.text.secondary, margin: "2px 0 0" }}>Vehículos con neumáticos dados de baja según terreno de operación</p>
             </div>
 
             <div className="flex flex-wrap gap-2.5">
@@ -475,10 +475,10 @@ export default function ReporteNeumaticoBaja() {
                       pointerEvents: 'none',
                       zIndex: 0.2
                     }}>
-                      <div style={{ fontSize: 34, fontWeight: 700, color: theme.palette.text.primary, lineHeight: 1 }}>
+                      <div style={{ fontSize: '2.125rem', fontWeight: 700, color: theme.palette.text.primary, lineHeight: 1 }}>
                         {TOTAL}
                       </div>
-                      <div style={{ fontSize: 11, color: theme.palette.text.secondary, marginTop: 4, letterSpacing: '0.05em' }}>
+                      <div style={{ fontSize: '0.75rem', color: theme.palette.text.secondary, marginTop: 4, letterSpacing: '0.05em' }}>
                         TOTAL
                       </div>
                     </div>
@@ -491,14 +491,14 @@ export default function ReporteNeumaticoBaja() {
                       return (
                         <div key={item.name} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                           <div style={{ width: 10, height: 10, borderRadius: 2, background: PALETA_DONUT_TERRENO[i % PALETA_DONUT_TERRENO.length], flexShrink: 0 }} />
-                          <span style={{ flex: 1, fontSize: 13, color: theme.palette.text.primary }}>
+                          <span style={{ flex: 1, fontSize: '0.875rem', color: theme.palette.text.primary }}>
                             {item.name}
                           </span>
-                          <span style={{ fontSize: 14, fontWeight: 700, color: theme.palette.text.primary }}>
+                          <span style={{ fontSize: '1rem', fontWeight: 700, color: theme.palette.text.primary }}>
                             {item.value}
                           </span>
                           <span style={{
-                            fontSize: 11,
+                            fontSize: '0.75rem',
                             color: theme.palette.text.secondary,
                             minWidth: 40,
                             textAlign: 'right',
@@ -527,8 +527,8 @@ export default function ReporteNeumaticoBaja() {
           {/* Header + stats */}
           <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: 16, marginBottom: 18 }}>
             <div>
-              <p style={{ fontSize: 15, fontWeight: 700, color: theme.palette.text.primary, margin: 0 }}>Distribución por tipo de terreno</p>
-              <p style={{ fontSize: 12, color: theme.palette.text.secondary, margin: "2px 0 0" }}>Neumáticos dados de baja según terreno de operación</p>
+              <p style={{ fontSize: '1rem', fontWeight: 700, color: theme.palette.text.primary, margin: 0 }}>Distribución por tipo de terreno</p>
+              <p style={{ fontSize: '0.875rem', color: theme.palette.text.secondary, margin: "2px 0 0" }}>Neumáticos dados de baja según terreno de operación</p>
             </div>
 
             <div className="flex flex-wrap gap-2.5">
@@ -564,13 +564,13 @@ export default function ReporteNeumaticoBaja() {
                         <CartesianGrid vertical={false} stroke="#f1f5f9" />
                         <XAxis
                           dataKey="TIPO_TERRENO"
-                          tick={{ fontSize: 12, fill: theme.palette.text.secondary as string, fontWeight: 600 }}
+                          tick={{ fontSize: '0.875rem', fill: theme.palette.text.secondary as string, fontWeight: 600 }}
                           axisLine={{ stroke: "#e2e8f0" }}
                           tickLine={false}
                         />
                         <YAxis
                           dataKey="KM_PROMEDIO"
-                          tick={{ fontSize: 11, fill: theme.palette.text.secondary as string }}
+                          tick={{ fontSize: '0.75rem', fill: theme.palette.text.secondary as string }}
                           axisLine={false}
                           tickLine={false}
                           allowDecimals={false}
@@ -590,7 +590,7 @@ export default function ReporteNeumaticoBaja() {
                           <LabelList
                             dataKey="KM_PROMEDIO"
                             position="top"
-                            style={{ fontSize: 13, fontWeight: 700, fill: theme.palette.text.primary as string }}
+                            style={{ fontSize: '0.875rem', fontWeight: 700, fill: theme.palette.text.primary as string }}
                           />
                         </Bar>
                       </BarChart>
@@ -614,8 +614,8 @@ export default function ReporteNeumaticoBaja() {
         {/* Header + stats */}
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: 16, marginBottom: 18 }}>
           <div>
-            <p style={{ fontSize: 15, fontWeight: 700, color: theme.palette.text.primary, margin: 0 }}>Distribución por motivo de baja</p>
-            <p style={{ fontSize: 12, color: theme.palette.text.secondary, margin: "2px 0 0" }}>Neumáticos dados de baja según motivo</p>
+            <p style={{ fontSize: '1rem', fontWeight: 700, color: theme.palette.text.primary, margin: 0 }}>Distribución por motivo de baja</p>
+            <p style={{ fontSize: '0.875rem', color: theme.palette.text.secondary, margin: "2px 0 0" }}>Neumáticos dados de baja según motivo</p>
           </div>
           <div className="flex flex-wrap gap-2.5">
             {(() => {
@@ -648,13 +648,13 @@ export default function ReporteNeumaticoBaja() {
                     <CartesianGrid vertical={false} stroke="#f1f5f9" />
                     <XAxis
                       dataKey="TIPO_BAJA"
-                      tick={{ fontSize: 12, fill: theme.palette.text.secondary as string, fontWeight: 600 }}
+                      tick={{ fontSize: '0.875rem', fill: theme.palette.text.secondary as string, fontWeight: 600 }}
                       axisLine={{ stroke: "#e2e8f0" }}
                       tickLine={false}
                     />
                     <YAxis
                       dataKey="KM_PROMEDIO"
-                      tick={{ fontSize: 11, fill: theme.palette.text.secondary as string }}
+                      tick={{ fontSize: '0.75rem', fill: theme.palette.text.secondary as string }}
                       axisLine={false}
                       tickLine={false}
                       allowDecimals={false}
@@ -676,7 +676,7 @@ export default function ReporteNeumaticoBaja() {
                       <LabelList
                         dataKey="KM_PROMEDIO"
                         position="top"
-                        style={{ fontSize: 13, fontWeight: 700, fill: theme.palette.text.primary as string }}
+                        style={{ fontSize: '0.875rem', fontWeight: 700, fill: theme.palette.text.primary as string }}
                       />
                     </Bar>
                   </BarChart>

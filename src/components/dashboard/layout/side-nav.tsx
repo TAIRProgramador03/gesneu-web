@@ -380,7 +380,7 @@ function NavItem({
               <Typography
                 component="span"
                 sx={{
-                  color: 'inherit', fontSize: '16px', fontWeight: 500, lineHeight: '28px'
+                  color: 'inherit', fontSize: '1rem', fontWeight: 500, lineHeight: '28px'
                 }}
               >
                 {title}

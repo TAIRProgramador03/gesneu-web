@@ -58,11 +58,11 @@ function TallerTooltip({ active, payload }: any) {
       boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
       fontFamily: 'inherit',
     }}>
-      <div style={{ fontWeight: 700, fontSize: 13, color: isDark ? '#f1f5f9' : '#1e293b', marginBottom: 4 }}>
+      <div style={{ fontWeight: 700, fontSize: '0.875rem', color: isDark ? '#f1f5f9' : '#1e293b', marginBottom: 4 }}>
         {taller}
       </div>
-      <div style={{ fontSize: 14, fontWeight: 700, color: BAR_COLOR }}>{formatFull(costo)}</div>
-      <div style={{ fontSize: 11, color: isDark ? '#94a3b8' : '#64748b', marginTop: 2 }}>
+      <div style={{ fontSize: '1rem', fontWeight: 700, color: BAR_COLOR }}>{formatFull(costo)}</div>
+      <div style={{ fontSize: '0.75rem', color: isDark ? '#94a3b8' : '#64748b', marginTop: 2 }}>
         {pct}% del costo total
       </div>
     </div>
@@ -78,13 +78,13 @@ export function CostoPorTaller({ sx }: CostoPorTallerProps): React.JSX.Element {
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 16 }}>
           <div>
             <h3 className="font-semibold text-xl mb-1">Costo por Taller</h3>
-            <p style={{ fontSize: 13, color: theme.palette.text.secondary, margin: 0 }}>
+            <p style={{ fontSize: '0.875rem', color: theme.palette.text.secondary, margin: 0 }}>
               Capital inmovilizado en neumáticos asignados
             </p>
           </div>
           <div style={{ textAlign: 'right' }}>
-            <div style={{ fontSize: 11, color: theme.palette.text.secondary }}>Total</div>
-            <div style={{ fontSize: 16, fontWeight: 700, color: theme.palette.text.primary }}>
+            <div style={{ fontSize: '0.75rem', color: theme.palette.text.secondary }}>Total</div>
+            <div style={{ fontSize: '1rem', fontWeight: 700, color: theme.palette.text.primary }}>
               {formatFull(TOTAL_COSTO)}
             </div>
           </div>
@@ -99,7 +99,7 @@ export function CostoPorTaller({ sx }: CostoPorTallerProps): React.JSX.Element {
           >
             <XAxis
               type="number"
-              tick={{ fontSize: 10, fill: theme.palette.text.secondary as string }}
+              tick={{ fontSize: '0.75rem', fill: theme.palette.text.secondary as string }}
               axisLine={false}
               tickLine={false}
               tickFormatter={formatShort}
@@ -108,7 +108,7 @@ export function CostoPorTaller({ sx }: CostoPorTallerProps): React.JSX.Element {
               type="category"
               dataKey="taller"
               width={88}
-              tick={{ fontSize: 12, fill: theme.palette.text.primary as string, fontWeight: 600 }}
+              tick={{ fontSize: '0.875rem', fill: theme.palette.text.primary as string, fontWeight: 600 }}
               axisLine={false}
               tickLine={false}
             />
@@ -126,7 +126,7 @@ export function CostoPorTaller({ sx }: CostoPorTallerProps): React.JSX.Element {
                 position="right"
                 formatter={formatShort}
                 style={{
-                  fontSize: 12,
+                  fontSize: '0.875rem',
                   fontWeight: 700,
                   fill: theme.palette.text.primary as string,
                 }}

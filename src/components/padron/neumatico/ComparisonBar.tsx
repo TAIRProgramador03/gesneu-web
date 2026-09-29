@@ -21,7 +21,7 @@ export const ComparisonBar = ({ neu }: { neu: NeumaticoBuscado }) => {
         if (item.value === 0) return null
         return ((
           <div key={item.label} className="flex items-center gap-3">
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-gray-400 w-16 shrink-0 text-right">
+            <span className="text-xs font-semibold uppercase tracking-wider text-gray-400 w-16 shrink-0 text-right">
               {item.label}
             </span>
             <div className="flex-1 relative">

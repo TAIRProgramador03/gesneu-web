@@ -31,7 +31,7 @@ const DatoResumen: React.FC<{ icono: React.ReactNode; label: string; valor: Reac
       {icono}
     </span>
     <div className="min-w-0">
-      <p className="text-[10px] font-bold uppercase tracking-wide text-blue-400">{label}</p>
+      <p className="text-xs font-bold uppercase tracking-wide text-blue-400">{label}</p>
       <p className="truncate text-sm font-bold text-slate-800">{valor}</p>
     </div>
   </div>
@@ -40,13 +40,13 @@ const DatoResumen: React.FC<{ icono: React.ReactNode; label: string; valor: Reac
 /** Medida individual dentro de la tarjeta de un neumático. */
 const Medida: React.FC<{ icono: React.ReactNode; label: string; valor: React.ReactNode; unidad: string }> = ({ icono, label, valor, unidad }) => (
   <div className="rounded-lg border border-slate-200/70 bg-white px-2.5 py-1.5">
-    <p className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide text-slate-400">
+    <p className="flex items-center gap-1 text-xs font-bold uppercase tracking-wide text-slate-400">
       {icono}
       {label}
     </p>
     <p className="mt-0.5 text-sm font-bold text-slate-700">
       {valor ?? '—'}
-      <span className="ml-0.5 text-[10px] font-semibold text-slate-400">{unidad}</span>
+      <span className="ml-0.5 text-xs font-semibold text-slate-400">{unidad}</span>
     </p>
   </div>
 );
@@ -80,7 +80,7 @@ export const ModalInformacionAsignacion = ({ open, kilometraje, neumaticos = [],
           <ShieldCheck size={20} className="text-blue-600" />
         </Box>
         <Box sx={{ flex: 1, minWidth: 0 }}>
-          <Typography variant="h6" fontWeight={700} lineHeight={1.2} sx={{ fontSize: { xs: 16, md: 20 } }}>
+          <Typography variant="h6" fontWeight={700} lineHeight={1.2} sx={{ fontSize: { xs: '1rem', md: '1.25rem' } }}>
             Reconfirmar Asignación
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.4, flexWrap: 'wrap' }}>
@@ -88,10 +88,10 @@ export const ModalInformacionAsignacion = ({ open, kilometraje, neumaticos = [],
             <Chip
               label={placa}
               size="small"
-              sx={{ fontWeight: 700, fontSize: 12, bgcolor: '#f1f5f9', color: '#334155', letterSpacing: 0.5 }}
+              sx={{ fontWeight: 700, fontSize: '0.875rem', bgcolor: '#f1f5f9', color: '#334155', letterSpacing: 0.5 }}
             />
           </Box>
-          <Typography variant="caption" className='text-amber-600' sx={{ display: 'block', mt: 1, fontStyle: 'italic', fontSize: { xs: 10.5, md: 12 }, lineHeight: 1.35 }}>
+          <Typography variant="caption" className='text-amber-600' sx={{ display: 'block', mt: 1, fontStyle: 'italic', fontSize: { xs: '0.75rem', md: '0.875rem' }, lineHeight: 1.35 }}>
             <span className='font-bold'>Nota: </span>
             Revisa que los datos sean correctos. Al pulsar <b>Registrar Asignación</b> se guardarán definitivamente.
           </Typography>
@@ -148,7 +148,7 @@ export const ModalInformacionAsignacion = ({ open, kilometraje, neumaticos = [],
                   <span className="absolute inset-y-0 left-0 w-1.5 bg-linear-to-b from-violet-300 to-violet-500" />
 
                   <div className="flex items-center gap-2.5">
-                    <span className="shrink-0 rounded-md bg-violet-600 px-2 py-1 font-mono text-[11px] font-extrabold text-white">
+                    <span className="shrink-0 rounded-md bg-violet-600 px-2 py-1 font-mono text-xs font-extrabold text-white">
                       {neu.Posicion}
                     </span>
                     <div className="min-w-0 flex-1">
@@ -156,7 +156,7 @@ export const ModalInformacionAsignacion = ({ open, kilometraje, neumaticos = [],
                       <p className="truncate text-xs text-slate-500">{neu.Marca || '—'}</p>
                     </div>
                     {esRepuesto && (
-                      <span className="shrink-0 rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-[10px] font-bold text-amber-700">
+                      <span className="shrink-0 rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-xs font-bold text-amber-700">
                         REPUESTO
                       </span>
                     )}

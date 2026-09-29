@@ -36,7 +36,7 @@ function NeumaticoCard({ neu }: { neu: NeumaticoInstalado }) {
       )}
     >
       <div className="flex items-start justify-between gap-2 mb-2">
-        <span className="text-[13px] font-bold uppercase tracking-widest text-cyan-700 leading-tight">
+        <span className="text-sm font-bold uppercase tracking-widest text-cyan-700 leading-tight">
           {neu.POSICION_NEU}
         </span>
         <span className={cn('text-xs font-bold', vidaColor(pct))}>
@@ -46,11 +46,11 @@ function NeumaticoCard({ neu }: { neu: NeumaticoInstalado }) {
       <p className="text-sm font-bold text-gray-800 group-hover:text-sky-700 transition-colors">
         {neu.CODIGO_NEU}
       </p>
-      <p className="text-[11px] text-gray-400 mt-0.5">
+      <p className="text-xs text-gray-400 mt-0.5">
         {neu.MARCA} · {neu.MEDIDA} · {neu.DISENO}
       </p>
       <div className="flex items-center justify-between mt-2">
-        <span className="text-[11px] text-gray-500">
+        <span className="text-xs text-gray-500">
           Rem. <span className="font-semibold text-gray-700">{neu.REMANENTE} mm</span>
         </span>
       </div>

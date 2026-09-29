@@ -123,7 +123,7 @@ const TarjetaNeumaticoInspeccion: React.FC<{ neumatico: NeuInspeccionTable }> = 
         onClick={() => hayObs && setAbierto(!abierto)}
         className={`flex w-full items-center gap-3 py-2.5 pl-5 pr-3 text-left ${hayObs ? 'hover:bg-slate-50/50' : 'cursor-default'}`}
       >
-        <span className={`shrink-0 rounded-lg border px-2.5 py-1 font-mono text-[11px] font-extrabold ${acento.chip}`}>
+        <span className={`shrink-0 rounded-lg border px-2.5 py-1 font-mono text-xs font-extrabold ${acento.chip}`}>
           {neumatico.POSICION || '—'}
         </span>
 
@@ -136,18 +136,18 @@ const TarjetaNeumaticoInspeccion: React.FC<{ neumatico: NeuInspeccionTable }> = 
         </span>
 
         <span className="shrink-0 text-center">
-          <span className={`block text-[15px] font-extrabold leading-none ${acento.texto}`}>
+          <span className={`block text-base font-extrabold leading-none ${acento.texto}`}>
             {neumatico.REMANENTE ?? '—'}
-            <span className="ml-0.5 text-[10px] font-bold">mm</span>
+            <span className="ml-0.5 text-xs font-bold">mm</span>
           </span>
-          <span className="mt-0.5 block text-[10px] uppercase tracking-wide text-slate-400">remanente</span>
+          <span className="mt-0.5 block text-xs uppercase tracking-wide text-slate-400">remanente</span>
         </span>
 
         <span className="hidden w-20 shrink-0 sm:block">
           <span className="block h-1.5 overflow-hidden rounded-full bg-slate-200">
             <span className={`block h-full rounded-full ${acento.barra}`} style={{ width: `${Math.min(100, Math.max(0, vida))}%` }} />
           </span>
-          <span className={`mt-1 block text-[10px] font-bold ${acento.texto}`}>{vida}% vida</span>
+          <span className={`mt-1 block text-xs font-bold ${acento.texto}`}>{vida}% vida</span>
         </span>
 
         {hayObs ? (
@@ -165,8 +165,8 @@ const TarjetaNeumaticoInspeccion: React.FC<{ neumatico: NeuInspeccionTable }> = 
             <div className="flex items-start gap-2 border-t border-slate-200 bg-slate-100/70 px-4 py-3 pl-5">
               <StickyNote className="mt-0.5 h-3.5 w-3.5 shrink-0 text-slate-400" />
               <div className="min-w-0">
-                <p className="text-[10px] font-bold uppercase tracking-wide text-slate-400">Observación</p>
-                <p className="mt-0.5 text-[13px] text-slate-700">{neumatico.OBS}</p>
+                <p className="text-xs font-bold uppercase tracking-wide text-slate-400">Observación</p>
+                <p className="mt-0.5 text-sm text-slate-700">{neumatico.OBS}</p>
               </div>
             </div>
           </div>
@@ -266,7 +266,7 @@ export const ModalVerInspecciones = ({ open, onClose, placa }: ModalVerInspeccio
             size="small"
             color="primary"
             variant="outlined"
-            sx={{ fontWeight: 600, fontSize: 11 }}
+            sx={{ fontWeight: 600, fontSize: '0.75rem' }}
           />
         )}
       </Box>
@@ -344,7 +344,7 @@ export const ModalVerInspecciones = ({ open, onClose, placa }: ModalVerInspeccio
           <ClipboardList size={20} className="text-blue-600" />
         </Box>
         <Box sx={{ flex: 1, minWidth: 0 }}>
-          <Typography variant="h6" fontWeight={700} lineHeight={1.2} sx={{ fontSize: { xs: 16, md: 20 } }}>
+          <Typography variant="h6" fontWeight={700} lineHeight={1.2} sx={{ fontSize: { xs: '1rem', md: '1.25rem' } }}>
             Historial de Inspecciones
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.4, flexWrap: 'wrap' }}>
@@ -352,13 +352,13 @@ export const ModalVerInspecciones = ({ open, onClose, placa }: ModalVerInspeccio
             <Chip
               label={placa}
               size="small"
-              sx={{ fontWeight: 700, fontSize: 12, bgcolor: '#f1f5f9', color: '#334155', letterSpacing: 0.5 }}
+              sx={{ fontWeight: 700, fontSize: '0.875rem', bgcolor: '#f1f5f9', color: '#334155', letterSpacing: 0.5 }}
             />
             {!loadingInspecciones && (
               <Chip
                 label={`${inspeccionesPorPlaca.length} inspección${inspeccionesPorPlaca.length !== 1 ? 'es' : ''}`}
                 size="small"
-                sx={{ fontWeight: 500, fontSize: 11, bgcolor: '#eff6ff', color: '#2563eb' }}
+                sx={{ fontWeight: 500, fontSize: '0.75rem', bgcolor: '#eff6ff', color: '#2563eb' }}
               />
             )}
           </Box>

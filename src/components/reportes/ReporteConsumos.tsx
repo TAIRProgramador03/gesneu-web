@@ -66,7 +66,7 @@ function StatPill({ label, value, accent, muted }: StatPillProps) {
     >
       <span className="w-1 rounded-full" style={{ background: accent }} />
       <div className="flex flex-col justify-center">
-        <span className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: isDark ? '#64748b' : '#94a3b8' }}>{label}</span>
+        <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: isDark ? '#64748b' : '#94a3b8' }}>{label}</span>
         <span className="text-xl font-extrabold leading-tight tabular-nums" style={{ color: muted ? theme.palette.text.primary : accent }}>
           {value}
         </span>
@@ -85,9 +85,9 @@ function DespachoTooltip({ active, payload }: { active?: boolean; payload?: { pa
       background: isDark ? '#1e293b' : '#fff',
       border: `1px solid ${isDark ? '#334155' : '#e2e8f0'}`,
       color: theme.palette.text.primary as string, borderRadius: 10, padding: "10px 14px",
-      fontSize: 12, boxShadow: "0 8px 24px rgba(0,0,0,.25)", minWidth: 160,
+      fontSize: '0.875rem', boxShadow: "0 8px 24px rgba(0,0,0,.25)", minWidth: 160,
     }}>
-      <p style={{ margin: "0 0 6px", fontWeight: 700, fontSize: 13 }}>{d.TALLER}</p>
+      <p style={{ margin: "0 0 6px", fontWeight: 700, fontSize: '0.875rem' }}>{d.TALLER}</p>
       <div style={{ display: "flex", justifyContent: "space-between", gap: 16, marginBottom: 3 }}>
         <span style={{ color: theme.palette.text.secondary as string }}>Neumáticos</span><span style={{ fontWeight: 600 }}>{d.QTY_NEUMATICOS_DESPACHADOS}</span>
       </div>
@@ -122,7 +122,7 @@ function DatePicker({ value, onChange, placeholder = "Seleccionar" }: DatePicker
             width: "100%", display: "flex", alignItems: "center", gap: 8,
             padding: "8px 12px", borderRadius: 8,
             border: `1.5px solid ${activo ? acento : (isDark ? '#334155' : '#e2e8f0')}`,
-            fontSize: 13, background: isDark ? '#1e293b' : '#fff', cursor: "pointer", textAlign: "left",
+            fontSize: '0.875rem', background: isDark ? '#1e293b' : '#fff', cursor: "pointer", textAlign: "left",
             color: activo ? theme.palette.text.primary : theme.palette.text.secondary, boxSizing: "border-box",
           }}
         >
@@ -217,11 +217,11 @@ export default function ReporteConsumos() {
             }}>
               <PackageSearch size={18} color="#fff" strokeWidth={2.5} />
             </div>
-            <h1 style={{ fontSize: 22, fontWeight: 700, color: theme.palette.text.primary, margin: 0, letterSpacing: "-0.4px" }}>
+            <h1 style={{ fontSize: '1.375rem', fontWeight: 700, color: theme.palette.text.primary, margin: 0, letterSpacing: "-0.4px" }}>
               Análisis por consumos
             </h1>
           </div>
-          <p style={{ fontSize: 13, color: theme.palette.text.secondary, margin: 0 }}>
+          <p style={{ fontSize: '0.875rem', color: theme.palette.text.secondary, margin: 0 }}>
             Análisis por consumos de neumáticos que se generan a través del SIALOG.
           </p>
         </div>
@@ -234,10 +234,10 @@ export default function ReporteConsumos() {
       }}
       >
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-          <span style={{ fontSize: 13, fontWeight: 600, color: theme.palette.text.primary }}>Filtros:</span>
+          <span style={{ fontSize: '0.875rem', fontWeight: 600, color: theme.palette.text.primary }}>Filtros:</span>
           {hayFiltrosActivos && (
             <button onClick={limpiarFiltros} style={{
-              fontSize: 12, color: "#0c87da", background: "none", border: "none",
+              fontSize: '0.875rem', color: "#0c87da", background: "none", border: "none",
               cursor: "pointer", fontWeight: 500,
             }}>
               Limpiar todo
@@ -246,7 +246,7 @@ export default function ReporteConsumos() {
         </div>
 
         <div style={{ marginBottom: 14 }}>
-          <p style={{ fontSize: 11, fontWeight: 600, color: theme.palette.text.secondary, margin: "0 0 8px", textTransform: "uppercase", letterSpacing: ".05em" }}>
+          <p style={{ fontSize: '0.75rem', fontWeight: 600, color: theme.palette.text.secondary, margin: "0 0 8px", textTransform: "uppercase", letterSpacing: ".05em" }}>
             Taller(es)
           </p>
           <MultiSearchSelect
@@ -260,7 +260,7 @@ export default function ReporteConsumos() {
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 12 }}>
           <div>
-            <p style={{ fontSize: 11, fontWeight: 600, color: theme.palette.text.secondary, margin: "0 0 5px", textTransform: "uppercase", letterSpacing: ".05em" }}>
+            <p style={{ fontSize: '0.75rem', fontWeight: 600, color: theme.palette.text.secondary, margin: "0 0 5px", textTransform: "uppercase", letterSpacing: ".05em" }}>
               Marca(s)
             </p>
             <MultiSearchSelect
@@ -272,7 +272,7 @@ export default function ReporteConsumos() {
             />
           </div>
           <div>
-            <p style={{ fontSize: 11, fontWeight: 600, color: theme.palette.text.secondary, margin: "0 0 5px", textTransform: "uppercase", letterSpacing: ".05em" }}>
+            <p style={{ fontSize: '0.75rem', fontWeight: 600, color: theme.palette.text.secondary, margin: "0 0 5px", textTransform: "uppercase", letterSpacing: ".05em" }}>
               Diseño(s)
             </p>
             <MultiSearchSelect
@@ -284,11 +284,11 @@ export default function ReporteConsumos() {
             />
           </div>
           <div>
-            <p style={{ fontSize: 11, fontWeight: 600, color: theme.palette.text.secondary, margin: "0 0 5px", textTransform: "uppercase", letterSpacing: ".05em" }}>Fecha desde</p>
+            <p style={{ fontSize: '0.75rem', fontWeight: 600, color: theme.palette.text.secondary, margin: "0 0 5px", textTransform: "uppercase", letterSpacing: ".05em" }}>Fecha desde</p>
             <DatePicker value={fechaInicio} onChange={setFechaInicio} placeholder="Todas" />
           </div>
           <div>
-            <p style={{ fontSize: 11, fontWeight: 600, color: theme.palette.text.secondary, margin: "0 0 5px", textTransform: "uppercase", letterSpacing: ".05em" }}>Fecha hasta</p>
+            <p style={{ fontSize: '0.75rem', fontWeight: 600, color: theme.palette.text.secondary, margin: "0 0 5px", textTransform: "uppercase", letterSpacing: ".05em" }}>Fecha hasta</p>
             <DatePicker value={fechaFin} onChange={setFechaFin} placeholder="Todas" />
           </div>
         </div>
@@ -306,8 +306,8 @@ export default function ReporteConsumos() {
         {/* Header + stats */}
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: 16, marginBottom: 18 }}>
           <div>
-            <p style={{ fontSize: 15, fontWeight: 700, color: theme.palette.text.primary, margin: 0 }}>Consumos de neumáticos</p>
-            <p style={{ fontSize: 12, color: theme.palette.text.secondary, margin: "2px 0 0" }}>Entradas de neumático según taller</p>
+            <p style={{ fontSize: '1rem', fontWeight: 700, color: theme.palette.text.primary, margin: 0 }}>Consumos de neumáticos</p>
+            <p style={{ fontSize: '0.875rem', color: theme.palette.text.secondary, margin: "2px 0 0" }}>Entradas de neumático según taller</p>
           </div>
           <div className="flex flex-wrap gap-2.5">
             {(() => {
@@ -347,7 +347,7 @@ export default function ReporteConsumos() {
                     <CartesianGrid horizontal={false} stroke="#f1f5f9" />
                     <XAxis
                       type="number"
-                      tick={{ fontSize: 11, fill: theme.palette.text.secondary as string }}
+                      tick={{ fontSize: '0.75rem', fill: theme.palette.text.secondary as string }}
                       axisLine={false}
                       tickLine={false}
                       allowDecimals={false}
@@ -355,7 +355,7 @@ export default function ReporteConsumos() {
                     <YAxis
                       dataKey="TALLER"
                       type="category"
-                      tick={{ fontSize: 12, fill: theme.palette.text.secondary as string, fontWeight: 600 }}
+                      tick={{ fontSize: '0.875rem', fill: theme.palette.text.secondary as string, fontWeight: 600 }}
                       axisLine={{ stroke: "#e2e8f0" }}
                       tickLine={false}
                       width={110}
@@ -377,7 +377,7 @@ export default function ReporteConsumos() {
                       <LabelList
                         dataKey="QTY_NEUMATICOS_DESPACHADOS"
                         position="right"
-                        style={{ fontSize: 13, fontWeight: 700, fill: theme.palette.text.primary as string }}
+                        style={{ fontSize: '0.875rem', fontWeight: 700, fill: theme.palette.text.primary as string }}
                       />
                     </Bar>
                   </BarChart>

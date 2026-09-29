@@ -857,7 +857,7 @@ export default function Page(): React.JSX.Element {
                 <Chip
                   label={`${neumaticosAsignadosUnicos.length} ${neumaticosAsignadosUnicos.length === 1 ? 'unidad' : 'unidades'}`}
                   size="small"
-                  sx={{ background: '#eff6ff', color: '#1d4ed8', fontWeight: 700, fontSize: 11 }}
+                  sx={{ background: '#eff6ff', color: '#1d4ed8', fontWeight: 700, fontSize: '0.75rem' }}
                 />
               </Stack>
 

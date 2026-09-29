@@ -15,10 +15,10 @@ export default function Page(): React.JSX.Element {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
       {/* Header */}
       <div>
-        <h2 style={{ fontSize: 24, fontWeight: 800, margin: 0, marginBottom: 4, color: '#1e293b' }}>
+        <h2 style={{ fontSize: '1.5rem', fontWeight: 800, margin: 0, marginBottom: 4, color: '#1e293b' }}>
           Mapa de Talleres
         </h2>
-        <p style={{ margin: 0, fontSize: 14, color: '#64748b' }}>
+        <p style={{ margin: 0, fontSize: '1rem', color: '#64748b' }}>
           Distribución geográfica de la flota por taller
         </p>
       </div>

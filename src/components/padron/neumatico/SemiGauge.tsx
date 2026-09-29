@@ -39,7 +39,7 @@ export const SemiGauge = ({ pct }: { pct: number }) => {
           {pct}<span className="text-lg">%</span>
         </span>
         <div className={cn(
-          "inline-flex items-center gap-1.5 rounded-full px-3 py-0.5 text-[10px] font-semibold mt-1.5",
+          "inline-flex items-center gap-1.5 rounded-full px-3 py-0.5 text-xs font-semibold mt-1.5",
           pct < 39 ? "bg-red-50 text-red-700" :
             pct < 79 ? "bg-yellow-50 text-yellow-700" :
               "bg-teal-50 text-teal-700"

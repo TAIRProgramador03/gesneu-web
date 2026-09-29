@@ -54,7 +54,7 @@ function DetailChip({ icon, label, value }: { icon: React.ReactNode; label: stri
     <div className="flex items-center gap-2 rounded-lg bg-gray-50 px-3 py-2">
       <span className="text-gray-400 shrink-0">{icon}</span>
       <div className="min-w-0">
-        <p className="text-[10px] uppercase tracking-wider text-gray-400 leading-none">{label}</p>
+        <p className="text-xs uppercase tracking-wider text-gray-400 leading-none">{label}</p>
         <p className="text-xs font-semibold text-gray-800 truncate">{value}</p>
       </div>
     </div>
@@ -134,13 +134,13 @@ export const TimelineEventCard = ({ mov, isLast }: { mov: MovimientoHistorial; i
               <div className="flex items-center gap-3 shrink-0">
                 {/* Quick preview chips — tinted per type */}
                 {!expanded && mov.PLACA_VEHICULO && (
-                  <span className={cn("hidden sm:inline-flex items-center gap-1 text-[10px] rounded-full px-2 py-0.5", accent.chip)}>
+                  <span className={cn("hidden sm:inline-flex items-center gap-1 text-xs rounded-full px-2 py-0.5", accent.chip)}>
                     <Truck className="size-3" />
                     {mov.PLACA_VEHICULO}
                   </span>
                 )}
                 {!expanded && mov.REMANENTE_MEDIDO_MM !== null && (
-                  <span className={cn("hidden sm:inline-flex items-center gap-1 text-[10px] rounded-full px-2 py-0.5", accent.chip)}>
+                  <span className={cn("hidden sm:inline-flex items-center gap-1 text-xs rounded-full px-2 py-0.5", accent.chip)}>
                     <Gauge className="size-3" />
                     {mov.REMANENTE_MEDIDO_MM} mm
                   </span>
@@ -193,7 +193,7 @@ export const TimelineEventCard = ({ mov, isLast }: { mov: MovimientoHistorial; i
                 </div>
                 {mov.OBSERVACION && (
                   <div className="mt-3 rounded-lg bg-amber-50/60 border border-amber-100 px-3 py-2">
-                    <p className="text-[10px] uppercase tracking-wider text-amber-500 font-semibold mb-0.5">Observación</p>
+                    <p className="text-xs uppercase tracking-wider text-amber-500 font-semibold mb-0.5">Observación</p>
                     <p className="text-xs text-amber-800">{mov.OBSERVACION}</p>
                   </div>
                 )}

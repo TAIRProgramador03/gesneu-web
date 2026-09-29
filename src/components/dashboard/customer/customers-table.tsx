@@ -151,7 +151,7 @@ export const CustomersTable = memo(({ count = 0, rows = [], page = 0, rowsPerPag
                                 justifyContent: 'center',
                                 color: `${row.ESTADO < 79 && row.ESTADO > 39 ? '#000' : (row.ESTADO <= 39) ? '#000' : '#fff'}`,
                                 fontWeight: 'bold',
-                                fontSize: 13,
+                                fontSize: '0.875rem',
                                 letterSpacing: 0.5,
                                 textShadow: '0 1px 2px rgba(255,255,255,0.15)'
                               }}

@@ -68,10 +68,10 @@ const ModalConfirmarInspeccion: React.FC<ModalConfirmarInspeccionProps> = memo((
                         <Typography variant="h5" fontWeight="bold" color={colorTitulo} sx={{ mb: 1 }}>
                             {titulo}
                         </Typography>
-                        <Typography sx={{ fontSize: 16, color: '#222', mb: 1 }}>
+                        <Typography sx={{ fontSize: '1rem', color: '#222', mb: 1 }}>
                             {mensaje}
                         </Typography>
-                        <Typography sx={{ fontSize: 15, color: '#1976d2', mb: 1 }}>
+                        <Typography sx={{ fontSize: '1rem', color: '#1976d2', mb: 1 }}>
                             Acción: Reubicar neumático
                         </Typography>
                     </Box>
@@ -87,7 +87,7 @@ const ModalConfirmarInspeccion: React.FC<ModalConfirmarInspeccionProps> = memo((
                     onClick={onClose}
                     variant="outlined"
                     size="large"
-                    sx={{ fontWeight: 'bold', color: '#1976d2', borderColor: '#1976d2', borderRadius: 1.5, px: 3, py: 1.2, fontSize: 16, textTransform: 'none', transition: 'all 0.2s', '&:hover': { backgroundColor: '#1976d2', color: '#fff' } }}
+                    sx={{ fontWeight: 'bold', color: '#1976d2', borderColor: '#1976d2', borderRadius: 1.5, px: 3, py: 1.2, fontSize: '1rem', textTransform: 'none', transition: 'all 0.2s', '&:hover': { backgroundColor: '#1976d2', color: '#fff' } }}
                 >
                     Cerrar
                 </Button>
@@ -95,7 +95,7 @@ const ModalConfirmarInspeccion: React.FC<ModalConfirmarInspeccionProps> = memo((
                     onClick={onRegistrarInspeccion}
                     variant="contained"
                     size="large"
-                    sx={{ fontWeight: 'bold', backgroundColor: '#1976d2', color: '#fff', borderRadius: 1.5, px: 3, py: 1.2, fontSize: 16, textTransform: 'none', boxShadow: 'none', '&:hover': { backgroundColor: '#115293' } }}
+                    sx={{ fontWeight: 'bold', backgroundColor: '#1976d2', color: '#fff', borderRadius: 1.5, px: 3, py: 1.2, fontSize: '1rem', textTransform: 'none', boxShadow: 'none', '&:hover': { backgroundColor: '#115293' } }}
                 >
                     Registrar nueva inspección
                 </Button>
@@ -105,7 +105,7 @@ const ModalConfirmarInspeccion: React.FC<ModalConfirmarInspeccionProps> = memo((
                         onClick={onContinuarReubicacion}
                         variant="contained"
                         size="large"
-                        sx={{ fontWeight: 'bold', backgroundColor: '#2ecc40', color: '#fff', borderRadius: 1.5, px: 3, py: 1.2, fontSize: 16, textTransform: 'none', boxShadow: 'none', '&:hover': { backgroundColor: '#27ae60' } }}
+                        sx={{ fontWeight: 'bold', backgroundColor: '#2ecc40', color: '#fff', borderRadius: 1.5, px: 3, py: 1.2, fontSize: '1rem', textTransform: 'none', boxShadow: 'none', '&:hover': { backgroundColor: '#27ae60' } }}
                     >
                         Continuar reubicación
                     </Button>

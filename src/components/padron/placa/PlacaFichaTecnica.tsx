@@ -40,7 +40,7 @@ export const PlacaFichaTecnica = ({ vehiculo }: { vehiculo: VehiculoMain }) => {
           <div key={section.title}>
             <div className="flex items-center gap-2 mb-3">
               <div className="h-px flex-1 bg-gray-100" />
-              <h3 className="text-[10px] font-bold uppercase tracking-widest text-gray-600 px-2">
+              <h3 className="text-xs font-bold uppercase tracking-widest text-gray-600 px-2">
                 {section.title}
               </h3>
               <div className="h-px flex-1 bg-gray-100" />
