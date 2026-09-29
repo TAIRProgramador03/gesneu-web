@@ -687,6 +687,7 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = memo(({
                         : 'Así quedará el vehículo al guardar.'}
             </p>
             <DiagramaVehiculo
+                    etiquetaDatos="remanente"
                 neumaticosAsignados={neumaticosEnDiagrama}
                 layout="modal"
                 tipoModal="mantenimiento"

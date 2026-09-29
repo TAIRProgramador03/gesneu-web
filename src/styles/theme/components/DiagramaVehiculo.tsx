@@ -42,6 +42,16 @@ interface DiagramaVehiculoProps {
     posicionesCompletadas?: string[];
     /** Ancho máximo del contenedor en px — sobrescribe el valor por defecto de `layout`/`tipoModal` para instancias que necesiten un diagrama más compacto. */
     anchoMax?: number;
+    /**
+     * Cuánto escribe la etiqueta que acompaña a cada rueda. El diagrama es un mapa:
+     * repetir en él lo que ya está en la lista de al lado amontona la silueta,
+     * sobre todo en camiones de 7 posiciones.
+     * - `completo`  código + remanente + km (por defecto; comportamiento anterior)
+     * - `remanente` solo el remanente — el dato operativo, en una sola línea
+     * - `ninguno`   sin etiqueta: la pantalla ya lista esos datos aparte
+     * En los tres casos el detalle completo sigue disponible en el tooltip.
+     */
+    etiquetaDatos?: 'completo' | 'remanente' | 'ninguno';
 }
 
 // Ancho máximo por contexto — el alto se deriva del contenido (imagen o filas).
@@ -193,7 +203,7 @@ const DiagramaVehiculo: React.FC<
         fromMantenimientoModal?: boolean;
         placa?: string;
     }
-> = React.memo(({ neumaticosAsignados = [], layout = 'dashboard', tipoModal, onPosicionClick, placa, posicionResaltada, cantidadNeumaticos, posicionesCompletadas, anchoMax, ...props }) => {
+> = React.memo(({ neumaticosAsignados = [], layout = 'dashboard', tipoModal, onPosicionClick, placa, posicionResaltada, cantidadNeumaticos, posicionesCompletadas, anchoMax, etiquetaDatos = 'completo', ...props }) => {
     const contenedor = anchoMax
         ? { width: anchoMax }
         : layout === 'dashboard'
@@ -271,8 +281,11 @@ const DiagramaVehiculo: React.FC<
         // Las etiquetas IZQ/DER se dibujan fuera de la silueta — se les reserva margen
         // a los costados sin achicar la imagen (el ancho total del componente crece).
         const margenEtiquetaLateral = 78;
+        // El repuesto cuelga su etiqueta por debajo de la silueta: con la etiqueta completa
+        // (3 líneas) hace falta más aire abajo o se recorta contra el borde de la tarjeta.
+        const espacioInferior = etiquetaDatos === 'completo' ? '76px' : '34px';
         return (
-            <Box sx={{ width: '100%', maxWidth: contenedor.width + margenEtiquetaLateral * 2, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px', pt: '26px', pb: '34px' }}>
+            <Box sx={{ width: '100%', maxWidth: contenedor.width + margenEtiquetaLateral * 2, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px', pt: '26px', pb: espacioInferior }}>
                 <Box
                     sx={{
                         position: 'relative',
@@ -305,6 +318,7 @@ const DiagramaVehiculo: React.FC<
                         return (
                             <MarcadorImagenNeumatico
                                 key={marcador.codigo}
+                                etiquetaDatos={etiquetaDatos}
                                 marcador={marcador}
                                 anchoNatural={configuracionImagen.anchoNatural}
                                 altoNatural={configuracionImagen.altoNatural}
@@ -560,6 +574,7 @@ const PosicionNeumatico: React.FC<{
 
 /** Marcador que "sombrea" la rueda dibujada en la imagen del vehículo. */
 const MarcadorImagenNeumatico: React.FC<{
+    etiquetaDatos: 'completo' | 'remanente' | 'ninguno';
     marcador: MarcadorImagen;
     anchoNatural: number;
     altoNatural: number;
@@ -567,7 +582,7 @@ const MarcadorImagenNeumatico: React.FC<{
     onPosicionClick?: (neumatico: Neumatico | undefined, codigoPosicion: string) => void;
     posicionResaltada?: string;
     completada?: boolean;
-}> = React.memo(({ marcador, anchoNatural, altoNatural, neumatico, onPosicionClick, posicionResaltada, completada }) => {
+}> = React.memo(({ marcador, anchoNatural, altoNatural, neumatico, onPosicionClick, posicionResaltada, completada, etiquetaDatos }) => {
     const keyPos = marcador.codigo;
     const { combinedRef, attributes, listeners, isDragging, isOver, colores, esTemporal, esResaltada, kmRecorrido } =
         useEstadoMarcador(keyPos, neumatico, posicionResaltada);
@@ -704,7 +719,7 @@ const MarcadorImagenNeumatico: React.FC<{
 
                     {/* Etiqueta fija de remanente/km — visible siempre (los supervisores capturan el diagrama en foto, no pasan el mouse).
                         IZQ/DER van a los costados (fuera de la silueta, para no tapar la rueda/pilar); el repuesto se queda abajo. */}
-                    {neumatico && (
+                    {neumatico && etiquetaDatos !== 'ninguno' && (
                         <Box
                             sx={{
                                 position: 'absolute',
@@ -729,17 +744,25 @@ const MarcadorImagenNeumatico: React.FC<{
                                 pointerEvents: 'none',
                             }}
                         >
-                            <Box component="span" sx={{ fontSize: '0.75rem', fontWeight: 700, color: '#475569', fontFamily: 'monospace', letterSpacing: '0.2px' }}>
-                                {neumatico.CODIGO_NEU || neumatico.CODIGO || '—'}
-                            </Box>
-                            <Box component="span" sx={{ width: '100%', height: '1px', background: 'rgba(15, 23, 42, 0.12)' }} />
+                            {etiquetaDatos === 'completo' && (
+                                <>
+                                    <Box component="span" sx={{ fontSize: '0.75rem', fontWeight: 700, color: '#475569', fontFamily: 'monospace', letterSpacing: '0.2px' }}>
+                                        {neumatico.CODIGO_NEU || neumatico.CODIGO || '—'}
+                                    </Box>
+                                    <Box component="span" sx={{ width: '100%', height: '1px', background: 'rgba(15, 23, 42, 0.12)' }} />
+                                </>
+                            )}
                             <Box component="span" sx={{ fontSize: '0.75rem', fontWeight: 800, color: '#0f172a', fontFamily: 'monospace', letterSpacing: '0.2px' }}>
                                 {neumatico.REMANENTE ?? '—'}mm
                             </Box>
-                            <Box component="span" sx={{ width: '100%', height: '1px', background: 'rgba(15, 23, 42, 0.12)' }} />
-                            <Box component="span" sx={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b', fontFamily: 'monospace' }}>
-                                {kmRecorrido}
-                            </Box>
+                            {etiquetaDatos === 'completo' && (
+                                <>
+                                    <Box component="span" sx={{ width: '100%', height: '1px', background: 'rgba(15, 23, 42, 0.12)' }} />
+                                    <Box component="span" sx={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b', fontFamily: 'monospace' }}>
+                                        {kmRecorrido}
+                                    </Box>
+                                </>
+                            )}
                         </Box>
                     )}
                 </Box>

@@ -666,6 +666,7 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
                 Posiciones
             </div>
             <DiagramaVehiculo
+                    etiquetaDatos="remanente"
                 neumaticosAsignados={Object.entries(assignedNeumaticos)
                     .filter(([, neu]) => neu)
                     .map(([pos, neu]) => ({ ...neu, POSICION: pos, POSICION_NEU: pos }))}

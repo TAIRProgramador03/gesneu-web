@@ -1238,6 +1238,7 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
 
                 <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
                   <DiagramaVehiculo
+                    etiquetaDatos="remanente"
                     neumaticosAsignados={neumaticosAsignados}
                     layout="modal"
                     tipoModal="inspeccion"

@@ -831,6 +831,12 @@ export default function Page(): React.JSX.Element {
               <Box sx={{ display: 'flex', justifyContent: 'center' }}>
                 <DiagramaVehiculo
                   layout="dashboard"
+                  /* Acá se muestran los tres datos (código, remanente y km) porque es la vista
+                     de consulta. Para que las 7 etiquetas de un camión no se pisen, el diagrama
+                     va más ancho que el resto: la tarjeta tiene sitio de sobra (401 px incluso
+                     en pantallas de 1366) y 230 px de silueta separan lo suficiente las ruedas. */
+                  etiquetaDatos="completo"
+                  anchoMax={230}
                   cantidadNeumaticos={vehiculo?.CANTIDAD_NEUMATICOS}
                   neumaticosAsignados={neumaticosAsignados}
                 />

@@ -758,6 +758,7 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = memo(({
                 Posiciones
               </div>
               <DiagramaVehiculo
+                    etiquetaDatos="remanente"
                 key={`diagrama-live-${refreshKey}-${Date.now()}`}
                 neumaticosAsignados={(() => {
                   // USAR DATOS SINCRONIZADOS DIRECTOS
