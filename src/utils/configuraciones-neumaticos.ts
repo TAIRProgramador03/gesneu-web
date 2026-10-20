@@ -32,7 +32,7 @@ export interface ConfiguracionNeumaticos {
   posiciones: PosicionNeumatico[];
   rangos: RangosMedicion;
 }
- 
+
 /** Valores de camioneta/camión: son los que rigen mientras no se reconozca el vehículo. */
 const RANGOS_ESTANDAR: RangosMedicion = {
   remanente: { min: 0, max: 25 },
@@ -69,7 +69,11 @@ export const CONFIGURACIONES_NEUMATICOS: Record<number, ConfiguracionNeumaticos>
   7: {
     cantidad: 7,
     nombre: 'Camión, eje trasero doble',
-    rangos: RANGOS_ESTANDAR,
+    rangos: {
+      remanente: { min: 0, max: 25 },
+      presion: { min: 55, max: 90 },
+      torque: { min: 190, max: 805 },
+    },
     posiciones: [
       { codigo: 'POS01', eje: 1, lado: 'IZQ', repuesto: false },
       { codigo: 'POS02', eje: 1, lado: 'DER', repuesto: false },
