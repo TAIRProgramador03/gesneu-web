@@ -13,7 +13,7 @@ import { consultarInspeccionHoy, listarNeumaticosAsignados, guardarInspeccion, N
 import { UserContext } from '../../../contexts/user-context';
 import ModalAsignacionNeu from './modal-asignacion-neu';
 import { toast } from 'sonner';
-import { cn, convertToDateHuman } from '@/lib/utils';
+import { cn, convertToDateHuman, mensajeErrorApi } from '@/lib/utils';
 import { ArrowLeft, BadgeAlert, Car, CircleCheckBig, ClipboardList, ListChecks, X } from 'lucide-react';
 import { LoadingButton } from '@/components/ui/loading-button';
 import { Button as ButtonCustom } from '@/components/ui/button';
@@ -858,8 +858,7 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
       onClose();
     } catch (error: any) {
 
-      const messageErrorCatch = error?.message || 'Error al enviar inspecciones.'
-      toast.error(messageErrorCatch)
+      toast.error(mensajeErrorApi(error, 'Error al enviar inspecciones.'), { duration: 6000 })
       // Intentar actualizar el diagrama aunque haya error en el guardado
       if (onUpdateAsignados) {
         await onUpdateAsignados();

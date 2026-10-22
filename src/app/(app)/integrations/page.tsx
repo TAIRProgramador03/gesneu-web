@@ -40,6 +40,8 @@ import Link from 'next/link';
 import Chip from '@mui/material/Chip';
 import { EmptyStatePlaca } from '@/components/dashboard/integrations/empty-state-placa';
 import { diasDesdeFecha, parsearFechaLocal } from '@/lib/utils';
+import { ColaS60Banner } from '@/components/dashboard/integrations/ColaS60Banner';
+import { useColaS60 } from '@/hooks/use-cola-s60';
 
 /**
  * Deja un solo movimiento por posición (el más reciente) y normaliza los campos que la API
@@ -88,7 +90,15 @@ export default function Page(): React.JSX.Element {
   const [fechaUltimaInspeccion, setFechaUltimaInspeccion] = useState('');
   const [diasDiferenciaInspeccion, setDiasDiferenciaInspeccion] = useState(0);
   const { user } = useUser();
+
+  // Cola obligatoria de S60: mientras haya una pendiente, solo se puede trabajar
+  // la placa de la más antigua. El backend bloquea igual; esto es para que el
+  // técnico lo sepa antes de llenar un modal entero.
+  const { grupos: colaS60Grupos, placaBloqueada, isLoading: colaS60Cargando, refetch: refrescarColaS60 } = useColaS60();
   const [vehiculo, setVehiculo] = React.useState<Vehiculo | null>(null);
+  // Mientras no se sepa si hay pendientes tampoco se habilita nada: dejar actuar
+  // y bloquear después sería peor que esperar un par de segundos.
+  const placaBloqueadaPorColaS60 = colaS60Cargando || placaBloqueada(vehiculo?.PLACA);
   const [error, setError] = React.useState<string | null>(null);
   const [transitoActivo, setTransitoActivo] = React.useState(false);
 
@@ -673,7 +683,19 @@ export default function Page(): React.JSX.Element {
         transitoChecked={transitoActivo}
         onTransitoChange={setTransitoActivo}
         onReset={handleReset}
+        buscarDeshabilitado={colaS60Cargando}
+        textoDeshabilitado="Revisando S60 pendientes…"
       />
+
+      <ColaS60Banner
+        grupos={colaS60Grupos}
+        cargando={colaS60Cargando}
+        placaActual={vehiculo?.PLACA}
+        onIrAPlaca={(placa) => {
+          handleSearchChange({ target: { value: placa } } as any);
+        }}
+      />
+
       {!vehiculo ? (
         <EmptyStatePlaca error={error} />
       ) : (
@@ -733,7 +755,7 @@ export default function Page(): React.JSX.Element {
                 <LoadingButton2
                   variant="teal"
                   onClick={handleOpenModalConRefresh}
-                  disabled={user?.usuario?.trim() === 'GESNEU'}
+                  disabled={user?.usuario?.trim() === 'GESNEU' || placaBloqueadaPorColaS60}
                   icon={<ClipboardText />}
                 >
                   Asignar Neumático
@@ -742,7 +764,7 @@ export default function Page(): React.JSX.Element {
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <ButtonCustom variant="life"
-                      disabled={neumaticosAsignadosUnicos.length === 0}
+                      disabled={neumaticosAsignadosUnicos.length === 0 || placaBloqueadaPorColaS60}
                     >
                       <ClipboardText />
                       Inspección
@@ -771,7 +793,7 @@ export default function Page(): React.JSX.Element {
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <ButtonCustom variant="warning"
-                      disabled={neumaticosAsignadosUnicos.length === 0}
+                      disabled={neumaticosAsignadosUnicos.length === 0 || placaBloqueadaPorColaS60}
                     >
                       <ClipboardText />
                       Mantenimiento
@@ -1157,6 +1179,9 @@ export default function Page(): React.JSX.Element {
                 await Promise.all([refreshAsignados(), refreshVehiculo()]);
                 neumaticosDispobilesRefetch();
               }
+              // La desasignación es lo único que cierra líneas de S60, así que
+              // es el único momento en que la cola puede avanzar.
+              refrescarColaS60();
             }}
             placa={vehiculo?.PLACA ?? ''}
             neumaticosAsignados={neumaticosAsignadosUnicos.map(n => ({

@@ -25,9 +25,19 @@ interface CompaniesFiltersProps {
   transitoChecked?: boolean;
   onTransitoChange?: (checked: boolean) => void;
   onReset?: () => void;
+  /**
+   * Bloquea la búsqueda mientras se averigua la cola de S60.
+   *
+   * Sin esto el técnico alcanza a buscar una placa y empezar a trabajar antes
+   * de que llegue la respuesta, y recién después se entera de que esa placa
+   * estaba bloqueada. Son un par de segundos, pero son justo los primeros.
+   */
+  buscarDeshabilitado?: boolean;
+  /** Qué mostrar en el placeholder mientras está deshabilitado. */
+  textoDeshabilitado?: string;
 }
 
-export const CompaniesFilters = memo(({ onSearchChange, autosDisponiblesCount, onVehiculoSeleccionado, transitoChecked = false, onTransitoChange, onReset }: CompaniesFiltersProps): React.JSX.Element => {
+export const CompaniesFilters = memo(({ onSearchChange, autosDisponiblesCount, onVehiculoSeleccionado, transitoChecked = false, onTransitoChange, onReset, buscarDeshabilitado = false, textoDeshabilitado }: CompaniesFiltersProps): React.JSX.Element => {
   const [openModal, setOpenModal] = React.useState(false);
   const [checkboxChecked, setCheckboxChecked] = React.useState(false);
   const [inputValue, setInputValue] = React.useState('');
@@ -165,7 +175,7 @@ export const CompaniesFilters = memo(({ onSearchChange, autosDisponiblesCount, o
             onKeyPress={handleKeyPress}
             value={inputValue}
             fullWidth
-            placeholder="Buscar por Placa"
+            placeholder={buscarDeshabilitado && textoDeshabilitado ? textoDeshabilitado : "Buscar por Placa"}
             inputProps={{
               maxLength: 8, // 3 caracteres + guion + 4 caracteres = 8 total
             }}
@@ -178,7 +188,7 @@ export const CompaniesFilters = memo(({ onSearchChange, autosDisponiblesCount, o
               <InputAdornment position="end">
                 <Button
                   onClick={() => handleBuscar(null)}
-                  disabled={checkboxChecked || !inputValue.trim()}
+                  disabled={checkboxChecked || buscarDeshabilitado || !inputValue.trim()}
                   variant="text"
                   sx={{
                     minWidth: 'auto',
@@ -203,7 +213,7 @@ export const CompaniesFilters = memo(({ onSearchChange, autosDisponiblesCount, o
                 </Button>
               </InputAdornment>
             }
-            disabled={checkboxChecked}
+            disabled={checkboxChecked || buscarDeshabilitado}
             sx={{ flex: '1 1 auto', maxWidth: { xs: '100%', sm: '450px' }, minWidth: { xs: 'auto', sm: '260px' } }}
           />
 

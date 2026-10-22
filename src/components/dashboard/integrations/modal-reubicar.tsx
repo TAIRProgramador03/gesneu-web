@@ -11,7 +11,7 @@ import {
   getUltimaFechaInspeccionPorPlaca
 } from '../../../api/Neumaticos';
 import { toast } from 'sonner';
-import { convertToDateHuman } from '@/lib/utils';
+import { convertToDateHuman, mensajeErrorApi } from '@/lib/utils';
 import { Button as ButtonCustom } from '@/components/ui/button';
 import { LoadingButton2 } from '@/components/ui/loading-button2';
 import { ArrowLeftRight, BadgeAlert, Car, ClipboardList, MapPinned, Repeat2, X } from 'lucide-react';
@@ -393,11 +393,7 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = memo(({
       if (onSuccess) onSuccess();
       handleClose();
     } catch (error) {
-      if (error instanceof Error) {
-        toast.error(error.message);
-      } else {
-        toast.error(String(error));
-      }
+      toast.error(mensajeErrorApi(error, 'Error al reubicar el neumático.'), { duration: 6000 });
     }
   };
 

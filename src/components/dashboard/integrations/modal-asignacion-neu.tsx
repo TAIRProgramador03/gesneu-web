@@ -17,7 +17,7 @@ import { Field, FieldDescription, FieldLabel } from '@/components/ui/field';
 import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from '@/components/ui/input-group';
 import { EsRecuperadoBadge } from '@/components/ui/EsRecuperadoBadge';
 import { LinearProgressItem } from '@/components/ui/LinearProgress';
-import { convertToDateHuman } from '@/lib/utils';
+import { convertToDateHuman, mensajeErrorApi } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import {
     ArrowUpDown,
@@ -591,7 +591,7 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
             onClose();
         } catch (e: any) {
             console.error(e);
-            toast.error(e.message || 'Error al asignar neumático.');
+            toast.error(mensajeErrorApi(e, 'Error al asignar neumático.'), { duration: 6000 });
         }
     };
     // ------------------------------------------------

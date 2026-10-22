@@ -1296,3 +1296,52 @@ export async function obtenerLoteAsignacionMasiva(batchId: string): Promise<Resu
   const res = await fetch(`${BASE_URL}/lotes/${batchId}`, { method: 'GET' });
   return manejarRespuesta<ResultadoProcesamiento>(res);
 }
+/* =====================================================================
+ * Cola obligatoria de S60
+ *
+ * La S60 pendiente más antigua de los talleres del usuario define la única
+ * placa sobre la que se puede trabajar. El backend bloquea igual, pero la
+ * pantalla tiene que avisar ANTES de que el técnico llene todo un modal.
+ * ===================================================================== */
+
+export interface ColaS60Linea {
+  correlativo: number;
+  par: string;
+  codigoEntrante: string;
+  codigoSaliente: string;
+}
+
+export interface ColaS60Cabeza {
+  almacen: string;
+  comprobante: number;
+  /** AAAAMMDD numérico, tal como viene del ERP. */
+  fecha: number;
+  /** HHMMSS numérico; las horas de un dígito vienen sin el cero de adelante. */
+  hora: number;
+  placa: string;
+  taller: string;
+  lineas: ColaS60Linea[];
+}
+
+export interface ColaS60Estado {
+  hayPendientes: boolean;
+  cabeza: ColaS60Cabeza | null;
+  talleres?: string[];
+}
+
+export const obtenerEstadoColaS60 = async (): Promise<ColaS60Estado> => {
+  const response = await axios.get<ColaS60Estado>('/api/cola-s60/estado', {
+    withCredentials: true,
+  });
+  return response.data;
+};
+
+export const obtenerPendientesColaS60 = async (limite = 50) => {
+  const response = await axios.get<{ total: number; pendientes: (ColaS60Linea & {
+    almacen: string; comprobante: number; fecha: number; hora: number; placa: string; taller: string;
+  })[] }>('/api/cola-s60/pendientes', {
+    params: { limite },
+    withCredentials: true,
+  });
+  return response.data;
+};

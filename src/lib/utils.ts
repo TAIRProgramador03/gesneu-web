@@ -64,3 +64,23 @@ export const capitalizeCustomString = (texto: string) => {
   if (!texto) return texto;
   return texto.charAt(0).toUpperCase() + texto.slice(1).toLowerCase();
 }
+/**
+ * El mensaje legible de un error de la API.
+ *
+ * El backend responde `{ error, detalle }`. Sin esto, un `error.message` de
+ * Axios muestra "Request failed with status code 409" — inútil para el técnico,
+ * justo cuando el servidor sí mandó una explicación (por ejemplo, qué placa hay
+ * que regularizar primero).
+ */
+export const mensajeErrorApi = (error: any, porDefecto = 'Ocurrió un error.'): string => {
+  const data = error?.response?.data;
+  const principal = data?.error || data?.mensaje;
+  const detalle = data?.detalle;
+  if (principal && detalle) return `${principal}: ${detalle}`;
+  if (principal) return principal;
+  if (detalle) return detalle;
+  if (typeof error?.message === 'string' && !error.message.startsWith('Request failed with status')) {
+    return error.message;
+  }
+  return porDefecto;
+};
