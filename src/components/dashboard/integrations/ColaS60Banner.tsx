@@ -3,7 +3,7 @@
 import * as React from 'react';
 import Card from '@mui/material/Card';
 import Collapse from '@mui/material/Collapse';
-import { ArrowRight, ChevronDown, CircleCheckBig, Clock3, ListChecks, Loader2, TriangleAlert } from 'lucide-react';
+import { ArrowRight, ChevronDown, CircleCheckBig, Clock3, ListChecks, Loader2, MapPinned, TriangleAlert, Wrench } from 'lucide-react';
 import { Button as ButtonCustom } from '@/components/ui/button';
 import type { ColaS60Cabeza } from '@/api/Neumaticos';
 
@@ -165,8 +165,15 @@ export function ColaS60Banner({ grupos, placaActual, onIrAPlaca, cargando = fals
                 <ListChecks size={14} />
                 {cambios}
               </span>
+              {cabeza.operacion && (
+                <span className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-semibold ${tono.meta}`}>
+                  <MapPinned size={14} />
+                  {cabeza.operacion}
+                </span>
+              )}
               {cabeza.taller && (
                 <span className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-semibold ${tono.meta}`}>
+                  <Wrench size={14} />
                   {cabeza.taller}
                 </span>
               )}
@@ -222,8 +229,17 @@ export function ColaS60Banner({ grupos, placaActual, onIrAPlaca, cargando = fals
                       <ListChecks size={13} />
                       {contarCambios(grupo.lineas.length)}
                     </span>
+                    {grupo.operacion && (
+                      <span className={`inline-flex items-center gap-1.5 text-xs font-medium ${tono.apagado}`}>
+                        <MapPinned size={13} />
+                        {grupo.operacion}
+                      </span>
+                    )}
                     {grupo.taller && (
-                      <span className={`text-xs font-medium ${tono.apagado}`}>{grupo.taller}</span>
+                      <span className={`inline-flex items-center gap-1.5 text-xs font-medium ${tono.apagado}`}>
+                        <Wrench size={13} />
+                        {grupo.taller}
+                      </span>
                     )}
                   </li>
                 ))}

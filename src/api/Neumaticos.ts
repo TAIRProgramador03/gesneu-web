@@ -1319,6 +1319,7 @@ export interface ColaS60Cabeza {
   /** HHMMSS numérico; las horas de un dígito vienen sin el cero de adelante. */
   hora: number;
   placa: string;
+  operacion: string;
   taller: string;
   lineas: ColaS60Linea[];
 }
@@ -1338,7 +1339,7 @@ export const obtenerEstadoColaS60 = async (): Promise<ColaS60Estado> => {
 
 export const obtenerPendientesColaS60 = async (limite = 50) => {
   const response = await axios.get<{ total: number; pendientes: (ColaS60Linea & {
-    almacen: string; comprobante: number; fecha: number; hora: number; placa: string; taller: string;
+    almacen: string; comprobante: number; fecha: number; hora: number; placa: string; operacion: string; taller: string;
   })[] }>('/api/cola-s60/pendientes', {
     params: { limite },
     withCredentials: true,

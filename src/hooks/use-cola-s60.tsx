@@ -69,6 +69,7 @@ export const useColaS60 = () => {
           fecha: linea.fecha,
           hora: linea.hora,
           placa: linea.placa,
+          operacion: linea.operacion,
           taller: linea.taller,
           lineas: [detalle],
         })
