@@ -1177,7 +1177,7 @@ export const obtenerVehiculosDeCamionetas = async () => {
 
 export interface NeumaticoAsignacion {
   codigo: string;
-  /** Código de posición (POS01, POS02, ..., RES01). El set válido depende de la cantidad
+  /** Código de posición (POS01, POS02, ..., RES01, RES02). El set válido depende de la cantidad
    *  de neumáticos del vehículo — ver `obtenerConfiguracionNeumaticos` en utils. */
   posicion: string;
   remanente: number;
@@ -1337,10 +1337,12 @@ export const obtenerEstadoColaS60 = async (): Promise<ColaS60Estado> => {
   return response.data;
 };
 
-export const obtenerPendientesColaS60 = async (limite = 50) => {
-  const response = await axios.get<{ total: number; pendientes: (ColaS60Linea & {
-    almacen: string; comprobante: number; fecha: number; hora: number; placa: string; operacion: string; taller: string;
-  })[] }>('/api/cola-s60/pendientes', {
+export const obtenerPendientesColaS60 = async (limite = 900) => {
+  const response = await axios.get<{
+    total: number; pendientes: (ColaS60Linea & {
+      almacen: string; comprobante: number; fecha: number; hora: number; placa: string; operacion: string; taller: string;
+    })[]
+  }>('/api/cola-s60/pendientes', {
     params: { limite },
     withCredentials: true,
   });

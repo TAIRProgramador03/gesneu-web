@@ -25,7 +25,7 @@ import { useQuery } from '@tanstack/react-query'
  */
 
 /** Cuántas líneas se traen. Son ~20 al día en toda la empresa; 200 sobra. */
-const LIMITE = 200
+const LIMITE = 900
 
 export const useColaS60 = () => {
   const { data, isLoading, isError, refetch } = useQuery({

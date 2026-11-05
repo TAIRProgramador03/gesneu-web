@@ -24,7 +24,7 @@ import { ModalInformacionInspeccion } from './modal-informacion-inspeccion';
 import { DatePicker } from '@/components/ui/DatePicker';
 import { Field, FieldDescription, FieldLabel } from '@/components/ui/field';
 import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from '@/components/ui/input-group';
-import { obtenerConfiguracionNeumaticos, obtenerRangosMedicion } from '@/utils/configuraciones-neumaticos';
+import { obtenerConfiguracionNeumaticos, obtenerRangosMedicion, esPosicionRepuesto } from '@/utils/configuraciones-neumaticos';
 
 // --- Declaraciones de tipos fuera del componente ---
 interface FormValues {
@@ -186,7 +186,7 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
   const [cantidadPosicionesValidas, setCantidadPosicionesValidas] = useState(0);
 
   // Si la placa NO tiene inspecciones previas => es la primera inspección.
-  // Solo en la primera inspección el RES01 es editable; luego se bloquea (flujo normal).
+  // Solo en la primera inspección el repuesto es editable; luego se bloquea (flujo normal).
   const [esPrimeraInspeccion, setEsPrimeraInspeccion] = useState(false);
 
   // Estado para la fecha mínima de inspección (no puede ser menor a la última registrada)
@@ -308,7 +308,7 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
   }, [open]);
 
   // Determinar si es la primera inspección de la placa (sin inspecciones previas).
-  // Default seguro: false => RES01 bloqueado mientras no se confirme que es la primera.
+  // Default seguro: false => repuesto bloqueado mientras no se confirme que es la primera.
   useEffect(() => {
     if (open && placa) {
       getFechasInspeccionVehicularPorPlaca(placa)
@@ -559,7 +559,7 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
     const limit = remanenteAsignacionReal !== null ? remanenteAsignacionReal : (remanenteAsignacion ?? Number(neumaticoSeleccionado?.REMANENTE));
 
     if (!isNaN(val) && limit > 0) {
-      const isSpare = neumaticoSeleccionado?.POSICION === 'RES01' || formValues.posicion === 'RES01';
+      const isSpare = esPosicionRepuesto(neumaticoSeleccionado?.POSICION) || esPosicionRepuesto(formValues.posicion);
       if (isSpare) {
         // REPUESTO: No puede aumentar (val <= limit)
         if (val > limit) {
@@ -611,10 +611,10 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
       toast.error('Debe seleccionar un neumático.')
       return;
     }
-    // RES01 (repuesto) puede guardarse sin cambios: bloqueado mantiene el último valor y editable
+    // Un repuesto (RES01/RES02) puede guardarse sin cambios: bloqueado mantiene el último valor y editable
     // puede conservar el mismo remanente/torque. En cualquier otra posición se exigen cambios.
-    const esRES01Local = neumaticoSeleccionado.POSICION === 'RES01' || formValues.posicion === 'RES01';
-    if (!hayCambiosFormulario && !esRES01Local) {
+    const esRepuestoLocal = esPosicionRepuesto(neumaticoSeleccionado.POSICION) || esPosicionRepuesto(formValues.posicion);
+    if (!hayCambiosFormulario && !esRepuestoLocal) {
       toast.info('No hay cambios para guardar.')
       return;
     }
@@ -624,7 +624,7 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
       return;
     }
 
-    if (formValues.posicion !== 'RES01') {
+    if (!esPosicionRepuesto(formValues.posicion)) {
       if (Number(formValues.remanente) >= valorReferenciaRemanente) {
         toast.error(`El valor de remanente no puede ser igual o mayor a ${valorReferenciaRemanente}`)
         return;
@@ -793,7 +793,7 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
       const pad = (n: number) => n.toString().padStart(2, '0');
       return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
     };
-    // Incluir todas las inspecciones, incluyendo RES01
+    // Incluir todas las inspecciones, incluyendo los repuestos
     const payloads = inspeccionesPendientes.map(ins => {
       const poNeu = poNeumaticos.find(n => String(n.CODIGO) === String(ins.codigo));
       const remanente = ins.remanente ? parseFloat(ins.remanente) : 0;
@@ -894,16 +894,16 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
   }, [open, onClose]);
 
   // Constante para habilitar el botón solo si los campos requeridos están llenos
-  const esRES01 = formValues.posicion === 'RES01';
-  // RES01 solo es editable en la PRIMERA inspección de la placa. En las siguientes se bloquea.
-  const res01Bloqueado = esRES01 && !esPrimeraInspeccion;
-  const esRES01Editable = esRES01 && esPrimeraInspeccion;
-  // - RES01 bloqueado: no exigimos campos (se guarda con el último valor).
-  // - RES01 editable (1ra inspección): el torque puede ser 0, así que NO se exige lleno.
+  const esRepuesto = esPosicionRepuesto(formValues.posicion);
+  // El repuesto solo es editable en la PRIMERA inspección de la placa. En las siguientes se bloquea.
+  const repuestoBloqueado = esRepuesto && !esPrimeraInspeccion;
+  const esRepuestoEditable = esRepuesto && esPrimeraInspeccion;
+  // - Repuesto bloqueado: no exigimos campos (se guarda con el último valor).
+  // - Repuesto editable (1ra inspección): el torque puede ser 0, así que NO se exige lleno.
   // - Rueda normal: se exigen todos los campos llenos.
-  const camposRequeridosLlenos = res01Bloqueado
+  const camposRequeridosLlenos = repuestoBloqueado
     ? true
-    : esRES01Editable
+    : esRepuestoEditable
       ? !!(formValues.remanente && formValues.presion_aire && formValues.observacion)
       : !!(
         formValues.remanente &&
@@ -1093,20 +1093,20 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
                           pattern="^\d*(\.\d{0,2})?$"
                           value={formValues.remanente}
                           onChange={e => {
-                            if (res01Bloqueado) return;
+                            if (repuestoBloqueado) return;
                             const value = e.target.value.replace(/,/g, '.'); // Permitir punto decimal
                             // Permitir solo números y hasta 2 decimales
                             if (!/^\d*(\.?\d{0,2})?$/.test(value)) return;
                             setFormValues(prev => ({ ...prev, remanente: value }));
                           }}
                           aria-invalid={remanenteError}
-                          disabled={bloquearFormulario || res01Bloqueado}
+                          disabled={bloquearFormulario || repuestoBloqueado}
                         />
                         <InputGroupAddon align="inline-end"><InputGroupText>mm</InputGroupText></InputGroupAddon>
                       </InputGroup>
                       <FieldDescription className={remanenteError ? 'text-destructive font-medium' : undefined}>
                         {remanenteError
-                          ? (formValues.posicion === 'RES01' || neumaticoSeleccionado?.POSICION === 'RES01')
+                          ? (esPosicionRepuesto(formValues.posicion) || esPosicionRepuesto(neumaticoSeleccionado?.POSICION))
                             ? `No puede ser mayor al anterior (${valorReferenciaRemanente})`
                             : `Debe ser MENOR al anterior (${valorReferenciaRemanente})`
                           : `Anterior: ${valorReferenciaRemanente ?? '-'}`}
@@ -1123,13 +1123,13 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
                           max={50}
                           value={formValues.presion_aire ?? ''}
                           onChange={(e) => {
-                            if (res01Bloqueado) return;
+                            if (repuestoBloqueado) return;
                             const value = Number(e.target.value);
                             setFormValues(prev => ({ ...prev, presion_aire: e.target.value }));
                             setPresionError(value < rangos.presion.min || value > rangos.presion.max);
                           }}
                           aria-invalid={presionError}
-                          disabled={bloquearFormulario || res01Bloqueado}
+                          disabled={bloquearFormulario || repuestoBloqueado}
                         />
                         <InputGroupAddon align="inline-end"><InputGroupText>psi</InputGroupText></InputGroupAddon>
                       </InputGroup>
@@ -1146,28 +1146,28 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
                         <InputGroupInput
                           id="torque"
                           type="number"
-                          min={esRES01Editable ? 0 : rangos.torque.min}
+                          min={esRepuestoEditable ? 0 : rangos.torque.min}
                           max={rangos.torque.max}
                           value={formValues.torque}
                           onChange={(e) => {
-                            if (res01Bloqueado) return;
+                            if (repuestoBloqueado) return;
                             const value = Number(e.target.value);
                             setFormValues(prev => ({ ...prev, torque: Number(e.target.value) }));
-                            // RES01 editable: el torque puede ser 0 (repuesto sin torque aplicado) o estar en rango.
-                            const torqueValido = esRES01Editable
+                            // Repuesto editable: el torque puede ser 0 (repuesto sin torque aplicado) o estar en rango.
+                            const torqueValido = esRepuestoEditable
                               ? (value === 0 || (value >= rangos.torque.min && value <= rangos.torque.max))
                               : (value >= rangos.torque.min && value <= rangos.torque.max);
                             setTorqueError(!torqueValido);
                           }}
                           aria-invalid={torqueError}
-                          disabled={bloquearFormulario || res01Bloqueado}
+                          disabled={bloquearFormulario || repuestoBloqueado}
                         />
                         <InputGroupAddon align="inline-end"><InputGroupText>N·m</InputGroupText></InputGroupAddon>
                       </InputGroup>
                       <FieldDescription className={torqueError ? 'text-destructive font-medium' : undefined}>
                         {torqueError
-                          ? (esRES01Editable ? `Debe ser 0 o estar entre ${rangos.torque.min} y ${rangos.torque.max} Nm` : `Debe estar entre ${rangos.torque.min} y ${rangos.torque.max} Nm`)
-                          : (esRES01Editable ? `Permitido: 0 o ${rangos.torque.min}-${rangos.torque.max} Nm` : `Recomendado: ${rangos.torque.min}-${rangos.torque.max} Nm`)}
+                          ? (esRepuestoEditable ? `Debe ser 0 o estar entre ${rangos.torque.min} y ${rangos.torque.max} Nm` : `Debe estar entre ${rangos.torque.min} y ${rangos.torque.max} Nm`)
+                          : (esRepuestoEditable ? `Permitido: 0 o ${rangos.torque.min}-${rangos.torque.max} Nm` : `Recomendado: ${rangos.torque.min}-${rangos.torque.max} Nm`)}
                       </FieldDescription>
                     </Field>
                   </div>
@@ -1180,8 +1180,8 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
                         name="observacion"
                         rows={2}
                         value={formValues.observacion}
-                        onChange={res01Bloqueado ? undefined : handleInputChange}
-                        disabled={bloquearFormulario || res01Bloqueado}
+                        onChange={repuestoBloqueado ? undefined : handleInputChange}
+                        disabled={bloquearFormulario || repuestoBloqueado}
                       />
                     </Field>
                   </div>
@@ -1192,7 +1192,7 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
                     variant={'teal'}
                     onClick={handleGuardarInspeccionLocal}
                     disabled={
-                      (!hayCambiosFormulario && !esRES01) || bloquearFormulario || kmError || !camposRequeridosLlenos
+                      (!hayCambiosFormulario && !esRepuesto) || bloquearFormulario || kmError || !camposRequeridosLlenos
                     }
                   >
                     <CircleCheckBig />

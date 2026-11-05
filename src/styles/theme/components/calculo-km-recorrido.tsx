@@ -1,3 +1,5 @@
+import { esPosicionRepuesto } from '@/utils/configuraciones-neumaticos';
+
 
 export interface MovimientoNeumatico {
     CODIGO: string;
@@ -42,18 +44,19 @@ export function calcularKmRecorrido(historial: MovimientoNeumatico[], posicionAc
                 }
             }
         }
-        // Si la posición es RES01, el km recorrido es fijo y nunca suma (aunque tenga inspecciones)
-        if (posicion === 'RES01') {
-            // Buscar el último movimiento antes de entrar a RES01
-            const idxRes = historialOrdenado.findIndex(m => m.POSICION_NEU === 'RES01' && (m.TIPO_MOVIMIENTO === 'ASIGNADO' || m.TIPO_MOVIMIENTO === 'REUBICADO'));
+        // En un repuesto el km recorrido es fijo y nunca suma, aunque tenga inspecciones:
+        // el neumático está ahí guardado, no rodando. Vale para RES01 y RES02 por igual.
+        if (esPosicionRepuesto(posicion)) {
+            // Buscar el último movimiento antes de entrar al repuesto
+            const idxRes = historialOrdenado.findIndex(m => m.POSICION_NEU === posicion && (m.TIPO_MOVIMIENTO === 'ASIGNADO' || m.TIPO_MOVIMIENTO === 'REUBICADO'));
             if (idxRes > 0) {
                 const posAnterior = historialOrdenado[idxRes - 1].POSICION_NEU;
-                if (posAnterior && posAnterior !== 'RES01') {
+                if (posAnterior && posAnterior !== posicion) {
                     kmBase = calcularKmRecorrido(historial, posAnterior);
                 }
             }
             kmRecorridoTotal = kmBase;
-            // Nunca sumar inspecciones en RES01
+            // Nunca sumar inspecciones hechas mientras era repuesto
             return;
         }
         // Para posiciones activas, sumar solo entre inspecciones en esa posición, partiendo del kmBase

@@ -3,7 +3,7 @@ import { Box, Dialog, DialogContent, DialogTitle } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 import { convertToDateHuman } from '@/lib/utils';
-import { obtenerRangosMedicion } from '@/utils/configuraciones-neumaticos';
+import { obtenerRangosMedicion, esPosicionRepuesto } from '@/utils/configuraciones-neumaticos';
 import { Button as ButtonCustom } from '@/components/ui/button';
 import { DatePicker } from '@/components/ui/DatePicker';
 import { Field, FieldDescription, FieldLabel } from '@/components/ui/field';
@@ -53,7 +53,7 @@ const ModalInputsNeu: React.FC<ModalInputsNeuProps> = ({ open, onClose, onSubmit
     const theme = useTheme();
     const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
-    const esRepuesto = position === 'RES01';
+    const esRepuesto = esPosicionRepuesto(position);
     const fechaImpuesta = Boolean(fechaFija);
 
     // Los rangos salen del tipo de vehículo: una moto no usa el mismo torque ni la misma

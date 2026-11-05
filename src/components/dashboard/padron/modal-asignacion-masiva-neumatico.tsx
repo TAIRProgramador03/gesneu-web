@@ -25,6 +25,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { cn } from '@/lib/utils';
 import XLSXStyle from 'xlsx-js-style';
 import { confirmarAsignacionMasiva, NeumaticoAsignacion, ResultadoProcesamiento, validarAsignacionMasiva } from "@/api/Neumaticos";
+import { esPosicionRepuesto } from '@/utils/configuraciones-neumaticos';
 
 interface ModalAsignacionMasivaNeumaticoProps {
   open: boolean;
@@ -39,7 +40,7 @@ type NeumaticoMasivo = NeumaticoAsignacion
 const formatFechaCorta = (fecha: string) => dayjs(fecha).format('DD/MM/YYYY');
 
 const PosicionBadge = ({ posicion }: { posicion: Posicion }) => {
-  const esRepuesto = posicion === 'RES01';
+  const esRepuesto = esPosicionRepuesto(posicion);
   return (
     <span className={cn(
       "inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold ring-1 ring-inset whitespace-nowrap",
@@ -69,15 +70,15 @@ const MotivoFila = ({ motivo }: { motivo?: string }) => (
  * - Posiciones montadas: TORQUE obligatorio, dentro del rango del tipo de vehículo
  *   (moto 30-90 N·m, camioneta y camión 110-160). El backend lo valida por placa según
  *   su cantidad de neumáticos, así que un mismo Excel puede mezclar tipos.
- * - RES01 (repuesto): TORQUE deshabilitado, forzado a 0, sin validación de rango.
+ * - Repuestos (RES01, RES02): TORQUE deshabilitado, forzado a 0, sin validación de rango.
  * REMANENTE, PRESION y FECHA_ASIGNACION son obligatorios y se validan igual en ambos casos.
  */
 const TorqueCell = ({ neu, dense }: { neu: NeumaticoMasivo; dense?: boolean }) => {
-  const esRepuesto = neu.posicion === 'RES01';
+  const esRepuesto = esPosicionRepuesto(neu.posicion);
   if (esRepuesto) {
     return (
       <span
-        title="RES01: torque deshabilitado, forzado a 0 y sin validación de rango."
+        title="Repuesto: torque deshabilitado, forzado a 0 y sin validación de rango."
         className={cn(
           "inline-flex items-center gap-1 rounded-md bg-slate-100 px-1.5 py-0.5 font-medium text-slate-400 ring-1 ring-inset ring-slate-200",
           dense ? "text-xs" : "text-xs"
@@ -104,7 +105,7 @@ const TablaNeumaticosPlaca = ({ neumaticos, mostrarMotivo }: { neumaticos: Neuma
             <th className="text-left font-semibold px-3 py-2">
               <span
                 className="inline-flex items-center gap-1"
-                title="Obligatorio en las posiciones montadas, dentro del rango del tipo de vehículo (moto 30-90 N·m; camioneta y camión 110-160). En el repuesto (RES01) se deshabilita y se guarda como 0."
+                title="Obligatorio en las posiciones montadas, dentro del rango del tipo de vehículo (moto 30-90 N·m; camioneta y camión 110-160). En los repuestos (RES01, RES02) se deshabilita y se guarda como 0."
               >
                 Torque
                 <Info size={11} className="text-slate-300" />

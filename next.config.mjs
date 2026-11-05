@@ -9,6 +9,11 @@ const config = {
     '127.0.0.1',
   ],
   
+  // Permite levantar un segundo servidor de desarrollo para verificar un cambio sin
+  // pisar el .next del que ya está corriendo (NEXT_TEST_DIST_DIR=.next-xxx next dev -p 3097).
+  // Sin esto, los dos escriben en la misma carpeta y el servidor en uso se cae.
+  distDir: process.env.NEXT_TEST_DIST_DIR || '.next',
+
   // Configuración para solucionar el error de ActionQueueContext
   reactStrictMode: true,
   experimental: {

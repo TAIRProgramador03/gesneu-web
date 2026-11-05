@@ -24,7 +24,7 @@ import DiagramaVehiculo from '../../../styles/theme/components/DiagramaVehiculo'
 import ModalInputsNeu from './modal-inputs-neu';
 import { desasignarConReemplazo, getUltimaFechaInspeccionPorPlaca, obtenerNeumaticosDisponibles } from '../../../api/Neumaticos';
 import { Neumatico, Vehiculo } from '../../../types/types';
-import { obtenerConfiguracionNeumaticos } from '@/utils/configuraciones-neumaticos';
+import { obtenerConfiguracionNeumaticos, esPosicionRepuesto } from '@/utils/configuraciones-neumaticos';
 import { convertToDateHuman } from '@/lib/utils';
 import { Button as ButtonCustom } from '@/components/ui/button';
 import { LoadingButton2 } from '@/components/ui/loading-button2';
@@ -87,7 +87,7 @@ const datosCompletos = (r: Reemplazo | undefined, posicion: string): boolean => 
     if (!r.FECHA_ASIGNACION) return false;
     if (!valido(r.REMANENTE)) return false;
     if (!valido(r.PRESION_AIRE)) return false;
-    if (posicion === 'RES01') return true;
+    if (esPosicionRepuesto(posicion)) return true;
     return valido(r.TORQUE_APLICADO);
 };
 
@@ -164,19 +164,34 @@ const FilaInstalado: React.FC<{
 /** Tarjeta del paso 2: una posición liberada y su reemplazo (o el botón para elegirlo). */
 const TarjetaPosicionLiberada: React.FC<{
     posicion: string;
+    /** Código del neumático que se está sacando de esa posición. */
+    codigoSaliente?: string;
     reemplazo: Reemplazo | undefined;
     esObjetivo: boolean;
     onElegir: () => void;
     onEditar: () => void;
     onQuitar: () => void;
-}> = ({ posicion, reemplazo, esObjetivo, onElegir, onEditar, onQuitar }) => (
+}> = ({ posicion, codigoSaliente, reemplazo, esObjetivo, onElegir, onEditar, onQuitar }) => (
     <div className={`rounded-xl border px-3 py-2.5 transition-colors ${esObjetivo ? 'border-indigo-300 bg-indigo-50/70 ring-1 ring-indigo-200'
         : reemplazo ? 'border-emerald-200 bg-emerald-50/50' : 'border-dashed border-amber-300 bg-amber-50/50'
         }`}>
         <div className="flex items-center gap-2.5">
-            <span className="shrink-0 rounded-md bg-violet-600 px-2 py-1 font-mono text-xs font-extrabold text-white">
-                {posicion}
-            </span>
+            {/* Debajo de la posición, el neumático que sale: sin esto el paso 2 no decía
+                cuál se estaba reemplazando y había que volver al paso 1 para verlo. */}
+            <div className="flex shrink-0 flex-col items-center gap-0.5">
+                <span className="rounded-md bg-violet-600 px-2 py-1 font-mono text-xs font-extrabold text-white">
+                    {posicion}
+                </span>
+                {codigoSaliente && (
+                    <span
+                        className="inline-flex items-center gap-0.5 font-mono text-xs font-bold text-rose-600"
+                        title={`Sale el neumático ${codigoSaliente}`}
+                    >
+                        <CircleMinus className="h-3 w-3" />
+                        {codigoSaliente}
+                    </span>
+                )}
+            </div>
 
             <div className="min-w-0 flex-1">
                 {reemplazo ? (
@@ -595,7 +610,7 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = memo(({
         const kilometroActual = kilometraje ?? 0;
 
         const desasignaciones = posicionesLiberadas
-            .filter(pos => /^POS\d{2}$/.test(pos) || pos === 'RES01')
+            .filter(pos => /^POS\d{2}$/.test(pos) || esPosicionRepuesto(pos))
             .map(pos => ({
                 CODIGO: codigoDe(marcados[pos]),
                 TIPO_MOVIMIENTO: accion,
@@ -818,6 +833,7 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = memo(({
                         <TarjetaPosicionLiberada
                             key={pos}
                             posicion={pos}
+                            codigoSaliente={codigoDe(instaladoPorPosicion[pos])}
                             reemplazo={reemplazos[pos]}
                             esObjetivo={posicionObjetivo === pos}
                             onElegir={() => setPosicionObjetivo(pos)}

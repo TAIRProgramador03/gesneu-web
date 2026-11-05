@@ -14,6 +14,7 @@ import { Button as ButtonCustom } from '@/components/ui/button';
 import { LoadingButton2 } from '@/components/ui/loading-button2';
 import { NeumaticoPorInspeccionar } from '@/types/neumatico';
 import { convertToDateHuman } from '../../../lib/utils';
+import { esPosicionRepuesto } from '@/utils/configuraciones-neumaticos';
 
 interface ModalInformacionInspeccionProps {
   open: boolean;
@@ -137,7 +138,7 @@ export const ModalInformacionInspeccion = ({ open, kilometraje, fechaInspeccion,
         ) : (
           <div className="grid grid-cols-1 gap-2 lg:grid-cols-2">
             {neumaticos.map((neu) => {
-              const esRepuesto = neu.Posicion === 'RES01';
+              const esRepuesto = esPosicionRepuesto(neu.Posicion);
               const anterior = Number(neu.RemanenteReferencia ?? 0);
               const actual = Number(neu.Remanente ?? 0);
               const desgaste = anterior > 0 ? +(anterior - actual).toFixed(2) : null;

@@ -27,6 +27,7 @@ import {
     CircleAlert,
     ClipboardList,
     Gauge,
+    Lock,
     MapPinned,
     MousePointerClick,
     Pencil,
@@ -35,7 +36,7 @@ import {
     X,
 } from 'lucide-react';
 import { ModalInformacionAsignacion } from './modal-informacion-asignacion';
-import { obtenerConfiguracionNeumaticos } from '@/utils/configuraciones-neumaticos';
+import { obtenerConfiguracionNeumaticos, esPosicionRepuesto } from '@/utils/configuraciones-neumaticos';
 import { ColumnDef } from '@tanstack/react-table';
 
 export interface ModalAsignacionNeuProps {
@@ -65,7 +66,7 @@ const datosCompletos = (neumatico: any, posicion: string): boolean => {
     if (!neumatico.FECHA_ASIGNACION) return false;
     if (!valido(neumatico.REMANENTE)) return false;
     if (!valido(neumatico.PRESION_AIRE)) return false;
-    if (posicion === 'RES01') return true;
+    if (esPosicionRepuesto(posicion)) return true;
     return valido(neumatico.TORQUE_APLICADO);
 };
 
@@ -231,12 +232,19 @@ const FilaPosicion: React.FC<{
     esRepuesto: boolean;
     neumatico: any | null;
     haySeleccionado: boolean;
+    /**
+     * La posición ya venía montada desde la base, no se llenó en este modal. No se
+     * puede editar ni quitar desde acá: este modal sólo monta lo que falta. Para
+     * cambiar o sacar un neumático que ya está puesto se usa Desasignar o Reubicar,
+     * que son los flujos que sí registran el movimiento de salida.
+     */
+    yaMontado: boolean;
     /** En móvil, una posición vacía ofrece ir a elegir un neumático para ella. */
     onElegirNeumatico?: (posicion: string) => void;
     onAsignarAqui: (posicion: string) => void;
     onEditar: (posicion: string) => void;
     onQuitar: (posicion: string) => void;
-}> = ({ posicion, esRepuesto, neumatico, haySeleccionado, onElegirNeumatico, onAsignarAqui, onEditar, onQuitar }) => {
+}> = ({ posicion, esRepuesto, neumatico, haySeleccionado, yaMontado, onElegirNeumatico, onAsignarAqui, onEditar, onQuitar }) => {
     const ocupada = Boolean(neumatico);
     const completo = datosCompletos(neumatico, posicion);
 
@@ -264,7 +272,7 @@ const FilaPosicion: React.FC<{
                 )}
             </div>
 
-            {ocupada && !completo && (
+            {ocupada && !completo && !yaMontado && (
                 <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-700">
                     <CircleAlert className="h-3 w-3" />
                     Faltan datos
@@ -272,7 +280,15 @@ const FilaPosicion: React.FC<{
             )}
 
             <div className="flex shrink-0 items-center gap-1">
-                {ocupada ? (
+                {yaMontado ? (
+                    <span
+                        className="inline-flex shrink-0 items-center gap-1 rounded-full border border-slate-200 bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-500"
+                        title="Ya está montado. Para cambiarlo o sacarlo usa Desasignar o Reubicar."
+                    >
+                        <Lock className="h-3 w-3" />
+                        Montado
+                    </span>
+                ) : ocupada ? (
                     <>
                         <ButtonCustom variant="warning" size="sm" onClick={() => onEditar(posicion)} title="Editar datos de instalación">
                             <Pencil className="h-3.5 w-3.5" />
@@ -334,6 +350,33 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
     );
 
     const [assignedNeumaticos, setAssignedNeumaticos] = useState(initialAssignedMap);
+
+    /**
+     * Lo que de verdad se va a registrar: sólo las posiciones que cambiaron en esta
+     * pasada. Las que ya venían montadas desde la base y siguen con el MISMO neumático
+     * se dejan en paz.
+     *
+     * Antes se enviaban las N posiciones siempre. Eso funcionaba cuando el modal era
+     * sólo para vehículos vacíos, pero dejó de serlo: una camioneta que pasa de 5 a 6
+     * posiciones entra acá a montar el que le falta. Al reenviar los otros 5, el backend
+     * les registraba un MONTAJE duplicado y —peor— les pisaba ODOMETRO_AL_MONTAR, que es
+     * desde dónde se cuenta su kilometraje recorrido. No hay guarda en el backend contra
+     * re-montar algo ya montado, así que el filtro tiene que estar acá.
+     *
+     * La pantalla de reconfirmación usa esta misma lista: si mostrara las 6 cuando sólo
+     * se monta 1, le estaría mintiendo al técnico.
+     */
+    const posicionesAMontar = useMemo(
+        () => Object.entries(assignedNeumaticos).filter(([pos, neu]) => {
+            if (!neu) return false;
+            if (neu.TIPO_MOVIMIENTO === 'BAJA DEFINITIVA' || neu.TIPO_MOVIMIENTO === 'RECUPERADO') return false;
+            const yaMontado = initialAssignedMap[pos];
+            if (yaMontado && codigoDe(yaMontado) === codigoDe(neu)) return false;
+            return true;
+        }),
+        [assignedNeumaticos, initialAssignedMap]
+    );
+
     const [openDialog, setOpenDialog] = useState(false);
     const [neumaticoSeleccionado, setNeumaticoSeleccionado] = useState<any | null>(null);
 
@@ -426,12 +469,29 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
         setTabMovil(1);
     };
 
+    /**
+     * La posición ya venía montada desde la base y nadie la cambió en este modal.
+     * Este modal sólo monta lo que falta: tocar un neumático que ya está puesto es
+     * trabajo de Desasignar o Reubicar, que sí registran el movimiento de salida.
+     */
+    const estaYaMontado = (posicion: string) => {
+        const original = initialAssignedMap[posicion];
+        if (!original) return false;
+        return codigoDe(original) === codigoDe(assignedNeumaticos[posicion]);
+    };
+
+    const avisarMontado = () => {
+        toast.info('Ese neumático ya está montado. Para cambiarlo o sacarlo usa Desasignar o Reubicar.');
+    };
+
     const abrirEdicion = (posicion: string) => {
+        if (estaYaMontado(posicion)) { avisarMontado(); return; }
         setInputsModalPosition(posicion);
         setInputsModalOpen(true);
     };
 
     const pedirQuitar = (posicion: string) => {
+        if (estaYaMontado(posicion)) { avisarMontado(); return; }
         setRemovePosition(posicion);
         setRemoveConfirmOpen(true);
     };
@@ -506,25 +566,20 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
             return;
         }
 
-        const fechas = Object.values(assignedNeumaticos)
-            .filter(Boolean)
-            .map((neu) => neu!.FECHA_ASIGNACION ?? '');
-        const todasIguales = fechas.every((f) => f === fechas[0]);
-        if (!todasIguales) {
-            toast.error('Todos los neumáticos deben tener la misma fecha de asignación.');
+        // Ver `posicionesAMontar`: sólo lo que cambió en esta pasada.
+        const toAssign = posicionesAMontar;
+        if (toAssign.length === 0) {
+            toast.info('No hay cambios que guardar: las posiciones ya estaban montadas con esos mismos neumáticos.');
             return;
         }
 
-        // Tomar todos los asignados (excepto baja definitiva o recuperado)
-        const toAssign = Object.entries(assignedNeumaticos).filter(
-            ([pos, neu]) => {
-                if (!neu) return false;
-                if (neu.TIPO_MOVIMIENTO === 'BAJA DEFINITIVA' || neu.TIPO_MOVIMIENTO === 'RECUPERADO') return false;
-                return true;
-            }
-        );
-        if (toAssign.length === 0) {
-            toast.info('No hay neumáticos asignados para actualizar.');
+        // La fecha se exige igual sólo entre los que se van a montar ahora. Antes se
+        // comparaba contra todas las posiciones: una camioneta que pasa de 5 a 6 nunca
+        // habría podido guardar, porque los 5 viejos traen su fecha de montaje original
+        // y el nuevo la de hoy.
+        const fechas = toAssign.map(([, neu]) => neu!.FECHA_ASIGNACION ?? '');
+        if (!fechas.every((f) => f === fechas[0])) {
+            toast.error('Todos los neumáticos a montar deben tener la misma fecha de asignación.');
             return;
         }
         // Validación robusta de campos requeridos
@@ -541,7 +596,7 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
 
                 // Validación extra: el backend no acepta 0, así que bloqueamos 0 explícitamente (excepto FECHA_ASIGNACION)
                 if (campo !== 'FECHA_ASIGNACION' && typeof valor === 'number' && valor === 0) {
-                    if (pos === 'RES01' && campo === 'TORQUE_APLICADO') continue;
+                    if (esPosicionRepuesto(pos) && campo === 'TORQUE_APLICADO') continue;
                     toast.error(`El campo "${campo}" no puede ser 0 en la posición ${pos}.`);
                     return;
                 }
@@ -580,7 +635,31 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
                 };
             });
 
-            await asignarNeumatico(payloadArray);
+            const respuesta = await asignarNeumatico(payloadArray);
+
+            // El backend responde por ítem: puede salir 207 con unas asignadas y otras
+            // rechazadas. Sin mirar `resultados` el front cantaba "asignado
+            // correctamente" aunque no se hubiera grabado nada — pasó en producción el
+            // 2026-11-02: no se registró el movimiento ni se actualizó el neumático, y
+            // el usuario no se enteró.
+            const fallidos = Array.isArray(respuesta?.resultados)
+                ? respuesta.resultados.filter((r: any) => r?.error)
+                : [];
+
+            if (fallidos.length > 0) {
+                const detalle = fallidos
+                    .map((r: any) => r.detalle || r.error)
+                    .join(' · ');
+                toast.error(`No se pudo asignar ${fallidos.length} neumático(s): ${detalle}`, {
+                    position: 'top-center',
+                    duration: 12000,
+                });
+                if (typeof onAssignedUpdate === 'function') {
+                    await onAssignedUpdate();
+                }
+                return;
+            }
+
             toast.success('Neumático(s) asignado(s) y kilometraje actualizado.', {
                 position: 'top-right',
                 duration: 6000
@@ -600,9 +679,15 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
     const [initialOdometro, setInitialOdometro] = useState<number>(kilometro || 0);
     const [kmError, setKmError] = useState<boolean>(false);
 
-    // Sincronizar Odometro e initialOdometro cuando cambie la prop kilometro o al abrir el modal
+    // Sincronizar Odometro e initialOdometro cuando cambie la prop kilometro o al abrir el modal.
+    //
+    // El campo arranca con el kilometraje actual del vehículo en vez de vacío: montar un
+    // neumático no es recorrer kilómetros. Cuando sólo se agrega el que falta a un
+    // vehículo que ya anda, el odómetro no cambió y obligar a escribir un número mayor
+    // sería inventar un dato. Si de verdad subió, el técnico lo corrige — la validación
+    // acepta desde el valor actual hasta +25.000 km.
     useEffect(() => {
-        setOdometro('');
+        setOdometro(kilometro ? String(kilometro) : '');
         setInitialOdometro(kilometro || 0);
         setKmError(false);
     }, [kilometro, open]);
@@ -696,6 +781,7 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
                         posicion={p.codigo}
                         esRepuesto={p.repuesto}
                         neumatico={assignedNeumaticos[p.codigo]}
+                        yaMontado={estaYaMontado(p.codigo)}
                         haySeleccionado={Boolean(neumaticoSeleccionado)}
                         onElegirNeumatico={esPantallaChica ? elegirNeumaticoPara : undefined}
                         onAsignarAqui={asignarAPosicion}
@@ -815,7 +901,7 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
             placa={placa}
             kilometraje={Odometro}
             neumaticos={
-                Object.entries(assignedNeumaticos).map(([pos, neu]) => {
+                posicionesAMontar.map(([pos, neu]) => {
                     const codigo = neu!.CODIGO ?? neu!.CODIGO_NEU;
                     const remanente = typeof neu!.REMANENTE === 'string' ? parseFloat(neu!.REMANENTE) : (neu!.REMANENTE ?? 0);
                     const presionAire = typeof neu!.PRESION_AIRE === 'string' ? parseFloat(neu!.PRESION_AIRE) : (neu!.PRESION_AIRE ?? 0);

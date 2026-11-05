@@ -14,6 +14,7 @@ import { Button as ButtonCustom } from '@/components/ui/button';
 import { LoadingButton2 } from '@/components/ui/loading-button2';
 import { convertToDateHuman } from '@/lib/utils';
 import { NeumaticoPorAsignar } from '@/types/neumatico';
+import { esPosicionRepuesto } from '@/utils/configuraciones-neumaticos';
 
 interface ModalInformacionAsignacionProps {
   open: boolean;
@@ -139,7 +140,7 @@ export const ModalInformacionAsignacion = ({ open, kilometraje, neumaticos = [],
         ) : (
           <div className="grid grid-cols-1 gap-2 lg:grid-cols-2">
             {neumaticos.map((neu) => {
-              const esRepuesto = neu.Posicion === 'RES01';
+              const esRepuesto = esPosicionRepuesto(neu.Posicion);
               return (
                 <div
                   key={neu.Posicion}

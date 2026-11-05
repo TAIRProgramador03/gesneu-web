@@ -45,6 +45,24 @@ export const CONFIGURACION_IMAGEN: Record<number, ConfiguracionImagen> = {
             { codigo: 'RES01', x: 223, y: 881, w: 70, h: 132, lado: null, repuesto: true },
         ],
     },
+    6: {
+        // Misma camioneta que la de 5, con un segundo repuesto (los dos obligatorios).
+        // Se corren a los lados desde donde iba el único (x: 223), porque uno encima del
+        // otro no entra. Las cuatro ruedas de rodaje no se mueven.
+        imagen: '/assets/vehiculos/carro.png',
+        anchoNatural: 436,
+        altoNatural: 970,
+        marcadores: [
+            { codigo: 'POS01', x: 54, y: 158, w: 60, h: 135, lado: 'IZQ' },
+            { codigo: 'POS02', x: 376, y: 158, w: 60, h: 135, lado: 'DER' },
+            { codigo: 'POS03', x: 54, y: 765, w: 60, h: 132, lado: 'IZQ' },
+            { codigo: 'POS04', x: 376, y: 765, w: 60, h: 132, lado: 'DER' },
+            // Las etiquetas cuelgan ABAJO, no a los costados: a la izquierda ya está la
+            // del POS03 y a la derecha la del POS04, y se pisaban entre ellas.
+            { codigo: 'RES01', x: 150, y: 881, w: 70, h: 132, lado: null, repuesto: true, etiqueta: 'ABAJO' },
+            { codigo: 'RES02', x: 296, y: 881, w: 70, h: 132, lado: null, repuesto: true, etiqueta: 'ABAJO' },
+        ],
+    },
     7: {
         imagen: '/assets/vehiculos/camion.png',
         anchoNatural: 388,

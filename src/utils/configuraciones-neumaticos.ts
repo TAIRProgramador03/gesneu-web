@@ -22,7 +22,7 @@ export interface RangosMedicion {
   remanente: Rango;
   /** Presión de aire, en psi. */
   presion: Rango;
-  /** Torque de ajuste, en N·m. No aplica al repuesto (RES01). */
+  /** Torque de ajuste, en N·m. No aplica a los repuestos (RES01, RES02). */
   torque: Rango;
 }
 
@@ -66,6 +66,20 @@ export const CONFIGURACIONES_NEUMATICOS: Record<number, ConfiguracionNeumaticos>
       { codigo: 'RES01', eje: null, lado: null, repuesto: true },
     ],
   },
+  6: {
+    cantidad: 6,
+    nombre: 'Camioneta, doble repuesto',
+    rangos: RANGOS_ESTANDAR,
+    posiciones: [
+      { codigo: 'POS01', eje: 1, lado: 'IZQ', repuesto: false },
+      { codigo: 'POS02', eje: 1, lado: 'DER', repuesto: false },
+      { codigo: 'POS03', eje: 2, lado: 'IZQ', repuesto: false },
+      { codigo: 'POS04', eje: 2, lado: 'DER', repuesto: false },
+      { codigo: 'RES01', eje: null, lado: null, repuesto: true },
+      // Los dos repuestos son obligatorios: la camioneta de 6 debe andar con sus 6.
+      { codigo: 'RES02', eje: null, lado: null, repuesto: true },
+    ],
+  },
   7: {
     cantidad: 7,
     nombre: 'Camión, eje trasero doble',
@@ -85,6 +99,23 @@ export const CONFIGURACIONES_NEUMATICOS: Record<number, ConfiguracionNeumaticos>
     ],
   },
 };
+
+/**
+ * Si una posición es de repuesto, mirando solo su código.
+ *
+ * Reemplaza a los `=== 'RES01'` que había repartidos por toda la app: ese literal
+ * significaba "es repuesto", no "es el repuesto número uno". Desde que existe el
+ * RES02 la diferencia importa — con el literal, el segundo repuesto sumaba
+ * kilometraje y exigía torque como si rodara.
+ *
+ * Va por patrón y no por la configuración del vehículo a propósito: casi todos los
+ * sitios que preguntan esto tienen el código de la posición a mano, pero no la
+ * cantidad de neumáticos.
+ */
+export function esPosicionRepuesto(codigo: string | null | undefined): boolean {
+  if (!codigo) return false;
+  return /^RES\d+$/i.test(codigo.trim());
+}
 
 export function obtenerConfiguracionNeumaticos(cantidadNeumaticos: number | string | null | undefined): ConfiguracionNeumaticos | null {
   if (cantidadNeumaticos === null || cantidadNeumaticos === undefined) return null;
