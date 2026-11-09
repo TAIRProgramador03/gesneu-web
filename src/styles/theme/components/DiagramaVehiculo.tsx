@@ -302,7 +302,7 @@ const DiagramaVehiculo: React.FC<
                             overflow: 'hidden',
                             border: '1px solid',
                             borderColor: 'divider',
-                            background: '#fff',
+                            background: 'var(--card)',
                         }}
                     >
                         <Box
@@ -381,7 +381,7 @@ const DiagramaVehiculo: React.FC<
                 borderColor: 'divider',
                 borderRadius: 2,
                 padding: '14px 12px',
-                background: '#fff',
+                background: 'var(--card)',
             }}
         >
             {filasConRepuesto.map((fila) => (
@@ -471,7 +471,7 @@ const PosicionNeumatico: React.FC<{
                         justifyContent: 'center',
                         gap: '1px',
                         fontWeight: 700,
-                        color: '#1e293b',
+                        color: 'var(--foreground)',
                         fontFamily: 'monospace',
                         cursor: neumatico ? 'grab' : 'pointer',
                         transition: 'background 0.15s, border 0.15s',
@@ -488,7 +488,7 @@ const PosicionNeumatico: React.FC<{
                             sx={{
                                 fontSize: Math.max(7, width * 0.15),
                                 fontWeight: 500,
-                                color: '#64748b',
+                                color: 'var(--texto-apagado)',
                                 lineHeight: 1,
                                 textTransform: 'uppercase',
                             }}
@@ -735,7 +735,7 @@ const MarcadorImagenNeumatico: React.FC<{
                                 flexDirection: 'column',
                                 alignItems: 'center',
                                 gap: '2px',
-                                background: 'linear-gradient(135deg, #f8fafc, #eef2f6)',
+                                background: 'linear-gradient(135deg, var(--superficie-1), var(--superficie-2))',
                                 borderRadius: '7px',
                                 padding: '4px 7px',
                                 boxShadow: '0 2px 6px rgba(15, 23, 42, 0.18)',
@@ -746,19 +746,19 @@ const MarcadorImagenNeumatico: React.FC<{
                         >
                             {etiquetaDatos === 'completo' && (
                                 <>
-                                    <Box component="span" sx={{ fontSize: '0.75rem', fontWeight: 700, color: '#475569', fontFamily: 'monospace', letterSpacing: '0.2px' }}>
+                                    <Box component="span" sx={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--texto-apagado)', fontFamily: 'monospace', letterSpacing: '0.2px' }}>
                                         {neumatico.CODIGO_NEU || neumatico.CODIGO || '—'}
                                     </Box>
                                     <Box component="span" sx={{ width: '100%', height: '1px', background: 'rgba(15, 23, 42, 0.12)' }} />
                                 </>
                             )}
-                            <Box component="span" sx={{ fontSize: '0.75rem', fontWeight: 800, color: '#0f172a', fontFamily: 'monospace', letterSpacing: '0.2px' }}>
+                            <Box component="span" sx={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--foreground)', fontFamily: 'monospace', letterSpacing: '0.2px' }}>
                                 {neumatico.REMANENTE ?? '—'}mm
                             </Box>
                             {etiquetaDatos === 'completo' && (
                                 <>
                                     <Box component="span" sx={{ width: '100%', height: '1px', background: 'rgba(15, 23, 42, 0.12)' }} />
-                                    <Box component="span" sx={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b', fontFamily: 'monospace' }}>
+                                    <Box component="span" sx={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--texto-apagado)', fontFamily: 'monospace' }}>
                                         {kmRecorrido}
                                     </Box>
                                 </>

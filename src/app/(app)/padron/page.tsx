@@ -397,8 +397,8 @@ export default function Page(): React.JSX.Element {
                   <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.98rem' }}>
                     <thead>
                       <tr>
-                        <th style={{ background: '#f5f5f5', padding: '6px' }}>Fila/Código</th>
-                        <th style={{ background: '#f5f5f5', padding: '6px' }}>Mensaje</th>
+                        <th style={{ background: 'var(--superficie-2)', padding: '6px' }}>Fila/Código</th>
+                        <th style={{ background: 'var(--superficie-2)', padding: '6px' }}>Mensaje</th>
                       </tr>
                     </thead>
                     <tbody>

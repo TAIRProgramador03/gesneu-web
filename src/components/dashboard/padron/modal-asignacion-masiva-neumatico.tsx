@@ -44,7 +44,7 @@ const PosicionBadge = ({ posicion }: { posicion: Posicion }) => {
   return (
     <span className={cn(
       "inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold ring-1 ring-inset whitespace-nowrap",
-      esRepuesto ? "bg-purple-50 text-purple-700 ring-purple-200" : "bg-blue-50 text-blue-700 ring-blue-200"
+      esRepuesto ? "bg-purple-50 dark:bg-purple-500/10 text-purple-700 dark:text-purple-300 ring-purple-200 dark:ring-purple-500/30" : "bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-300 ring-blue-200 dark:ring-blue-500/30"
     )}>
       {posicion}
     </span>
@@ -53,7 +53,7 @@ const PosicionBadge = ({ posicion }: { posicion: Posicion }) => {
 
 const MotivoFila = ({ motivo }: { motivo?: string }) => (
   motivo ? (
-    <span className="inline-flex items-center gap-1 text-red-600 font-medium">
+    <span className="inline-flex items-center gap-1 text-red-600 dark:text-red-300 font-medium">
       <CircleAlert size={12} className="shrink-0" />
       {motivo}
     </span>
@@ -80,7 +80,7 @@ const TorqueCell = ({ neu, dense }: { neu: NeumaticoMasivo; dense?: boolean }) =
       <span
         title="Repuesto: torque deshabilitado, forzado a 0 y sin validación de rango."
         className={cn(
-          "inline-flex items-center gap-1 rounded-md bg-slate-100 px-1.5 py-0.5 font-medium text-slate-400 ring-1 ring-inset ring-slate-200",
+          "inline-flex items-center gap-1 rounded-md bg-slate-100 dark:bg-superficie-2 px-1.5 py-0.5 font-medium text-slate-400 ring-1 ring-inset ring-slate-200",
           dense ? "text-xs" : "text-xs"
         )}
       >
@@ -88,11 +88,11 @@ const TorqueCell = ({ neu, dense }: { neu: NeumaticoMasivo; dense?: boolean }) =
       </span>
     );
   }
-  return <span className="text-slate-600">{neu.torque ?? '-'} Nm</span>;
+  return <span className="text-slate-600 dark:text-slate-300">{neu.torque ?? '-'} Nm</span>;
 };
 
 const TablaNeumaticosPlaca = ({ neumaticos, mostrarMotivo }: { neumaticos: NeumaticoMasivo[]; mostrarMotivo: boolean }) => (
-  <div className="border-t border-slate-100">
+  <div className="border-t border-slate-100 dark:border-slate-800">
     {/* Tabla (desktop) */}
     <div className="hidden md:block overflow-x-auto">
       <table className="w-full text-xs">
@@ -117,13 +117,13 @@ const TablaNeumaticosPlaca = ({ neumaticos, mostrarMotivo }: { neumaticos: Neuma
         </thead>
         <tbody>
           {neumaticos.map(neu => (
-            <tr key={neu.codigo} className="border-t border-slate-100">
-              <td className="px-3 py-2 font-mono font-medium text-slate-700">{neu.codigo}</td>
+            <tr key={neu.codigo} className="border-t border-slate-100 dark:border-slate-800">
+              <td className="px-3 py-2 font-mono font-medium text-slate-700 dark:text-slate-200">{neu.codigo}</td>
               <td className="px-3 py-2"><PosicionBadge posicion={neu.posicion} /></td>
-              <td className="px-3 py-2 text-slate-600">{neu.remanente} mm</td>
-              <td className="px-3 py-2 text-slate-600">{neu.presion} psi</td>
+              <td className="px-3 py-2 text-slate-600 dark:text-slate-300">{neu.remanente} mm</td>
+              <td className="px-3 py-2 text-slate-600 dark:text-slate-300">{neu.presion} psi</td>
               <td className="px-3 py-2"><TorqueCell neu={neu} /></td>
-              <td className="px-3 py-2 text-slate-600">{formatFechaCorta(neu.fechaAsignacion)}</td>
+              <td className="px-3 py-2 text-slate-600 dark:text-slate-300">{formatFechaCorta(neu.fechaAsignacion)}</td>
               {mostrarMotivo && (
                 <td className="px-3 py-2"><MotivoFila motivo={neu.error} /></td>
               )}
@@ -136,11 +136,11 @@ const TablaNeumaticosPlaca = ({ neumaticos, mostrarMotivo }: { neumaticos: Neuma
     {/* Cards (mobile) */}
     <div className="md:hidden flex flex-col gap-2 p-3">
       {neumaticos.map(neu => (
-        <div key={neu.codigo} className="rounded-md border border-slate-100 bg-slate-50 p-2.5 text-xs">
+        <div key={neu.codigo} className="rounded-md border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-superficie-1 p-2.5 text-xs">
           <div className="grid grid-cols-2 gap-x-2 gap-y-1.5">
             <div>
               <div className="text-xs uppercase text-slate-400">Código</div>
-              <div className="font-mono font-medium text-slate-700">{neu.codigo}</div>
+              <div className="font-mono font-medium text-slate-700 dark:text-slate-200">{neu.codigo}</div>
             </div>
             <div>
               <div className="text-xs uppercase text-slate-400">Posición</div>
@@ -148,11 +148,11 @@ const TablaNeumaticosPlaca = ({ neumaticos, mostrarMotivo }: { neumaticos: Neuma
             </div>
             <div>
               <div className="text-xs uppercase text-slate-400">Remanente</div>
-              <div className="text-slate-600">{neu.remanente} mm</div>
+              <div className="text-slate-600 dark:text-slate-300">{neu.remanente} mm</div>
             </div>
             <div>
               <div className="text-xs uppercase text-slate-400">Presión</div>
-              <div className="text-slate-600">{neu.presion} psi</div>
+              <div className="text-slate-600 dark:text-slate-300">{neu.presion} psi</div>
             </div>
             <div>
               <div className="text-xs uppercase text-slate-400">Torque</div>
@@ -160,11 +160,11 @@ const TablaNeumaticosPlaca = ({ neumaticos, mostrarMotivo }: { neumaticos: Neuma
             </div>
             <div>
               <div className="text-xs uppercase text-slate-400">F. Asignación</div>
-              <div className="text-slate-600">{formatFechaCorta(neu.fechaAsignacion)}</div>
+              <div className="text-slate-600 dark:text-slate-300">{formatFechaCorta(neu.fechaAsignacion)}</div>
             </div>
           </div>
           {mostrarMotivo && (
-            <div className="mt-2 pt-2 border-t border-slate-200">
+            <div className="mt-2 pt-2 border-t border-slate-200 dark:border-slate-700">
               <MotivoFila motivo={neu.error} />
             </div>
           )}
@@ -364,9 +364,9 @@ export const ModalAsignacionMasivaNeumatico = ({ open, onClose, onSuccess }: Mod
         <Box sx={{
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           width: 40, height: 40, borderRadius: 2, flexShrink: 0,
-          background: 'linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%)',
+          background: 'linear-gradient(135deg, var(--tinte-azul-fuerte) 0%, var(--tinte-indigo) 100%)',
         }}>
-          <Sheet size={20} className="text-blue-600" />
+          <Sheet size={20} className="text-blue-600 dark:text-blue-300" />
         </Box>
         <Box sx={{ flex: 1, minWidth: 0 }}>
           <Typography variant="h6" fontWeight={700} lineHeight={1.2}>
@@ -381,7 +381,7 @@ export const ModalAsignacionMasivaNeumatico = ({ open, onClose, onSuccess }: Mod
         </IconButton>
       </DialogTitle>
 
-      <DialogContent sx={{ p: 3, bgcolor: '#f8fafc', flex: 1, overflowY: 'auto', position: 'relative' }}>
+      <DialogContent sx={{ p: 3, bgcolor: 'var(--superficie-1)', flex: 1, overflowY: 'auto', position: 'relative' }}>
 
         {confirmandoCierre && (
           <Box sx={{
@@ -394,7 +394,7 @@ export const ModalAsignacionMasivaNeumatico = ({ open, onClose, onSuccess }: Mod
                 background: 'linear-gradient(135deg, #fef9c3 0%, #fef08a 100%)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
-                <TriangleAlert size={26} className="text-yellow-600" />
+                <TriangleAlert size={26} className="text-yellow-600 dark:text-yellow-300" />
               </Box>
               <Typography variant="subtitle1" fontWeight={700} gutterBottom>
                 ¿Cancelar el procesamiento?
@@ -427,7 +427,7 @@ export const ModalAsignacionMasivaNeumatico = ({ open, onClose, onSuccess }: Mod
               onClick={() => inputRef.current?.click()}
               className={cn(
                 "flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed py-10 px-6 cursor-pointer transition-colors mt-4",
-                dragActive ? "border-blue-500 bg-blue-50" : "border-slate-300 bg-white hover:bg-slate-50"
+                dragActive ? "border-blue-500 bg-blue-50 dark:bg-blue-500/10" : "border-slate-300 dark:border-slate-600 bg-white dark:bg-card hover:bg-slate-50 dark:hover:bg-superficie-1"
               )}
             >
               <input
@@ -441,9 +441,9 @@ export const ModalAsignacionMasivaNeumatico = ({ open, onClose, onSuccess }: Mod
                 <>
                   <Box sx={{
                     width: 44, height: 44, borderRadius: 2, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    background: 'linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%)',
+                    background: 'linear-gradient(135deg, var(--tinte-verde-fuerte) 0%, var(--tinte-verde-fuerte) 100%)',
                   }}>
-                    <FileSpreadsheet size={22} className="text-green-600" />
+                    <FileSpreadsheet size={22} className="text-green-600 dark:text-green-300" />
                   </Box>
                   <Typography variant="body2" fontWeight={600}>{archivo.name}</Typography>
                   <Typography variant="caption" color="text.secondary">Haz clic para elegir otro archivo</Typography>
@@ -463,14 +463,14 @@ export const ModalAsignacionMasivaNeumatico = ({ open, onClose, onSuccess }: Mod
               <button
                 type="button"
                 onClick={descargarPlantilla}
-                className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-800 hover:underline"
+                className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 dark:text-blue-300 hover:text-blue-800 dark:hover:text-blue-200 hover:underline"
               >
                 <Download size={13} />
                 Descargar plantilla
               </button>
             </Box>
 
-            <div className="mt-4 flex items-start gap-2 rounded-lg bg-amber-50 border border-amber-200 px-3 py-2.5 text-sm text-amber-700">
+            <div className="mt-4 flex items-start gap-2 rounded-lg bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/30 px-3 py-2.5 text-sm text-amber-700 dark:text-amber-300">
               <CircleAlert size={16} className="mt-0.5 shrink-0" />
               <div>
                 <span className="font-semibold">Antes de subir el archivo, ten en cuenta:</span>
@@ -487,7 +487,7 @@ export const ModalAsignacionMasivaNeumatico = ({ open, onClose, onSuccess }: Mod
 
         {paso === 'procesando' && (
           <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: 320, gap: 2 }}>
-            <Spinner className="size-10 text-blue-600" />
+            <Spinner className="size-10 text-blue-600 dark:text-blue-300" />
             <Typography variant="body1" fontWeight={600}>Procesando archivo...</Typography>
             <Typography variant="body2" color="text.secondary">Esto puede demorar unos segundos.</Typography>
           </Box>
@@ -499,39 +499,39 @@ export const ModalAsignacionMasivaNeumatico = ({ open, onClose, onSuccess }: Mod
               const totalPlacas = resultado.aprobadas.length + resultado.rechazadas.length;
               const porcentajeExito = totalPlacas > 0 ? Math.round((resultado.aprobadas.length / totalPlacas) * 100) : 0;
               const exitoTono = porcentajeExito >= 80
-                ? { grad: 'from-emerald-500 to-emerald-600', text: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-200' }
+                ? { grad: 'from-emerald-500 to-emerald-600', text: 'text-emerald-600 dark:text-emerald-300', bg: 'bg-emerald-50 dark:bg-emerald-500/10', border: 'border-emerald-200 dark:border-emerald-500/30' }
                 : porcentajeExito >= 50
-                  ? { grad: 'from-amber-500 to-amber-600', text: 'text-amber-600', bg: 'bg-amber-50', border: 'border-amber-200' }
-                  : { grad: 'from-red-500 to-red-600', text: 'text-red-600', bg: 'bg-red-50', border: 'border-red-200' };
+                  ? { grad: 'from-amber-500 to-amber-600', text: 'text-amber-600 dark:text-amber-300', bg: 'bg-amber-50 dark:bg-amber-500/10', border: 'border-amber-200 dark:border-amber-500/30' }
+                  : { grad: 'from-red-500 to-red-600', text: 'text-red-600 dark:text-red-300', bg: 'bg-red-50 dark:bg-red-500/10', border: 'border-red-200 dark:border-red-500/30' };
 
               return (
                 <div className="grid grid-cols-4 gap-3 mb-4 mt-4">
-                  <div className="rounded-xl bg-indigo-50 border border-indigo-200 px-3 py-3 flex items-center gap-2.5">
+                  <div className="rounded-xl bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/30 px-3 py-3 flex items-center gap-2.5">
                     <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-linear-to-br from-indigo-500 to-blue-600 shrink-0">
                       <ListChecks size={18} className="text-white" />
                     </div>
                     <div className="min-w-0">
-                      <div className="text-xl font-bold text-indigo-700 leading-tight">{totalPlacas}</div>
+                      <div className="text-xl font-bold text-indigo-700 dark:text-indigo-300 leading-tight">{totalPlacas}</div>
                       <div className="text-xs font-medium text-indigo-500/80 leading-tight">Total procesadas</div>
                     </div>
                   </div>
 
-                  <div className="rounded-xl bg-emerald-50 border border-emerald-200 px-3 py-3 flex items-center gap-2.5">
+                  <div className="rounded-xl bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/30 px-3 py-3 flex items-center gap-2.5">
                     <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-linear-to-br from-emerald-500 to-green-600 shrink-0">
                       <SquareCheck size={18} className="text-white" />
                     </div>
                     <div className="min-w-0">
-                      <div className="text-xl font-bold text-emerald-700 leading-tight">{resultado.aprobadas.length}</div>
-                      <div className="text-xs font-medium text-emerald-600/80 leading-tight">Aprobadas</div>
+                      <div className="text-xl font-bold text-emerald-700 dark:text-emerald-300 leading-tight">{resultado.aprobadas.length}</div>
+                      <div className="text-xs font-medium text-emerald-600 dark:text-emerald-300/80 dark:text-emerald-300/80 leading-tight">Aprobadas</div>
                     </div>
                   </div>
 
-                  <div className="rounded-xl bg-red-50 border border-red-200 px-3 py-3 flex items-center gap-2.5">
+                  <div className="rounded-xl bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 px-3 py-3 flex items-center gap-2.5">
                     <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-linear-to-br from-red-500 to-rose-600 shrink-0">
                       <XCircle size={18} className="text-white" />
                     </div>
                     <div className="min-w-0">
-                      <div className="text-xl font-bold text-red-700 leading-tight">{resultado.rechazadas.length}</div>
+                      <div className="text-xl font-bold text-red-700 dark:text-red-300 leading-tight">{resultado.rechazadas.length}</div>
                       <div className="text-xs font-medium text-red-500/80 leading-tight">Rechazadas</div>
                     </div>
                   </div>
@@ -549,13 +549,13 @@ export const ModalAsignacionMasivaNeumatico = ({ open, onClose, onSuccess }: Mod
               );
             })()}
 
-            <div className="flex gap-1 border-b border-slate-200 mb-3">
+            <div className="flex gap-1 border-b border-slate-200 dark:border-slate-700 mb-3">
               <button
                 type="button"
                 onClick={() => setTabActiva('aprobadas')}
                 className={cn(
                   "px-3 py-2 text-sm font-medium border-b-2 -mb-px transition-colors",
-                  tabActiva === 'aprobadas' ? "border-blue-600 text-blue-600" : "border-transparent text-slate-500 hover:text-slate-700"
+                  tabActiva === 'aprobadas' ? "border-blue-600 text-blue-600 dark:text-blue-300" : "border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
                 )}
               >
                 Aprobadas ({resultado.aprobadas.length})
@@ -565,7 +565,7 @@ export const ModalAsignacionMasivaNeumatico = ({ open, onClose, onSuccess }: Mod
                 onClick={() => setTabActiva('rechazadas')}
                 className={cn(
                   "px-3 py-2 text-sm font-medium border-b-2 -mb-px transition-colors",
-                  tabActiva === 'rechazadas' ? "border-red-600 text-red-600" : "border-transparent text-slate-500 hover:text-slate-700"
+                  tabActiva === 'rechazadas' ? "border-red-600 text-red-600 dark:text-red-300" : "border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
                 )}
               >
                 Rechazadas ({resultado.rechazadas.length})
@@ -581,20 +581,20 @@ export const ModalAsignacionMasivaNeumatico = ({ open, onClose, onSuccess }: Mod
                 ) : resultado.aprobadas.map(fila => {
                   const expandida = placasExpandidas.has(fila.placa);
                   return (
-                    <div key={fila.placa} className="rounded-lg border border-slate-200 bg-white overflow-hidden">
+                    <div key={fila.placa} className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-card overflow-hidden">
                       <button
                         type="button"
                         onClick={() => handleTogglePlaca(fila.placa)}
-                        className="w-full flex items-center justify-between px-3 py-2.5 text-left hover:bg-slate-50"
+                        className="w-full flex items-center justify-between px-3 py-2.5 text-left hover:bg-slate-50 dark:hover:bg-superficie-1"
                       >
                         <div className="flex items-center gap-2">
-                          <span className="text-sm font-semibold text-slate-800">{fila.placa}</span>
-                          <span className="inline-flex items-center rounded-md bg-slate-100 px-1.5 py-0.5 text-xs font-medium text-slate-600 ring-1 ring-inset ring-slate-200">
+                          <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">{fila.placa}</span>
+                          <span className="inline-flex items-center rounded-md bg-slate-100 dark:bg-superficie-2 px-1.5 py-0.5 text-xs font-medium text-slate-600 dark:text-slate-300 ring-1 ring-inset ring-slate-200">
                             {fila.kilometraje.toLocaleString('es-PE')} km
                           </span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <span className="text-xs text-slate-500">{fila.neumaticos.length} neumáticos</span>
+                          <span className="text-xs text-slate-500 dark:text-slate-400">{fila.neumaticos.length} neumáticos</span>
                           <ChevronDown size={16} className={cn("text-slate-400 transition-transform", expandida && "rotate-180")} />
                         </div>
                       </button>
@@ -618,32 +618,32 @@ export const ModalAsignacionMasivaNeumatico = ({ open, onClose, onSuccess }: Mod
                       key={fila.placa}
                       className={cn(
                         "rounded-lg border overflow-hidden",
-                        fila.arrastrada ? "border-slate-200 bg-slate-50" : "border-red-200 bg-white"
+                        fila.arrastrada ? "border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-superficie-1" : "border-red-200 dark:border-red-500/30 bg-white dark:bg-card"
                       )}
                     >
                       <button
                         type="button"
                         onClick={() => handleTogglePlaca(fila.placa)}
-                        className="w-full flex items-center justify-between px-3 py-2.5 text-left hover:bg-slate-100/60"
+                        className="w-full flex items-center justify-between px-3 py-2.5 text-left hover:bg-slate-100 dark:hover:bg-superficie-2/60 dark:hover:bg-superficie-2/60"
                       >
                         <div className="flex items-center gap-2">
-                          <span className={cn("text-sm font-semibold", fila.arrastrada ? "text-slate-600" : "text-slate-800")}>
+                          <span className={cn("text-sm font-semibold", fila.arrastrada ? "text-slate-600 dark:text-slate-300" : "text-slate-800 dark:text-slate-100")}>
                             {fila.placa}
                           </span>
-                          <span className="inline-flex items-center rounded-md bg-slate-100 px-1.5 py-0.5 text-xs font-medium text-slate-600 ring-1 ring-inset ring-slate-200">
+                          <span className="inline-flex items-center rounded-md bg-slate-100 dark:bg-superficie-2 px-1.5 py-0.5 text-xs font-medium text-slate-600 dark:text-slate-300 ring-1 ring-inset ring-slate-200">
                             {fila.kilometraje.toLocaleString('es-PE')} km
                           </span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <span className="text-xs text-slate-500">{fila.neumaticos.length} neumáticos</span>
+                          <span className="text-xs text-slate-500 dark:text-slate-400">{fila.neumaticos.length} neumáticos</span>
                           <ChevronDown size={16} className={cn("text-slate-400 transition-transform", expandida && "rotate-180")} />
                         </div>
                       </button>
                       <div className="px-3 pb-2.5 pt-0 -mt-1">
                         {fila.arrastrada ? (
-                          <p className="text-xs text-slate-500 italic">Bloqueada por otra fila del mismo lote: {fila.motivo}</p>
+                          <p className="text-xs text-slate-500 dark:text-slate-400 italic">Bloqueada por otra fila del mismo lote: {fila.motivo}</p>
                         ) : (
-                          <p className="text-xs text-red-600 font-medium">{fila.motivo}</p>
+                          <p className="text-xs text-red-600 dark:text-red-300 font-medium">{fila.motivo}</p>
                         )}
                       </div>
                       {expandida && (

@@ -12,21 +12,21 @@ const TONOS: Record<TonoAviso, { barra: string; fondo: string; circulo: string; 
         fondo: '#fffbeb',
         circulo: 'from-amber-400 to-orange-500',
         sombra: 'shadow-amber-200',
-        titulo: 'text-amber-700',
+        titulo: 'text-amber-700 dark:text-amber-300',
     },
     azul: {
         barra: 'linear-gradient(90deg, #3b82f6 0%, #6366f1 100%)',
         fondo: '#eff6ff',
         circulo: 'from-blue-500 to-indigo-600',
         sombra: 'shadow-blue-200',
-        titulo: 'text-blue-700',
+        titulo: 'text-blue-700 dark:text-blue-300',
     },
     rojo: {
         barra: 'linear-gradient(90deg, #ef4444 0%, #f97316 100%)',
         fondo: '#fef2f2',
         circulo: 'from-rose-500 to-red-600',
         sombra: 'shadow-rose-200',
-        titulo: 'text-rose-700',
+        titulo: 'text-rose-700 dark:text-rose-300',
     },
 };
 
@@ -92,8 +92,8 @@ export const ModalAviso: React.FC<ModalAvisoProps> = ({
 
                     <div className="min-w-0 flex-1">
                         <p className={`text-base font-extrabold tracking-wide ${t.titulo} sm:text-lg`}>{titulo}</p>
-                        <div className="mt-1 text-sm text-slate-700 sm:text-base">{mensaje}</div>
-                        {detalle && <div className="mt-1.5 text-xs text-slate-500 sm:text-sm">{detalle}</div>}
+                        <div className="mt-1 text-sm text-slate-700 dark:text-slate-200 sm:text-base">{mensaje}</div>
+                        {detalle && <div className="mt-1.5 text-xs text-slate-500 dark:text-slate-400 sm:text-sm">{detalle}</div>}
                     </div>
 
                     {imagen && (

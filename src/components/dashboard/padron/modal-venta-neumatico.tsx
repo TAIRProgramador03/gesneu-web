@@ -46,18 +46,18 @@ const NeumaticoRow = React.memo(function NeumaticoRow({
       className={cn(
         "flex items-center gap-3 rounded-xl px-3 py-2.5 cursor-pointer border-2 transition-all duration-150",
         isSelected
-          ? "border-rose-500 bg-rose-50 shadow-sm"
-          : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
+          ? "border-rose-500 bg-rose-50 dark:bg-rose-500/10 shadow-sm"
+          : "border-slate-200 dark:border-slate-700 bg-white dark:bg-card hover:border-slate-300 dark:hover:border-slate-600 hover:bg-slate-50 dark:hover:bg-superficie-1"
       )}
     >
       <Checkbox checked={isSelected} onCheckedChange={() => onToggle(neu)} onClick={(e) => e.stopPropagation()} aria-label={`Seleccionar ${neu.CODIGO}`} />
 
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
-          <span className="font-mono font-semibold text-sm text-slate-800 truncate">{neu.CODIGO}</span>
+          <span className="font-mono font-semibold text-sm text-slate-800 dark:text-slate-100 truncate">{neu.CODIGO}</span>
           <TipoMovimientoBadge tipoMovimiento={neu.TIPO_MOVIMIENTO} />
         </div>
-        <p className="text-xs text-slate-500 truncate mt-0.5">
+        <p className="text-xs text-slate-500 dark:text-slate-400 truncate mt-0.5">
           {neu.MARCA} · {neu.MEDIDA} · {neu.DISEÑO} · {neu.PROYECTO}
         </p>
       </div>
@@ -69,7 +69,7 @@ const NeumaticoRow = React.memo(function NeumaticoRow({
 
       <div className="text-right shrink-0 w-20">
         <span className="text-xs font-semibold text-slate-400 uppercase tracking-wide block">Costo</span>
-        <span className="text-sm font-bold text-slate-700">{formatCosto(neu.COSTO)}</span>
+        <span className="text-sm font-bold text-slate-700 dark:text-slate-200">{formatCosto(neu.COSTO)}</span>
       </div>
     </div>
   )
@@ -187,7 +187,7 @@ export const ModalVentaNeumatico = ({ open, onClose, onSuccess }: ModalVentaNeum
           width: 40, height: 40, borderRadius: 2, flexShrink: 0,
           background: 'linear-gradient(135deg, #ffe4e6 0%, #fecdd3 100%)',
         }}>
-          <BanknoteArrowUp size={20} className="text-rose-600" />
+          <BanknoteArrowUp size={20} className="text-rose-600 dark:text-rose-300" />
         </Box>
         <Box sx={{ flex: 1, minWidth: 0 }}>
           <Typography variant="h6" fontWeight={700} lineHeight={1.2}>
@@ -199,10 +199,10 @@ export const ModalVentaNeumatico = ({ open, onClose, onSuccess }: ModalVentaNeum
         </Box>
       </DialogTitle>
 
-      <DialogContent sx={{ pt: 2.5, bgcolor: '#f8fafc' }}>
+      <DialogContent sx={{ pt: 2.5, bgcolor: 'var(--superficie-1)' }}>
 
         <Stack spacing={2.5}>
-          <Card sx={{ p: 2.5, borderRadius: 2.5, border: '1px solid #e2e8f0', marginTop: '8px' }} elevation={0}>
+          <Card sx={{ p: 2.5, borderRadius: 2.5, border: '1px solid var(--border)', marginTop: '8px' }} elevation={0}>
             <div className="flex items-center justify-between mb-3 flex-wrap gap-1">
               <Typography variant="subtitle2" color="text.secondary" fontWeight={700}>Neumáticos disponibles</Typography>
               <Typography variant="caption" color="text.disabled">Haz clic en uno o varios para seleccionarlos</Typography>
@@ -220,7 +220,7 @@ export const ModalVentaNeumatico = ({ open, onClose, onSuccess }: ModalVentaNeum
                 <button
                   type="button"
                   onClick={() => cambiarBusqueda('')}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
                   aria-label="Limpiar búsqueda"
                 >
                   <X size={14} />
@@ -235,7 +235,7 @@ export const ModalVentaNeumatico = ({ open, onClose, onSuccess }: ModalVentaNeum
                   onCheckedChange={toggleSeleccionarTodosVisibles}
                   aria-label="Seleccionar todos los visibles"
                 />
-                <span className="text-xs text-slate-500">
+                <span className="text-xs text-slate-500 dark:text-slate-400">
                   Seleccionar todos los visibles de esta página ({neumaticosPagina.length} de {neumaticosDisponiblesParaVenta.length})
                 </span>
                 {isFetching && !isLoading && <Spinner className="size-3.5 text-slate-400" />}
@@ -246,7 +246,7 @@ export const ModalVentaNeumatico = ({ open, onClose, onSuccess }: ModalVentaNeum
               {isLoading ? (
                 <div className="flex flex-col gap-2">
                   {Array.from({ length: 4 }).map((_, i) => (
-                    <div key={i} className="h-15 rounded-xl bg-slate-100 animate-pulse" />
+                    <div key={i} className="h-15 rounded-xl bg-slate-100 dark:bg-superficie-2 animate-pulse" />
                   ))}
                 </div>
               ) : neumaticosDisponiblesParaVenta.length === 0 ? (
@@ -272,7 +272,7 @@ export const ModalVentaNeumatico = ({ open, onClose, onSuccess }: ModalVentaNeum
 
             {!isLoading && neumaticosDisponiblesParaVenta.length > NEUMATICOS_POR_PAGINA && (
               <div className="flex items-center justify-between mt-2 px-1">
-                <span className="text-xs text-slate-500">
+                <span className="text-xs text-slate-500 dark:text-slate-400">
                   Página {paginaActual + 1} de {totalPaginas}
                 </span>
                 <div className="flex items-center gap-1">
@@ -280,7 +280,7 @@ export const ModalVentaNeumatico = ({ open, onClose, onSuccess }: ModalVentaNeum
                     type="button"
                     onClick={() => setPagina(p => Math.max(0, p - 1))}
                     disabled={paginaActual === 0}
-                    className="p-1.5 rounded-md border border-slate-200 text-slate-500 hover:bg-slate-100 disabled:opacity-40 disabled:hover:bg-transparent"
+                    className="p-1.5 rounded-md border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-superficie-2 disabled:opacity-40 disabled:hover:bg-transparent"
                     aria-label="Página anterior"
                   >
                     <ChevronLeft size={14} />
@@ -289,7 +289,7 @@ export const ModalVentaNeumatico = ({ open, onClose, onSuccess }: ModalVentaNeum
                     type="button"
                     onClick={() => setPagina(p => Math.min(totalPaginas - 1, p + 1))}
                     disabled={paginaActual >= totalPaginas - 1}
-                    className="p-1.5 rounded-md border border-slate-200 text-slate-500 hover:bg-slate-100 disabled:opacity-40 disabled:hover:bg-transparent"
+                    className="p-1.5 rounded-md border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-superficie-2 disabled:opacity-40 disabled:hover:bg-transparent"
                     aria-label="Página siguiente"
                   >
                     <ChevronRight size={14} />
@@ -299,12 +299,12 @@ export const ModalVentaNeumatico = ({ open, onClose, onSuccess }: ModalVentaNeum
             )}
 
             {seleccionados.length > 0 && (
-              <div className="mt-3 rounded-lg bg-rose-50 border border-rose-200 p-2.5">
+              <div className="mt-3 rounded-lg bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/30 p-2.5">
                 <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-sm text-rose-700 font-semibold">
+                  <span className="text-sm text-rose-700 dark:text-rose-300 font-semibold">
                     {seleccionados.length} neumático(s) seleccionado(s)
                   </span>
-                  <span className="text-sm text-rose-700 font-bold">
+                  <span className="text-sm text-rose-700 dark:text-rose-300 font-bold">
                     Total: {formatCosto(costoTotalSeleccionados)}
                   </span>
                 </div>
@@ -312,13 +312,13 @@ export const ModalVentaNeumatico = ({ open, onClose, onSuccess }: ModalVentaNeum
                   {seleccionados.map(n => (
                     <span
                       key={n.ID_NEUMATICO}
-                      className="inline-flex items-center gap-1 rounded-full bg-white border border-rose-200 pl-2 pr-1 py-0.5 text-xs font-medium text-rose-700 font-mono"
+                      className="inline-flex items-center gap-1 rounded-full bg-white dark:bg-card border border-rose-200 dark:border-rose-500/30 pl-2 pr-1 py-0.5 text-xs font-medium text-rose-700 dark:text-rose-300 font-mono"
                     >
                       {n.CODIGO}
                       <button
                         type="button"
                         onClick={() => toggleSeleccion(n)}
-                        className="rounded-full hover:bg-rose-100 p-0.5"
+                        className="rounded-full hover:bg-rose-100 dark:hover:bg-rose-500/15 p-0.5"
                         aria-label={`Quitar ${n.CODIGO}`}
                       >
                         <X size={11} />
@@ -330,14 +330,14 @@ export const ModalVentaNeumatico = ({ open, onClose, onSuccess }: ModalVentaNeum
             )}
           </Card>
 
-          <Card sx={{ p: 2.5, borderRadius: 2.5, border: '1px solid #e2e8f0' }} elevation={0}>
+          <Card sx={{ p: 2.5, borderRadius: 2.5, border: '1px solid var(--border)' }} elevation={0}>
             <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 2 }}>
               Datos de la venta
             </Typography>
             <Stack spacing={2}>
               <div>
                 <p style={{ fontSize: '0.75rem', fontWeight: 600, color: "#64748b", margin: "0 0 5px", textTransform: "uppercase", letterSpacing: ".05em" }}>
-                  Número de cotización <span className="text-rose-600">*</span>
+                  Número de cotización <span className="text-rose-600 dark:text-rose-300">*</span>
                 </p>
                 <Input
                   value={numeroCotizacion}

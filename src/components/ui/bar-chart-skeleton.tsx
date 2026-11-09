@@ -23,11 +23,11 @@ export function BarChartSkeleton({ bars = 6, height = 300, className }: BarChart
       </div>
 
       {/* area del grafico: lineas guia + barras */}
-      <div className="relative flex h-[calc(100%-3.5rem)] items-end justify-around gap-3 border-b border-l border-slate-200 px-2 pb-0">
+      <div className="relative flex h-[calc(100%-3.5rem)] items-end justify-around gap-3 border-b border-l border-border px-2 pb-0">
         {/* lineas horizontales guia */}
         <div className="pointer-events-none absolute inset-x-0 top-0 flex h-full flex-col justify-between">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="h-px w-full bg-slate-100" />
+            <div key={i} className="h-px w-full bg-superficie-2" />
           ))}
         </div>
 

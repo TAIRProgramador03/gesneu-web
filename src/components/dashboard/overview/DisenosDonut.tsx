@@ -126,7 +126,7 @@ export const DisenosDonut = (): React.JSX.Element => {
 
       {
         total === 0 && !isLoading && (
-          <div className='flex gap-1 flex-wrap justify-center items-center bg-cyan-50 text-cyan-700 border-2 border-cyan-700 p-2 rounded-lg'>
+          <div className='flex gap-1 flex-wrap justify-center items-center bg-cyan-50 dark:bg-cyan-500/10 text-cyan-700 dark:text-cyan-300 border-2 border-cyan-700 p-2 rounded-lg'>
             <BadgeCheck width={12} />
             <span className='italic text-xs'>Almacén Vacío.</span>
           </div>

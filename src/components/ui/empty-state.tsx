@@ -22,17 +22,17 @@ export function EmptyState({
   return (
     <div
       className={cn(
-        "flex w-full flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-slate-200 bg-slate-50/60 px-6 text-center",
+        "flex w-full flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border bg-superficie-1/60 px-6 text-center",
         className
       )}
       style={{ height }}
     >
-      <div className="flex h-14 w-14 items-center justify-center rounded-full bg-slate-100">
-        <Icon className="h-7 w-7 text-slate-400" strokeWidth={1.75} />
+      <div className="flex h-14 w-14 items-center justify-center rounded-full bg-superficie-2">
+        <Icon className="h-7 w-7 text-texto-apagado" strokeWidth={1.75} />
       </div>
       <div>
-        <p className="text-sm font-semibold text-slate-700">{title}</p>
-        <p className="mt-1 max-w-xs text-xs leading-relaxed text-slate-400">{description}</p>
+        <p className="text-sm font-semibold text-foreground">{title}</p>
+        <p className="mt-1 max-w-xs text-xs leading-relaxed text-texto-apagado">{description}</p>
       </div>
     </div>
   )

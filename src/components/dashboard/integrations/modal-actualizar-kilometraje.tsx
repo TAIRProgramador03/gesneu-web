@@ -26,10 +26,10 @@ export const ModalActualizarKilometraje = ({ open, onClose, placa }: ModalActual
         <Box sx={{
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           width: 40, height: 40, borderRadius: 2,
-          background: 'linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%)',
+          background: 'linear-gradient(135deg, var(--tinte-azul-fuerte) 0%, var(--tinte-indigo) 100%)',
           flexShrink: 0,
         }}>
-          <CloudBackup size={20} className="text-blue-600" />
+          <CloudBackup size={20} className="text-blue-600 dark:text-blue-300" />
         </Box>
         <Box sx={{ flex: 1 }}>
           <Typography variant="h6" fontWeight={700} lineHeight={1.2}>
@@ -40,10 +40,10 @@ export const ModalActualizarKilometraje = ({ open, onClose, placa }: ModalActual
             <Chip
               label={placa}
               size="small"
-              sx={{ fontWeight: 700, fontSize: '0.875rem', bgcolor: '#f1f5f9', color: '#334155', letterSpacing: 0.5 }}
+              sx={{ fontWeight: 700, fontSize: '0.875rem', bgcolor: 'var(--superficie-2)', color: 'var(--foreground)', letterSpacing: 0.5 }}
             />
           </Box>
-          <Typography variant="caption" className='text-amber-600' sx={{ display: 'block', mt: 1, fontStyle: 'italic' }}>
+          <Typography variant="caption" className='text-amber-600 dark:text-amber-300' sx={{ display: 'block', mt: 1, fontStyle: 'italic' }}>
             <span className='font-bold'>Nota: </span>
             Aquí podrás actualizar el kilometraje asignado al primer montaje o en su defecto a la última inspección.
             <br />
@@ -52,9 +52,9 @@ export const ModalActualizarKilometraje = ({ open, onClose, placa }: ModalActual
         </Box>
       </DialogTitle>
 
-      <DialogContent sx={{ pt: 2, bgcolor: '#f8fafc' }}>
+      <DialogContent sx={{ pt: 2, bgcolor: 'var(--superficie-1)' }}>
 
-        <Card sx={{ flex: 1, p: 2.5, borderRadius: 2.5, border: '1px solid #e2e8f0', marginTop: '10px' }} elevation={0}>
+        <Card sx={{ flex: 1, p: 2.5, borderRadius: 2.5, border: '1px solid var(--border)', marginTop: '10px' }} elevation={0}>
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
             <h4>Hola a todos!</h4>
           </Box>

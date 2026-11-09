@@ -22,23 +22,23 @@ function CustomTooltipContent({ active, payload }: { active?: boolean; payload?:
   if (!active || !payload?.length) return null
   const d = payload[0].payload
   return (
-    <div className="rounded-lg border border-gray-200 bg-white px-3 py-2 shadow-lg text-xs min-w-40">
+    <div className="rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-card px-3 py-2 shadow-lg text-xs min-w-40">
       <div className="flex items-baseline justify-between gap-3">
-        <span className="font-semibold text-gray-800">{d.placa}</span>
+        <span className="font-semibold text-gray-800 dark:text-slate-100">{d.placa}</span>
         <span className="text-gray-400">{d.fecha}</span>
       </div>
-      <div className="mt-1.5 pt-1.5 border-t border-gray-100 space-y-1">
+      <div className="mt-1.5 pt-1.5 border-t border-gray-100 dark:border-slate-800 space-y-1">
         <div className="flex items-baseline justify-between gap-3">
-          <span className="text-gray-500">Recorrido en etapa</span>
-          <span className="font-bold text-blue-600">{d.km_etapa} km</span>
+          <span className="text-gray-500 dark:text-slate-400">Recorrido en etapa</span>
+          <span className="font-bold text-blue-600 dark:text-blue-300">{d.km_etapa} km</span>
         </div>
         <div className="flex items-baseline justify-between gap-3">
-          <span className="text-gray-500">Remanente</span>
-          <span className="font-semibold text-gray-700">{d.remanente} mm</span>
+          <span className="text-gray-500 dark:text-slate-400">Remanente</span>
+          <span className="font-semibold text-gray-700 dark:text-slate-200">{d.remanente} mm</span>
         </div>
         <div className="flex items-baseline justify-between gap-3">
-          <span className="text-gray-500">Odómetro</span>
-          <span className="text-gray-700">{d.odometro - d.km_etapa} → {d.odometro} km</span>
+          <span className="text-gray-500 dark:text-slate-400">Odómetro</span>
+          <span className="text-gray-700 dark:text-slate-200">{d.odometro - d.km_etapa} → {d.odometro} km</span>
         </div>
       </div>
     </div>
@@ -84,17 +84,17 @@ export const KilometrajeChart = ({ historial, neu }: { historial: MovimientoHist
                 <stop offset="95%" stopColor={fillColorD} stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--grafico-grid)" vertical={false} />
             <XAxis
               dataKey="id"
               tickFormatter={(id) => chartData.find((d) => d.id === id)?.fecha ?? String(id)}
-              tick={{ fontSize: '0.75rem', fill: "#9ca3af" }}
+              tick={{ fontSize: '0.75rem', fill: "var(--texto-apagado)" }}
               tickLine={false}
-              axisLine={{ stroke: "#e5e7eb" }}
+              axisLine={{ stroke: "var(--grafico-eje)" }}
             />
             <YAxis
               domain={[0, maxY]}
-              tick={{ fontSize: '0.75rem', fill: "#9ca3af" }}
+              tick={{ fontSize: '0.75rem', fill: "var(--texto-apagado)" }}
               tickLine={false}
               axisLine={false}
               unit=" km"

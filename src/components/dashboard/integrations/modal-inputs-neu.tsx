@@ -182,8 +182,8 @@ const ModalInputsNeu: React.FC<ModalInputsNeuProps> = ({ open, onClose, onSubmit
                     <Settings2 className="h-4.5 w-4.5 text-white" />
                 </div>
                 <div className="min-w-0 flex-1">
-                    <p className="text-base font-bold leading-tight text-slate-900">Datos de instalación</p>
-                    <p className="mt-0.5 text-xs text-slate-500">Completa los valores medidos al montar el neumático.</p>
+                    <p className="text-base font-bold leading-tight text-slate-900 dark:text-slate-100">Datos de instalación</p>
+                    <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">Completa los valores medidos al montar el neumático.</p>
                 </div>
                 {position && (
                     <span className="shrink-0 rounded-md bg-violet-600 px-2 py-1 text-xs font-bold tracking-wide text-white">
@@ -222,9 +222,9 @@ const ModalInputsNeu: React.FC<ModalInputsNeuProps> = ({ open, onClose, onSubmit
                             </InputGroupAddon>
                         </InputGroup>
                         {esRecuperado ? (
-                            <FieldDescription className="text-emerald-600">Neumático recuperado — remanente fijo</FieldDescription>
+                            <FieldDescription className="text-emerald-600 dark:text-emerald-300">Neumático recuperado — remanente fijo</FieldDescription>
                         ) : (
-                            <FieldDescription className={remanenteError ? 'font-semibold text-rose-600' : ''}>
+                            <FieldDescription className={remanenteError ? 'font-semibold text-rose-600 dark:text-rose-300' : ''}>
                                 {remanenteError
                                     ? `Debe estar entre ${REMANENTE_MIN} y ${REMANENTE_MAX}`
                                     : `Rango permitido: ${REMANENTE_MIN}-${REMANENTE_MAX} mm`}
@@ -256,7 +256,7 @@ const ModalInputsNeu: React.FC<ModalInputsNeuProps> = ({ open, onClose, onSubmit
                                 <InputGroupText>psi</InputGroupText>
                             </InputGroupAddon>
                         </InputGroup>
-                        <FieldDescription className={presionError ? 'font-semibold text-rose-600' : ''}>
+                        <FieldDescription className={presionError ? 'font-semibold text-rose-600 dark:text-rose-300' : ''}>
                             {presionError
                                 ? `Debe estar entre ${PRESION_MIN} y ${PRESION_MAX} psi`
                                 : `Rango permitido: ${PRESION_MIN}-${PRESION_MAX} psi`}
@@ -289,9 +289,9 @@ const ModalInputsNeu: React.FC<ModalInputsNeuProps> = ({ open, onClose, onSubmit
                             </InputGroupAddon>
                         </InputGroup>
                         {esRepuesto ? (
-                            <FieldDescription className="text-amber-600">No se aplica torque al repuesto</FieldDescription>
+                            <FieldDescription className="text-amber-600 dark:text-amber-300">No se aplica torque al repuesto</FieldDescription>
                         ) : (
-                            <FieldDescription className={torqueError ? 'font-semibold text-rose-600' : ''}>
+                            <FieldDescription className={torqueError ? 'font-semibold text-rose-600 dark:text-rose-300' : ''}>
                                 {torqueError
                                     ? `Debe estar entre ${TORQUE_MIN} y ${TORQUE_MAX} Nm`
                                     : `Recomendado: ${TORQUE_MIN}-${TORQUE_MAX} Nm`}
@@ -304,13 +304,13 @@ const ModalInputsNeu: React.FC<ModalInputsNeuProps> = ({ open, onClose, onSubmit
                         <FieldLabel htmlFor="fecha-instalacion">Fecha de asignación</FieldLabel>
                         {fechaImpuesta ? (
                             <>
-                                <div className="flex h-9 items-center gap-2 rounded-md border border-slate-200 bg-slate-50 px-3">
+                                <div className="flex h-9 items-center gap-2 rounded-md border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-superficie-1 px-3">
                                     <CalendarDays className="h-4 w-4 shrink-0 text-slate-400" />
-                                    <span className="text-sm font-semibold text-slate-700">
+                                    <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">
                                         {convertToDateHuman(fechaFija ?? '') || '—'}
                                     </span>
                                 </div>
-                                <FieldDescription className={fechaError ? 'font-semibold text-rose-600' : ''}>
+                                <FieldDescription className={fechaError ? 'font-semibold text-rose-600 dark:text-rose-300' : ''}>
                                     {fechaError ?? 'Se usa la fecha de la última inspección de la placa'}
                                 </FieldDescription>
                             </>
@@ -327,7 +327,7 @@ const ModalInputsNeu: React.FC<ModalInputsNeuProps> = ({ open, onClose, onSubmit
                                     maxDate={new Date(`${hoy}T00:00:00`)}
                                     className="w-full"
                                 />
-                                <FieldDescription className={fechaError ? 'font-semibold text-rose-600' : ''}>
+                                <FieldDescription className={fechaError ? 'font-semibold text-rose-600 dark:text-rose-300' : ''}>
                                     {fechaError ?? `Rango válido: ${convertToDateHuman(fechaMinEfectiva)} a ${convertToDateHuman(hoy)}`}
                                 </FieldDescription>
                             </>
@@ -337,27 +337,27 @@ const ModalInputsNeu: React.FC<ModalInputsNeuProps> = ({ open, onClose, onSubmit
 
                 {fechaImpuesta ? (
                     /* Con fecha impuesta hay que explicar de dónde sale y qué condiciones debe cumplir */
-                    <div className="mt-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2.5 text-xs text-amber-800">
+                    <div className="mt-3 rounded-lg border border-amber-200 dark:border-amber-500/30 bg-amber-50 dark:bg-amber-500/10 px-3 py-2.5 text-xs text-amber-800 dark:text-amber-200">
                         <p className="mb-1.5 flex items-center gap-1.5 font-semibold">
                             <TriangleAlert className="h-3.5 w-3.5 shrink-0" />
                             Nota importante
                         </p>
-                        <ul className="list-inside list-disc space-y-1 text-amber-700">
+                        <ul className="list-inside list-disc space-y-1 text-amber-700 dark:text-amber-300">
                             <li>La <b>fecha de asignación</b> se tomará de la última inspección registrada.</li>
                             <li>Para usar otra fecha, realice una nueva inspección antes de continuar.</li>
                             <li>Si es un neumático recién enviado, la inspección debe ser igual o posterior a la del envío.</li>
                             <li>Si asigna un neumático recuperado, la inspección debe ser igual o posterior a su fecha de recupero.</li>
                         </ul>
-                        <div className="mt-2.5 flex flex-wrap gap-x-4 gap-y-1 border-t border-amber-200 pt-2">
-                            <span className="text-amber-800">
+                        <div className="mt-2.5 flex flex-wrap gap-x-4 gap-y-1 border-t border-amber-200 dark:border-amber-500/30 pt-2">
+                            <span className="text-amber-800 dark:text-amber-200">
                                 Última inspección: <span className="font-semibold">{convertToDateHuman(fechaFija ?? '') || '—'}</span>
                             </span>
                             {esRecuperado ? (
-                                <span className="text-sky-700">
+                                <span className="text-sky-700 dark:text-sky-300">
                                     F. Recuperación: <span className="font-semibold">{convertToDateHuman(fechaRecuperado ?? '') || '—'}</span>
                                 </span>
                             ) : (
-                                <span className="text-teal-700">
+                                <span className="text-teal-700 dark:text-teal-300">
                                     F. Envío: <span className="font-semibold">{convertToDateHuman(fechaRegistroNeumatico ?? '') || '—'}</span>
                                 </span>
                             )}
@@ -365,9 +365,9 @@ const ModalInputsNeu: React.FC<ModalInputsNeuProps> = ({ open, onClose, onSubmit
                     </div>
                 ) : (
                     /* Referencia de origen del neumático */
-                    <div className="mt-3 flex items-center gap-2 rounded-lg border border-slate-100 bg-slate-50 px-3 py-2">
+                    <div className="mt-3 flex items-center gap-2 rounded-lg border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-superficie-1 px-3 py-2">
                         <CalendarDays className="h-3.5 w-3.5 shrink-0 text-slate-400" />
-                        <p className="text-xs text-slate-500">
+                        <p className="text-xs text-slate-500 dark:text-slate-400">
                             {esRecuperado
                                 ? `Fecha de recuperación: ${convertToDateHuman(fechaRecuperado ?? '') || '—'}`
                                 : `Fecha de envío: ${convertToDateHuman(fechaRegistroNeumatico ?? '') || '—'}`}
@@ -376,9 +376,9 @@ const ModalInputsNeu: React.FC<ModalInputsNeuProps> = ({ open, onClose, onSubmit
                 )}
 
                 {(remanenteError || presionError || torqueError || fechaError) && (
-                    <div className="mt-3 flex items-start gap-2 rounded-lg border border-rose-100 bg-rose-50 px-3 py-2">
+                    <div className="mt-3 flex items-start gap-2 rounded-lg border border-rose-100 dark:border-rose-500/20 bg-rose-50 dark:bg-rose-500/10 px-3 py-2">
                         <CircleAlert className="mt-0.5 h-3.5 w-3.5 shrink-0 text-rose-500" />
-                        <p className="text-xs text-rose-700">
+                        <p className="text-xs text-rose-700 dark:text-rose-300">
                             Revisa los campos marcados en rojo antes de guardar.
                         </p>
                     </div>

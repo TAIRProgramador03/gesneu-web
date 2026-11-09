@@ -112,12 +112,15 @@ export const MapaTalleres = () => {
   const textSec = isDark ? '#94a3b8' : '#64748b';
   const trackBg = isDark ? '#334155' : '#e2e8f0';
 
-  const tileUrl = isDark
-    ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-    : 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
-  const tileAttribution = isDark
-    ? '&copy; <a href="https://carto.com/">CARTO</a>'
-    : '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
+  // Siempre OpenStreetMap. El modo oscuro NO se hace cambiando de proveedor:
+  // el `dark_all` de CARTO que había aquí hoy devuelve una imagen que dice
+  // "API KEY REQUIRED", así que el mapa salía en blanco y gris con ese texto
+  // repetido. En su lugar, un filtro CSS oscurece SÓLO la capa de baldosas
+  // (`.leaflet-tile-pane`, ver global.css). Los marcadores viven en otra capa
+  // y conservan su color, que es lo que importa: el verde/ámbar/rojo del
+  // estado de cada taller no se puede invertir.
+  const tileUrl = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+  const tileAttribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
 
   const selectedTaller = talleresConNeumaticos.find(t => `${t.ID}${t.CH_SERI_TALLER}` === selectedId) ?? null;
 

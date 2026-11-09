@@ -79,10 +79,10 @@ const ModalInspeccionAver: React.FC<ModalInspeccionAverProps> = ({
                         </span>
 
                         <div className="min-w-0 flex-1">
-                            <p className="text-base font-extrabold tracking-wide text-amber-700 sm:text-lg">
+                            <p className="text-base font-extrabold tracking-wide text-amber-700 dark:text-amber-300 sm:text-lg">
                                 {titulo}
                             </p>
-                            <p className="mt-1 text-sm text-slate-700 sm:text-base">
+                            <p className="mt-1 text-sm text-slate-700 dark:text-slate-200 sm:text-base">
                                 {mensaje}
                             </p>
                         </div>

@@ -71,7 +71,19 @@ span:hover > .tooltip-eliminar {
 
 a{
   text-decoration: underline;
-  color: #167bd9;
+  /* Antes era el #167bd9 fijo: en modo oscuro no se distinguía del fondo.
+     Ahora sigue al token de marca (ver tailwind.css). */
+  color: var(--primary);
+}
+
+/* Mapa de talleres en modo oscuro.
+   Se oscurece la capa de baldosas, no el mapa entero: los marcadores y los
+   popups están en otras capas de Leaflet y mantienen su color, que es
+   información (verde / ámbar / rojo según el estado del taller).
+   hue-rotate(180deg) después del invert devuelve los tonos a su sitio: sin
+   él, el agua azul quedaría naranja. */
+:root.dark .leaflet-tile-pane {
+  filter: invert(1) hue-rotate(180deg) brightness(0.92) contrast(0.9) saturate(0.35);
 }
 
 #map.focus {
@@ -97,13 +109,15 @@ a{
 }
 
 .skeleton-shimmer {
+  /* Los dos grises estaban fijos: en oscuro los skeletons se veían como
+     barras blancas encendidas. Ahora salen de los tokens. */
   background-image: linear-gradient(
     90deg,
-    #e2e8f0 0px,
-    #e2e8f0 40px,
-    #f1f5f9 80px,
-    #e2e8f0 120px,
-    #e2e8f0 160px
+    var(--esqueleto-base) 0px,
+    var(--esqueleto-base) 40px,
+    var(--esqueleto-brillo) 80px,
+    var(--esqueleto-base) 120px,
+    var(--esqueleto-base) 160px
   );
   background-size: 400px 100%;
   animation: shimmer 1.6s ease-in-out infinite;

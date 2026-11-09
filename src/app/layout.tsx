@@ -37,8 +37,11 @@ interface LayoutProps {
 }
 
 export default function Layout({ children }: LayoutProps): React.JSX.Element {
+  // suppressHydrationWarning: next-themes escribe la clase `.dark` y el
+  // atributo de MUI en el <html> desde un script inline, antes de hidratar.
+  // Sin esto React marca el mismatch en cada carga en modo oscuro.
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <link href="/assets/icon-tair-2.png" rel="shortcut icon" type="image/vnd.microsoft.icon"></link>
         <title>Gesneu</title>
@@ -53,11 +56,15 @@ export default function Layout({ children }: LayoutProps): React.JSX.Element {
                 <TooltipProvider>
                   {children}
                 </TooltipProvider>
+                {/* El Toaster va DENTRO del ThemeProvider: lee el tema con
+                    useTheme() de next-themes y fuera del provider siempre
+                    creía estar en claro, así que los avisos salían blancos
+                    sobre la app oscura. */}
+                <Toaster position="bottom-right" richColors />
               </ThemeProvider>
             </UserProvider>
           </LocalizationProvider>
           <ReactQueryDevtools initialIsOpen={false} />
-          <Toaster position="bottom-right" richColors />
         </QueryClientProvider>
       </body>
     </html>

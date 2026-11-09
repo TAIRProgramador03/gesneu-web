@@ -113,9 +113,9 @@ export const VidaUtilDistribucion = (): React.JSX.Element => {
   })
 
   const MOCK_VIDA_UTIL = [
-    { rango: 'Buen estado', desc: '100 - 79% vida útil', cantidad: data?.NEUMATICOS_BUENO ?? 0, color: '#2e7d32' },
+    { rango: 'Buen estado', desc: '100 - 79% vida útil', cantidad: data?.NEUMATICOS_BUENO ?? 0, color: 'var(--texto-verde)' },
     { rango: 'Desgaste regular', desc: '39 – 78%', cantidad: data?.NEUMATICOS_REGULAR ?? 0, color: '#efdc34' },
-    { rango: 'Crítico', desc: '< 39% vida útil', cantidad: data?.NEUMATICOS_CRITICO ?? 0, color: '#d32f2f' },
+    { rango: 'Crítico', desc: '< 39% vida útil', cantidad: data?.NEUMATICOS_CRITICO ?? 0, color: 'var(--texto-rojo)' },
   ];
 
   return (
@@ -152,7 +152,7 @@ export const VidaUtilDistribucion = (): React.JSX.Element => {
 
       {
         data?.NEUMATICOS_TOTALES === 0 && !isLoading && (
-          <div className='flex gap-1 flex-wrap justify-center items-center bg-orange-50 text-orange-700 border-2 border-orange-700 p-2 rounded-lg'>
+          <div className='flex gap-1 flex-wrap justify-center items-center bg-orange-50 dark:bg-orange-500/10 text-orange-700 dark:text-orange-300 border-2 border-orange-700 p-2 rounded-lg'>
             <BadgeCheck width={12} />
             <span className='italic text-xs'>Almacén Vacío.</span>
           </div>
@@ -179,7 +179,7 @@ export const VidaUtilDistribucion = (): React.JSX.Element => {
                   axisLine={false}
                   tickLine={false}
                 />
-                <Tooltip content={<VidaTooltip total={data?.NEUMATICOS_TOTALES ?? 0} />} cursor={{ fill: 'rgba(0,0,0,0.04)', radius: 6 } as any} />
+                <Tooltip content={<VidaTooltip total={data?.NEUMATICOS_TOTALES ?? 0} />} cursor={{ fill: 'var(--grafico-cursor)', radius: 6 } as any} />
                 <Bar dataKey="cantidad" radius={[6, 6, 0, 0]}>
                   {MOCK_VIDA_UTIL.map((entry) => (
                     <Cell key={entry.rango} fill={entry.color} fillOpacity={0.82} />

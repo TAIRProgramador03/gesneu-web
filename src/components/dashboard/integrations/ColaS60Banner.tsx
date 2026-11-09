@@ -3,7 +3,7 @@
 import * as React from 'react';
 import Card from '@mui/material/Card';
 import Collapse from '@mui/material/Collapse';
-import { ArrowRight, ChevronDown, CircleCheckBig, Clock3, ListChecks, Loader2, MapPinned, TriangleAlert, Wrench } from 'lucide-react';
+import { ArrowRight, ChevronDown, CircleCheckBig, Clock3, Info, ListChecks, Loader2, MapPinned, TriangleAlert, Wrench } from 'lucide-react';
 import { Button as ButtonCustom } from '@/components/ui/button';
 import type { ColaS60Cabeza } from '@/api/Neumaticos';
 
@@ -54,9 +54,22 @@ interface ColaS60BannerProps {
   onIrAPlaca?: (placa: string) => void;
   /** Todavía no se sabe si hay pendientes. */
   cargando?: boolean;
+  /**
+   * El usuario no está sujeto a la cola (GESNEU / EGAMBOA).
+   *
+   * Se sigue mostrando —saber qué hay pendiente es útil igual— pero sin decirle
+   * que algo está bloqueado, porque para él no lo está.
+   */
+  soloInformativo?: boolean;
 }
 
-export function ColaS60Banner({ grupos, placaActual, onIrAPlaca, cargando = false }: ColaS60BannerProps) {
+export function ColaS60Banner({
+  grupos,
+  placaActual,
+  onIrAPlaca,
+  cargando = false,
+  soloInformativo = false,
+}: ColaS60BannerProps) {
   const [abierto, setAbierto] = React.useState(false);
 
   const cabeza = grupos[0];
@@ -77,13 +90,13 @@ export function ColaS60Banner({ grupos, placaActual, onIrAPlaca, cargando = fals
           border: 'none',
         }}
       >
-        <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-linear-to-r from-slate-50 to-slate-100 p-4 md:p-5">
-          <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-slate-200 text-slate-600">
+        <div className="flex items-center gap-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-linear-to-r from-slate-50 dark:from-superficie-1 to-slate-100 dark:to-superficie-2 p-4 md:p-5">
+          <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-slate-200 dark:bg-superficie-3 text-slate-600 dark:text-slate-300">
             <Loader2 size={22} className="animate-spin" />
           </div>
           <div className="flex min-w-0 flex-col gap-1">
-            <span className="font-bold text-slate-800">Revisando S60 pendientes…</span>
-            <span className="text-sm text-slate-600">
+            <span className="font-bold text-slate-800 dark:text-slate-100">Revisando S60 pendientes…</span>
+            <span className="text-sm text-slate-600 dark:text-slate-300">
               Un momento: puede que haya una placa que atender primero.
             </span>
           </div>
@@ -102,27 +115,39 @@ export function ColaS60Banner({ grupos, placaActual, onIrAPlaca, cargando = fals
   const cambios = `${contarCambios(cabeza.lineas.length)} ${cabeza.lineas.length === 1 ? 'pendiente' : 'pendientes'}`;
   const cuando = `${formatearFecha(cabeza.fecha)} · ${formatearHora(cabeza.hora)}`;
 
-  // Dos tonos: ámbar cuando bloquea, teal cuando el técnico ya está donde debe.
-  const tono = enLaPlacaCorrecta
+  // Tres tonos: azul cuando solo informa, teal cuando el técnico ya está donde
+  // debe, ámbar cuando bloquea.
+  const tono = soloInformativo
     ? {
-        card: 'border-teal-200 bg-linear-to-r from-teal-50 to-emerald-50',
-        icono: 'bg-teal-100 text-teal-700',
-        titulo: 'text-teal-900',
-        texto: 'text-teal-800',
+        card: 'border-sky-200 dark:border-sky-500/30 bg-linear-to-r from-sky-50 dark:from-sky-500/10 to-blue-50 dark:to-blue-500/10',
+        icono: 'bg-sky-100 dark:bg-sky-500/15 text-sky-700 dark:text-sky-300',
+        titulo: 'text-sky-900 dark:text-sky-200',
+        texto: 'text-sky-800 dark:text-sky-200',
+        chip: 'bg-sky-600 text-white',
+        meta: 'bg-white dark:bg-card/70 text-sky-800 dark:text-sky-200 border-sky-200 dark:border-sky-500/30',
+        separador: 'border-sky-200 dark:border-sky-500/30',
+        apagado: 'text-sky-700 dark:text-sky-300/70',
+      }
+    : enLaPlacaCorrecta
+    ? {
+        card: 'border-teal-200 dark:border-teal-500/30 bg-linear-to-r from-teal-50 dark:from-teal-500/10 to-emerald-50 dark:to-emerald-500/10',
+        icono: 'bg-teal-100 dark:bg-teal-500/15 text-teal-700 dark:text-teal-300',
+        titulo: 'text-teal-900 dark:text-teal-200',
+        texto: 'text-teal-800 dark:text-teal-200',
         chip: 'bg-teal-600 text-white',
-        meta: 'bg-white/70 text-teal-800 border-teal-200',
-        separador: 'border-teal-200',
-        apagado: 'text-teal-700/70',
+        meta: 'bg-white dark:bg-card/70 dark:bg-card/70 text-teal-800 dark:text-teal-200 border-teal-200 dark:border-teal-500/30',
+        separador: 'border-teal-200 dark:border-teal-500/30',
+        apagado: 'text-teal-700 dark:text-teal-300/70 dark:text-teal-300/70',
       }
     : {
-        card: 'border-amber-200 bg-linear-to-r from-amber-50 to-orange-50',
-        icono: 'bg-amber-100 text-amber-700',
-        titulo: 'text-amber-900',
-        texto: 'text-amber-800',
+        card: 'border-amber-200 dark:border-amber-500/30 bg-linear-to-r from-amber-50 dark:from-amber-500/10 to-orange-50 dark:to-orange-500/10',
+        icono: 'bg-amber-100 dark:bg-amber-500/15 text-amber-700 dark:text-amber-300',
+        titulo: 'text-amber-900 dark:text-amber-200',
+        texto: 'text-amber-800 dark:text-amber-200',
         chip: 'bg-amber-600 text-white',
-        meta: 'bg-white/70 text-amber-800 border-amber-200',
-        separador: 'border-amber-200',
-        apagado: 'text-amber-700/70',
+        meta: 'bg-white dark:bg-card/70 dark:bg-card/70 text-amber-800 dark:text-amber-200 border-amber-200 dark:border-amber-500/30',
+        separador: 'border-amber-200 dark:border-amber-500/30',
+        apagado: 'text-amber-700 dark:text-amber-300/70 dark:text-amber-300/70',
       };
 
   return (
@@ -137,13 +162,17 @@ export function ColaS60Banner({ grupos, placaActual, onIrAPlaca, cargando = fals
         {/* --- La que toca ahora ------------------------------------------ */}
         <div className="flex flex-col gap-4 md:flex-row md:items-center">
           <div className={`flex size-11 shrink-0 items-center justify-center rounded-xl ${tono.icono}`}>
-            {enLaPlacaCorrecta ? <CircleCheckBig size={22} /> : <TriangleAlert size={22} />}
+            {soloInformativo ? <Info size={22} /> : enLaPlacaCorrecta ? <CircleCheckBig size={22} /> : <TriangleAlert size={22} />}
           </div>
 
           <div className="flex min-w-0 flex-1 flex-col gap-2">
             <div className="flex flex-wrap items-center gap-2">
               <span className={`font-bold ${tono.titulo}`}>
-                {enLaPlacaCorrecta ? 'Esta es la placa que toca regularizar' : 'Hay una S60 pendiente'}
+                {soloInformativo
+                  ? 'S60 pendiente más antigua'
+                  : enLaPlacaCorrecta
+                    ? 'Esta es la placa que toca regularizar'
+                    : 'Hay una S60 pendiente'}
               </span>
               <span className={`rounded-lg px-2.5 py-1 text-sm font-bold shadow-sm ${tono.chip}`}>
                 {cabeza.placa}
@@ -151,9 +180,11 @@ export function ColaS60Banner({ grupos, placaActual, onIrAPlaca, cargando = fals
             </div>
 
             <p className={`text-sm ${tono.texto}`}>
-              {enLaPlacaCorrecta
-                ? 'Completa estos cambios para que la cola avance a la siguiente S60.'
-                : `Primero hay que regularizar la S60 más antigua, de la placa ${cabeza.placa}. Hasta completarla no se puede trabajar en otra placa.`}
+              {soloInformativo
+                ? `La más antigua sin regularizar es la de la placa ${cabeza.placa}. A ti la cola no te bloquea: puedes trabajar cualquier placa en el orden que necesites.`
+                : enLaPlacaCorrecta
+                  ? 'Completa estos cambios para que la cola avance a la siguiente S60.'
+                  : `Primero hay que regularizar la S60 más antigua, de la placa ${cabeza.placa}. Hasta completarla no se puede trabajar en otra placa.`}
             </p>
 
             <div className="flex flex-wrap items-center gap-2">
@@ -182,7 +213,7 @@ export function ColaS60Banner({ grupos, placaActual, onIrAPlaca, cargando = fals
 
           {!enLaPlacaCorrecta && onIrAPlaca && (
             <ButtonCustom
-              variant="warning"
+              variant={soloInformativo ? 'default' : 'warning'}
               className="w-full shrink-0 md:w-auto"
               onClick={() => onIrAPlaca(cabeza.placa)}
             >
@@ -215,7 +246,7 @@ export function ColaS60Banner({ grupos, placaActual, onIrAPlaca, cargando = fals
                 {siguientes.map((grupo, i) => (
                   <li
                     key={`${grupo.almacen}-${grupo.comprobante}`}
-                    className="flex shrink-0 flex-wrap items-center gap-x-3 gap-y-1 rounded-xl border border-white/80 bg-white/60 px-3 py-2"
+                    className="flex shrink-0 flex-wrap items-center gap-x-3 gap-y-1 rounded-xl border border-white dark:border-white/10/80 dark:border-white/10 bg-white dark:bg-card/60 dark:bg-card/60 px-3 py-2"
                   >
                     <span className={`text-xs font-bold tabular-nums ${tono.apagado}`}>
                       #{i + 2}
@@ -245,7 +276,9 @@ export function ColaS60Banner({ grupos, placaActual, onIrAPlaca, cargando = fals
                 ))}
               </ul>
               <p className={`mt-2 text-xs ${tono.apagado}`}>
-                Estas quedan bloqueadas hasta completar la de arriba.
+                {soloInformativo
+                  ? 'Para el resto de usuarios estas quedan bloqueadas hasta completar la de arriba.'
+                  : 'Estas quedan bloqueadas hasta completar la de arriba.'}
               </p>
             </Collapse>
           </div>

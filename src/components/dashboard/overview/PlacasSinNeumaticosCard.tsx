@@ -55,7 +55,7 @@ export function PlacasSinNeumaticosCard({ sx }: PlacasSinNeumaticosCardProps) {
         sx={{ ...sx, overflow: 'hidden', position: 'relative' }}
       >
         <div
-          className="bg-orange-50"
+          className="bg-orange-50 dark:bg-orange-500/10"
           style={{
             position: 'absolute', top: -30, right: -30,
             width: 110, height: 110, borderRadius: '50%',
@@ -149,10 +149,10 @@ export function PlacasSinNeumaticosCard({ sx }: PlacasSinNeumaticosCardProps) {
           <Box sx={{
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             width: 40, height: 40, borderRadius: 2,
-            background: 'linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%)',
+            background: 'linear-gradient(135deg, var(--tinte-azul-fuerte) 0%, var(--tinte-indigo) 100%)',
             flexShrink: 0,
           }}>
-            <ClipboardList size={20} className="text-blue-600" />
+            <ClipboardList size={20} className="text-blue-600 dark:text-blue-300" />
           </Box>
           <Box sx={{ flex: 1 }}>
             <Typography variant="h6" fontWeight={700} lineHeight={1.2}>

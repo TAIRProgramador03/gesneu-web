@@ -96,7 +96,7 @@ export const VidaUtilCard = ({ neu, historial }: { neu: NeumaticoBuscado; histor
             label="Km recorridos"
             value={stats.kmTotal > 0 ? stats.kmTotal.toLocaleString("es-PE") : "—"}
             sub={stats.kmTotal > 0 ? "acumulados" : "sin datos"}
-            color="bg-sky-50 text-sky-600"
+            color="bg-sky-50 dark:bg-sky-500/10 text-sky-600 dark:text-sky-300"
           />
           <MiniKpi
             icon={<TrendingDown className="size-3.5" />}
@@ -104,10 +104,10 @@ export const VidaUtilCard = ({ neu, historial }: { neu: NeumaticoBuscado; histor
             value={stats.tasaDesgaste > 0 ? `${stats.tasaDesgaste.toFixed(2)}` : "—"}
             sub={stats.tasaDesgaste > 0 ? "mm / 1,000 km" : "sin datos"}
             color={cn(
-              stats.tasaDesgaste === 0 ? "bg-gray-50 text-gray-500" :
-                stats.tasaDesgaste <= 1 ? "bg-teal-50 text-teal-600" :
-                  stats.tasaDesgaste <= 2.5 ? "bg-yellow-50 text-yellow-600" :
-                    "bg-red-50 text-red-600"
+              stats.tasaDesgaste === 0 ? "bg-gray-50 dark:bg-superficie-1 text-gray-500 dark:text-slate-400" :
+                stats.tasaDesgaste <= 1 ? "bg-teal-50 dark:bg-teal-500/10 text-teal-600 dark:text-teal-300" :
+                  stats.tasaDesgaste <= 2.5 ? "bg-yellow-50 dark:bg-yellow-500/10 text-yellow-600 dark:text-yellow-300" :
+                    "bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-300"
             )}
           />
           <MiniKpi
@@ -115,44 +115,44 @@ export const VidaUtilCard = ({ neu, historial }: { neu: NeumaticoBuscado; histor
             label="Días en recorrido"
             value={stats.diasDeRecorrido > 0 ? `${stats.diasDeRecorrido}` : "—"}
             sub={stats.diasDeRecorrido > 0 ? `≈ ${Math.round(stats.diasDeRecorrido / 30)} meses` : "sin datos"}
-            color="bg-indigo-50 text-indigo-600"
+            color="bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-300"
           />
           <MiniKpi
             icon={<CircleDollarSign className="size-3.5" />}
             label="Costo * Km."
             value={stats.costoPorkM > 0 ? `${stats.costoPorkM.toFixed(5)}` : "—"}
             sub={stats.costoPorkM > 0 ? `$${neu.COSTO_NEUMATICO} / ${stats.kmTotal}km.` : "sin datos"}
-            color="bg-pink-50 text-pink-600"
+            color="bg-pink-50 dark:bg-pink-500/10 text-pink-600 dark:text-pink-300"
           />
           <MiniKpi
             icon={<ChartCandlestick className="size-3.5" />}
             label="Costo * mm"
             value={stats.costoPorMm > 0 ? `${stats.costoPorMm.toFixed(5)}` : "—"}
             sub={stats.costoPorMm > 0 ? `$${neu.COSTO_NEUMATICO} / ${stats.mmDesgastados}mm` : "sin datos"}
-            color="bg-purple-50 text-purple-600"
+            color="bg-purple-50 dark:bg-purple-500/10 text-purple-600 dark:text-purple-300"
           />
           <MiniKpi
             icon={<ParkingMeter className="size-3.5" />}
             label="Km. * mm"
             value={stats.kmPorMm > 0 ? `${stats.kmPorMm.toFixed(2)}` : "—"}
             sub={stats.kmPorMm > 0 ? `${stats.kmTotal}km. / ${stats.mmDesgastados}mm` : "sin datos"}
-            color="bg-orange-50 text-orange-600"
+            color="bg-orange-50 dark:bg-orange-500/10 text-orange-600 dark:text-orange-300"
           />
         </div>
 
         {/* Comparison bar: Original vs Montado vs Actual */}
         <div>
           <div className="flex items-center gap-2 mb-3">
-            <div className="h-px flex-1 bg-gray-100" />
+            <div className="h-px flex-1 bg-gray-100 dark:bg-superficie-2" />
             <h3 className="text-xs font-bold uppercase tracking-widest text-gray-400 px-2">
               Comparación remanente
             </h3>
-            <div className="h-px flex-1 bg-gray-100" />
+            <div className="h-px flex-1 bg-gray-100 dark:bg-superficie-2" />
           </div>
           <ComparisonBar neu={neu} />
           {stats.mmDesgastados > 0 && (
             <p className="text-center text-xs text-gray-400 mt-2">
-              Desgaste total: <strong className="text-gray-600">{stats.mmDesgastados.toFixed(1)} mm</strong> consumidos
+              Desgaste total: <strong className="text-gray-600 dark:text-slate-300">{stats.mmDesgastados.toFixed(1)} mm</strong> consumidos
             </p>
           )}
         </div>
@@ -161,13 +161,13 @@ export const VidaUtilCard = ({ neu, historial }: { neu: NeumaticoBuscado; histor
         {stats.remanenteSeries.length >= 2 && (
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <div className="h-px flex-1 bg-gray-100" />
+              <div className="h-px flex-1 bg-gray-100 dark:bg-superficie-2" />
               <h3 className="text-xs font-bold uppercase tracking-widest text-gray-400 px-2">
                 Tendencia de desgaste
               </h3>
-              <div className="h-px flex-1 bg-gray-100" />
+              <div className="h-px flex-1 bg-gray-100 dark:bg-superficie-2" />
             </div>
-            <div className="rounded-xl border border-gray-100 bg-linear-to-br from-white to-gray-50/40 p-4">
+            <div className="rounded-xl border border-gray-100 dark:border-slate-800 bg-linear-to-br from-white dark:from-card to-gray-50/40 dark:to-superficie-1/40 p-4">
               <div className="flex items-center justify-between text-xs text-gray-400 mb-2">
                 <span>Primer registro</span>
                 <span>Último registro</span>
@@ -177,7 +177,7 @@ export const VidaUtilCard = ({ neu, historial }: { neu: NeumaticoBuscado; histor
                 color={pct < 39 ? "stop-red-500" : pct < 79 ? "stop-yellow-500" : "stop-green-500"}
               />
               <div className="flex items-center justify-between text-xs mt-2">
-                <span className="font-semibold text-gray-600">{stats.remanenteSeries[0]} mm</span>
+                <span className="font-semibold text-gray-600 dark:text-slate-300">{stats.remanenteSeries[0]} mm</span>
                 <div className="flex items-center gap-1 text-xs text-gray-400">
                   <Zap className="size-3" />
                   {stats.qtyInspecciones} inspecciones
@@ -196,29 +196,29 @@ export const VidaUtilCard = ({ neu, historial }: { neu: NeumaticoBuscado; histor
         {stats.diasRestantes !== null && stats.diasRestantes > 0 && (
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <div className="h-px flex-1 bg-gray-100" />
+              <div className="h-px flex-1 bg-gray-100 dark:bg-superficie-2" />
               <h3 className="text-xs font-bold uppercase tracking-widest text-gray-400 px-2">
                 Proyección de vida restante
               </h3>
-              <div className="h-px flex-1 bg-gray-100" />
+              <div className="h-px flex-1 bg-gray-100 dark:bg-superficie-2" />
             </div>
             <div className={cn(
               "rounded-xl border p-4",
               stats.diasRestantes <= 30
-                ? "border-red-200 bg-linear-to-br from-red-50/50 to-white"
+                ? "border-red-200 dark:border-red-500/30 bg-linear-to-br from-red-50 dark:from-red-500/10/50 dark:from-red-500/10 to-white dark:to-card"
                 : stats.diasRestantes <= 90
-                  ? "border-amber-200 bg-linear-to-br from-amber-50/50 to-white"
-                  : "border-teal-200 bg-linear-to-br from-teal-50/50 to-white"
+                  ? "border-amber-200 dark:border-amber-500/30 bg-linear-to-br from-amber-50 dark:from-amber-500/10/50 dark:from-amber-500/10 to-white dark:to-card"
+                  : "border-teal-200 dark:border-teal-500/30 bg-linear-to-br from-teal-50 dark:from-teal-500/10/50 dark:from-teal-500/10 to-white dark:to-card"
             )}>
               {/* Main projection */}
               <div className="flex items-center gap-3 mb-3">
                 <div className={cn(
                   "rounded-lg p-2 shrink-0",
                   stats.diasRestantes <= 30
-                    ? "bg-red-100 text-red-600"
+                    ? "bg-red-100 dark:bg-red-500/15 text-red-600 dark:text-red-300"
                     : stats.diasRestantes <= 90
-                      ? "bg-amber-100 text-amber-600"
-                      : "bg-teal-100 text-teal-600"
+                      ? "bg-amber-100 dark:bg-amber-500/15 text-amber-600 dark:text-amber-300"
+                      : "bg-teal-100 dark:bg-teal-500/15 text-teal-600 dark:text-teal-300"
                 )}>
                   <Clock className="size-4" />
                 </div>
@@ -226,10 +226,10 @@ export const VidaUtilCard = ({ neu, historial }: { neu: NeumaticoBuscado; histor
                   <p className={cn(
                     "text-lg font-bold leading-tight",
                     stats.diasRestantes <= 30
-                      ? "text-red-700"
+                      ? "text-red-700 dark:text-red-300"
                       : stats.diasRestantes <= 90
-                        ? "text-amber-700"
-                        : "text-teal-700"
+                        ? "text-amber-700 dark:text-amber-300"
+                        : "text-teal-700 dark:text-teal-300"
                   )}>
                     ~{stats.diasRestantes} días restantes
                   </p>
@@ -243,9 +243,9 @@ export const VidaUtilCard = ({ neu, historial }: { neu: NeumaticoBuscado; histor
               {/* Sub projections */}
               <div className="grid grid-cols-2 gap-2">
                 {stats.fechaEstimada && (
-                  <div className="rounded-lg bg-white/80 border border-gray-100 px-3 py-2">
+                  <div className="rounded-lg bg-white dark:bg-card/80 dark:bg-card/80 border border-gray-100 dark:border-slate-800 px-3 py-2">
                     <p className="text-xs uppercase tracking-wider text-gray-400">Fecha estimada</p>
-                    <p className="text-xs font-semibold text-gray-800">
+                    <p className="text-xs font-semibold text-gray-800 dark:text-slate-100">
                       {stats.fechaEstimada.toLocaleDateString("es-PE", {
                         day: "2-digit",
                         month: "short",
@@ -255,9 +255,9 @@ export const VidaUtilCard = ({ neu, historial }: { neu: NeumaticoBuscado; histor
                   </div>
                 )}
                 {stats.kmRestantes !== null && (
-                  <div className="rounded-lg bg-white/80 border border-gray-100 px-3 py-2">
+                  <div className="rounded-lg bg-white dark:bg-card/80 dark:bg-card/80 border border-gray-100 dark:border-slate-800 px-3 py-2">
                     <p className="text-xs uppercase tracking-wider text-gray-400">Km restantes</p>
-                    <p className="text-xs font-semibold text-gray-800">
+                    <p className="text-xs font-semibold text-gray-800 dark:text-slate-100">
                       ~{Math.round(stats.kmRestantes).toLocaleString("es-PE")} km
                     </p>
                   </div>

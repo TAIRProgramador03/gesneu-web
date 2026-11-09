@@ -112,7 +112,7 @@ export function CostoPorTaller({ sx }: CostoPorTallerProps): React.JSX.Element {
               axisLine={false}
               tickLine={false}
             />
-            <Tooltip content={<TallerTooltip />} cursor={{ fill: 'rgba(0,0,0,0.04)' }} />
+            <Tooltip content={<TallerTooltip />} cursor={{ fill: 'var(--grafico-cursor)' }} />
             <Bar dataKey="costo" radius={[0, 5, 5, 0]}>
               {MOCK_TALLERES.map((entry, index) => (
                 <Cell

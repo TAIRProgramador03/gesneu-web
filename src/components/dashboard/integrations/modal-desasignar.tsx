@@ -103,10 +103,10 @@ const Paso: React.FC<{ indice: number; actual: number; etiqueta: string; onClick
             type="button"
             onClick={onClick}
             disabled={indice > actual}
-            className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold transition-colors ${activo ? 'bg-blue-600 text-white' : completado ? 'text-blue-700 hover:bg-blue-50' : 'text-slate-400'
+            className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold transition-colors ${activo ? 'bg-blue-600 text-white' : completado ? 'text-blue-700 dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-500/10' : 'text-slate-400'
                 } ${indice > actual ? 'cursor-default' : 'cursor-pointer'}`}
         >
-            <span className={`flex h-4.5 w-4.5 items-center justify-center rounded-full text-xs font-bold ${activo ? 'bg-white/25 text-white' : completado ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-400'
+            <span className={`flex h-4.5 w-4.5 items-center justify-center rounded-full text-xs font-bold ${activo ? 'bg-white dark:bg-card/25 dark:bg-card/25 text-white' : completado ? 'bg-blue-100 dark:bg-blue-500/15 text-blue-700 dark:text-blue-300' : 'bg-slate-100 dark:bg-superficie-2 text-slate-400'
                 }`}>
                 {completado ? <Check className="h-3 w-3" /> : indice + 1}
             </span>
@@ -123,9 +123,9 @@ const FilaInstalado: React.FC<{
     bloqueado: boolean;
     onToggle: () => void;
 }> = ({ posicion, neumatico, marcado, bloqueado, onToggle }) => (
-    <div className={`flex items-center gap-2.5 rounded-xl border px-3 py-2 transition-colors ${marcado ? 'border-red-200 bg-red-50/70' : neumatico ? 'border-slate-200 bg-white' : 'border-dashed border-slate-200 bg-slate-50/60'
+    <div className={`flex items-center gap-2.5 rounded-xl border px-3 py-2 transition-colors ${marcado ? 'border-red-200 dark:border-red-500/30 bg-red-50 dark:bg-red-500/10/70 dark:bg-red-500/10' : neumatico ? 'border-slate-200 dark:border-slate-700 bg-white dark:bg-card' : 'border-dashed border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-superficie-1/60 dark:bg-superficie-1/60'
         }`}>
-        <span className={`shrink-0 rounded-md px-2 py-1 font-mono text-xs font-extrabold ${marcado ? 'bg-red-600 text-white' : neumatico ? 'bg-violet-600 text-white' : 'bg-slate-200 text-slate-500'
+        <span className={`shrink-0 rounded-md px-2 py-1 font-mono text-xs font-extrabold ${marcado ? 'bg-red-600 text-white' : neumatico ? 'bg-violet-600 text-white' : 'bg-slate-200 dark:bg-superficie-3 text-slate-500 dark:text-slate-400'
             }`}>
             {posicion}
         </span>
@@ -133,10 +133,10 @@ const FilaInstalado: React.FC<{
         <div className="min-w-0 flex-1">
             {neumatico ? (
                 <>
-                    <p className={`truncate text-sm font-bold ${marcado ? 'text-red-700 line-through' : 'text-slate-800'}`}>
+                    <p className={`truncate text-sm font-bold ${marcado ? 'text-red-700 dark:text-red-300 line-through' : 'text-slate-800 dark:text-slate-100'}`}>
                         {codigoDe(neumatico)}
                     </p>
-                    <p className="truncate text-xs text-slate-500">
+                    <p className="truncate text-xs text-slate-500 dark:text-slate-400">
                         {[neumatico.MARCA, neumatico.MEDIDA].filter(Boolean).join(' · ') || '—'}
                         {neumatico.REMANENTE ? ` · ${neumatico.REMANENTE} mm` : ''}
                     </p>
@@ -172,8 +172,8 @@ const TarjetaPosicionLiberada: React.FC<{
     onEditar: () => void;
     onQuitar: () => void;
 }> = ({ posicion, codigoSaliente, reemplazo, esObjetivo, onElegir, onEditar, onQuitar }) => (
-    <div className={`rounded-xl border px-3 py-2.5 transition-colors ${esObjetivo ? 'border-indigo-300 bg-indigo-50/70 ring-1 ring-indigo-200'
-        : reemplazo ? 'border-emerald-200 bg-emerald-50/50' : 'border-dashed border-amber-300 bg-amber-50/50'
+    <div className={`rounded-xl border px-3 py-2.5 transition-colors ${esObjetivo ? 'border-indigo-300 dark:border-indigo-500/40 bg-indigo-50 dark:bg-indigo-500/10/70 dark:bg-indigo-500/10 ring-1 ring-indigo-200 dark:ring-indigo-500/30'
+        : reemplazo ? 'border-emerald-200 dark:border-emerald-500/30 bg-emerald-50 dark:bg-emerald-500/10/50 dark:bg-emerald-500/10' : 'border-dashed border-amber-300 dark:border-amber-500/40 bg-amber-50 dark:bg-amber-500/10/50 dark:bg-amber-500/10'
         }`}>
         <div className="flex items-center gap-2.5">
             {/* Debajo de la posición, el neumático que sale: sin esto el paso 2 no decía
@@ -184,7 +184,7 @@ const TarjetaPosicionLiberada: React.FC<{
                 </span>
                 {codigoSaliente && (
                     <span
-                        className="inline-flex items-center gap-0.5 font-mono text-xs font-bold text-rose-600"
+                        className="inline-flex items-center gap-0.5 font-mono text-xs font-bold text-rose-600 dark:text-rose-300"
                         title={`Sale el neumático ${codigoSaliente}`}
                     >
                         <CircleMinus className="h-3 w-3" />
@@ -196,13 +196,13 @@ const TarjetaPosicionLiberada: React.FC<{
             <div className="min-w-0 flex-1">
                 {reemplazo ? (
                     <>
-                        <p className="truncate text-sm font-bold text-slate-800">{codigoDe(reemplazo.neumatico)}</p>
-                        <p className="truncate text-xs text-slate-500">
+                        <p className="truncate text-sm font-bold text-slate-800 dark:text-slate-100">{codigoDe(reemplazo.neumatico)}</p>
+                        <p className="truncate text-xs text-slate-500 dark:text-slate-400">
                             {[reemplazo.neumatico.MARCA, reemplazo.neumatico.MEDIDA].filter(Boolean).join(' · ') || '—'}
                         </p>
                     </>
                 ) : (
-                    <p className="text-xs font-medium text-amber-700">
+                    <p className="text-xs font-medium text-amber-700 dark:text-amber-300">
                         {esObjetivo ? 'Elige un neumático de la lista →' : 'Falta el reemplazo'}
                     </p>
                 )}
@@ -213,7 +213,7 @@ const TarjetaPosicionLiberada: React.FC<{
                     <ButtonCustom variant="ghost" size="icon" onClick={onEditar} title="Editar datos">
                         <Pencil className="h-3.5 w-3.5" />
                     </ButtonCustom>
-                    <ButtonCustom variant="ghost" size="icon" onClick={onQuitar} title="Quitar reemplazo" className="text-red-500 hover:text-red-700">
+                    <ButtonCustom variant="ghost" size="icon" onClick={onQuitar} title="Quitar reemplazo" className="text-red-500 hover:text-red-700 dark:hover:text-red-300">
                         <Trash2 className="h-3.5 w-3.5" />
                     </ButtonCustom>
                 </div>
@@ -231,9 +231,9 @@ const TarjetaPosicionLiberada: React.FC<{
                     { label: 'Presión', valor: reemplazo.PRESION_AIRE, unidad: 'psi' },
                     { label: 'Torque', valor: reemplazo.TORQUE_APLICADO, unidad: 'N·m' },
                 ].map((d) => (
-                    <div key={d.label} className="rounded-lg border border-slate-200/70 bg-white px-2 py-1">
+                    <div key={d.label} className="rounded-lg border border-slate-200 dark:border-slate-700/70 dark:border-slate-700/70 bg-white dark:bg-card px-2 py-1">
                         <p className="text-xs font-bold uppercase tracking-wide text-slate-400">{d.label}</p>
-                        <p className="text-xs font-bold text-slate-700">
+                        <p className="text-xs font-bold text-slate-700 dark:text-slate-200">
                             {d.valor}<span className="ml-0.5 text-xs font-semibold text-slate-400">{d.unidad}</span>
                         </p>
                     </div>
@@ -262,7 +262,7 @@ const CeldaSeleccion: React.FC<{ neumatico: any }> = ({ neumatico }) => {
 
     if (posicionUsada) {
         return (
-            <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">
+            <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 dark:border-emerald-500/30 bg-emerald-50 dark:bg-emerald-500/10 px-2.5 py-1 text-xs font-semibold text-emerald-700 dark:text-emerald-300">
                 <Check className="h-3.5 w-3.5" />
                 En {posicionUsada}
             </span>
@@ -292,7 +292,7 @@ const columnasDisponibles: ColumnDef<any>[] = [
             </ButtonCustom>
         ),
         cell: ({ row }) => (
-            <Link href={`/padron/neumatico/${row.original.CODIGO}`} target="_blank" className="text-blue-600 underline">
+            <Link href={`/padron/neumatico/${row.original.CODIGO}`} target="_blank" className="text-blue-600 dark:text-blue-300 underline">
                 {row.original.CODIGO}
             </Link>
         ),
@@ -335,25 +335,25 @@ const TarjetaDisponible: React.FC<{
 }> = ({ neumatico, posicionUsada, habilitado, onElegir }) => {
     const codigo = codigoDe(neumatico);
     return (
-        <div className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white px-3 py-2.5">
+        <div className="flex items-center gap-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-card px-3 py-2.5">
             <div className="min-w-0 flex-1">
                 <Link href={`/padron/neumatico/${codigo}`} target="_blank" className="text-sm font-bold text-[#167bd9] underline underline-offset-2">
                     {codigo}
                 </Link>
-                <p className="mt-0.5 truncate text-xs text-slate-500">
+                <p className="mt-0.5 truncate text-xs text-slate-500 dark:text-slate-400">
                     {[neumatico.MARCA, neumatico.DISEÑO, neumatico.MEDIDA].filter(Boolean).join(' · ') || '—'}
                 </p>
             </div>
 
             <div className="shrink-0 text-center">
-                <p className="text-sm font-bold leading-none text-slate-700">
+                <p className="text-sm font-bold leading-none text-slate-700 dark:text-slate-200">
                     {neumatico.REMANENTE ?? '—'}<span className="ml-0.5 text-xs">mm</span>
                 </p>
                 <p className="mt-0.5 text-xs uppercase tracking-wide text-slate-400">remanente</p>
             </div>
 
             {posicionUsada ? (
-                <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">
+                <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-emerald-200 dark:border-emerald-500/30 bg-emerald-50 dark:bg-emerald-500/10 px-2.5 py-1 text-xs font-semibold text-emerald-700 dark:text-emerald-300">
                     <Check className="h-3.5 w-3.5" />
                     {posicionUsada}
                 </span>
@@ -684,13 +684,13 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = memo(({
     const panelDiagrama = (
         <Card sx={{
             // pb extra: la etiqueta del repuesto cuelga por debajo del diagrama y se recortaba.
-            p: 2, pb: 5, borderRadius: 2.5, border: '1px solid #e2e8f0',
+            p: 2, pb: 5, borderRadius: 2.5, border: '1px solid var(--border)',
             maxWidth: { xs: '100%', sm: 420, lg: 330 }, minWidth: { xs: 0, lg: 300 },
             display: 'flex', flexDirection: 'column', alignItems: 'center',
         }} elevation={0}>
             <div className="mb-1 flex w-full items-center justify-between gap-2">
-                <span className="text-xs font-bold uppercase tracking-wide text-slate-500">Posiciones</span>
-                <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-bold text-slate-500">
+                <span className="text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">Posiciones</span>
+                <span className="rounded-full bg-slate-100 dark:bg-superficie-2 px-2 py-0.5 text-xs font-bold text-slate-500 dark:text-slate-400">
                     {placa}
                 </span>
             </div>
@@ -716,10 +716,10 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = memo(({
 
     const panelPaso1 = (
         <Stack spacing={2} sx={{ minWidth: 0, flex: 1 }}>
-            <Card sx={{ p: 2, borderRadius: 2.5, border: '1px solid #e2e8f0' }} elevation={0}>
-                <p className="mb-2 text-sm font-semibold text-slate-700">
+            <Card sx={{ p: 2, borderRadius: 2.5, border: '1px solid var(--border)' }} elevation={0}>
+                <p className="mb-2 text-sm font-semibold text-slate-700 dark:text-slate-200">
                     Neumáticos instalados
-                    <span className="ml-2 rounded-full bg-red-50 px-2 py-0.5 text-xs font-bold text-red-600">
+                    <span className="ml-2 rounded-full bg-red-50 dark:bg-red-500/10 px-2 py-0.5 text-xs font-bold text-red-600 dark:text-red-300">
                         {posicionesLiberadas.length} marcado{posicionesLiberadas.length === 1 ? '' : 's'}
                     </span>
                 </p>
@@ -737,8 +737,8 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = memo(({
                 </div>
             </Card>
 
-            <Card sx={{ p: 2, borderRadius: 2.5, border: '1px solid #e2e8f0' }} elevation={0}>
-                <p className="mb-2 text-sm font-semibold text-slate-700">Motivo de la salida</p>
+            <Card sx={{ p: 2, borderRadius: 2.5, border: '1px solid var(--border)' }} elevation={0}>
+                <p className="mb-2 text-sm font-semibold text-slate-700 dark:text-slate-200">Motivo de la salida</p>
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     <Field>
                         <FieldLabel htmlFor="accion-desasignar">Acción</FieldLabel>
@@ -793,7 +793,7 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = memo(({
                         className="h-9 pl-8"
                     />
                 </div>
-                <span className="shrink-0 rounded-full bg-slate-100 px-2.5 py-1 text-xs font-bold text-slate-500">
+                <span className="shrink-0 rounded-full bg-slate-100 dark:bg-superficie-2 px-2.5 py-1 text-xs font-bold text-slate-500 dark:text-slate-400">
                     {resultadosBusqueda.length}
                 </span>
             </div>
@@ -821,10 +821,10 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = memo(({
 
     const panelPaso2 = (
         <Stack spacing={2} sx={{ minWidth: 0, flex: 1 }}>
-            <Card sx={{ p: 2, borderRadius: 2.5, border: '1px solid #e2e8f0' }} elevation={0}>
+            <Card sx={{ p: 2, borderRadius: 2.5, border: '1px solid var(--border)' }} elevation={0}>
                 <div className="mb-2 flex items-center justify-between gap-2">
-                    <p className="text-sm font-semibold text-slate-700">Posiciones a cubrir</p>
-                    <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${todasCubiertas ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}`}>
+                    <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">Posiciones a cubrir</p>
+                    <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${todasCubiertas ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300' : 'bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-300'}`}>
                         {Object.keys(reemplazos).length}/{posicionesLiberadas.length}
                     </span>
                 </div>
@@ -844,15 +844,15 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = memo(({
                 </div>
             </Card>
 
-            <Card sx={{ p: 2, borderRadius: 2.5, border: '1px solid #e2e8f0', minWidth: 0 }} elevation={0}>
-                <p className="mb-2 text-sm font-semibold text-slate-700">
+            <Card sx={{ p: 2, borderRadius: 2.5, border: '1px solid var(--border)', minWidth: 0 }} elevation={0}>
+                <p className="mb-2 text-sm font-semibold text-slate-700 dark:text-slate-200">
                     Neumáticos disponibles
                     {posicionObjetivo ? (
-                        <span className="ml-2 text-xs font-normal text-indigo-600">
+                        <span className="ml-2 text-xs font-normal text-indigo-600 dark:text-indigo-300">
                             Eligiendo para <b>{posicionObjetivo}</b>
                         </span>
                     ) : (
-                        <span className="ml-2 text-xs font-normal text-emerald-600">
+                        <span className="ml-2 text-xs font-normal text-emerald-600 dark:text-emerald-300">
                             Todas las posiciones están cubiertas.
                         </span>
                     )}
@@ -870,22 +870,22 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = memo(({
 
     const panelPaso3 = (
         <Stack spacing={2} sx={{ minWidth: 0, flex: 1 }}>
-            <Card sx={{ p: 2, borderRadius: 2.5, border: '1px solid #fecaca', bgcolor: '#fef2f2' }} elevation={0}>
-                <p className="mb-2 flex items-center gap-1.5 text-sm font-bold text-red-700">
+            <Card sx={{ p: 2, borderRadius: 2.5, border: '1px solid var(--borde-rojo)', bgcolor: 'var(--tinte-rojo)' }} elevation={0}>
+                <p className="mb-2 flex items-center gap-1.5 text-sm font-bold text-red-700 dark:text-red-300">
                     <CircleMinus className="h-4 w-4" />
                     Salen del vehículo ({posicionesLiberadas.length})
                 </p>
                 <div className="flex flex-col gap-1.5">
                     {posicionesLiberadas.map(pos => (
-                        <div key={pos} className="flex items-center gap-2.5 rounded-lg border border-red-200 bg-white px-3 py-2">
+                        <div key={pos} className="flex items-center gap-2.5 rounded-lg border border-red-200 dark:border-red-500/30 bg-white dark:bg-card px-3 py-2">
                             <span className="shrink-0 rounded-md bg-red-600 px-2 py-1 font-mono text-xs font-extrabold text-white">{pos}</span>
                             <div className="min-w-0 flex-1">
-                                <p className="truncate text-sm font-bold text-slate-800">{codigoDe(marcados[pos])}</p>
-                                <p className="truncate text-xs text-slate-500">
+                                <p className="truncate text-sm font-bold text-slate-800 dark:text-slate-100">{codigoDe(marcados[pos])}</p>
+                                <p className="truncate text-xs text-slate-500 dark:text-slate-400">
                                     {[marcados[pos].MARCA, marcados[pos].MEDIDA].filter(Boolean).join(' · ') || '—'}
                                 </p>
                             </div>
-                            <span className="shrink-0 rounded-full border border-red-200 bg-red-50 px-2 py-0.5 text-xs font-bold text-red-700">
+                            <span className="shrink-0 rounded-full border border-red-200 dark:border-red-500/30 bg-red-50 dark:bg-red-500/10 px-2 py-0.5 text-xs font-bold text-red-700 dark:text-red-300">
                                 {accion === 'BAJA DEFINITIVA' ? tipoAccion || 'BAJA' : accion}
                             </span>
                         </div>
@@ -893,8 +893,8 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = memo(({
                 </div>
             </Card>
 
-            <Card sx={{ p: 2, borderRadius: 2.5, border: '1px solid #bbf7d0', bgcolor: '#f0fdf4' }} elevation={0}>
-                <p className="mb-2 flex items-center gap-1.5 text-sm font-bold text-emerald-700">
+            <Card sx={{ p: 2, borderRadius: 2.5, border: '1px solid var(--borde-verde)', bgcolor: 'var(--tinte-verde)' }} elevation={0}>
+                <p className="mb-2 flex items-center gap-1.5 text-sm font-bold text-emerald-700 dark:text-emerald-300">
                     <Check className="h-4 w-4" />
                     Entran al vehículo ({posicionesLiberadas.length})
                 </p>
@@ -902,20 +902,20 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = memo(({
                     {posicionesLiberadas.map(pos => {
                         const r = reemplazos[pos];
                         return (
-                            <div key={pos} className="rounded-lg border border-emerald-200 bg-white px-3 py-2">
+                            <div key={pos} className="rounded-lg border border-emerald-200 dark:border-emerald-500/30 bg-white dark:bg-card px-3 py-2">
                                 <div className="flex items-center gap-2.5">
                                     <span className="shrink-0 rounded-md bg-emerald-600 px-2 py-1 font-mono text-xs font-extrabold text-white">{pos}</span>
                                     <div className="min-w-0 flex-1">
-                                        <p className="truncate text-sm font-bold text-slate-800">{codigoDe(r?.neumatico)}</p>
-                                        <p className="truncate text-xs text-slate-500">
+                                        <p className="truncate text-sm font-bold text-slate-800 dark:text-slate-100">{codigoDe(r?.neumatico)}</p>
+                                        <p className="truncate text-xs text-slate-500 dark:text-slate-400">
                                             {[r?.neumatico?.MARCA, r?.neumatico?.MEDIDA].filter(Boolean).join(' · ') || '—'}
                                         </p>
                                     </div>
                                 </div>
-                                <div className="mt-1.5 flex flex-wrap gap-1.5 text-xs font-semibold text-slate-600">
-                                    <span className="rounded bg-slate-100 px-1.5 py-0.5">{r?.REMANENTE} mm</span>
-                                    <span className="rounded bg-slate-100 px-1.5 py-0.5">{r?.PRESION_AIRE} psi</span>
-                                    <span className="rounded bg-slate-100 px-1.5 py-0.5">{r?.TORQUE_APLICADO} N·m</span>
+                                <div className="mt-1.5 flex flex-wrap gap-1.5 text-xs font-semibold text-slate-600 dark:text-slate-300">
+                                    <span className="rounded bg-slate-100 dark:bg-superficie-2 px-1.5 py-0.5">{r?.REMANENTE} mm</span>
+                                    <span className="rounded bg-slate-100 dark:bg-superficie-2 px-1.5 py-0.5">{r?.PRESION_AIRE} psi</span>
+                                    <span className="rounded bg-slate-100 dark:bg-superficie-2 px-1.5 py-0.5">{r?.TORQUE_APLICADO} N·m</span>
                                 </div>
                             </div>
                         );
@@ -923,12 +923,12 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = memo(({
                 </div>
             </Card>
 
-            <Card sx={{ p: 2, borderRadius: 2.5, border: '1px solid #e2e8f0' }} elevation={0}>
+            <Card sx={{ p: 2, borderRadius: 2.5, border: '1px solid var(--border)' }} elevation={0}>
                 <p className="text-xs font-bold uppercase tracking-wide text-slate-400">Observación</p>
-                <p className="mt-0.5 whitespace-pre-wrap text-sm text-slate-700">{observacion}</p>
-                <div className="mt-2 flex flex-wrap gap-3 text-xs text-slate-500">
-                    <span><b className="text-slate-700">Kilometraje:</b> {Number(kilometraje ?? 0).toLocaleString()} km</span>
-                    <span><b className="text-slate-700">Última inspección:</b> {convertToDateHuman(fechaUltimaInspeccion) || 'Sin registro'}</span>
+                <p className="mt-0.5 whitespace-pre-wrap text-sm text-slate-700 dark:text-slate-200">{observacion}</p>
+                <div className="mt-2 flex flex-wrap gap-3 text-xs text-slate-500 dark:text-slate-400">
+                    <span><b className="text-slate-700 dark:text-slate-200">Kilometraje:</b> {Number(kilometraje ?? 0).toLocaleString()} km</span>
+                    <span><b className="text-slate-700 dark:text-slate-200">Última inspección:</b> {convertToDateHuman(fechaUltimaInspeccion) || 'Sin registro'}</span>
                 </div>
             </Card>
         </Stack>
@@ -950,9 +950,9 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = memo(({
                     <Box sx={{
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         width: { xs: 34, md: 40 }, height: { xs: 34, md: 40 }, borderRadius: 2,
-                        background: 'linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%)', flexShrink: 0,
+                        background: 'linear-gradient(135deg, var(--tinte-azul-fuerte) 0%, var(--tinte-indigo) 100%)', flexShrink: 0,
                     }}>
-                        <ClipboardList size={20} className="text-blue-600" />
+                        <ClipboardList size={20} className="text-blue-600 dark:text-blue-300" />
                     </Box>
 
                     <Box sx={{ flex: 1, minWidth: 0 }}>
@@ -961,7 +961,7 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = memo(({
                         </Typography>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.4, flexWrap: 'wrap' }}>
                             <Typography variant="body2" color="text.secondary">Vehículo:</Typography>
-                            <Chip label={placa} size="small" sx={{ fontWeight: 700, fontSize: '0.875rem', bgcolor: '#f1f5f9', color: '#334155', letterSpacing: 0.5 }} />
+                            <Chip label={placa} size="small" sx={{ fontWeight: 700, fontSize: '0.875rem', bgcolor: 'var(--superficie-2)', color: 'var(--foreground)', letterSpacing: 0.5 }} />
                             {vehiculo?.marca && (
                                 <Typography variant="caption" color="text.secondary">
                                     {[vehiculo.marca, vehiculo.modelo].filter(Boolean).join(' · ')}
@@ -971,23 +971,23 @@ export const ModalDesasignar: React.FC<ModalDesasignarProps> = memo(({
                         <div className="mt-1.5 flex items-center gap-1">
                             {PASOS.map((etiqueta, i) => (
                                 <React.Fragment key={etiqueta}>
-                                    {i > 0 && <span className="h-px w-3 bg-slate-200 sm:w-5" />}
+                                    {i > 0 && <span className="h-px w-3 bg-slate-200 dark:bg-superficie-3 sm:w-5" />}
                                     <Paso indice={i} actual={paso} etiqueta={etiqueta} onClick={() => { if (i < paso) setPaso(i); }} />
                                 </React.Fragment>
                             ))}
                         </div>
                     </Box>
 
-                    <ButtonCustom variant="ghost" size="icon" onClick={onClose} title="Cerrar" aria-label="Cerrar" className="shrink-0 text-slate-400 hover:text-slate-700">
+                    <ButtonCustom variant="ghost" size="icon" onClick={onClose} title="Cerrar" aria-label="Cerrar" className="shrink-0 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200">
                         <X className="h-4 w-4" />
                     </ButtonCustom>
                 </DialogTitle>
-                <DialogContent sx={{ pt: 2.5, px: { xs: 1.5, md: 3 }, bgcolor: '#f8fafc' }}>
+                <DialogContent sx={{ pt: 2.5, px: { xs: 1.5, md: 3 }, bgcolor: 'var(--superficie-1)' }}>
                     <div className='mt-3'></div>
                     {paso === 0 && posicionesLiberadas.length === 0 && (
-                        <div className="mb-2.5 flex items-start gap-2 rounded-xl border border-blue-100 bg-blue-50/70 px-3 py-2.5">
+                        <div className="mb-2.5 flex items-start gap-2 rounded-xl border border-blue-100 dark:border-blue-500/20 bg-blue-50 dark:bg-blue-500/10/70 dark:bg-blue-500/10 px-3 py-2.5">
                             <CircleAlert className="mt-0.5 h-4 w-4 shrink-0 text-blue-500" />
-                            <p className="text-xs leading-snug text-blue-800">
+                            <p className="text-xs leading-snug text-blue-800 dark:text-blue-200">
                                 Marca los neumáticos que salen del vehículo. Después tendrás que cubrir cada posición
                                 liberada con un reemplazo: <b>las posiciones no pueden quedar vacías</b>.
                             </p>

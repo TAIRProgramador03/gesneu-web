@@ -127,9 +127,9 @@ export const CustomersTable = memo(({ count = 0, rows = [], page = 0, rowsPerPag
                                 height: 20,
                                 color: "#ffffff",
                                 borderRadius: 5,
-                                border: `.5px solid #2a2a2a`,
+                                border: `.5px solid var(--border)`,
                                 padding: "10px",
-                                backgroundColor: '#eee',
+                                backgroundColor: 'var(--superficie-3)',
                                 '& .MuiLinearProgress-bar': {
                                   backgroundColor:
                                     row.ESTADO < 39 ? '#d32f2f' : row.ESTADO < 79 ? '#FFEB3B' : '#2e7d32',

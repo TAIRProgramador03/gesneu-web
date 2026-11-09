@@ -5,6 +5,7 @@ import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
+import { useTheme } from '@mui/material/styles';
 import { MagnifyingGlass } from '@phosphor-icons/react/dist/ssr/MagnifyingGlass';
 
 interface PasoGuia {
@@ -12,7 +13,15 @@ interface PasoGuia {
     texto: React.ReactNode;
     from: string;
     to: string;
-    color: string;
+    /* Los círculos numerados van de azul pálido a azul medio para sugerir
+       avance. Ese degradado no se puede resolver con variables CSS porque
+       cada paso tiene el suyo, y en oscuro un fondo azul pálido con el
+       número también azul claro queda ilegible (era el caso: el 2 y el 3
+       no se leían). Por eso cada paso lleva su par oscuro, y el componente
+       elige con `theme.palette.mode`, que es el mismo mecanismo que ya
+       usan los reportes y el mapa. */
+    fromOscuro: string;
+    toOscuro: string;
 }
 
 const PASOS: PasoGuia[] = [
@@ -21,21 +30,24 @@ const PASOS: PasoGuia[] = [
         texto: <>Escribe la placa completa, por ejemplo <strong>TAIR-000</strong>.</>,
         from: '#dbeafe',
         to: '#bfdbfe',
-        color: '#1d4ed8',
+        fromOscuro: 'rgb(59 130 246 / 15%)',
+        toOscuro: 'rgb(59 130 246 / 22%)',
     },
     {
         numero: 2,
         texto: <>Activa <strong>Tránsito</strong> si la unidad no pertenece a tu operación.</>,
         from: '#bfdbfe',
         to: '#93c5fd',
-        color: '#1e40af',
+        fromOscuro: 'rgb(59 130 246 / 24%)',
+        toOscuro: 'rgb(59 130 246 / 32%)',
     },
     {
         numero: 3,
         texto: <>Desde el resultado puedes asignar, inspeccionar o dar mantenimiento.</>,
         from: '#93c5fd',
         to: '#60a5fa',
-        color: '#1e3a8a',
+        fromOscuro: 'rgb(59 130 246 / 34%)',
+        toOscuro: 'rgb(59 130 246 / 45%)',
     },
 ];
 
@@ -44,15 +56,18 @@ interface EmptyStatePlacaProps {
 }
 
 export function EmptyStatePlaca({ error }: EmptyStatePlacaProps): React.JSX.Element {
+    const tema = useTheme();
+    const esOscuro = tema.palette.mode === 'dark';
+
     return (
         <Card
             sx={{
                 p: { xs: 3, md: 6 },
                 textAlign: 'center',
                 borderRadius: 3,
-                background: 'linear-gradient(180deg, #eff6ff 0%, #ffffff 55%)',
+                background: 'linear-gradient(180deg, var(--tinte-azul) 0%, var(--card) 55%)',
                 boxShadow: '0 8px 30px rgba(37, 99, 235, 0.10)',
-                border: '1px solid #dbeafe',
+                border: '1px solid var(--borde-azul)',
             }}
         >
             <Stack spacing={1.25} alignItems="center" sx={{ maxWidth: 560, mx: 'auto' }}>
@@ -77,10 +92,10 @@ export function EmptyStatePlaca({ error }: EmptyStatePlacaProps): React.JSX.Elem
                     <Typography
                         variant="body2"
                         sx={{
-                            color: '#b91c1c',
+                            color: 'var(--texto-rojo)',
                             fontWeight: 600,
-                            background: '#fef2f2',
-                            border: '1px solid #fecaca',
+                            background: 'var(--tinte-rojo)',
+                            border: '1px solid var(--borde-rojo)',
                             borderRadius: 2,
                             px: 2,
                             py: 0.75,
@@ -90,7 +105,7 @@ export function EmptyStatePlaca({ error }: EmptyStatePlacaProps): React.JSX.Elem
                     </Typography>
                 ) : null}
 
-                <Typography variant="h5" fontWeight="bold" sx={{ color: '#0f172a' }}>
+                <Typography variant="h5" fontWeight="bold" sx={{ color: 'var(--foreground)' }}>
                     Consulta una placa para ver sus neumáticos
                 </Typography>
                 <Typography variant="body1" color="text.secondary">
@@ -113,8 +128,8 @@ export function EmptyStatePlaca({ error }: EmptyStatePlacaProps): React.JSX.Elem
                             p: 2.5,
                             textAlign: 'left',
                             borderRadius: 2.5,
-                            borderColor: '#e2e8f0',
-                            background: '#fff',
+                            borderColor: 'var(--border)',
+                            background: 'var(--card)',
                             transition: 'transform 0.15s, box-shadow 0.15s',
                             '&:hover': {
                                 transform: 'translateY(-2px)',
@@ -130,8 +145,10 @@ export function EmptyStatePlaca({ error }: EmptyStatePlacaProps): React.JSX.Elem
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                background: `linear-gradient(135deg, ${paso.from}, ${paso.to})`,
-                                color: paso.color,
+                                background: esOscuro
+                                    ? `linear-gradient(135deg, ${paso.fromOscuro}, ${paso.toOscuro})`
+                                    : `linear-gradient(135deg, ${paso.from}, ${paso.to})`,
+                                color: 'var(--texto-azul)',
                                 fontWeight: 800,
                                 fontSize: '0.875rem',
                                 mb: 1.5,

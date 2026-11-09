@@ -6,11 +6,11 @@ import { ArrowUpDown } from "lucide-react"
 import Link from "next/link"
 
 const getBadgeColor = (cantidad: number) => {
-  if (cantidad === 0) return 'bg-red-100 text-red-700 border border-red-500'
-  if (cantidad === 2) return 'bg-violet-100 text-violet-700 border border-violet-500'
-  if (cantidad === 7) return 'bg-amber-100 text-amber-700 border border-amber-500'
-  if (cantidad === 5) return 'bg-cyan-100 text-cyan-700 border border-cyan-500'
-  return 'bg-gray-100 text-gray-700 border border-gray-300'
+  if (cantidad === 0) return 'bg-red-100 dark:bg-red-500/15 text-red-700 dark:text-red-300 border border-red-500'
+  if (cantidad === 2) return 'bg-violet-100 dark:bg-violet-500/15 text-violet-700 dark:text-violet-300 border border-violet-500'
+  if (cantidad === 7) return 'bg-amber-100 dark:bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500'
+  if (cantidad === 5) return 'bg-cyan-100 dark:bg-cyan-500/15 text-cyan-700 dark:text-cyan-300 border border-cyan-500'
+  return 'bg-gray-100 dark:bg-superficie-2 text-gray-700 dark:text-slate-200 border border-gray-300 dark:border-slate-600'
 }
 
 export const columnsPlacasNeumaticos: ColumnDef<PlacasConNeumaticos>[] = [

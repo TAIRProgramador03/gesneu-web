@@ -17,6 +17,7 @@ import { usePopover } from '@/hooks/use-popover';
 
 import { ConnectionStatus } from './connection-status';
 import { MobileNav } from './mobile-nav';
+import { ThemeToggle } from './theme-toggle';
 import { UserPopover } from './user-popover';
 
 export function MainNav(): React.JSX.Element {
@@ -51,21 +52,22 @@ export function MainNav(): React.JSX.Element {
             </IconButton>
           </Stack>
           <Stack sx={{ alignItems: 'center' }} direction="row" spacing={2}>
+            {/* <ThemeToggle /> */}
             <ConnectionStatus />
-            <Tooltip title="Contactos">
+            {/* <Tooltip title="Contactos">
               <span>
                 <IconButton disabled={true}>
                   <UsersIcon />
                 </IconButton>
               </span>
-            </Tooltip>
-            <Tooltip title="Notificaciones">
+            </Tooltip> */}
+            {/* <Tooltip title="Notificaciones">
               <span>
                 <IconButton disabled={true}>
                   <BellIcon />
                 </IconButton>
               </span>
-            </Tooltip>
+            </Tooltip> */}
             <Avatar
               onClick={userPopover.handleOpen}
               ref={userPopover.anchorRef}

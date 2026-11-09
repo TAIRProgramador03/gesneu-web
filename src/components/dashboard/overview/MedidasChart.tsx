@@ -144,7 +144,7 @@ export const MedidasChart = (): React.JSX.Element => {
 
       {
         TOTAL_FLOTA === 0 && !isLoading && (
-          <div className='flex gap-1 flex-wrap justify-center items-center bg-indigo-50 text-blue-700 border-2 border-blue-700 p-2 rounded-lg'>
+          <div className='flex gap-1 flex-wrap justify-center items-center bg-indigo-50 dark:bg-indigo-500/10 text-blue-700 dark:text-blue-300 border-2 border-blue-700 p-2 rounded-lg'>
             <BadgeCheck width={12} />
             <span className='italic text-xs'>Almacén Vacío.</span>
           </div>
@@ -185,7 +185,7 @@ export const MedidasChart = (): React.JSX.Element => {
                     axisLine={false}
                     tickLine={false}
                   />
-                  <Tooltip content={<MedidasTooltip />} cursor={{ fill: 'rgba(0,0,0,0.04)' }} />
+                  <Tooltip content={<MedidasTooltip />} cursor={{ fill: 'var(--grafico-cursor)' }} />
                   <Bar dataKey="disponibles" name="Disponibles" stackId="a" fill={COLOR_DISP} radius={[3, 0, 0, 3]} />
                   <Bar dataKey="asignados" name="Asignados" stackId="a" fill={COLOR_ASIG} radius={[0, 0, 0, 0]} />
                   <Bar dataKey="baja" name="Bajas" stackId="a" fill={COLOR_BAJ} radius={[0, 3, 3, 0]}>

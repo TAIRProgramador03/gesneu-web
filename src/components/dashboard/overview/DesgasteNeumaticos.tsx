@@ -247,7 +247,7 @@ export const DesgasteNeumaticos = (): React.JSX.Element => {
 
       {
         desgasteNeumaticos.neumaticos.length === 0 && !isLoading && (
-          <div className='flex gap-1 flex-wrap justify-center items-center bg-red-50 text-red-700 border-2 border-red-700 p-2 rounded-lg'>
+          <div className='flex gap-1 flex-wrap justify-center items-center bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-300 border-2 border-red-700 p-2 rounded-lg'>
             <BadgeCheck width={12} />
             <span className='italic text-xs'>Sin neumáticos en baja.</span>
           </div>
@@ -348,18 +348,18 @@ export const DesgasteNeumaticos = (): React.JSX.Element => {
                     axisLine={false}
                     tickLine={false}
                   />
-                  <Tooltip content={<DesgasteTooltip fleetAvg={desgasteNeumaticos.fleetAvg} />} cursor={{ fill: 'rgba(0,0,0,0.04)' }} />
+                  <Tooltip content={<DesgasteTooltip fleetAvg={desgasteNeumaticos.fleetAvg} />} cursor={{ fill: 'var(--grafico-cursor)' }} />
 
                   {/* Línea de referencia: promedio flota */}
                   <ReferenceLine
                     x={desgasteNeumaticos.fleetAvg}
-                    stroke="#94a3b8"
+                    stroke="var(--texto-apagado)"
                     strokeDasharray="5 3"
                     label={{
                       value: `Prom. ${desgasteNeumaticos.fleetAvg}`,
                       position: 'insideTopRight',
                       fontSize: '0.75rem',
-                      fill: '#94a3b8',
+                      fill: 'var(--texto-apagado)',
                       dy: -4,
                     }}
                   />

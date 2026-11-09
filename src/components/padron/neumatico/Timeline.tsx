@@ -12,7 +12,7 @@ export const Timeline = ({ movimientos }: { movimientos: MovimientoHistorial[] }
     return (
       <CollapsibleSection title="Línea de Tiempo" icon={<Clock className="size-4" />}>
         <div className="flex flex-col items-center justify-center py-10 text-gray-400">
-          <div className="rounded-2xl bg-gray-50 p-5 mb-4">
+          <div className="rounded-2xl bg-gray-50 dark:bg-superficie-1 p-5 mb-4">
             <Clock className="size-10 opacity-30" />
           </div>
           <p className="text-sm font-medium text-gray-400">Sin movimientos registrados</p>
@@ -29,7 +29,7 @@ export const Timeline = ({ movimientos }: { movimientos: MovimientoHistorial[] }
       title="Línea de Tiempo"
       icon={<Clock className="size-4" />}
       headerRight={
-        <span className="text-xs font-medium text-gray-400 bg-gray-100 rounded-full px-2.5 py-0.5">
+        <span className="text-xs font-medium text-gray-400 bg-gray-100 dark:bg-superficie-2 rounded-full px-2.5 py-0.5">
           {movimientos.length} movimientos
         </span>
       }
@@ -49,7 +49,7 @@ export const Timeline = ({ movimientos }: { movimientos: MovimientoHistorial[] }
             <button
               type="button"
               onClick={() => setShowAll(!showAll)}
-              className="inline-flex items-center gap-1.5 text-xs font-medium text-sky-700 hover:text-sky-900 bg-sky-50 hover:bg-sky-100 rounded-full px-5 py-2 transition-colors"
+              className="inline-flex items-center gap-1.5 text-xs font-medium text-sky-700 dark:text-sky-300 hover:text-sky-900 dark:hover:text-sky-200 bg-sky-50 dark:bg-sky-500/10 hover:bg-sky-100 dark:hover:bg-sky-500/15 rounded-full px-5 py-2 transition-colors"
             >
               {showAll ? (
                 <>Mostrar menos</>

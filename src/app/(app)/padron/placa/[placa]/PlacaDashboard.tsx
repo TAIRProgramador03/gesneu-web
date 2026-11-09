@@ -22,7 +22,7 @@ export const PlacaDashboard = ({ placa }: { placa: string }) => {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-32">
-        <Spinner className="size-8 text-sky-800" />
+        <Spinner className="size-8 text-sky-800 dark:text-sky-200" />
       </div>
     )
   }
@@ -30,10 +30,10 @@ export const PlacaDashboard = ({ placa }: { placa: string }) => {
   if (isError || !vehiculo?.PLACA) {
     return (
       <div className="flex flex-col items-center justify-center py-32 gap-4">
-        <p className="text-gray-500">
+        <p className="text-gray-500 dark:text-slate-400">
           No se encontró el vehículo con placa <strong>{placa}</strong>.
         </p>
-        <Link href="/padron" className="text-sky-800 hover:underline text-sm">
+        <Link href="/padron" className="text-sky-800 dark:text-sky-200 hover:underline text-sm">
           Volver al padrón
         </Link>
       </div>
@@ -78,28 +78,28 @@ export const PlacaDashboard = ({ placa }: { placa: string }) => {
           icon={<Route className="size-5" />}
           label="Kilometraje actual"
           value={vehiculo.KILOMETRAJE_GESNEU !== null ? vehiculo.KILOMETRAJE_GESNEU.toLocaleString('es-PE') : vehiculo.KILOMETRAJE.toLocaleString('es-PE')}
-          color="text-sky-800"
+          color="text-sky-800 dark:text-sky-200"
           border="border-sky-800"
         />
         <StatCard
           icon={<ArrowRightLeft className="size-5" />}
           label="Total movimientos"
           value={totalMovimientos}
-          color="text-teal-600"
+          color="text-teal-600 dark:text-teal-300"
           border="border-teal-600"
         />
         <StatCard
           icon={<ClipboardList className="size-5" />}
           label="Total inspecciones"
           value={totalInspecciones}
-          color="text-indigo-600"
+          color="text-indigo-600 dark:text-indigo-300"
           border="border-indigo-600"
         />
         <StatCard
           icon={<CircleDot className="size-5" />}
           label="Neumáticos históricos"
           value={neumaticosUnicos}
-          color="text-amber-600"
+          color="text-amber-600 dark:text-amber-300"
           border="border-amber-600"
         />
       </div>

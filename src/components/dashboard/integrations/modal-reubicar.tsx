@@ -487,21 +487,21 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = memo(({
   const panelPosiciones = (
     <div className="w-full">
       {neumaticoSeleccionado ? (
-        <div className="mb-3 flex items-center gap-2 rounded-xl border-2 border-violet-300 bg-linear-to-br from-violet-50 via-white to-violet-50 p-3">
+        <div className="mb-3 flex items-center gap-2 rounded-xl border-2 border-violet-300 dark:border-violet-500/40 bg-linear-to-br from-violet-50 dark:from-violet-500/10 via-white dark:via-card to-violet-50 dark:to-violet-500/10 p-3">
           <span className="shrink-0 rounded-md bg-violet-600 px-2 py-1 text-xs font-bold text-white">{posicionSeleccionada}</span>
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-bold text-slate-800">
+            <p className="truncate text-sm font-bold text-slate-800 dark:text-slate-100">
               {neumaticoSeleccionado.CODIGO_NEU || neumaticoSeleccionado.CODIGO}
-              <span className="ml-2 text-xs font-normal text-slate-500">{neumaticoSeleccionado.MARCA}</span>
+              <span className="ml-2 text-xs font-normal text-slate-500 dark:text-slate-400">{neumaticoSeleccionado.MARCA}</span>
             </p>
-            <p className="text-xs text-slate-500">Elige la posición de destino. Si está ocupada, se intercambian.</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400">Elige la posición de destino. Si está ocupada, se intercambian.</p>
           </div>
           <ButtonCustom variant="ghost" size="sm" onClick={() => setPosicionSeleccionada(null)} title="Cancelar">
             <X className="h-3.5 w-3.5" />
           </ButtonCustom>
         </div>
       ) : (
-        <p className="mb-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-500">
+        <p className="mb-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-superficie-1 px-3 py-2 text-xs text-slate-500 dark:text-slate-400">
           Elige el neumático que quieres mover —desde el diagrama o esta lista— y luego su posición de destino.
         </p>
       )}
@@ -515,18 +515,18 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = memo(({
           return (
             <div
               key={pos}
-              className={`flex items-center gap-2.5 rounded-lg border px-3 py-2 transition-colors ${esOrigen ? 'border-violet-300 bg-violet-50' : ocupada ? 'border-slate-200 bg-white' : 'border-dashed border-slate-200 bg-slate-50/60'
+              className={`flex items-center gap-2.5 rounded-lg border px-3 py-2 transition-colors ${esOrigen ? 'border-violet-300 dark:border-violet-500/40 bg-violet-50 dark:bg-violet-500/10' : ocupada ? 'border-slate-200 dark:border-slate-700 bg-white dark:bg-card' : 'border-dashed border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-superficie-1/60 dark:bg-superficie-1/60'
                 }`}
             >
-              <span className={`shrink-0 rounded-md px-2 py-1 text-xs font-bold ${ocupada ? 'bg-violet-600 text-white' : 'bg-slate-200 text-slate-500'}`}>
+              <span className={`shrink-0 rounded-md px-2 py-1 text-xs font-bold ${ocupada ? 'bg-violet-600 text-white' : 'bg-slate-200 dark:bg-superficie-3 text-slate-500 dark:text-slate-400'}`}>
                 {pos}
               </span>
 
               <div className="min-w-0 flex-1">
                 {ocupada ? (
                   <>
-                    <p className="truncate text-sm font-semibold text-slate-800">{neu!.CODIGO_NEU || neu!.CODIGO}</p>
-                    <p className="truncate text-xs text-slate-500">{neu!.MARCA || '—'}</p>
+                    <p className="truncate text-sm font-semibold text-slate-800 dark:text-slate-100">{neu!.CODIGO_NEU || neu!.CODIGO}</p>
+                    <p className="truncate text-xs text-slate-500 dark:text-slate-400">{neu!.MARCA || '—'}</p>
                   </>
                 ) : (
                   <p className="text-sm text-slate-400">Libre</p>
@@ -573,10 +573,10 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = memo(({
         <Box sx={{
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           width: { xs: 34, md: 40 }, height: { xs: 34, md: 40 }, borderRadius: 2,
-          background: 'linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%)',
+          background: 'linear-gradient(135deg, var(--tinte-azul-fuerte) 0%, var(--tinte-indigo) 100%)',
           flexShrink: 0,
         }}>
-          <ClipboardList size={20} className="text-blue-600" />
+          <ClipboardList size={20} className="text-blue-600 dark:text-blue-300" />
         </Box>
         <Box sx={{ flex: 1, minWidth: 0 }}>
           <Typography variant="h6" fontWeight={700} lineHeight={1.2} sx={{ fontSize: { xs: '1rem', md: '1.25rem' } }}>
@@ -587,10 +587,10 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = memo(({
             <Chip
               label={placa}
               size="small"
-              sx={{ fontWeight: 700, fontSize: '0.875rem', bgcolor: '#f1f5f9', color: '#334155', letterSpacing: 0.5 }}
+              sx={{ fontWeight: 700, fontSize: '0.875rem', bgcolor: 'var(--superficie-2)', color: 'var(--foreground)', letterSpacing: 0.5 }}
             />
           </Box>
-          <Typography variant="caption" className='text-amber-600' sx={{ display: 'block', mt: 1, fontStyle: 'italic', fontSize: { xs: '0.75rem', md: '0.875rem' }, lineHeight: 1.35 }}>
+          <Typography variant="caption" className='text-amber-600 dark:text-amber-300' sx={{ display: 'block', mt: 1, fontStyle: 'italic', fontSize: { xs: '0.75rem', md: '0.875rem' }, lineHeight: 1.35 }}>
             <span className='font-bold'>Nota: </span>
             Elige un neumático y luego su posición de destino: si esa posición está ocupada, ambos <b>se intercambian</b>.
           </Typography>
@@ -602,7 +602,7 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = memo(({
           onClick={handleClose}
           title="Cerrar"
           aria-label="Cerrar"
-          className="shrink-0 self-start text-slate-400 hover:text-slate-700"
+          className="shrink-0 self-start text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
         >
           <X className="h-4 w-4" />
         </ButtonCustom>
@@ -620,29 +620,29 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = memo(({
                 maxWidth: { xs: '100%', lg: 400 }, minWidth: { xs: 0, lg: 320 }, width: '100%'
               }}>
                 {vehiculo ? (
-                  <div className="flex items-center gap-3 rounded-xl border border-blue-100 bg-linear-to-br from-blue-50 via-white to-indigo-50 px-4 py-3">
+                  <div className="flex items-center gap-3 rounded-xl border border-blue-100 dark:border-blue-500/20 bg-linear-to-br from-blue-50 dark:from-blue-500/10 via-white dark:via-card to-indigo-50 dark:to-indigo-500/10 px-4 py-3">
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-linear-to-br from-blue-500 to-indigo-600 shadow-sm shadow-blue-200">
                       <Car className="h-5 w-5 text-white" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-semibold text-slate-900">
+                      <p className="truncate text-sm font-semibold text-slate-900 dark:text-slate-100">
                         {[vehiculo.marca, vehiculo.modelo, vehiculo.anio].filter(Boolean).join(' · ')}
                       </p>
-                      <div className="mt-0.5 flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-slate-500">
+                      <div className="mt-0.5 flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-slate-500 dark:text-slate-400">
                         {[vehiculo.color, vehiculo.proyecto, vehiculo.operacion]
                           .filter(Boolean)
                           .map((dato, i) => <span key={i}>{dato}</span>)}
                       </div>
                     </div>
                     {vehiculo?.kilometro !== undefined && (
-                      <div className="shrink-0 rounded-lg bg-white/70 px-3 py-1.5 text-right shadow-sm">
+                      <div className="shrink-0 rounded-lg bg-white dark:bg-card/70 dark:bg-card/70 px-3 py-1.5 text-right shadow-sm">
                         <p className="text-xs font-semibold uppercase tracking-wide text-blue-400">Kilometraje</p>
-                        <p className="text-sm font-bold text-blue-900">{vehiculo.kilometro.toLocaleString()} km</p>
+                        <p className="text-sm font-bold text-blue-900 dark:text-blue-200">{vehiculo.kilometro.toLocaleString()} km</p>
                       </div>
                     )}
                   </div>
                 ) : (
-                  <p className="text-sm text-slate-500">No hay datos del vehículo.</p>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">No hay datos del vehículo.</p>
                 )}
               </Card>
               {/* Error al registrar la reubicación: Error al registrar la reubicación: No se puede guardar: las posiciones RES01 quedarían vacías. Asigna neumáticos a estas posiciones antes de guardar. */}
@@ -651,11 +651,11 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = memo(({
                 p: { xs: 1.5, md: 2 }, boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)',
                 maxWidth: { xs: '100%', lg: 400 }, minWidth: { xs: 0, lg: 320 }, width: '100%'
               }}>
-                <div className="mb-3 flex items-center gap-2 rounded-lg border border-violet-100 bg-violet-50/60 px-3 py-2">
+                <div className="mb-3 flex items-center gap-2 rounded-lg border border-violet-100 dark:border-violet-500/20 bg-violet-50 dark:bg-violet-500/10/60 dark:bg-violet-500/10 px-3 py-2">
                   <MapPinned className="h-4 w-4 shrink-0 text-violet-500" />
                   <div className="min-w-0">
                     <p className="text-xs font-semibold uppercase tracking-wide text-violet-400 leading-tight">Fecha última inspección</p>
-                    <p className="truncate text-sm font-semibold text-violet-900">
+                    <p className="truncate text-sm font-semibold text-violet-900 dark:text-violet-200">
                       {convertToDateHuman(fechaUltimaInspeccion) || 'Sin registro'}
                     </p>
                   </div>
@@ -676,7 +676,7 @@ export const ModalReubicar: React.FC<ModalReubicarProps> = memo(({
                   <div className="w-full">
                     <div className="mb-2 flex items-center justify-center gap-1.5">
                       <ArrowLeftRight className="h-3.5 w-3.5 text-violet-500" />
-                      <p className="text-sm font-semibold text-slate-700">Posiciones del vehículo</p>
+                      <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">Posiciones del vehículo</p>
                     </div>
 
                     {panelPosiciones}

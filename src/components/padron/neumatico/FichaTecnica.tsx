@@ -55,15 +55,15 @@ export const FichaTecnica = ({ neu }: { neu: NeumaticoBuscado }) => {
   ]
   return (
     <CollapsibleSection title="Ficha Técnica" icon={<FileText className="size-4" />} border='border-sky-500'>
-      <div className="space-y-6 bg-linear-to-br from-sky-100 to-gray-100 p-4 rounded-2xl">
+      <div className="space-y-6 bg-linear-to-br from-sky-100 dark:from-sky-500/15 to-gray-100 dark:to-superficie-2 p-4 rounded-2xl">
         {sections.map((section) => (
           <div key={section.title}>
             <div className="flex items-center gap-2 mb-3">
-              <div className="h-px flex-1 bg-gray-100" />
-              <h3 className="text-xs font-bold uppercase tracking-widest text-gray-600 px-2">
+              <div className="h-px flex-1 bg-gray-100 dark:bg-superficie-2" />
+              <h3 className="text-xs font-bold uppercase tracking-widest text-gray-600 dark:text-slate-300 px-2">
                 {section.title}
               </h3>
-              <div className="h-px flex-1 bg-gray-100" />
+              <div className="h-px flex-1 bg-gray-100 dark:bg-superficie-2" />
             </div>
             <div className={cn("grid gap-2.5", section.cols || "grid-cols-2 sm:grid-cols-3 lg:grid-cols-5")}>
               {section.items.map((item) => (

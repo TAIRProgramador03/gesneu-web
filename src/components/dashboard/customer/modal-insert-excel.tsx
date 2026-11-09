@@ -283,23 +283,23 @@ const ModalInsertExcel: React.FC<ModalInsertExcelProps> = ({ open, onClose, onSu
                 <div className="flex items-center gap-1.5 flex-wrap mt-3">
                   {resultadoCarga.muestra.length >= 4 ? (
                     <>
-                      <span className="inline-flex items-center rounded-md bg-cyan-50 px-2.5 py-1 text-xs font-mono font-medium text-cyan-700 ring-1 ring-inset ring-cyan-200">
+                      <span className="inline-flex items-center rounded-md bg-cyan-50 dark:bg-cyan-500/10 px-2.5 py-1 text-xs font-mono font-medium text-cyan-700 dark:text-cyan-300 ring-1 ring-inset ring-cyan-200 dark:ring-cyan-500/30">
                         {resultadoCarga.muestra[0]}
                       </span>
-                      <span className="inline-flex items-center rounded-md bg-cyan-50 px-2.5 py-1 text-xs font-mono font-medium text-cyan-700 ring-1 ring-inset ring-cyan-200">
+                      <span className="inline-flex items-center rounded-md bg-cyan-50 dark:bg-cyan-500/10 px-2.5 py-1 text-xs font-mono font-medium text-cyan-700 dark:text-cyan-300 ring-1 ring-inset ring-cyan-200 dark:ring-cyan-500/30">
                         {resultadoCarga.muestra[1]}
                       </span>
                       <span className="text-muted-foreground text-sm font-medium px-1">•••</span>
-                      <span className="inline-flex items-center rounded-md bg-cyan-50 px-2.5 py-1 text-xs font-mono font-medium text-cyan-700 ring-1 ring-inset ring-cyan-200">
+                      <span className="inline-flex items-center rounded-md bg-cyan-50 dark:bg-cyan-500/10 px-2.5 py-1 text-xs font-mono font-medium text-cyan-700 dark:text-cyan-300 ring-1 ring-inset ring-cyan-200 dark:ring-cyan-500/30">
                         {resultadoCarga.muestra[resultadoCarga.muestra.length - 2]}
                       </span>
-                      <span className="inline-flex items-center rounded-md bg-cyan-50 px-2.5 py-1 text-xs font-mono font-medium text-cyan-700 ring-1 ring-inset ring-cyan-200">
+                      <span className="inline-flex items-center rounded-md bg-cyan-50 dark:bg-cyan-500/10 px-2.5 py-1 text-xs font-mono font-medium text-cyan-700 dark:text-cyan-300 ring-1 ring-inset ring-cyan-200 dark:ring-cyan-500/30">
                         {resultadoCarga.muestra[resultadoCarga.muestra.length - 1]}
                       </span>
                     </>
                   ) : (
                     resultadoCarga.muestra.map((codigo: string) => (
-                      <span key={codigo} className="inline-flex items-center rounded-md bg-cyan-50 px-2.5 py-1 text-xs font-mono font-medium text-cyan-700 ring-1 ring-inset ring-cyan-200">
+                      <span key={codigo} className="inline-flex items-center rounded-md bg-cyan-50 dark:bg-cyan-500/10 px-2.5 py-1 text-xs font-mono font-medium text-cyan-700 dark:text-cyan-300 ring-1 ring-inset ring-cyan-200 dark:ring-cyan-500/30">
                         {codigo}
                       </span>
                     ))
@@ -315,8 +315,8 @@ const ModalInsertExcel: React.FC<ModalInsertExcelProps> = ({ open, onClose, onSu
                   <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.98rem' }}>
                     <thead>
                       <tr>
-                        <th style={{ background: '#f5f5f5', padding: '6px' }}>Fila/Código</th>
-                        <th style={{ background: '#f5f5f5', padding: '6px' }}>Mensaje</th>
+                        <th style={{ background: 'var(--superficie-2)', padding: '6px' }}>Fila/Código</th>
+                        <th style={{ background: 'var(--superficie-2)', padding: '6px' }}>Mensaje</th>
                       </tr>
                     </thead>
                     <tbody>

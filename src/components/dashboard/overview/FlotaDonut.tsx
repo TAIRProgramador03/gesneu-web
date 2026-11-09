@@ -55,7 +55,7 @@ export const FlotaDonut = ({ data }: { data: DataFlotaDonut[] }): React.JSX.Elem
 
       {
         TOTAL === 0 && (
-          <div className='flex gap-1 flex-wrap justify-center items-center bg-sky-50 text-sky-700 border-2 border-sky-700 p-2 rounded-lg'>
+          <div className='flex gap-1 flex-wrap justify-center items-center bg-sky-50 dark:bg-sky-500/10 text-sky-700 dark:text-sky-300 border-2 border-sky-700 p-2 rounded-lg'>
             <BadgeCheck width={12} />
             <span className='italic text-xs'>Almacén Vacío.</span>
           </div>

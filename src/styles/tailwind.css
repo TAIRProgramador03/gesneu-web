@@ -45,75 +45,234 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+
+  /* ---- Tokens de dominio (Gesneu) --------------------------------------
+     Los de arriba son los de shadcn. Estos son los que necesita el código
+     de la app, que hoy escribe colores claros a mano (bg-white, bg-slate-50,
+     text-slate-900...). Al migrar, usar estos y el modo oscuro sale solo.
+
+     superficie-1/2/3 = los mismos niveles que background.level1/2/3 de MUI,
+     para que una tarjeta de Tailwind y una Card de MUI se vean igual. */
+  --color-superficie-1: var(--superficie-1);
+  --color-superficie-2: var(--superficie-2);
+  --color-superficie-3: var(--superficie-3);
+  --color-borde-suave: var(--borde-suave);
+  --color-texto-apagado: var(--texto-apagado);
+
+  /* Semáforo de vida útil. Importante: el significado NO se invierte entre
+     modos (rojo sigue siendo crítico); sólo cambia la luminosidad para que
+     contraste contra el fondo. Los *-suave son fondos de badge/chip, que
+     hoy son los `bg-red-100` y compañía de utils/helpers.ts. */
+  /* Tintes y textos de color. Existen porque medio código pinta con `sx` de
+     MUI, donde no hay variantes `dark:`: ahí sólo se puede poner una variable
+     CSS que cambie sola. En claro valen exactamente los hex que había
+     escritos a mano. */
+  --color-tinte-azul: var(--tinte-azul);
+  --color-tinte-azul-fuerte: var(--tinte-azul-fuerte);
+  --color-tinte-indigo: var(--tinte-indigo);
+  --color-tinte-verde: var(--tinte-verde);
+  --color-tinte-verde-fuerte: var(--tinte-verde-fuerte);
+  --color-tinte-rojo: var(--tinte-rojo);
+  --color-tinte-rojo-fuerte: var(--tinte-rojo-fuerte);
+  --color-tinte-cyan: var(--tinte-cyan);
+  --color-borde-azul: var(--borde-azul);
+  --color-borde-verde: var(--borde-verde);
+  --color-borde-rojo: var(--borde-rojo);
+  --color-texto-azul: var(--texto-azul);
+  --color-texto-verde: var(--texto-verde);
+  --color-texto-rojo: var(--texto-rojo);
+  --color-texto-ambar: var(--texto-ambar);
+
+  --color-vida-ok: var(--vida-ok);
+  --color-vida-ok-suave: var(--vida-ok-suave);
+  --color-vida-alerta: var(--vida-alerta);
+  --color-vida-alerta-suave: var(--vida-alerta-suave);
+  --color-vida-critico: var(--vida-critico);
+  --color-vida-critico-suave: var(--vida-critico-suave);
 }
 
 :root {
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+
+  /* Base: igual que hoy (fondo blanco), salvo --primary. Ver nota abajo. */
+  --background: #ffffff;
+  --foreground: #212636;
+  --card: #ffffff;
+  --card-foreground: #212636;
+  --popover: #ffffff;
+  --popover-foreground: #212636;
+
+  /* Azul Tair. Antes era el negro de fábrica de shadcn (oklch(0.205 0 0)),
+     que pintaba de negro los ~147 <Button> sin `variant`. Es el mismo valor
+     que primary.main del tema MUI (tairBlue 500), para que un botón shadcn y
+     uno MUI no se vean distintos.
+     --primary-foreground es BLANCO en los dos modos a propósito: todas las
+     variantes de color del botón (destructive, teal, rose, warning...) lo
+     usan como color de texto sobre fondos saturados. Si se invirtiera en
+     oscuro, el texto de todos esos botones quedaría negro e ilegible. */
+  --primary: #0068a7;
+  --primary-foreground: #ffffff;
+
+  --secondary: #f3f4f6;
+  --secondary-foreground: #212636;
+  --muted: #f8f9fa;
+  --muted-foreground: #667085;
+  --accent: #f0f4f8;
+  --accent-foreground: #212636;
+  --destructive: #f04438;
+  --border: #dcdfe4;
+  --input: #dcdfe4;
+  --ring: #0c87da;
+
+  --chart-1: #0068a7;
+  --chart-2: #15b79f;
+  --chart-3: #fb9c0c;
+  --chart-4: #635bff;
+  --chart-5: #f04438;
+
+  --sidebar: #ffffff;
+  --sidebar-foreground: #212636;
+  --sidebar-primary: #0068a7;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f0f4f8;
+  --sidebar-accent-foreground: #212636;
+  --sidebar-border: #dcdfe4;
+  --sidebar-ring: #0c87da;
+
+  /* Dominio */
+  /* Fondo del contenedor que envuelve TODAS las pantallas (SideBarMain).
+     Estaba fijo en #f5f5f5, el mismo valor que tiene aquí. */
+  --fondo-app: #f5f5f5;
+  --superficie-1: #f8f9fa;
+  --superficie-2: #f3f4f6;
+  --superficie-3: #e5e7eb;
+  --borde-suave: #eceff3;
+  --texto-apagado: #667085;
+
+  /* Son exactamente los green-500/yellow-500/red-500 (y sus -100) que
+     utils/helpers.ts devolvía a mano, para que el modo claro no cambie
+     ni un píxel al migrar esas funciones a tokens. */
+  --vida-ok: #22c55e;
+  --vida-ok-suave: #dcfce7;
+  --vida-alerta: #eab308;
+  --vida-alerta-suave: #fef9c3;
+  --vida-critico: #ef4444;
+  --vida-critico-suave: #fee2e2;
+
+  /* Tintes para paneles de aviso y textos de color (los mismos hex que ya
+     estaban escritos en los `sx`). En oscuro el tinte pasa a ser el color
+     con poca opacidad, que se compone sobre el fondo que tenga debajo. */
+  --tinte-azul: #eff6ff;
+  --tinte-azul-fuerte: #dbeafe;
+  --tinte-indigo: #e0e7ff;
+  --tinte-verde: #f0fdf4;
+  --tinte-verde-fuerte: #dcfce7;
+  --tinte-rojo: #fef2f2;
+  --tinte-rojo-fuerte: #fee2e2;
+  --tinte-cyan: #e0f7fa;
+  --borde-azul: #bfdbfe;
+  --borde-verde: #bbf7d0;
+  --borde-rojo: #fecaca;
+  --texto-azul: #1d4ed8;
+  --texto-verde: #2e7d32;
+  --texto-rojo: #dc2626;
+  --texto-ambar: #c9a227;
+
+  /* Gráficos. Van como variables y no como props de React a propósito: un
+     atributo SVG acepta `var(--x)`, así que la rejilla y los ejes cambian
+     solos al pasar a oscuro, sin volver a renderizar el gráfico ni pasarle
+     el modo por props. Los colores de las series no están aquí: son
+     saturados y se leen igual contra los dos fondos. */
+  --grafico-grid: #f1f5f9;
+  --grafico-eje: #e2e8f0;
+  --grafico-cursor: rgb(0 0 0 / 4%);
+
+  /* Skeletons: antes estaban fijos en global.css (#e2e8f0/#f1f5f9) y en
+     oscuro quedaban como barras blancas. */
+  --esqueleto-base: #e2e8f0;
+  --esqueleto-brillo: #f1f5f9;
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  /* Los fondos son los mismos que background.default/paper/level1 del tema
+     MUI oscuro (color-schemes.ts), para que las dos capas de UI coincidan. */
+  --background: #111315;
+  --foreground: #f0f4f8;
+  --card: #181c20;
+  --card-foreground: #f0f4f8;
+  --popover: #23272b;
+  --popover-foreground: #f0f4f8;
+
+  /* Un paso más claro que en modo claro: el azul 500 sobre #111315 queda
+     apagado. Coincide con primary.main del tema MUI oscuro (tairBlue 400). */
+  --primary: #0c87da;
+  --primary-foreground: #ffffff;
+
+  --secondary: #23272b;
+  --secondary-foreground: #f0f4f8;
+  --muted: #23272b;
+  --muted-foreground: #9fa6ad;
+  --accent: #2b3136;
+  --accent-foreground: #f0f4f8;
+  --destructive: #f97970;
+  --border: #32383e;
+  --input: #3a4147;
+  --ring: #39a5ef;
+
+  --chart-1: #39a5ef;
+  --chart-2: #2ed3b8;
+  --chart-3: #ffbb1f;
+  --chart-4: #9ca7ff;
+  --chart-5: #f97970;
+
+  --sidebar: #181c20;
+  --sidebar-foreground: #f0f4f8;
+  --sidebar-primary: #0c87da;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #2b3136;
+  --sidebar-accent-foreground: #f0f4f8;
+  --sidebar-border: #32383e;
+  --sidebar-ring: #39a5ef;
+
+  /* Dominio */
+  --fondo-app: #111315;
+  --superficie-1: #181c20;
+  --superficie-2: #23272b;
+  --superficie-3: #2b3136;
+  --borde-suave: #272c31;
+  --texto-apagado: #9fa6ad;
+
+  /* Mismo semáforo, subido de luminosidad. Los *-suave pasan de ser un tono
+     100 (pensado para fondo blanco) a el color propio con poca opacidad. */
+  --vida-ok: #4ade80;
+  --vida-ok-suave: rgb(74 222 128 / 18%);
+  --vida-alerta: #facc15;
+  --vida-alerta-suave: rgb(250 204 21 / 18%);
+  --vida-critico: #f87171;
+  --vida-critico-suave: rgb(248 113 113 / 18%);
+
+  --tinte-azul: rgb(59 130 246 / 12%);
+  --tinte-azul-fuerte: rgb(59 130 246 / 20%);
+  --tinte-indigo: rgb(99 102 241 / 20%);
+  --tinte-verde: rgb(34 197 94 / 12%);
+  --tinte-verde-fuerte: rgb(34 197 94 / 20%);
+  --tinte-rojo: rgb(239 68 68 / 12%);
+  --tinte-rojo-fuerte: rgb(239 68 68 / 20%);
+  --tinte-cyan: rgb(6 182 212 / 15%);
+  --borde-azul: rgb(96 165 250 / 35%);
+  --borde-verde: rgb(74 222 128 / 35%);
+  --borde-rojo: rgb(248 113 113 / 35%);
+  --texto-azul: #93c5fd;
+  --texto-verde: #86efac;
+  --texto-rojo: #fca5a5;
+  --texto-ambar: #fcd34d;
+
+  --grafico-grid: rgb(255 255 255 / 8%);
+  --grafico-eje: rgb(255 255 255 / 14%);
+  --grafico-cursor: rgb(255 255 255 / 6%);
+
+  --esqueleto-base: #23272b;
+  --esqueleto-brillo: #2f353b;
 }
 
 @layer base {

@@ -486,7 +486,7 @@ export const columnsNeuPorReubicar: ColumnDef<NeumaticoReubicar>[] = [
     accessorKey: "PosicionOrigen",
     header: "Posición origen",
     cell: ({ row }) => (
-      <span className="inline-flex items-center rounded-md bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800 ring-1 ring-inset ring-amber-300">
+      <span className="inline-flex items-center rounded-md bg-amber-100 dark:bg-amber-500/15 px-2 py-0.5 text-xs font-medium text-amber-800 dark:text-amber-200 ring-1 ring-inset ring-amber-300">
         {row.original.PosicionOrigen}
       </span>
     ),
@@ -495,7 +495,7 @@ export const columnsNeuPorReubicar: ColumnDef<NeumaticoReubicar>[] = [
     accessorKey: "PosicionDestino",
     header: "Posición destino",
     cell: ({ row }) => (
-      <span className="inline-flex items-center rounded-md bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-800 ring-1 ring-inset ring-emerald-300">
+      <span className="inline-flex items-center rounded-md bg-emerald-100 dark:bg-emerald-500/15 px-2 py-0.5 text-xs font-medium text-emerald-800 dark:text-emerald-200 ring-1 ring-inset ring-emerald-300">
         {row.original.PosicionDestino}
       </span>
     ),

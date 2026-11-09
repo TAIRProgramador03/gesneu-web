@@ -44,7 +44,7 @@ export function DatePicker({
           disabled={disabled}
           className={cn("justify-between font-normal", className)}
         >
-          <span className={`${value ? "text-black" : "text-gray-400"}`}>
+          <span className={`${value ? "text-foreground" : "text-texto-apagado"}`}>
             {value ? format(value, "dd/MM/yyyy") : placeholder}
           </span>
 

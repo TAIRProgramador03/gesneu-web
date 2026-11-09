@@ -18,10 +18,10 @@ function CustomTooltipContent({ active, payload }: { active?: boolean; payload?:
   if (!active || !payload?.length) return null
   const d = payload[0].payload
   return (
-    <div className="rounded-lg border border-gray-200 bg-white px-3 py-2 shadow-lg text-xs">
-      <p className="font-semibold text-gray-800">{d.label}</p>
-      <p className="text-gray-500 mt-0.5">{d.tipo}</p>
-      <p className="font-bold text-sky-700 mt-1">{d.remanente} mm</p>
+    <div className="rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-card px-3 py-2 shadow-lg text-xs">
+      <p className="font-semibold text-gray-800 dark:text-slate-100">{d.label}</p>
+      <p className="text-gray-500 dark:text-slate-400 mt-0.5">{d.tipo}</p>
+      <p className="font-bold text-sky-700 dark:text-sky-300 mt-1">{d.remanente} mm</p>
     </div>
   )
 }
@@ -62,17 +62,17 @@ export const RemanenteChart = ({ historial, neu }: { historial: MovimientoHistor
                 <stop offset="95%" stopColor={fillColor} stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--grafico-grid)" vertical={false} />
             <XAxis
               dataKey="id"
               tickFormatter={(id) => chartData.find((d) => d.id === id)?.fecha ?? String(id)}
-              tick={{ fontSize: '0.75rem', fill: "#9ca3af" }}
+              tick={{ fontSize: '0.75rem', fill: "var(--texto-apagado)" }}
               tickLine={false}
-              axisLine={{ stroke: "#e5e7eb" }}
+              axisLine={{ stroke: "var(--grafico-eje)" }}
             />
             <YAxis
               domain={[0, maxY]}
-              tick={{ fontSize: '0.75rem', fill: "#9ca3af" }}
+              tick={{ fontSize: '0.75rem', fill: "var(--texto-apagado)" }}
               tickLine={false}
               axisLine={false}
               unit=" mm"
@@ -102,7 +102,7 @@ export const RemanenteChart = ({ historial, neu }: { historial: MovimientoHistor
                   value: `Montado ${original} mm`,
                   position: "insideTopRight",
                   fontSize: '0.75rem',
-                  fill: "#94a3b8",
+                  fill: "var(--texto-apagado)",
                 }}
               />
             )}

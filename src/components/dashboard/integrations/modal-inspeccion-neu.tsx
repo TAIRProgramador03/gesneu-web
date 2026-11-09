@@ -102,7 +102,7 @@ interface ModalInpeccionNeuProps {
 const CampoVehiculo: React.FC<{ label: string; value: React.ReactNode }> = ({ label, value }) => (
   <div className="min-w-0">
     <p className="text-xs font-semibold uppercase tracking-wide text-slate-400 leading-tight">{label}</p>
-    <p className="truncate text-sm font-semibold text-slate-800">{value}</p>
+    <p className="truncate text-sm font-semibold text-slate-800 dark:text-slate-100">{value}</p>
   </div>
 );
 
@@ -960,7 +960,7 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
           sx: { borderRadius: { xs: 0, lg: 3 }, overflow: 'hidden' }
         }}
       >
-        {/* <DialogTitle sx={{ fontWeight: 'bold', color: '#388e3c' }}>Inspección de Neumáticos</DialogTitle> */}
+        {/* <DialogTitle sx={{ fontWeight: 'bold', color: 'var(--texto-verde)' }}>Inspección de Neumáticos</DialogTitle> */}
 
         <Box sx={{ height: 4, background: 'linear-gradient(90deg, #3b82f6 0%, #6366f1 100%)' }} />
 
@@ -968,10 +968,10 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
           <Box sx={{
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             width: { xs: 34, md: 40 }, height: { xs: 34, md: 40 }, borderRadius: 2,
-            background: 'linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%)',
+            background: 'linear-gradient(135deg, var(--tinte-azul-fuerte) 0%, var(--tinte-indigo) 100%)',
             flexShrink: 0,
           }}>
-            <ClipboardList size={20} className="text-blue-600" />
+            <ClipboardList size={20} className="text-blue-600 dark:text-blue-300" />
           </Box>
           <Box sx={{ flex: 1, minWidth: 0 }}>
             <Typography variant="h6" fontWeight={700} lineHeight={1.2} sx={{ fontSize: { xs: '1rem', md: '1.25rem' } }}>
@@ -982,10 +982,10 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
               <Chip
                 label={placa}
                 size="small"
-                sx={{ fontWeight: 700, fontSize: '0.875rem', bgcolor: '#f1f5f9', color: '#334155', letterSpacing: 0.5 }}
+                sx={{ fontWeight: 700, fontSize: '0.875rem', bgcolor: 'var(--superficie-2)', color: 'var(--foreground)', letterSpacing: 0.5 }}
               />
             </Box>
-            <Typography variant="caption" className='text-amber-600' sx={{ display: 'block', mt: 1, fontStyle: 'italic', fontSize: { xs: '0.75rem', md: '0.875rem' }, lineHeight: 1.35 }}>
+            <Typography variant="caption" className='text-amber-600 dark:text-amber-300' sx={{ display: 'block', mt: 1, fontStyle: 'italic', fontSize: { xs: '0.75rem', md: '0.875rem' }, lineHeight: 1.35 }}>
               <span className='font-bold'>Nota: </span>
               Para guardar temporalmente la inspección de cada neumático, debes darle click al boton <b>siguiente posición</b>.
             </Typography>
@@ -997,7 +997,7 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
             onClick={onClose}
             title="Cerrar"
             aria-label="Cerrar"
-            className="shrink-0 self-start text-slate-400 hover:text-slate-700"
+            className="shrink-0 self-start text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
           >
             <X className="h-4 w-4" />
           </ButtonCustom>
@@ -1021,47 +1021,47 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
               <Stack direction="column" spacing={2} sx={{ flex: 1, width: { xs: '100%', lg: '1px' }, minWidth: 0, marginTop: '10px' }}>
                 {/* Resumen del vehículo */}
                 {vehiculo ? (
-                  <div className="flex flex-wrap items-center gap-3 rounded-xl border border-blue-100 bg-linear-to-br from-blue-50 via-white to-indigo-50 px-4 py-3">
+                  <div className="flex flex-wrap items-center gap-3 rounded-xl border border-blue-100 dark:border-blue-500/20 bg-linear-to-br from-blue-50 dark:from-blue-500/10 via-white dark:via-card to-indigo-50 dark:to-indigo-500/10 px-4 py-3">
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-linear-to-br from-blue-500 to-indigo-600 shadow-sm shadow-blue-200">
                       <Car className="h-5 w-5 text-white" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-semibold text-slate-900">
+                      <p className="truncate text-sm font-semibold text-slate-900 dark:text-slate-100">
                         {[vehiculo.marca, vehiculo.modelo, vehiculo.anio].filter(Boolean).join(' · ')}
                       </p>
-                      <div className="mt-0.5 flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-slate-500">
+                      <div className="mt-0.5 flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-slate-500 dark:text-slate-400">
                         {[vehiculo.color, vehiculo.proyecto, vehiculo.operacion, vehiculo.tipo_terreno, vehiculo.reten]
                           .filter(Boolean)
                           .map((dato, i) => <span key={i}>{dato}</span>)}
                       </div>
                     </div>
                     {vehiculo?.kilometro !== undefined && (
-                      <div className="ml-auto shrink-0 rounded-lg bg-white/70 px-3 py-1.5 text-right shadow-sm">
+                      <div className="ml-auto shrink-0 rounded-lg bg-white dark:bg-card/70 dark:bg-card/70 px-3 py-1.5 text-right shadow-sm">
                         <p className="text-xs font-semibold uppercase tracking-wide text-blue-400">Kilometraje</p>
-                        <p className="text-sm font-bold text-blue-900">{initialOdometro.toLocaleString()} km</p>
+                        <p className="text-sm font-bold text-blue-900 dark:text-blue-200">{initialOdometro.toLocaleString()} km</p>
                       </div>
                     )}
                   </div>
                 ) : (
-                  <p className="text-sm text-slate-500">No hay datos del vehículo.</p>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">No hay datos del vehículo.</p>
                 )}
 
                 {/* Datos de la posición seleccionada */}
-                <div className="rounded-xl border border-violet-100 bg-linear-to-br from-violet-50 via-white to-white p-4">
+                <div className="rounded-xl border border-violet-100 dark:border-violet-500/20 bg-linear-to-br from-violet-50 dark:from-violet-500/10 via-white dark:via-card to-white dark:to-card p-4">
                   <div className="mb-4 flex items-center gap-3">
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-linear-to-br from-violet-500 to-purple-600 shadow-sm shadow-violet-200">
                       <ListChecks className="h-5 w-5 text-white" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <h3 className="text-sm font-semibold text-slate-900">
+                      <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
                         {formValues.posicion ? `Datos de ${formValues.posicion}` : 'Selecciona una posición'}
                       </h3>
-                      <p className="text-xs text-slate-500">Haz clic en una rueda del diagrama para cargar sus datos</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">Haz clic en una rueda del diagrama para cargar sus datos</p>
                     </div>
                     <span
                       className={cn(
                         'shrink-0 rounded-full px-2.5 py-1 text-xs font-bold',
-                        inspeccionesPendientes.length >= totalPosiciones ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'
+                        inspeccionesPendientes.length >= totalPosiciones ? 'bg-green-100 dark:bg-green-500/15 text-green-700 dark:text-green-300' : 'bg-blue-100 dark:bg-blue-500/15 text-blue-700 dark:text-blue-300'
                       )}
                     >
                       {inspeccionesPendientes.length}/{totalPosiciones} guardadas
@@ -1069,10 +1069,10 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
                   </div>
 
                   {/* Referencia de solo lectura */}
-                  <div className="mb-4 grid grid-cols-2 items-start gap-x-4 gap-y-3 border-b border-dashed border-violet-200 pb-4 sm:grid-cols-5">
+                  <div className="mb-4 grid grid-cols-2 items-start gap-x-4 gap-y-3 border-b border-dashed border-violet-200 dark:border-violet-500/30 pb-4 sm:grid-cols-5">
                     <div className="min-w-0">
                       <p className="text-xs font-semibold uppercase tracking-wide text-slate-400 leading-tight">Posición</p>
-                      <span className="mt-0.5 inline-block rounded-md bg-violet-100 px-2 py-0.5 text-sm font-bold text-violet-700">
+                      <span className="mt-0.5 inline-block rounded-md bg-violet-100 dark:bg-violet-500/15 px-2 py-0.5 text-sm font-bold text-violet-700 dark:text-violet-300">
                         {formValues.posicion || '—'}
                       </span>
                     </div>
@@ -1215,7 +1215,7 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
                 gap: 1,
                 marginTop: '10px'
               }}>
-                <Typography variant="subtitle1" fontWeight="bold" sx={{ color: '#0f172a', alignSelf: 'flex-start' }}>
+                <Typography variant="subtitle1" fontWeight="bold" sx={{ color: 'var(--foreground)', alignSelf: 'flex-start' }}>
                   Diagrama de posiciones
                 </Typography>
                 <Typography variant="caption" color="text.secondary" sx={{ alignSelf: 'flex-start', mb: 0.5 }}>
@@ -1224,9 +1224,9 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
 
                 <Stack direction="row" spacing={2} sx={{ alignSelf: 'flex-start' }}>
                   {[
-                    { color: '#2e7d32', label: 'Óptimo' },
-                    { color: '#c9a227', label: 'Medio' },
-                    { color: '#d32f2f', label: 'Crítico' },
+                    { color: 'var(--texto-verde)', label: 'Óptimo' },
+                    { color: 'var(--texto-ambar)', label: 'Medio' },
+                    { color: 'var(--texto-rojo)', label: 'Crítico' },
                   ].map((item) => (
                     <Stack key={item.label} direction="row" alignItems="center" spacing={0.75}>
                       <Box sx={{ width: 9, height: 9, borderRadius: '50%', background: item.color }} />
@@ -1262,10 +1262,10 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
                 <Box sx={{
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   width: 40, height: 40, borderRadius: 2,
-                  background: 'linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%)',
+                  background: 'linear-gradient(135deg, var(--tinte-verde-fuerte) 0%, var(--tinte-verde-fuerte) 100%)',
                   flexShrink: 0,
                 }}>
-                  <CircleCheckBig size={20} className="text-green-700" />
+                  <CircleCheckBig size={20} className="text-green-700 dark:text-green-300" />
                 </Box>
                 <Box>
                   <Typography variant="subtitle1" fontWeight="bold">{`Los ${totalPosiciones} neumáticos fueron inspeccionados`}</Typography>
@@ -1352,7 +1352,7 @@ const ModalInpeccionNeu: React.FC<ModalInpeccionNeuProps> = React.memo(({ open, 
               >
                 <ButtonCustom
                   variant="outline"
-                  className="border-violet-200 bg-violet-50 text-violet-700 hover:border-violet-300 hover:bg-violet-100 hover:text-violet-800"
+                  className="border-violet-200 dark:border-violet-500/30 bg-violet-50 dark:bg-violet-500/10 text-violet-700 dark:text-violet-300 hover:border-violet-300 dark:hover:border-violet-500/40 hover:bg-violet-100 dark:hover:bg-violet-500/15 hover:text-violet-800 dark:hover:text-violet-200"
                   onClick={() => setActiveTab(0)}
                 >
                   <ArrowLeft />

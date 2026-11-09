@@ -161,9 +161,9 @@ export const ModalReubicarNeumatico = ({ open, onClose, onSuccess }: ModalReubic
         <Box sx={{
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           width: 40, height: 40, borderRadius: 2, flexShrink: 0,
-          background: 'linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%)',
+          background: 'linear-gradient(135deg, var(--tinte-azul-fuerte) 0%, var(--tinte-indigo) 100%)',
         }}>
-          <CircleChevronRight size={20} className="text-blue-600" />
+          <CircleChevronRight size={20} className="text-blue-600 dark:text-blue-300" />
         </Box>
         <Box>
           <Typography variant="h6" fontWeight={700} lineHeight={1.2}>
@@ -173,7 +173,7 @@ export const ModalReubicarNeumatico = ({ open, onClose, onSuccess }: ModalReubic
             Mueve neumáticos de un taller origen a un taller destino
           </Typography>
 
-          <Typography variant="caption" className='text-amber-600' sx={{ display: 'block', mt: 1, fontStyle: 'italic' }}>
+          <Typography variant="caption" className='text-amber-600 dark:text-amber-300' sx={{ display: 'block', mt: 1, fontStyle: 'italic' }}>
             <span className='font-bold'>Nota: </span>
             Solo puedes visualizar los neumáticos disponibles que se encuentren recuperados o de baja.
           </Typography>
@@ -181,14 +181,14 @@ export const ModalReubicarNeumatico = ({ open, onClose, onSuccess }: ModalReubic
         </Box>
       </DialogTitle>
 
-      <DialogContent sx={{ pt: 2.5, bgcolor: '#f8fafc' }}>
+      <DialogContent sx={{ pt: 2.5, bgcolor: 'var(--superficie-1)' }}>
 
 
         <Stack direction="row" spacing={3} alignItems="flex-start">
 
           {/* Panel izquierdo — lista de neumáticos */}
-          <Card sx={{ flex: 1, p: 2.5, minWidth: 340, borderRadius: 2.5, border: '1px solid #e2e8f0', marginTop: '10px' }} elevation={0} className='relative'>
-            <span className="inline-flex items-center gap-1 mb-3 px-2 py-0.5 rounded-full bg-blue-100 text-blue-500 text-sm font-medium">
+          <Card sx={{ flex: 1, p: 2.5, minWidth: 340, borderRadius: 2.5, border: '1px solid var(--border)', marginTop: '10px' }} elevation={0} className='relative'>
+            <span className="inline-flex items-center gap-1 mb-3 px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-500/15 text-blue-500 text-sm font-medium">
               Origen
             </span>
 
@@ -289,21 +289,21 @@ export const ModalReubicarNeumatico = ({ open, onClose, onSuccess }: ModalReubic
                         grid grid-cols-[1fr_auto_auto_auto_auto] items-center gap-x-4
                         rounded-xl px-3 py-2.5 cursor-pointer border-2 transition-all duration-150
                         ${isSelected
-                              ? 'border-blue-500 bg-blue-50 shadow-sm'
-                              : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
+                              ? 'border-blue-500 bg-blue-50 dark:bg-blue-500/10 shadow-sm'
+                              : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-card hover:border-slate-300 dark:hover:border-slate-600 hover:bg-slate-50 dark:hover:bg-superficie-1'
                             }
                       `}
                         >
                           {/* Código + badge estado */}
                           <div className="flex flex-col gap-0.5">
-                            <span className="font-normal text-sm text-slate-800 truncate">
+                            <span className="font-normal text-sm text-slate-800 dark:text-slate-100 truncate">
                               {neu.CODIGO}
                             </span>
                           </div>
 
                           {/* Taller */}
                           <div className="flex flex-col items-center">
-                            <span className="font-light italic text-xs text-slate-700  truncate">
+                            <span className="font-light italic text-xs text-slate-700 dark:text-slate-200  truncate">
                               {neu.PROYECTO_ACTUAL}
                             </span>
                           </div>
@@ -332,7 +332,7 @@ export const ModalReubicarNeumatico = ({ open, onClose, onSuccess }: ModalReubic
             {
               (!!neumaticoSeleccionados && neumaticoSeleccionados.length >= 1) &&
               (
-                <div className="mt-3 px-3 py-2 rounded-lg bg-blue-50 border border-blue-200 text-sm text-blue-700 font-medium">
+                <div className="mt-3 px-3 py-2 rounded-lg bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/30 text-sm text-blue-700 dark:text-blue-300 font-medium">
                   Seleccionado(s): <span >{neumaticoSeleccionados.map((n, i) => i === (neumaticoSeleccionados.length - 1) ? n.codigo : `${n.codigo}, `)}</span>
                 </div>
               )
@@ -368,7 +368,7 @@ export const ModalReubicarNeumatico = ({ open, onClose, onSuccess }: ModalReubic
                   <ChevronsLeft />
                 </ButtonCustom>
               }
-              <span className="inline-flex items-center gap-1 mb-3 px-2 py-0.5 rounded-full bg-yellow-50 text-yellow-600 text-sm font-medium">
+              <span className="inline-flex items-center gap-1 mb-3 px-2 py-0.5 rounded-full bg-yellow-50 dark:bg-yellow-500/10 text-yellow-600 dark:text-yellow-300 text-sm font-medium">
                 Destino — Neumáticos a reubicar
               </span>
             </div>
@@ -433,19 +433,19 @@ export const ModalReubicarNeumatico = ({ open, onClose, onSuccess }: ModalReubic
                       relative grid grid-cols-[1fr_auto_auto_auto_auto] items-center gap-x-4
                       rounded-xl px-3 py-2.5 cursor-pointer border-2 transition-all duration-150
                       ${isSelected
-                            ? 'border-yellow-500 bg-yellow-50 shadow-sm'
-                            : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
+                            ? 'border-yellow-500 bg-yellow-50 dark:bg-yellow-500/10 shadow-sm'
+                            : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-card hover:border-slate-300 dark:hover:border-slate-600 hover:bg-slate-50 dark:hover:bg-superficie-1'
                           }
                     `}
                       >
                         <div className="flex flex-col gap-0.5">
-                          <span className="font-normal text-sm text-slate-800 truncate">
+                          <span className="font-normal text-sm text-slate-800 dark:text-slate-100 truncate">
                             {neu.codigo}
                           </span>
                         </div>
 
                         <div className="flex flex-col items-center">
-                          <span className="font-light italic text-xs  text-slate-700  truncate">{neu.proyecto}</span>
+                          <span className="font-light italic text-xs  text-slate-700 dark:text-slate-200  truncate">{neu.proyecto}</span>
                         </div>
 
                         <div className="flex items-center justify-center">
@@ -467,7 +467,7 @@ export const ModalReubicarNeumatico = ({ open, onClose, onSuccess }: ModalReubic
             {
               (!!neumaticoSeleccionadosTrasladados && neumaticoSeleccionadosTrasladados.length >= 1) &&
               (
-                <div className="mt-3 px-3 py-2 rounded-lg bg-yellow-50 border border-yellow-200 text-sm text-yellow-700 font-medium">
+                <div className="mt-3 px-3 py-2 rounded-lg bg-yellow-50 dark:bg-yellow-500/10 border border-yellow-200 dark:border-yellow-500/30 text-sm text-yellow-700 dark:text-yellow-300 font-medium">
                   Seleccionado(s): <span >{neumaticoSeleccionadosTrasladados.map((n, i) => i === (neumaticoSeleccionadosTrasladados.length - 1) ? n.codigo : `${n.codigo}, `)}</span>
                 </div>
               )

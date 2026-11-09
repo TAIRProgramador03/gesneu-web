@@ -29,7 +29,7 @@ export const NeumaticoDashboard = ({ codigo }: { codigo: string }) => {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-32">
-        <Spinner className="size-8 text-sky-800" />
+        <Spinner className="size-8 text-sky-800 dark:text-sky-200" />
       </div>
     )
   }
@@ -37,8 +37,8 @@ export const NeumaticoDashboard = ({ codigo }: { codigo: string }) => {
   if (isError || !neumatico) {
     return (
       <div className="flex flex-col items-center justify-center py-32 gap-4">
-        <p className="text-gray-500">No se encontró el neumático con código <strong>{codigo}</strong>.</p>
-        <Link href="/padron" className="text-sky-800 hover:underline text-sm">
+        <p className="text-gray-500 dark:text-slate-400">No se encontró el neumático con código <strong>{codigo}</strong>.</p>
+        <Link href="/padron" className="text-sky-800 dark:text-sky-200 hover:underline text-sm">
           Volver al padrón
         </Link>
       </div>
@@ -69,21 +69,21 @@ export const NeumaticoDashboard = ({ codigo }: { codigo: string }) => {
           icon={<Route className="size-5" />}
           label="Remanente actual"
           value={`${neumatico.REMANENTE_ACTUAL} mm`}
-          color="text-sky-800"
+          color="text-sky-800 dark:text-sky-200"
           border={"border-sky-800"}
         />
         <StatCard
           icon={<ClipboardList className="size-5" />}
           label="Total inspecciones"
           value={totalInspecciones}
-          color="text-indigo-600"
+          color="text-indigo-600 dark:text-indigo-300"
           border={"border-indigo-600"}
         />
         <StatCard
           icon={<ArrowRightLeft className="size-5" />}
           label="Total movimientos"
           value={historial.length}
-          color="text-teal-600"
+          color="text-teal-600 dark:text-teal-300"
           border={"border-teal-600"}
         />
       </div>

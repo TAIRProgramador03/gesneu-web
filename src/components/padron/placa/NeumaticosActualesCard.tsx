@@ -13,7 +13,7 @@ function VidaBar({ pct }: { pct: number }) {
         'bg-green-400'
 
   return (
-    <div className="w-full h-1.5 rounded-full bg-gray-100 mt-1.5">
+    <div className="w-full h-1.5 rounded-full bg-gray-100 dark:bg-superficie-2 mt-1.5">
       <div className={cn('h-1.5 rounded-full transition-all', color)} style={{ width: `${pct}%` }} />
     </div>
   )
@@ -22,36 +22,36 @@ function VidaBar({ pct }: { pct: number }) {
 function NeumaticoCard({ neu }: { neu: NeumaticoInstalado }) {
   const pct = neu.ESTADO
   const border =
-    pct < 39 ? 'border-red-200' :
-      pct < 79 ? 'border-yellow-200' :
-        'border-green-200'
+    pct < 39 ? 'border-red-200 dark:border-red-500/30' :
+      pct < 79 ? 'border-yellow-200 dark:border-yellow-500/30' :
+        'border-green-200 dark:border-green-500/30'
 
   return (
     <Link
       href={`/padron/neumatico/${neu.CODIGO_NEU}`}
       target='_BLANK'
       className={cn(
-        'group block rounded-xl border-2 bg-white p-3.5 hover:shadow-md transition-all',
+        'group block rounded-xl border-2 bg-white dark:bg-card p-3.5 hover:shadow-md transition-all',
         border
       )}
     >
       <div className="flex items-start justify-between gap-2 mb-2">
-        <span className="text-sm font-bold uppercase tracking-widest text-cyan-700 leading-tight">
+        <span className="text-sm font-bold uppercase tracking-widest text-cyan-700 dark:text-cyan-300 leading-tight">
           {neu.POSICION_NEU}
         </span>
         <span className={cn('text-xs font-bold', vidaColor(pct))}>
           {pct}%
         </span>
       </div>
-      <p className="text-sm font-bold text-gray-800 group-hover:text-sky-700 transition-colors">
+      <p className="text-sm font-bold text-gray-800 dark:text-slate-100 group-hover:text-sky-700 dark:group-hover:text-sky-300 transition-colors">
         {neu.CODIGO_NEU}
       </p>
       <p className="text-xs text-gray-400 mt-0.5">
         {neu.MARCA} · {neu.MEDIDA} · {neu.DISENO}
       </p>
       <div className="flex items-center justify-between mt-2">
-        <span className="text-xs text-gray-500">
-          Rem. <span className="font-semibold text-gray-700">{neu.REMANENTE} mm</span>
+        <span className="text-xs text-gray-500 dark:text-slate-400">
+          Rem. <span className="font-semibold text-gray-700 dark:text-slate-200">{neu.REMANENTE} mm</span>
         </span>
       </div>
       <VidaBar pct={pct} />
@@ -66,7 +66,7 @@ export const NeumaticosActualesCard = ({ neumaticos }: { neumaticos: NeumaticoIn
       icon={<CircleDot className="size-4" />}
       border="border-indigo-500"
       headerRight={
-        <span className="text-xs font-medium text-gray-400 bg-gray-100 rounded-full px-2.5 py-0.5">
+        <span className="text-xs font-medium text-gray-400 bg-gray-100 dark:bg-superficie-2 rounded-full px-2.5 py-0.5">
           {neumaticos.length} posiciones
         </span>
       }

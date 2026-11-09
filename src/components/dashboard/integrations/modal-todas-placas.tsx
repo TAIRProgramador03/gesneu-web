@@ -78,7 +78,7 @@ const ModalTodasPlacas: React.FC<ModalTodasPlacasProps> = ({ open, onClose, onVe
                             borderRadius: 3,
                             boxShadow: 2,
                             p: 2,
-                            border: '1px solid #e0e0e0',
+                            border: '1px solid var(--border)',
                             minHeight: 60,
                         }}
                     >
@@ -92,7 +92,7 @@ const ModalTodasPlacas: React.FC<ModalTodasPlacasProps> = ({ open, onClose, onVe
                                 style={{
                                     padding: '8px 12px',
                                     borderRadius: '8px',
-                                    border: '1px solid #ccc',
+                                    border: '1px solid var(--border)',
                                     fontSize: '1rem',
                                     width: '100%'
                                 }}
@@ -106,19 +106,19 @@ const ModalTodasPlacas: React.FC<ModalTodasPlacasProps> = ({ open, onClose, onVe
                             borderRadius: 3,
                             boxShadow: 2,
                             p: 2,
-                            border: '1px solid #e0e0e0',
+                            border: '1px solid var(--border)',
                             minHeight: 60,
                         }}
                     >
                         <Stack spacing={1} direction="row" alignItems="center">
-                            <Table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: 0, fontSize: '1rem', background: '#fff', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+                            <Table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: 0, fontSize: '1rem', background: 'var(--card)', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
                                 <TableHead>
                                     <TableRow>
-                                        <TableCell sx={{ backgroundColor: '#e0f7fa', fontWeight: 'bold' }}>Marca</TableCell>
-                                        <TableCell sx={{ backgroundColor: '#e0f7fa', fontWeight: 'bold' }}>Modelo</TableCell>
-                                        <TableCell sx={{ backgroundColor: '#e0f7fa', fontWeight: 'bold' }}>Tipo</TableCell>
-                                        <TableCell sx={{ backgroundColor: '#e0f7fa', fontWeight: 'bold' }}>Color</TableCell>
-                                        <TableCell sx={{ backgroundColor: '#e0f7fa', fontWeight: 'bold' }}>Año</TableCell>
+                                        <TableCell sx={{ backgroundColor: 'var(--tinte-cyan)', fontWeight: 'bold' }}>Marca</TableCell>
+                                        <TableCell sx={{ backgroundColor: 'var(--tinte-cyan)', fontWeight: 'bold' }}>Modelo</TableCell>
+                                        <TableCell sx={{ backgroundColor: 'var(--tinte-cyan)', fontWeight: 'bold' }}>Tipo</TableCell>
+                                        <TableCell sx={{ backgroundColor: 'var(--tinte-cyan)', fontWeight: 'bold' }}>Color</TableCell>
+                                        <TableCell sx={{ backgroundColor: 'var(--tinte-cyan)', fontWeight: 'bold' }}>Año</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <tbody>

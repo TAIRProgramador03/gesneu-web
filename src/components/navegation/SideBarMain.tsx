@@ -40,7 +40,11 @@ export const SideBarMain = ({ children }: { children: React.ReactNode }) => {
       />
       <Box
         sx={{
-          bgcolor: '#f5f5f5',
+          // Este Box envuelve TODAS las pantallas de la app. Estaba fijo en
+          // #f5f5f5, así que en modo oscuro quedaba un marco gris claro
+          // alrededor de todo, y cualquier tarjeta con fondo translúcido
+          // dejaba ver ese gris por detrás.
+          bgcolor: 'var(--fondo-app)',
           display: 'flex',
           flexDirection: 'column',
           position: 'relative',
@@ -62,7 +66,7 @@ export const SideBarMain = ({ children }: { children: React.ReactNode }) => {
             left: 16,
             zIndex: 1300,
             display: { xs: 'inline-flex', md: 'none' },
-            bgcolor: '#fff',
+            bgcolor: 'var(--card)',
             boxShadow: 1,
           }}
         >

@@ -344,7 +344,7 @@ export default function ReporteConsumos() {
                     layout="vertical"
                     margin={{ top: 4, right: 36, bottom: 4, left: 12 }}
                   >
-                    <CartesianGrid horizontal={false} stroke="#f1f5f9" />
+                    <CartesianGrid horizontal={false} stroke="var(--grafico-grid)" />
                     <XAxis
                       type="number"
                       tick={{ fontSize: '0.75rem', fill: theme.palette.text.secondary as string }}
@@ -356,7 +356,7 @@ export default function ReporteConsumos() {
                       dataKey="TALLER"
                       type="category"
                       tick={{ fontSize: '0.875rem', fill: theme.palette.text.secondary as string, fontWeight: 600 }}
-                      axisLine={{ stroke: "#e2e8f0" }}
+                      axisLine={{ stroke: "var(--grafico-eje)" }}
                       tickLine={false}
                       width={110}
                     />

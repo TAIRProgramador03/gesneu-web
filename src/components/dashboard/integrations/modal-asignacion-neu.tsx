@@ -105,7 +105,7 @@ const CeldaSeleccion: React.FC<{ neumatico: any }> = ({ neumatico }) => {
 
     if (posicionAsignada) {
         return (
-            <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">
+            <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 dark:border-emerald-500/30 bg-emerald-50 dark:bg-emerald-500/10 px-2.5 py-1 text-xs font-semibold text-emerald-700 dark:text-emerald-300">
                 <Check className="h-3.5 w-3.5" />
                 En {posicionAsignada}
             </span>
@@ -140,7 +140,7 @@ const columnasDisponibles: ColumnDef<any>[] = [
             </ButtonCustom>
         ),
         cell: ({ row }) => (
-            <Link href={`/padron/neumatico/${row.original.CODIGO}`} target="_blank" className="text-blue-600 underline">
+            <Link href={`/padron/neumatico/${row.original.CODIGO}`} target="_blank" className="text-blue-600 dark:text-blue-300 underline">
                 {row.original.CODIGO}
             </Link>
         ),
@@ -189,7 +189,7 @@ const TarjetaDisponible: React.FC<{
 }> = ({ neumatico, posicionAsignada, seleccionado, etiquetaAccion, onAccion }) => {
     const codigo = codigoDe(neumatico);
     return (
-        <div className={`flex items-center gap-3 rounded-xl border px-3 py-2.5 transition-colors ${seleccionado ? 'border-indigo-300 bg-indigo-50/60' : 'border-slate-200 bg-white'
+        <div className={`flex items-center gap-3 rounded-xl border px-3 py-2.5 transition-colors ${seleccionado ? 'border-indigo-300 dark:border-indigo-500/40 bg-indigo-50 dark:bg-indigo-500/10/60 dark:bg-indigo-500/10' : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-card'
             }`}>
             <div className="min-w-0 flex-1">
                 <Link
@@ -199,13 +199,13 @@ const TarjetaDisponible: React.FC<{
                 >
                     {codigo}
                 </Link>
-                <p className="mt-0.5 truncate text-xs text-slate-500">
+                <p className="mt-0.5 truncate text-xs text-slate-500 dark:text-slate-400">
                     {[neumatico.MARCA, neumatico.DISEÑO, neumatico.MEDIDA].filter(Boolean).join(' · ') || '—'}
                 </p>
             </div>
 
             <div className="shrink-0 text-center">
-                <p className="text-sm font-bold leading-none text-slate-700">
+                <p className="text-sm font-bold leading-none text-slate-700 dark:text-slate-200">
                     {neumatico.REMANENTE ?? '—'}
                     <span className="ml-0.5 text-xs">mm</span>
                 </p>
@@ -213,7 +213,7 @@ const TarjetaDisponible: React.FC<{
             </div>
 
             {posicionAsignada ? (
-                <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">
+                <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-emerald-200 dark:border-emerald-500/30 bg-emerald-50 dark:bg-emerald-500/10 px-2.5 py-1 text-xs font-semibold text-emerald-700 dark:text-emerald-300">
                     <Check className="h-3.5 w-3.5" />
                     {posicionAsignada}
                 </span>
@@ -249,9 +249,9 @@ const FilaPosicion: React.FC<{
     const completo = datosCompletos(neumatico, posicion);
 
     return (
-        <div className={`flex items-center gap-3 rounded-lg border px-3 py-2 transition-colors ${ocupada ? 'border-violet-100 bg-violet-50/50' : 'border-dashed border-slate-200 bg-slate-50/60'
+        <div className={`flex items-center gap-3 rounded-lg border px-3 py-2 transition-colors ${ocupada ? 'border-violet-100 dark:border-violet-500/20 bg-violet-50 dark:bg-violet-500/10/50 dark:bg-violet-500/10' : 'border-dashed border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-superficie-1/60 dark:bg-superficie-1/60'
             }`}>
-            <span className={`shrink-0 rounded-md px-2 py-1 text-xs font-bold tracking-wide ${ocupada ? 'bg-violet-600 text-white' : 'bg-slate-200 text-slate-500'
+            <span className={`shrink-0 rounded-md px-2 py-1 text-xs font-bold tracking-wide ${ocupada ? 'bg-violet-600 text-white' : 'bg-slate-200 dark:bg-superficie-3 text-slate-500 dark:text-slate-400'
                 }`}>
                 {posicion}
             </span>
@@ -259,8 +259,8 @@ const FilaPosicion: React.FC<{
             <div className="min-w-0 flex-1">
                 {ocupada ? (
                     <>
-                        <p className="truncate text-sm font-semibold text-slate-800">{codigoDe(neumatico)}</p>
-                        <p className="truncate text-xs text-slate-500">
+                        <p className="truncate text-sm font-semibold text-slate-800 dark:text-slate-100">{codigoDe(neumatico)}</p>
+                        <p className="truncate text-xs text-slate-500 dark:text-slate-400">
                             {neumatico.MARCA || '—'}
                             {neumatico.FECHA_ASIGNACION ? ` · ${convertToDateHuman(neumatico.FECHA_ASIGNACION)}` : ''}
                         </p>
@@ -273,7 +273,7 @@ const FilaPosicion: React.FC<{
             </div>
 
             {ocupada && !completo && !yaMontado && (
-                <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-700">
+                <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-amber-200 dark:border-amber-500/30 bg-amber-50 dark:bg-amber-500/10 px-2 py-0.5 text-xs font-semibold text-amber-700 dark:text-amber-300">
                     <CircleAlert className="h-3 w-3" />
                     Faltan datos
                 </span>
@@ -282,7 +282,7 @@ const FilaPosicion: React.FC<{
             <div className="flex shrink-0 items-center gap-1">
                 {yaMontado ? (
                     <span
-                        className="inline-flex shrink-0 items-center gap-1 rounded-full border border-slate-200 bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-500"
+                        className="inline-flex shrink-0 items-center gap-1 rounded-full border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-superficie-2 px-2 py-0.5 text-xs font-semibold text-slate-500 dark:text-slate-400"
                         title="Ya está montado. Para cambiarlo o sacarlo usa Desasignar o Reubicar."
                     >
                         <Lock className="h-3 w-3" />
@@ -734,7 +734,7 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
                     <InputGroupText>km</InputGroupText>
                 </InputGroupAddon>
             </InputGroup>
-            <FieldDescription className={kmError || Odometro === '' ? 'font-semibold text-rose-600' : ''}>
+            <FieldDescription className={kmError || Odometro === '' ? 'font-semibold text-rose-600 dark:text-rose-300' : ''}>
                 {Odometro === ''
                     ? `Último registrado: ${initialOdometro.toLocaleString()} km`
                     : kmError
@@ -768,8 +768,8 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
     const listaPosiciones = (
         <>
             <div className="mt-3 mb-2 flex items-center justify-between">
-                <p className="text-sm font-semibold text-slate-700">Neumáticos instalados</p>
-                <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-600">
+                <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">Neumáticos instalados</p>
+                <span className="rounded-full bg-slate-100 dark:bg-superficie-2 px-2.5 py-0.5 text-xs font-semibold text-slate-600 dark:text-slate-300">
                     {totalAsignados}/{posiciones.length}
                 </span>
             </div>
@@ -805,12 +805,12 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
     );
 
     const tarjetaSeleccionado = neumaticoSeleccionado ? (
-        <div className="mb-3 rounded-xl border border-indigo-200 bg-linear-to-br from-indigo-50 via-white to-violet-50 p-3">
+        <div className="mb-3 rounded-xl border border-indigo-200 dark:border-indigo-500/30 bg-linear-to-br from-indigo-50 dark:from-indigo-500/10 via-white dark:via-card to-violet-50 dark:to-violet-500/10 p-3">
             <div className="flex items-center gap-2">
                 <span className="text-xs font-semibold uppercase tracking-wide text-indigo-400">Seleccionado</span>
-                <p className="min-w-0 flex-1 truncate text-sm font-semibold text-slate-800">
+                <p className="min-w-0 flex-1 truncate text-sm font-semibold text-slate-800 dark:text-slate-100">
                     {codigoDe(neumaticoSeleccionado)}
-                    <span className="ml-2 font-normal text-slate-500">{neumaticoSeleccionado.MARCA}</span>
+                    <span className="ml-2 font-normal text-slate-500 dark:text-slate-400">{neumaticoSeleccionado.MARCA}</span>
                 </p>
                 <ButtonCustom variant="ghost" size="sm" onClick={() => setNeumaticoSeleccionado(null)} title="Cancelar selección">
                     <X className="h-3.5 w-3.5" />
@@ -818,7 +818,7 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
             </div>
 
             <div className="mt-2 flex flex-wrap items-center gap-1.5">
-                <span className="text-xs text-slate-500">Enviar a:</span>
+                <span className="text-xs text-slate-500 dark:text-slate-400">Enviar a:</span>
                 {posicionesLibres.length > 0 ? (
                     posicionesLibres.map((codigo) => (
                         <ButtonCustom key={codigo} variant="indigo" size="sm" onClick={() => asignarAPosicion(codigo)}>
@@ -838,9 +838,9 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
     const listaDisponiblesMovil = (
         <>
             {posicionDestino ? (
-                <div className="mb-3 flex items-center gap-2 rounded-xl border border-indigo-200 bg-indigo-50 px-3 py-2">
+                <div className="mb-3 flex items-center gap-2 rounded-xl border border-indigo-200 dark:border-indigo-500/30 bg-indigo-50 dark:bg-indigo-500/10 px-3 py-2">
                     <span className="shrink-0 rounded-md bg-indigo-600 px-2 py-1 text-xs font-bold text-white">{posicionDestino}</span>
-                    <p className="min-w-0 flex-1 text-xs text-indigo-900">Elige el neumático que irá en esta posición.</p>
+                    <p className="min-w-0 flex-1 text-xs text-indigo-900 dark:text-indigo-200">Elige el neumático que irá en esta posición.</p>
                     <ButtonCustom variant="ghost" size="sm" onClick={() => setPosicionDestino(null)} title="Cancelar">
                         <X className="h-3.5 w-3.5" />
                     </ButtonCustom>
@@ -949,10 +949,10 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
                 <Box sx={{
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     width: { xs: 34, md: 40 }, height: { xs: 34, md: 40 }, borderRadius: 2,
-                    background: 'linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%)',
+                    background: 'linear-gradient(135deg, var(--tinte-azul-fuerte) 0%, var(--tinte-indigo) 100%)',
                     flexShrink: 0,
                 }}>
-                    <ClipboardList size={20} className="text-blue-600" />
+                    <ClipboardList size={20} className="text-blue-600 dark:text-blue-300" />
                 </Box>
                 <Box sx={{ flex: 1, minWidth: 0 }}>
                     <Typography variant="h6" fontWeight={700} lineHeight={1.2} sx={{ fontSize: { xs: '1rem', md: '1.25rem' } }}>
@@ -963,10 +963,10 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
                         <Chip
                             label={placa}
                             size="small"
-                            sx={{ fontWeight: 700, fontSize: '0.875rem', bgcolor: '#f1f5f9', color: '#334155', letterSpacing: 0.5 }}
+                            sx={{ fontWeight: 700, fontSize: '0.875rem', bgcolor: 'var(--superficie-2)', color: 'var(--foreground)', letterSpacing: 0.5 }}
                         />
                     </Box>
-                    <Typography variant="caption" className='text-amber-600' sx={{ display: 'block', mt: 1, fontStyle: 'italic', fontSize: { xs: '0.75rem', md: '0.875rem' }, lineHeight: 1.35 }}>
+                    <Typography variant="caption" className='text-amber-600 dark:text-amber-300' sx={{ display: 'block', mt: 1, fontStyle: 'italic', fontSize: { xs: '0.75rem', md: '0.875rem' }, lineHeight: 1.35 }}>
                         <span className='font-bold'>Nota: </span>
                         Selecciona un neumático de la lista y envíalo a una posición. Al asignarlo se solicitarán los datos de instalación. <b>Las {posiciones.length} posiciones son obligatorias</b>.
                     </Typography>
@@ -978,7 +978,7 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
                     onClick={handleDialogClose}
                     title="Cerrar"
                     aria-label="Cerrar"
-                    className="shrink-0 self-start text-slate-400 hover:text-slate-700"
+                    className="shrink-0 self-start text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
                 >
                     <X className="h-4 w-4" />
                 </ButtonCustom>
@@ -1021,7 +1021,7 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
                             px: 1.5, py: 1.25, borderTop: '1px solid', borderColor: 'divider', bgcolor: 'background.paper',
                         }}
                     >
-                        <span className="shrink-0 text-xs font-semibold text-slate-600">
+                        <span className="shrink-0 text-xs font-semibold text-slate-600 dark:text-slate-300">
                             {totalAsignados}/{posiciones.length} posiciones
                         </span>
                         <div className="min-w-0 flex-1 [&>button]:w-full sm:flex-none sm:[&>button]:w-auto">{botonConfirmar}</div>
@@ -1044,7 +1044,7 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
                         <Stack direction="column" spacing={2} sx={{ flex: 0.62, width: '100%', minWidth: 0, height: '100%', marginTop: '10px' }}>
                             <Card sx={{ p: 2, boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)', height: '100%', display: 'flex', flexDirection: 'column' }}>
                                 <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-                                    <span className="rounded-lg border border-blue-200 bg-blue-50 px-3 py-1 text-sm font-semibold text-blue-700">
+                                    <span className="rounded-lg border border-blue-200 dark:border-blue-500/30 bg-blue-50 dark:bg-blue-500/10 px-3 py-1 text-sm font-semibold text-blue-700 dark:text-blue-300">
                                         Neu. disponibles: {filteredData.length}
                                     </span>
                                     {botonConfirmar}

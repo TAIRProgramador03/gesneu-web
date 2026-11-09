@@ -133,11 +133,11 @@ export const CompaniesFilters = memo(({ onSearchChange, autosDisponiblesCount, o
               top: 8,
               right: 8,
               zIndex: 2,
-              color: '#dc2626',
-              backgroundColor: '#fef2f2',
-              border: '1px solid #fecaca',
+              color: 'var(--texto-rojo)',
+              backgroundColor: 'var(--tinte-rojo)',
+              border: '1px solid var(--borde-rojo)',
               '&:hover': {
-                backgroundColor: '#fee2e2',
+                backgroundColor: 'var(--tinte-rojo-fuerte)',
                 borderColor: '#dc2626',
               },
             }}
@@ -220,7 +220,7 @@ export const CompaniesFilters = memo(({ onSearchChange, autosDisponiblesCount, o
           <div className='flex items-center gap-3 shrink-0'>
             <label
               htmlFor="placa-en-transito"
-              className="flex items-center gap-2 cursor-pointer select-none text-sm font-medium text-gray-700 whitespace-nowrap"
+              className="flex items-center gap-2 cursor-pointer select-none text-sm font-medium text-gray-700 dark:text-slate-200 whitespace-nowrap"
             >
               <CheckBoxCustom
                 id="placa-en-transito"

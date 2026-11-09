@@ -104,7 +104,7 @@ export function SearchSelect({
           {...buttonProps}
         >
           <span
-            className={`truncate ${selectedOption?.label ? "text-black" : "text-gray-400"}`}
+            className={`truncate ${selectedOption?.label ? "text-foreground" : "text-texto-apagado"}`}
           >
             {selectedOption?.label ?? placeholder}
           </span>

@@ -178,7 +178,7 @@ export function MultiSearchSelect({
         >
           <div className="flex flex-wrap justify-start gap-2 flex-1 overflow-hidden">
             {selectedOptions.length === 0 ? (
-              <span className="text-gray-400 font-normal truncate">
+              <span className="text-texto-apagado font-normal truncate">
                 {placeholder}
               </span>
             ) : (

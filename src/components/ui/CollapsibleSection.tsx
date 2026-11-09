@@ -9,7 +9,7 @@ export const CollapsibleSection = ({
   headerRight,
   children,
   border = "border-grey-500",
-  bgHeader = "bg-white"
+  bgHeader = "bg-card"
 }: {
   title: string
   icon: React.ReactNode
@@ -22,27 +22,27 @@ export const CollapsibleSection = ({
   const [open, setOpen] = useState(defaultOpen)
 
   return (
-    <div className={cn("rounded-2xl bg-white shadow-sm border-t-4", border)}>
+    <div className={cn("rounded-2xl bg-card shadow-sm border-t-4", border)}>
       <button
         type="button"
         onClick={() => setOpen(!open)}
         className={cn(
           "w-full flex items-center justify-between p-5 transition-colors rounded-tl-xl rounded-tr-xl bg-linear-to-r",
           bgHeader,
-          open ? "hover:bg-gray-50/50" : "hover:bg-gray-50/50 rounded-2xl"
+          open ? "hover:bg-superficie-1/50" : "hover:bg-superficie-1/50 rounded-2xl"
         )}
       >
         <div className="flex items-center gap-3">
           <div className="rounded-lg bg-sky-50 text-sky-700 p-2">
             {icon}
           </div>
-          <h2 className="text-base font-semibold text-gray-900">{title}</h2>
+          <h2 className="text-base font-semibold text-foreground">{title}</h2>
         </div>
         <div className="flex items-center gap-3">
           {headerRight}
           <ChevronDown
             className={cn(
-              "size-5 text-gray-400 transition-transform duration-200",
+              "size-5 text-texto-apagado transition-transform duration-200",
               open && "rotate-180"
             )}
           />

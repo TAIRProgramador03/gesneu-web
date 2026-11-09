@@ -22,34 +22,34 @@ export interface KpiCardProps {
 
 const colorClasses: Record<string, { bg: string, border: string, text: string }> = {
   green: {
-    bg: 'bg-green-50',
+    bg: 'bg-green-50 dark:bg-green-500/10',
     border: 'border-green-600',
-    text: 'text-green-600'
+    text: 'text-green-600 dark:text-green-300'
   },
   sky: {
-    bg: 'bg-sky-50',
+    bg: 'bg-sky-50 dark:bg-sky-500/10',
     border: 'border-sky-600',
-    text: 'text-sky-600'
+    text: 'text-sky-600 dark:text-sky-300'
   },
   amber: {
-    bg: 'bg-amber-50',
+    bg: 'bg-amber-50 dark:bg-amber-500/10',
     border: 'border-amber-600',
-    text: 'text-amber-600'
+    text: 'text-amber-600 dark:text-amber-300'
   },
   yellow: {
-    bg: 'bg-yellow-50',
+    bg: 'bg-yellow-50 dark:bg-yellow-500/10',
     border: 'border-yellow-600',
-    text: 'text-yellow-600'
+    text: 'text-yellow-600 dark:text-yellow-300'
   },
   lime: {
-    bg: 'bg-lime-50',
+    bg: 'bg-lime-50 dark:bg-lime-500/10',
     border: 'border-lime-600',
-    text: 'text-lime-600'
+    text: 'text-lime-600 dark:text-lime-300'
   },
   red: {
-    bg: 'bg-red-50',
+    bg: 'bg-red-50 dark:bg-red-500/10',
     border: 'border-red-600',
-    text: 'text-red-600'
+    text: 'text-red-600 dark:text-red-300'
   },
   stone: {
     bg: 'bg-stone-50',

@@ -94,11 +94,20 @@ export default function Page(): React.JSX.Element {
   // Cola obligatoria de S60: mientras haya una pendiente, solo se puede trabajar
   // la placa de la más antigua. El backend bloquea igual; esto es para que el
   // técnico lo sepa antes de llenar un modal entero.
-  const { grupos: colaS60Grupos, placaBloqueada, isLoading: colaS60Cargando, refetch: refrescarColaS60 } = useColaS60();
+  const {
+    grupos: colaS60Grupos,
+    placaBloqueada,
+    exento: exentoColaS60,
+    isLoading: colaS60CargandoRaw,
+    refetch: refrescarColaS60,
+  } = useColaS60();
+  // A los exceptuados ni siquiera se les hace esperar la consulta: para ellos la
+  // cola nunca bloquea, así que no hay nada que averiguar antes de dejar actuar.
+  const colaS60Cargando = colaS60CargandoRaw && !exentoColaS60;
   const [vehiculo, setVehiculo] = React.useState<Vehiculo | null>(null);
   // Mientras no se sepa si hay pendientes tampoco se habilita nada: dejar actuar
   // y bloquear después sería peor que esperar un par de segundos.
-  const placaBloqueadaPorColaS60 = colaS60Cargando || placaBloqueada(vehiculo?.PLACA);
+  const placaBloqueadaPorColaS60 = !exentoColaS60 && (colaS60Cargando || placaBloqueada(vehiculo?.PLACA));
   const [error, setError] = React.useState<string | null>(null);
   const [transitoActivo, setTransitoActivo] = React.useState(false);
 
@@ -690,6 +699,7 @@ export default function Page(): React.JSX.Element {
       <ColaS60Banner
         grupos={colaS60Grupos}
         cargando={colaS60Cargando}
+        soloInformativo={exentoColaS60}
         placaActual={vehiculo?.PLACA}
         onIrAPlaca={(placa) => {
           handleSearchChange({ target: { value: placa } } as any);
@@ -707,7 +717,7 @@ export default function Page(): React.JSX.Element {
               p: { xs: 2, md: 3 },
               borderRadius: 3,
               boxShadow: '0 6px 20px rgba(15, 23, 42, 0.06)',
-              border: '1px solid #eef2f6',
+              border: '1px solid var(--border)',
             }}
           >
             <Stack
@@ -731,10 +741,10 @@ export default function Page(): React.JSX.Element {
                       label={vehiculo.OPERACION.trim()}
                       size="small"
                       sx={{
-                        background: '#f1f5f9',
-                        color: '#475569',
+                        background: 'var(--superficie-2)',
+                        color: 'var(--texto-apagado)',
                         fontWeight: 600,
-                        '& .MuiChip-icon': { color: '#64748b' },
+                        '& .MuiChip-icon': { color: 'var(--texto-apagado)' },
                       }}
                     />
                   )}
@@ -755,7 +765,7 @@ export default function Page(): React.JSX.Element {
                 <LoadingButton2
                   variant="teal"
                   onClick={handleOpenModalConRefresh}
-                  disabled={user?.usuario?.trim() === 'GESNEU' || placaBloqueadaPorColaS60}
+                  disabled={placaBloqueadaPorColaS60}
                   icon={<ClipboardText />}
                 >
                   Asignar Neumático
@@ -828,20 +838,20 @@ export default function Page(): React.JSX.Element {
                 p: { xs: 2, md: 3 },
                 borderRadius: 3,
                 boxShadow: '0 6px 20px rgba(15, 23, 42, 0.06)',
-                border: '1px solid #eef2f6',
+                border: '1px solid var(--border)',
                 display: 'flex',
                 flexDirection: 'column',
               }}
             >
-              <Typography variant="subtitle1" fontWeight="bold" sx={{ color: '#0f172a' }}>
+              <Typography variant="subtitle1" fontWeight="bold" sx={{ color: 'var(--foreground)' }}>
                 Diagrama de posiciones
               </Typography>
 
               <Stack direction="row" spacing={2} sx={{ mt: 1, mb: 2 }}>
                 {[
-                  { color: '#2e7d32', label: 'Óptimo' },
-                  { color: '#c9a227', label: 'Medio' },
-                  { color: '#d32f2f', label: 'Crítico' },
+                  { color: 'var(--texto-verde)', label: 'Óptimo' },
+                  { color: 'var(--texto-ambar)', label: 'Medio' },
+                  { color: 'var(--texto-rojo)', label: 'Crítico' },
                 ].map((item) => (
                   <Stack key={item.label} direction="row" alignItems="center" spacing={0.75}>
                     <Box sx={{ width: 9, height: 9, borderRadius: '50%', background: item.color }} />
@@ -872,20 +882,20 @@ export default function Page(): React.JSX.Element {
                 p: { xs: 2, md: 3 },
                 borderRadius: 3,
                 boxShadow: '0 6px 20px rgba(15, 23, 42, 0.06)',
-                border: '1px solid #eef2f6',
+                border: '1px solid var(--border)',
                 position: 'relative',
                 maxHeight: '700px',
                 overflow: 'auto',
               }}
             >
               <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
-                <Typography variant="subtitle1" fontWeight="bold" sx={{ color: '#0f172a' }}>
+                <Typography variant="subtitle1" fontWeight="bold" sx={{ color: 'var(--foreground)' }}>
                   Neumáticos instalados
                 </Typography>
                 <Chip
                   label={`${neumaticosAsignadosUnicos.length} ${neumaticosAsignadosUnicos.length === 1 ? 'unidad' : 'unidades'}`}
                   size="small"
-                  sx={{ background: '#eff6ff', color: '#1d4ed8', fontWeight: 700, fontSize: '0.75rem' }}
+                  sx={{ background: 'var(--tinte-azul)', color: 'var(--texto-azul)', fontWeight: 700, fontSize: '0.75rem' }}
                 />
               </Stack>
 

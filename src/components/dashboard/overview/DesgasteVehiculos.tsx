@@ -164,18 +164,18 @@ export const DesgasteVehiculos = (): React.JSX.Element => {
               axisLine={false}
               tickLine={false}
             />
-            <Tooltip content={<DesgasteTooltip />} cursor={{ fill: 'rgba(0,0,0,0.04)' }} />
+            <Tooltip content={<DesgasteTooltip />} cursor={{ fill: 'var(--grafico-cursor)' }} />
 
             {/* Línea de referencia: promedio flota */}
             <ReferenceLine
               x={FLEET_AVG}
-              stroke="#94a3b8"
+              stroke="var(--texto-apagado)"
               strokeDasharray="5 3"
               label={{
                 value: `Prom. ${FLEET_AVG}`,
                 position: 'insideTopRight',
                 fontSize: '0.75rem',
-                fill: '#94a3b8',
+                fill: 'var(--texto-apagado)',
                 dy: -4,
               }}
             />

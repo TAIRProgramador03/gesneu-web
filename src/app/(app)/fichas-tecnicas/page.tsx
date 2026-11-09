@@ -78,7 +78,7 @@ export default function Page(): React.JSX.Element {
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-[#002141]">Fichas Técnicas</h1>
-          <p className="text-sm text-gray-500">Consulta las fichas técnicas de neumáticos en PDF.</p>
+          <p className="text-sm text-gray-500 dark:text-slate-400">Consulta las fichas técnicas de neumáticos en PDF.</p>
         </div>
         <span className="rounded-full bg-[#002141]/5 px-3 py-1 text-xs font-semibold text-[#002141]">
           {fichasFiltradas.length} {fichasFiltradas.length === 1 ? 'ficha' : 'fichas'}
@@ -86,7 +86,7 @@ export default function Page(): React.JSX.Element {
       </div>
 
       {/* Controles: búsqueda + filtros */}
-      <div className="flex flex-col gap-4 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
+      <div className="flex flex-col gap-4 rounded-2xl border border-gray-100 dark:border-slate-800 bg-white dark:bg-card p-4 shadow-sm">
         {/* Barra de búsqueda */}
         <div className="relative w-full">
           <Search className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
@@ -95,7 +95,7 @@ export default function Page(): React.JSX.Element {
             value={busqueda}
             onChange={(e) => setBusqueda(e.target.value)}
             placeholder="Buscar por modelo, diseño, medida o marca…"
-            className="w-full rounded-xl border border-gray-200 bg-gray-50 py-2.5 pl-11 pr-4 text-sm text-gray-800 outline-none transition focus:border-[#185FA5] focus:bg-white focus:ring-4 focus:ring-[#185FA5]/10"
+            className="w-full rounded-xl border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-superficie-1 py-2.5 pl-11 pr-4 text-sm text-gray-800 dark:text-slate-100 outline-none transition focus:border-[#185FA5] focus:bg-white dark:focus:bg-card focus:ring-4 focus:ring-[#185FA5]/10"
           />
         </div>
 
@@ -113,7 +113,7 @@ export default function Page(): React.JSX.Element {
                   'inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-medium transition',
                   activo
                     ? 'bg-[#185FA5] text-white shadow-sm'
-                    : 'border border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:bg-gray-50',
+                    : 'border border-gray-200 dark:border-slate-700 bg-white dark:bg-card text-gray-600 dark:text-slate-300 hover:border-gray-300 dark:hover:border-slate-600 hover:bg-gray-50 dark:hover:bg-superficie-1',
                 ].join(' ')}
               >
                 {color ? (
@@ -131,7 +131,7 @@ export default function Page(): React.JSX.Element {
 
       {/* Grid de tarjetas */}
       {fichasFiltradas.length === 0 ? (
-        <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-gray-200 bg-white py-20 text-gray-400">
+        <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-gray-200 dark:border-slate-700 bg-white dark:bg-card py-20 text-gray-400">
           <FileX2 size={48} strokeWidth={1.5} />
           <p className="text-sm font-medium">No se encontraron fichas</p>
           <p className="text-xs text-gray-400">Prueba con otra búsqueda o marca.</p>
@@ -146,7 +146,7 @@ export default function Page(): React.JSX.Element {
                 key={f.id}
                 type="button"
                 onClick={() => abrirPdf(f.pdfUrl)}
-                className="group relative flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white text-left shadow-sm transition hover:-translate-y-0.5 hover:border-gray-300 hover:shadow-md"
+                className="group relative flex flex-col overflow-hidden rounded-2xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-card text-left shadow-sm transition hover:-translate-y-0.5 hover:border-gray-300 dark:hover:border-slate-600 hover:shadow-md"
               >
                 {/* Franja de color de marca */}
                 <span className="absolute inset-x-0 top-0 h-1" style={{ backgroundColor: color }} />
@@ -156,7 +156,7 @@ export default function Page(): React.JSX.Element {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: color }} />
-                      <span className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                      <span className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-slate-400">
                         {f.marca}
                       </span>
                     </div>
@@ -172,12 +172,12 @@ export default function Page(): React.JSX.Element {
                   <h3 className="text-base font-semibold leading-snug text-[#002141]">{f.modelo}</h3>
 
                   {/* Medida */}
-                  <span className="w-fit rounded-md bg-gray-100 px-2 py-1 font-mono text-sm text-gray-700">
+                  <span className="w-fit rounded-md bg-gray-100 dark:bg-superficie-2 px-2 py-1 font-mono text-sm text-gray-700 dark:text-slate-200">
                     {f.medida}
                   </span>
 
                   {/* Botón Ver PDF */}
-                  <div className="mt-auto flex items-center justify-between gap-1.5 rounded-lg bg-red-50 px-3 py-2 text-red-600 transition group-hover:bg-red-600 group-hover:text-white">
+                  <div className="mt-auto flex items-center justify-between gap-1.5 rounded-lg bg-red-50 dark:bg-red-500/10 px-3 py-2 text-red-600 dark:text-red-300 transition group-hover:bg-red-600 group-hover:text-white">
                     <span className="flex items-center gap-1.5 text-xs font-semibold">
                       <FileText size={16} />
                       Ver PDF

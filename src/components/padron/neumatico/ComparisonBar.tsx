@@ -25,14 +25,14 @@ export const ComparisonBar = ({ neu }: { neu: NeumaticoBuscado }) => {
               {item.label}
             </span>
             <div className="flex-1 relative">
-              <div className="h-3 rounded-full bg-gray-100 overflow-hidden">
+              <div className="h-3 rounded-full bg-gray-100 dark:bg-superficie-2 overflow-hidden">
                 <div
                   className={cn("h-full rounded-full transition-all duration-700", item.barClass)}
                   style={{ width: `${Math.min(item.pct, 100)}%` }}
                 />
               </div>
             </div>
-            <span className="text-xs font-bold text-gray-700 w-14 text-right tabular-nums">
+            <span className="text-xs font-bold text-gray-700 dark:text-slate-200 w-14 text-right tabular-nums">
               {item.value} mm
             </span>
           </div>

@@ -52,7 +52,7 @@ export function PadronFilterChips({ counts, active, onChange, isLoading = false 
               'flex items-center gap-2 px-4 py-1.5 rounded-full border text-sm font-medium transition-all duration-150 cursor-pointer',
               isActive
                 ? chip.activeClass
-                : 'bg-white text-slate-600 border-slate-200 hover:border-slate-400 hover:text-slate-800',
+                : 'bg-white dark:bg-card text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-slate-400 hover:text-slate-800 dark:hover:text-slate-100',
             ].join(' ')}
           >
             {!isActive && (
@@ -61,7 +61,7 @@ export function PadronFilterChips({ counts, active, onChange, isLoading = false 
             {chip.label}
             <span className={[
               'text-xs font-bold px-1.5 py-0.5 rounded-full min-w-[22px] text-center',
-              isActive ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500',
+              isActive ? 'bg-white dark:bg-card/20 dark:bg-card/20 text-white' : 'bg-slate-100 dark:bg-superficie-2 text-slate-500 dark:text-slate-400',
             ].join(' ')}>
               {chip.count}
             </span>

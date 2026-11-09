@@ -623,7 +623,7 @@ function useChartOptions({ categories, chartHeight, lookupMapRef, filteredPlacas
         const rows = segmentos.map(({ posicion, item, isHovered }) => {
           const estado = Number(item.ESTADO);
           const color = getEstadoColor(estado);
-          const rowBg = isHovered ? (isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.04)') : 'transparent';
+          const rowBg = isHovered ? (isDark ? 'rgba(255,255,255,0.07)' : 'var(--grafico-cursor)') : 'transparent';
           return `
             <div style="display:flex;align-items:center;gap:8px;padding:4px 6px;border-radius:5px;background:${rowBg}">
               <div style="width:8px;height:8px;border-radius:2px;background:${color};flex-shrink:0"></div>

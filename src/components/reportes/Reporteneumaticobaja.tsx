@@ -561,11 +561,11 @@ export default function ReporteNeumaticoBaja() {
                     {/* Chart */}
                     <ResponsiveContainer width="100%" height={340}>
                       <BarChart data={distirbucionTipoTerrenoEnBaja} margin={{ top: 30, right: 12, bottom: 4, left: -12 }}>
-                        <CartesianGrid vertical={false} stroke="#f1f5f9" />
+                        <CartesianGrid vertical={false} stroke="var(--grafico-grid)" />
                         <XAxis
                           dataKey="TIPO_TERRENO"
                           tick={{ fontSize: '0.875rem', fill: theme.palette.text.secondary as string, fontWeight: 600 }}
-                          axisLine={{ stroke: "#e2e8f0" }}
+                          axisLine={{ stroke: "var(--grafico-eje)" }}
                           tickLine={false}
                         />
                         <YAxis
@@ -645,11 +645,11 @@ export default function ReporteNeumaticoBaja() {
                 {/* Chart */}
                 <ResponsiveContainer width="100%" height={340}>
                   <BarChart data={distribucionMotivoDeBaja} margin={{ top: 30, right: 12, bottom: 4, left: -12 }}>
-                    <CartesianGrid vertical={false} stroke="#f1f5f9" />
+                    <CartesianGrid vertical={false} stroke="var(--grafico-grid)" />
                     <XAxis
                       dataKey="TIPO_BAJA"
                       tick={{ fontSize: '0.875rem', fill: theme.palette.text.secondary as string, fontWeight: 600 }}
-                      axisLine={{ stroke: "#e2e8f0" }}
+                      axisLine={{ stroke: "var(--grafico-eje)" }}
                       tickLine={false}
                     />
                     <YAxis

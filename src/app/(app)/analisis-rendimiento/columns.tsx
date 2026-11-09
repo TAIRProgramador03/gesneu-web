@@ -24,7 +24,7 @@ export const columnsRelacionNeumaticosPorTerreno: ColumnDef<RelacionNeumaticoTer
         }
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
         aria-label="Seleccionar todo"
-        className="border-white data-[state=checked]:bg-white data-[state=checked]:text-sky-900 data-[state=indeterminate]:bg-white data-[state=indeterminate]:text-sky-900"
+        className="border-white dark:border-white/10 data-[state=checked]:bg-white data-[state=checked]:text-sky-900 data-[state=indeterminate]:bg-white data-[state=indeterminate]:text-sky-900"
       />
     ),
     cell: ({ row }) => (
@@ -244,7 +244,7 @@ export const columnsRelacionNeumaticosPorBaja: ColumnDef<RelacionNeumaticoTerren
         }
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
         aria-label="Seleccionar todo"
-        className="border-white data-[state=checked]:bg-white data-[state=checked]:text-sky-900 data-[state=indeterminate]:bg-white data-[state=indeterminate]:text-sky-900"
+        className="border-white dark:border-white/10 data-[state=checked]:bg-white data-[state=checked]:text-sky-900 data-[state=indeterminate]:bg-white data-[state=indeterminate]:text-sky-900"
       />
     ),
     cell: ({ row }) => (
@@ -459,7 +459,7 @@ export const columnsRelacionNeumaticoDespachados: ColumnDef<ResponseRelacionDesp
         }
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
         aria-label="Seleccionar todo"
-        className="border-white data-[state=checked]:bg-white data-[state=checked]:text-sky-900 data-[state=indeterminate]:bg-white data-[state=indeterminate]:text-sky-900"
+        className="border-white dark:border-white/10 data-[state=checked]:bg-white data-[state=checked]:text-sky-900 data-[state=indeterminate]:bg-white data-[state=indeterminate]:text-sky-900"
       />
     ),
     cell: ({ row }) => (

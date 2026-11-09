@@ -7,19 +7,19 @@ import React from 'react'
 
 export const HeroHeader = ({ neu }: { neu: NeumaticoBuscado }) => {
   return (
-    <div className="rounded-2xl bg-white shadow-sm border p-6">
+    <div className="rounded-2xl bg-white dark:bg-card shadow-sm border p-6">
       <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
         <div className="space-y-2">
           <div className="flex items-center gap-3 flex-wrap">
-            <h1 className="text-2xl font-bold text-gray-900">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-slate-100">
               {neu.CODIGO_NEUMATICO}
             </h1>
             <TipoMovimientoBadge tipoMovimiento={neu.SITUACION_NEUMATICO ?? ""} />
-            <span className="text-gray-500 text-sm">
+            <span className="text-gray-500 dark:text-slate-400 text-sm">
               <TextoRecuperadoBadge esRecuperado={neu.RECUPERADO_NEUMATICO} />
             </span>
           </div>
-          <p className="text-gray-500 text-sm">
+          <p className="text-gray-500 dark:text-slate-400 text-sm">
             {neu.MARCA_NEUMATICO} &middot; {neu.MEDIDA_NEUMATICO} &middot; {neu.DISENO_NEUMATICO}
           </p>
         </div>
@@ -27,8 +27,8 @@ export const HeroHeader = ({ neu }: { neu: NeumaticoBuscado }) => {
           <div>
             <span className="text-gray-400 block">Placa</span>
             {neu.PLACA_ACTUAL
-              ? <Link href={`/padron/placa/${neu.PLACA_ACTUAL}`} className="font-medium text-blue-600 hover:underline">{neu.PLACA_ACTUAL}</Link>
-              : <span className="font-medium text-gray-800">—</span>
+              ? <Link href={`/padron/placa/${neu.PLACA_ACTUAL}`} className="font-medium text-blue-600 dark:text-blue-300 hover:underline">{neu.PLACA_ACTUAL}</Link>
+              : <span className="font-medium text-gray-800 dark:text-slate-100">—</span>
             }
           </div>
           <Spec label="Remanente" value={`${neu.REMANENTE_ACTUAL} mm`} />

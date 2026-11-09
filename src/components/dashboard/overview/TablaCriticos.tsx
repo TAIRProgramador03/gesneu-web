@@ -54,7 +54,7 @@ export const TablaCriticos = (): React.JSX.Element => {
 
       {
         neumaticosEnCritico.length === 0 && !isLoading && (
-          <div className='flex gap-1 flex-wrap justify-center items-center bg-red-50 text-red-700 border-2 border-red-700 p-2 rounded-lg'>
+          <div className='flex gap-1 flex-wrap justify-center items-center bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-300 border-2 border-red-700 p-2 rounded-lg'>
             <BadgeCheck width={12} />
             <span className='italic text-xs'>No cuentas con neumáticos en estado crítico que se encuentren asignados.</span>
           </div>

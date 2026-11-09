@@ -40,9 +40,9 @@ export const SemiGauge = ({ pct }: { pct: number }) => {
         </span>
         <div className={cn(
           "inline-flex items-center gap-1.5 rounded-full px-3 py-0.5 text-xs font-semibold mt-1.5",
-          pct < 39 ? "bg-red-50 text-red-700" :
-            pct < 79 ? "bg-yellow-50 text-yellow-700" :
-              "bg-teal-50 text-teal-700"
+          pct < 39 ? "bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-300" :
+            pct < 79 ? "bg-yellow-50 dark:bg-yellow-500/10 text-yellow-700 dark:text-yellow-300" :
+              "bg-teal-50 dark:bg-teal-500/10 text-teal-700 dark:text-teal-300"
         )}>
           <span className={cn("size-1.5 rounded-full", vidaBgBar(pct))} />
           {pct < 39 ? "Desgaste crítico" : pct < 79 ? "Desgaste regular" : "Buen estado"}

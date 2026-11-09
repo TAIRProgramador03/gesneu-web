@@ -25,25 +25,25 @@ interface ModalVerReubicacionProps {
 
 /** Dato suelto del resumen superior. */
 const DatoResumen: React.FC<{ icono: React.ReactNode; label: string; valor: React.ReactNode }> = ({ icono, label, valor }) => (
-  <div className="flex items-center gap-2.5 rounded-xl border border-blue-100 bg-linear-to-br from-blue-50 via-white to-indigo-50 px-3 py-2.5">
+  <div className="flex items-center gap-2.5 rounded-xl border border-blue-100 dark:border-blue-500/20 bg-linear-to-br from-blue-50 dark:from-blue-500/10 via-white dark:via-card to-indigo-50 dark:to-indigo-500/10 px-3 py-2.5">
     <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-linear-to-br from-blue-500 to-indigo-600 text-white shadow-sm shadow-blue-200">
       {icono}
     </span>
     <div className="min-w-0">
       <p className="text-xs font-bold uppercase tracking-wide text-blue-400">{label}</p>
-      <p className="truncate text-sm font-bold text-slate-800">{valor}</p>
+      <p className="truncate text-sm font-bold text-slate-800 dark:text-slate-100">{valor}</p>
     </div>
   </div>
 );
 
 /** Medida individual dentro de la tarjeta de un neumático. */
 const Medida: React.FC<{ icono: React.ReactNode; label: string; valor: React.ReactNode; unidad: string }> = ({ icono, label, valor, unidad }) => (
-  <div className="rounded-lg border border-slate-200/70 bg-white px-2.5 py-1.5">
+  <div className="rounded-lg border border-slate-200 dark:border-slate-700/70 dark:border-slate-700/70 bg-white dark:bg-card px-2.5 py-1.5">
     <p className="flex items-center gap-1 text-xs font-bold uppercase tracking-wide text-slate-400">
       {icono}
       {label}
     </p>
-    <p className="mt-0.5 text-sm font-bold text-slate-700">
+    <p className="mt-0.5 text-sm font-bold text-slate-700 dark:text-slate-200">
       {valor ?? '—'}
       <span className="ml-0.5 text-xs font-semibold text-slate-400">{unidad}</span>
     </p>
@@ -72,10 +72,10 @@ export const ModalInformacionReubicacion = ({ open, fechaReubicacion, neumaticos
         <Box sx={{
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           width: { xs: 34, md: 40 }, height: { xs: 34, md: 40 }, borderRadius: 2,
-          background: 'linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%)',
+          background: 'linear-gradient(135deg, var(--tinte-azul-fuerte) 0%, var(--tinte-indigo) 100%)',
           flexShrink: 0,
         }}>
-          <ShieldCheck size={20} className="text-blue-600" />
+          <ShieldCheck size={20} className="text-blue-600 dark:text-blue-300" />
         </Box>
         <Box sx={{ flex: 1, minWidth: 0 }}>
           <Typography variant="h6" fontWeight={700} lineHeight={1.2} sx={{ fontSize: { xs: '1rem', md: '1.25rem' } }}>
@@ -86,10 +86,10 @@ export const ModalInformacionReubicacion = ({ open, fechaReubicacion, neumaticos
             <Chip
               label={placa}
               size="small"
-              sx={{ fontWeight: 700, fontSize: '0.875rem', bgcolor: '#f1f5f9', color: '#334155', letterSpacing: 0.5 }}
+              sx={{ fontWeight: 700, fontSize: '0.875rem', bgcolor: 'var(--superficie-2)', color: 'var(--foreground)', letterSpacing: 0.5 }}
             />
           </Box>
-          <Typography variant="caption" className='text-amber-600' sx={{ display: 'block', mt: 1, fontStyle: 'italic', fontSize: { xs: '0.75rem', md: '0.875rem' }, lineHeight: 1.35 }}>
+          <Typography variant="caption" className='text-amber-600 dark:text-amber-300' sx={{ display: 'block', mt: 1, fontStyle: 'italic', fontSize: { xs: '0.75rem', md: '0.875rem' }, lineHeight: 1.35 }}>
             <span className='font-bold'>Nota: </span>
             Revisa que cada neumático quede en la posición correcta. Al pulsar <b>Registrar Reubicación</b> se guardarán definitivamente.
           </Typography>
@@ -101,13 +101,13 @@ export const ModalInformacionReubicacion = ({ open, fechaReubicacion, neumaticos
           onClick={onClose}
           title="Cerrar"
           aria-label="Cerrar"
-          className="shrink-0 self-start text-slate-400 hover:text-slate-700"
+          className="shrink-0 self-start text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
         >
           <X className="h-4 w-4" />
         </ButtonCustom>
       </DialogTitle>
 
-      <DialogContent sx={{ pt: 2.5, px: { xs: 1.5, md: 3 }, bgcolor: '#f8fafc' }}>
+      <DialogContent sx={{ pt: 2.5, px: { xs: 1.5, md: 3 }, bgcolor: 'var(--superficie-1)' }}>
         {/* Resumen de la operación */}
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 mt-3">
           <DatoResumen
@@ -123,10 +123,10 @@ export const ModalInformacionReubicacion = ({ open, fechaReubicacion, neumaticos
         </div>
 
         {/* Detalle de los movimientos */}
-        <p className="mb-2 mt-4 text-sm font-semibold text-slate-700">Detalle de movimientos</p>
+        <p className="mb-2 mt-4 text-sm font-semibold text-slate-700 dark:text-slate-200">Detalle de movimientos</p>
 
         {neumaticos.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-slate-200 bg-white py-10 text-center text-sm text-slate-400">
+          <div className="rounded-xl border border-dashed border-slate-200 dark:border-slate-700 bg-white dark:bg-card py-10 text-center text-sm text-slate-400">
             No hay neumáticos por reubicar.
           </div>
         ) : (
@@ -137,36 +137,36 @@ export const ModalInformacionReubicacion = ({ open, fechaReubicacion, neumaticos
               return (
                 <div
                   key={neu.CodigoNeumatico}
-                  className="relative overflow-hidden rounded-xl border border-violet-100 bg-linear-to-r from-violet-50/60 via-white to-slate-50 p-3 pl-4 shadow-sm"
+                  className="relative overflow-hidden rounded-xl border border-violet-100 dark:border-violet-500/20 bg-linear-to-r from-violet-50 dark:from-violet-500/10/60 dark:from-violet-500/10 via-white dark:via-card to-slate-50 dark:to-superficie-1 p-3 pl-4 shadow-sm"
                 >
                   <span className="absolute inset-y-0 left-0 w-1.5 bg-linear-to-b from-violet-300 to-violet-500" />
 
                   <div className="flex items-center gap-2.5">
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-bold text-slate-800">{neu.CodigoNeumatico || '—'}</p>
-                      <p className="truncate text-xs text-slate-500">
+                      <p className="truncate text-sm font-bold text-slate-800 dark:text-slate-100">{neu.CodigoNeumatico || '—'}</p>
+                      <p className="truncate text-xs text-slate-500 dark:text-slate-400">
                         {[neu.Marca, neu.Medida].filter(Boolean).join(' · ') || '—'}
                       </p>
                     </div>
                     {!seMueve && (
-                      <span className="shrink-0 rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-xs font-bold text-slate-500">
+                      <span className="shrink-0 rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-superficie-1 px-2 py-0.5 text-xs font-bold text-slate-500 dark:text-slate-400">
                         SIN CAMBIO
                       </span>
                     )}
                   </div>
 
                   {/* Lo que importa revisar: de qué posición sale y a cuál entra */}
-                  <div className="mt-2.5 grid grid-cols-[1fr_auto_1fr] items-center gap-2 rounded-lg border border-slate-200/70 bg-white px-2.5 py-2">
+                  <div className="mt-2.5 grid grid-cols-[1fr_auto_1fr] items-center gap-2 rounded-lg border border-slate-200 dark:border-slate-700/70 dark:border-slate-700/70 bg-white dark:bg-card px-2.5 py-2">
                     <div className="text-center">
                       <p className="text-xs font-bold uppercase tracking-wide text-slate-400">Desde</p>
-                      <span className="mt-0.5 inline-block rounded-md bg-slate-200 px-2 py-1 font-mono text-xs font-extrabold text-slate-600">
+                      <span className="mt-0.5 inline-block rounded-md bg-slate-200 dark:bg-superficie-3 px-2 py-1 font-mono text-xs font-extrabold text-slate-600 dark:text-slate-300">
                         {neu.PosicionOrigen || '—'}
                       </span>
                     </div>
                     <ArrowRight className={`h-5 w-5 justify-self-center ${seMueve ? 'text-violet-500' : 'text-slate-300'}`} />
                     <div className="text-center">
                       <p className="text-xs font-bold uppercase tracking-wide text-violet-400">Hacia</p>
-                      <span className={`mt-0.5 inline-block rounded-md px-2 py-1 font-mono text-xs font-extrabold text-white ${seMueve ? 'bg-violet-600' : 'bg-slate-400'}`}>
+                      <span className={`mt-0.5 inline-block rounded-md px-2 py-1 font-mono text-xs font-extrabold text-white ${seMueve ? 'bg-violet-600' : 'bg-slate-400 dark:bg-slate-500'}`}>
                         {neu.PosicionDestino || '—'}
                       </span>
                     </div>
