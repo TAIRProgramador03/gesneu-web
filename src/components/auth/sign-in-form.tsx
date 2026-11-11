@@ -22,6 +22,7 @@ import IconButton from '@mui/material/IconButton';
 import { paths } from '@/paths';
 import { loginApi } from '@/lib/auth/auth-api';
 import { useUser } from '@/hooks/use-user';
+import { Decoracion } from '@/temporadas/temporada-provider';
 
 const schema = zod.object({
   usuario: zod.string().min(1, { message: 'Se requiere usuario' }),
@@ -76,7 +77,14 @@ export function SignInForm(): React.JSX.Element {
   return (
     <Stack spacing={4}>
       <Stack spacing={1}>
-        <Typography variant="h4">Inicio Sesión</Typography>
+        <Typography variant="h4">
+          Inicio{' '}
+          {/* El span es el ancla del adorno de temporada (gorro sobre la "S"). */}
+          <span style={{ position: 'relative', display: 'inline-block' }}>
+            <Decoracion nombre="sombreroTituloLogin" />
+            Sesión
+          </span>
+        </Typography>
         {/* <Typography color="text.secondary" variant="body2">
           No tienes una cuenta?{' '}
           <Link component={RouterLink} href={paths.auth.signUp} underline="hover" variant="subtitle2">
@@ -140,7 +148,7 @@ export function SignInForm(): React.JSX.Element {
               {errors.root.message}
             </Alert>
           )}
-          <Button disabled={isPending} type="submit" variant="contained">
+          <Button className="caramelo-azul" disabled={isPending} type="submit" variant="contained">
             {isPending ? 'Ingresando...' : 'Iniciar Sesion'}
           </Button>
         </Stack>

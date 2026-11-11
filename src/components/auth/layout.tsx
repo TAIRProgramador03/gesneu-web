@@ -1,3 +1,5 @@
+'use client';
+
 import * as React from 'react';
 import RouterLink from 'next/link';
 import Box from '@mui/material/Box';
@@ -7,12 +9,14 @@ import Typography from '@mui/material/Typography';
 import { paths } from '@/paths';
 import { DynamicLogo } from '@/components/core/logo';
 import Image from 'next/image';
+import { useTemporada } from '@/temporadas/temporada-provider';
 
 export interface LayoutProps {
   children: React.ReactNode;
 }
 
 export function Layout({ children }: LayoutProps): React.JSX.Element {
+  const { imagen } = useTemporada();
   return (
     <Box
       sx={{
@@ -57,7 +61,7 @@ export function Layout({ children }: LayoutProps): React.JSX.Element {
           <Box sx={{ display: 'flex', justifyContent: 'center' }}>
             <Image
               alt="Widgets"
-              src="/assets/gemini-login2.png"
+              src={imagen('login', '/assets/gemini-login2.png')}
               height={400}
               width={400}
               priority

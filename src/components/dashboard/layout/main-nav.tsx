@@ -14,6 +14,7 @@ import { List as ListIcon } from '@phosphor-icons/react/dist/ssr/List';
 import { Users as UsersIcon } from '@phosphor-icons/react/dist/ssr/Users';
 
 import { usePopover } from '@/hooks/use-popover';
+import { Decoracion } from '@/temporadas/temporada-provider';
 
 import { ConnectionStatus } from './connection-status';
 import { MobileNav } from './mobile-nav';
@@ -53,6 +54,7 @@ export function MainNav(): React.JSX.Element {
           </Stack>
           <Stack sx={{ alignItems: 'center' }} direction="row" spacing={2}>
             {/* <ThemeToggle /> */}
+            <Decoracion nombre="arbolitoCabecera" />
             <ConnectionStatus />
             {/* <Tooltip title="Contactos">
               <span>
@@ -68,12 +70,16 @@ export function MainNav(): React.JSX.Element {
                 </IconButton>
               </span>
             </Tooltip> */}
-            <Avatar
-              onClick={userPopover.handleOpen}
-              ref={userPopover.anchorRef}
-              src="/assets/avatar.png"
-              sx={{ cursor: 'pointer' }}
-            />
+            {/* font-size = diámetro del avatar: el gorro de temporada se mide en em. */}
+            <Box sx={{ position: 'relative', fontSize: 40, lineHeight: 0, flexShrink: 0 }}>
+              <Avatar
+                onClick={userPopover.handleOpen}
+                ref={userPopover.anchorRef}
+                src="/assets/avatar.png"
+                sx={{ cursor: 'pointer' }}
+              />
+              <Decoracion nombre="sombreroAvatar" />
+            </Box>
           </Stack>
         </Stack>
       </Box>

@@ -16,6 +16,7 @@ import { LocalizationProvider } from '@/components/core/localization-provider';
 import { ThemeProvider } from '@/components/core/theme-provider/theme-provider';
 import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
+import { TemporadaProvider } from '@/temporadas/temporada-provider';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -53,9 +54,11 @@ export default function Layout({ children }: LayoutProps): React.JSX.Element {
           <LocalizationProvider>
             <UserProvider>
               <ThemeProvider>
-                <TooltipProvider>
-                  {children}
-                </TooltipProvider>
+                <TemporadaProvider>
+                  <TooltipProvider>
+                    {children}
+                  </TooltipProvider>
+                </TemporadaProvider>
                 {/* El Toaster va DENTRO del ThemeProvider: lee el tema con
                     useTheme() de next-themes y fuera del provider siempre
                     creía estar en claro, así que los avisos salían blancos

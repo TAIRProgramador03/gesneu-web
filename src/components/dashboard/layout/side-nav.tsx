@@ -21,6 +21,7 @@ import { isNavItemActive } from '@/lib/is-nav-item-active';
 
 import { useUser } from '@/hooks/use-user';
 import { usePopover } from '@/hooks/use-popover';
+import { Decoracion } from '@/temporadas/temporada-provider';
 import { navItems } from './config';
 import { navIcons } from './nav-icons';
 import { UserPopover } from './user-popover';
@@ -55,6 +56,7 @@ export function SideNav({ collapsed, setCollapsed }: SideNavProps): React.JSX.El
         zIndex: 1,
       }}
     >
+      {!collapsed && <Decoracion nombre="coronaMenu" />}
       {/* Logo y botón */}
       <Box
         sx={{
@@ -188,20 +190,24 @@ function UserCard({ user, collapsed }: { user: User | null; collapsed: boolean }
             anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
             sx={{ '& .MuiBadge-badge': { bgcolor: '#167bd9', color: '#fff', fontSize: '0.6rem' } }}
           >
-            <Avatar
-              src={user?.avatar}
-              sx={{
-                bgcolor: '#167bd9',
-                color: '#fff',
-                width: 40,
-                height: 40,
-                fontSize: '0.95rem',
-                fontWeight: 600,
-                flexShrink: 0,
-              }}
-            >
-              {iniciales}
-            </Avatar>
+            {/* font-size = diámetro del avatar: el gorro de temporada se mide en em. */}
+            <Box sx={{ position: 'relative', fontSize: 40, lineHeight: 0, flexShrink: 0 }}>
+              <Avatar
+                src={user?.avatar}
+                sx={{
+                  bgcolor: '#167bd9',
+                  color: '#fff',
+                  width: 40,
+                  height: 40,
+                  fontSize: '0.95rem',
+                  fontWeight: 600,
+                  flexShrink: 0,
+                }}
+              >
+                {iniciales}
+              </Avatar>
+              <Decoracion nombre="sombreroAvatar" />
+            </Box>
           </Badge>
         </Tooltip>
         {!collapsed && (
@@ -329,6 +335,14 @@ function NavItem({
     <Tooltip title={collapsed ? title : ''} placement="right" arrow>
       <li>
         <Box
+          // Ganchos de estilo para temporadas (hover caramelo, activo con nieve).
+          className={[
+            'nav-item-temporada',
+            active ? 'nav-item-activo' : '',
+            collapsed ? 'nav-item-colapsado' : '',
+          ]
+            .filter(Boolean)
+            .join(' ')}
           {...(href
             ? {
               component: external ? 'a' : RouterLink,
