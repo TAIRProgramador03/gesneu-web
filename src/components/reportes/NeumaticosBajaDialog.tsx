@@ -38,6 +38,7 @@ export const NeumaticosBajaDialog = ({ data: dataDonnut, talleresSeleccionados, 
   return (
     <div>
       <DataTableNeumaticos
+        tarjetasEnMovil
         columns={columnsRelacionNeumaticosPorBaja}
         data={neumaticosEnBaja}
         type='pagination'

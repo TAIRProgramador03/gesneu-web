@@ -32,6 +32,7 @@ export const columnsHistorial: ColumnDef<MovimientoHistorial>[] = [
   },
   {
     accessorKey: 'ACCION_REALIZADA',
+    meta: { tarjeta: 'insignia' },
     header: 'Movimiento',
     cell: ({ row }) => (
       <TipoMovimientoBadgeNew tipo={row.original.ID_ACCION_REALIZADA} text={row.original.ACCION_REALIZADA} />

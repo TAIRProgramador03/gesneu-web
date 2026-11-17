@@ -4,7 +4,8 @@ import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
-import { Stack, Box, TableHead, TableRow, TableCell, Table } from '@mui/material';
+import { Stack, Box, TableHead, TableRow, TableCell, Table, useMediaQuery } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { buscarVehiculoPorPlacaEmpresa } from '@/api/Neumaticos';
 
 interface ModalTodasPlacasProps {
@@ -46,12 +47,16 @@ const ModalTodasPlacas: React.FC<ModalTodasPlacasProps> = ({ open, onClose, onVe
         }
     };
 
+    const theme = useTheme();
+    const esPantallaChica = useMediaQuery(theme.breakpoints.down('md'));
+
     return (
         <Dialog
             open={open}
             onClose={onClose}
             maxWidth="md"
             fullWidth
+            fullScreen={esPantallaChica}
             sx={{
                 '& .MuiDialog-container': {
                     alignItems: 'flex-start',
@@ -60,11 +65,11 @@ const ModalTodasPlacas: React.FC<ModalTodasPlacasProps> = ({ open, onClose, onVe
             }}
             PaperProps={{
                 sx: {
-                    borderRadius: 4,
-                    p: 4,
+                    borderRadius: { xs: 0, md: 4 },
+                    p: { xs: 1, md: 4 },
                     boxShadow: 3,
                     minHeight: 200,
-                    minWidth: 350,
+                    minWidth: 0,
                     bgcolor: 'background.paper',
                 }
             }}
@@ -110,8 +115,8 @@ const ModalTodasPlacas: React.FC<ModalTodasPlacasProps> = ({ open, onClose, onVe
                             minHeight: 60,
                         }}
                     >
-                        <Stack spacing={1} direction="row" alignItems="center">
-                            <Table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: 0, fontSize: '1rem', background: 'var(--card)', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+                        <Stack spacing={1} direction="row" alignItems="center" sx={{ overflowX: 'auto' }}>
+                            <Table style={{ minWidth: 480, width: '100%', borderCollapse: 'separate', borderSpacing: 0, fontSize: '1rem', background: 'var(--card)', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
                                 <TableHead>
                                     <TableRow>
                                         <TableCell sx={{ backgroundColor: 'var(--tinte-cyan)', fontWeight: 'bold' }}>Marca</TableCell>
@@ -159,7 +164,7 @@ const ModalTodasPlacas: React.FC<ModalTodasPlacasProps> = ({ open, onClose, onVe
                     </Box>
                 </Stack>
             </DialogContent>
-            <DialogActions>
+            <DialogActions sx={{ px: { xs: 2, md: 3 }, pb: { xs: 'max(12px, env(safe-area-inset-bottom, 0px))', md: 2 }, '& > button': { width: { xs: '100%', sm: 'auto' } } }}>
                 <Button onClick={onClose} variant="contained" color="primary">
                     Cerrar
                 </Button>

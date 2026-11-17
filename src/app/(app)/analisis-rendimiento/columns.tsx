@@ -217,7 +217,7 @@ export const columnsRelacionNeumaticosPorTerreno: ColumnDef<RelacionNeumaticoTer
   },
   {
     accessorKey: "PORCENTAJE_VIDA",
-    meta: { exportLabel: "Estado (%)" },
+    meta: { exportLabel: "Estado (%)", tarjeta: "ancho" },
     cell: ({ row }) => <LinearProgressItem estado={row.original.PORCENTAJE_VIDA ?? 0} width="120px" />,
     header: ({ column }) => {
       return (
@@ -431,7 +431,7 @@ export const columnsRelacionNeumaticosPorBaja: ColumnDef<RelacionNeumaticoTerren
   },
   {
     accessorKey: "PORCENTAJE_VIDA",
-    meta: { exportLabel: "Estado (%)" },
+    meta: { exportLabel: "Estado (%)", tarjeta: "ancho" },
     cell: ({ row }) => <LinearProgressItem estado={row.original.PORCENTAJE_VIDA ?? 0} width="120px" />,
     header: ({ column }) => {
       return (
@@ -681,7 +681,7 @@ export const columnsRelacionNeumaticoDespachados: ColumnDef<ResponseRelacionDesp
   },
   {
     accessorKey: "SITUACION_NEUMATICO",
-    meta: { exportLabel: "Situación" },
+    meta: { exportLabel: "Situación", tarjeta: "insignia" },
     cell: ({ row }) => < TipoMovimientoBadge tipoMovimiento={row.original.SITUACION_NEUMATICO} />,
     header: ({ column }) => "Situación",
   },
@@ -717,7 +717,7 @@ export const columnsRelacionNeumaticoDespachados: ColumnDef<ResponseRelacionDesp
   },
   {
     accessorKey: "VIDA_NEUMATICO",
-    meta: { exportLabel: "Estado (%)" },
+    meta: { exportLabel: "Estado (%)", tarjeta: "ancho" },
     cell: ({ row }) => <LinearProgressItem estado={row.original.VIDA_NEUMATICO ?? 0} width="120px" />,
     header: ({ column }) => {
       return (

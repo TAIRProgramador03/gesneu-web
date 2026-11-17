@@ -64,6 +64,7 @@ export const TablaCriticos = (): React.JSX.Element => {
       {
         neumaticosEnCritico.length >= 1 && (
           <DataTableNeumaticos
+            tarjetasEnMovil
             columns={columnsNeuCriticos}
             data={neumaticosEnCritico}
             filters={true}

@@ -9,7 +9,8 @@ export const CollapsibleSection = ({
   headerRight,
   children,
   border = "border-grey-500",
-  bgHeader = "bg-card"
+  bgHeader = "bg-card",
+  discreta = false
 }: {
   title: string
   icon: React.ReactNode
@@ -18,11 +19,13 @@ export const CollapsibleSection = ({
   children: React.ReactNode
   border?: string
   bgHeader?: string
+  /** Borde fino y neutro en vez de la franja gruesa de color: para secciones que no deben competir con la principal. */
+  discreta?: boolean
 }) => {
   const [open, setOpen] = useState(defaultOpen)
 
   return (
-    <div className={cn("rounded-2xl bg-card shadow-sm border-t-4", border)}>
+    <div className={cn("rounded-2xl bg-card shadow-sm", discreta ? "border" : cn("border-t-4", border))}>
       <button
         type="button"
         onClick={() => setOpen(!open)}

@@ -1032,7 +1032,7 @@ const ModalAsignacionNeu: React.FC<ModalAsignacionNeuProps> = memo(({ open, onCl
                 <DialogContent sx={{ px: 3 }}>
                     <Stack direction="row" spacing={2}>
                         {/* Panel Izquierdo: kilometraje, diagrama y posiciones */}
-                        <Card sx={{ flex: 0.38, width: '100%', p: 2, boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)', marginTop: '10px', minWidth: 360 }}>
+                        <Card sx={{ flex: 0.38, width: '100%', p: 2, boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)', marginTop: '10px', minWidth: { xs: 0, lg: 360 } }}>
                             {campoKilometraje}
                             <Box sx={{ mt: 2 }}>{diagrama}</Box>
                             {listaPosiciones}

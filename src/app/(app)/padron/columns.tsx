@@ -229,7 +229,7 @@ export const columnsPadron: ColumnDef<PadronExcel>[] = [
   },
   {
     accessorKey: "TIPO_MOVIMIENTO",
-    meta: { exportLabel: "Situación" },
+    meta: { exportLabel: "Situación", tarjeta: "insignia" },
     cell: ({ row }) => < TipoMovimientoBadge tipoMovimiento={row.original.TIPO_MOVIMIENTO} />,
     header: ({ column }) => "Situación",
   },
@@ -355,7 +355,7 @@ export const columnsPadron: ColumnDef<PadronExcel>[] = [
   },
   {
     accessorKey: "ESTADO",
-    meta: { exportLabel: "Estado (%)" },
+    meta: { exportLabel: "Estado (%)", tarjeta: "ancho" },
     cell: ({ row }) => <LinearProgressItem estado={row.original.ESTADO ?? 0} width="120px" />,
     header: ({ column }) => {
       return (

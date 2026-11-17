@@ -5,10 +5,25 @@ import { ChevronDown, Clock } from 'lucide-react';
 import { TimelineEventCard } from './TimelineEventCard';
 import { cn } from '../../../lib/utils';
 
-export const Timeline = ({ movimientos }: { movimientos: MovimientoHistorial[] }) => {
-  const [showAll, setShowAll] = useState(false)
+// Grupos del filtro, por ID_ACCION_REALIZADA (2 montaje · 4 rotación · 5 baja · 6 recupero · 7 inspección)
+const FILTROS: { id: string; label: string; acciones: number[] | null }[] = [
+  { id: 'todos', label: 'Todos', acciones: null },
+  { id: 'montajes', label: 'Montajes', acciones: [2] },
+  { id: 'inspecciones', label: 'Inspecciones', acciones: [7] },
+  { id: 'rotaciones', label: 'Rotaciones', acciones: [4] },
+  { id: 'bajas', label: 'Bajas', acciones: [5, 6] },
+]
 
-  if (movimientos.length === 0) {
+export const Timeline = ({ movimientos: todos }: { movimientos: MovimientoHistorial[] }) => {
+  const [showAll, setShowAll] = useState(false)
+  const [filtro, setFiltro] = useState('todos')
+
+  const grupo = FILTROS.find((f) => f.id === filtro)?.acciones ?? null
+  const movimientos = grupo ? todos.filter((m) => grupo.includes(m.ID_ACCION_REALIZADA)) : todos
+  // Sólo se ofrecen los filtros que tienen algo que mostrar
+  const filtrosDisponibles = FILTROS.filter((f) => !f.acciones || todos.some((m) => f.acciones!.includes(m.ID_ACCION_REALIZADA)))
+
+  if (todos.length === 0) {
     return (
       <CollapsibleSection title="Línea de Tiempo" icon={<Clock className="size-4" />}>
         <div className="flex flex-col items-center justify-center py-10 text-gray-400">
@@ -33,9 +48,30 @@ export const Timeline = ({ movimientos }: { movimientos: MovimientoHistorial[] }
           {movimientos.length} movimientos
         </span>
       }
-      border='border-sky-500'
+      border='border-indigo-500'
     >
       <div>
+        {filtrosDisponibles.length > 2 && (
+          <div className="mb-4 flex flex-wrap gap-1.5" role="group" aria-label="Filtrar movimientos">
+            {filtrosDisponibles.map((f) => (
+              <button
+                key={f.id}
+                type="button"
+                aria-pressed={filtro === f.id}
+                onClick={() => { setFiltro(f.id); setShowAll(false) }}
+                className={cn(
+                  'rounded-full border px-3 py-1 text-xs font-medium transition-colors',
+                  filtro === f.id
+                    ? 'border-transparent bg-sky-50 font-semibold text-sky-700 dark:bg-sky-500/15 dark:text-sky-300'
+                    : 'bg-card text-texto-apagado hover:text-foreground'
+                )}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
+        )}
+
         {visible.map((mov, idx) => (
           <TimelineEventCard
             key={`${mov.CODIGO_NEUMATICO}-${mov.FECHA_MOVIMIENTO}-${idx}`}

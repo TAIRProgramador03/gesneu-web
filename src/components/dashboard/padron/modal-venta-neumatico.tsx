@@ -1,7 +1,8 @@
 'use client'
 
 import React, { useCallback, useMemo, useState } from 'react'
-import { Box, Card, Dialog, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material'
+import { Box, Card, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography, useMediaQuery } from '@mui/material'
+import { useTheme } from '@mui/material/styles'
 import { Stack } from '@mui/system'
 import { BanknoteArrowUp, ChevronLeft, ChevronRight, PackageSearch, RotateCw, Search, SquareCheck, X } from 'lucide-react'
 import { toast } from 'sonner'
@@ -83,6 +84,8 @@ export const ModalVentaNeumatico = ({ open, onClose, onSuccess }: ModalVentaNeum
   const [comentarios, setComentarios] = useState('')
 
   const queryClient = useQueryClient()
+  const theme = useTheme()
+  const esPantallaChica = useMediaQuery(theme.breakpoints.down('md'))
 
   const { data: neumaticosDisponiblesParaVenta = [], isLoading, isFetching } = useQuery({
     queryKey: ['neumaticos-propios', { busqueda }],
@@ -177,11 +180,12 @@ export const ModalVentaNeumatico = ({ open, onClose, onSuccess }: ModalVentaNeum
       onClose={handleClose}
       maxWidth="md"
       fullWidth
-      PaperProps={{ sx: { borderRadius: 3, overflow: 'hidden' } }}
+      fullScreen={esPantallaChica}
+      PaperProps={{ sx: { borderRadius: { xs: 0, md: 3 }, overflow: 'hidden' } }}
     >
       <Box sx={{ height: 4, background: 'linear-gradient(90deg, #f43f5e 0%, #fb7185 100%)' }} />
 
-      <DialogTitle sx={{ pb: 1.5, pt: 2, display: 'flex', alignItems: 'center', gap: 1.5, borderBottom: '1px solid', borderColor: 'divider' }}>
+      <DialogTitle sx={{ pb: 1.5, pt: 2, px: { xs: 2, md: 3 }, display: 'flex', alignItems: 'center', gap: 1.5, borderBottom: '1px solid', borderColor: 'divider' }}>
         <Box sx={{
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           width: 40, height: 40, borderRadius: 2, flexShrink: 0,
@@ -190,19 +194,22 @@ export const ModalVentaNeumatico = ({ open, onClose, onSuccess }: ModalVentaNeum
           <BanknoteArrowUp size={20} className="text-rose-600 dark:text-rose-300" />
         </Box>
         <Box sx={{ flex: 1, minWidth: 0 }}>
-          <Typography variant="h6" fontWeight={700} lineHeight={1.2}>
-            Vender Neumático(s)
+          <Typography variant="h6" fontWeight={700} lineHeight={1.2} sx={{ fontSize: { xs: '1.05rem', md: '1.25rem' } }}>
+            Vender neumático(s)
           </Typography>
           <Typography variant="body2" color="text.secondary">
             Selecciona uno o varios neumáticos y registra la cotización de venta
           </Typography>
         </Box>
+        <IconButton size="small" onClick={handleClose} aria-label="Cerrar">
+          <X size={18} />
+        </IconButton>
       </DialogTitle>
 
-      <DialogContent sx={{ pt: 2.5, bgcolor: 'var(--superficie-1)' }}>
+      <DialogContent sx={{ pt: { xs: 1.5, md: 2.5 }, px: { xs: 1.5, md: 3 }, bgcolor: 'var(--superficie-1)' }}>
 
         <Stack spacing={2.5}>
-          <Card sx={{ p: 2.5, borderRadius: 2.5, border: '1px solid var(--border)', marginTop: '8px' }} elevation={0}>
+          <Card sx={{ p: { xs: 1.5, md: 2.5 }, borderRadius: 2.5, border: '1px solid var(--border)', marginTop: '8px' }} elevation={0}>
             <div className="flex items-center justify-between mb-3 flex-wrap gap-1">
               <Typography variant="subtitle2" color="text.secondary" fontWeight={700}>Neumáticos disponibles</Typography>
               <Typography variant="caption" color="text.disabled">Haz clic en uno o varios para seleccionarlos</Typography>
@@ -300,7 +307,7 @@ export const ModalVentaNeumatico = ({ open, onClose, onSuccess }: ModalVentaNeum
 
             {seleccionados.length > 0 && (
               <div className="mt-3 rounded-lg bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/30 p-2.5">
-                <div className="flex items-center justify-between mb-1.5">
+                <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-0.5 mb-1.5">
                   <span className="text-sm text-rose-700 dark:text-rose-300 font-semibold">
                     {seleccionados.length} neumático(s) seleccionado(s)
                   </span>
@@ -330,7 +337,7 @@ export const ModalVentaNeumatico = ({ open, onClose, onSuccess }: ModalVentaNeum
             )}
           </Card>
 
-          <Card sx={{ p: 2.5, borderRadius: 2.5, border: '1px solid var(--border)' }} elevation={0}>
+          <Card sx={{ p: { xs: 1.5, md: 2.5 }, borderRadius: 2.5, border: '1px solid var(--border)' }} elevation={0}>
             <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 2 }}>
               Datos de la venta
             </Typography>
@@ -361,7 +368,16 @@ export const ModalVentaNeumatico = ({ open, onClose, onSuccess }: ModalVentaNeum
         </Stack>
       </DialogContent>
 
-      <DialogActions sx={{ px: 3, py: 1.5, borderTop: '1px solid', borderColor: 'divider' }}>
+      <DialogActions
+        sx={{
+          px: { xs: 2, md: 3 }, py: 1.5,
+          pb: { xs: 'max(12px, env(safe-area-inset-bottom, 0px))', md: 1.5 },
+          borderTop: '1px solid', borderColor: 'divider',
+          flexDirection: { xs: 'column-reverse', sm: 'row' },
+          gap: 1,
+          '& > button': { width: { xs: '100%', sm: 'auto' }, m: '0 !important' },
+        }}
+      >
         <ButtonCustom onClick={handleClose}>
           Cerrar
         </ButtonCustom>

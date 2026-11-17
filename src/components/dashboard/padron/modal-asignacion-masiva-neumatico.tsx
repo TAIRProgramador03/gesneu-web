@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react"
-import { Dialog, DialogContent, DialogTitle, DialogActions, Typography, Box, IconButton } from '@mui/material';
+import { Dialog, DialogContent, DialogTitle, DialogActions, Typography, Box, IconButton, useMediaQuery } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import {
   Ban,
   ChevronDown,
@@ -344,6 +345,10 @@ export const ModalAsignacionMasivaNeumatico = ({ open, onClose, onSuccess }: Mod
     setTabActiva('aprobadas');
   };
 
+  const theme = useTheme();
+  // Por debajo de md el modal ocupa toda la pantalla: una ventana flotante de 85vh no deja sitio útil.
+  const esMovil = useMediaQuery(theme.breakpoints.down('md'));
+
   const subtitulo = paso === 'carga'
     ? 'Paso 1: Cargar archivo'
     : paso === 'procesando'
@@ -356,11 +361,21 @@ export const ModalAsignacionMasivaNeumatico = ({ open, onClose, onSuccess }: Mod
       onClose={handleIntentarCerrar}
       maxWidth="lg"
       fullWidth
-      PaperProps={{ sx: { borderRadius: 3, overflow: 'hidden', height: '85vh', display: 'flex', flexDirection: 'column' } }}
+      fullScreen={esMovil}
+      PaperProps={{
+        sx: {
+          borderRadius: esMovil ? 0 : 3,
+          overflow: 'hidden',
+          height: esMovil ? '100dvh' : '85dvh',
+          maxHeight: '100dvh',
+          display: 'flex',
+          flexDirection: 'column',
+        },
+      }}
     >
       <Box sx={{ height: 4, background: 'linear-gradient(90deg, #3b82f6 0%, #6366f1 100%)', flexShrink: 0 }} />
 
-      <DialogTitle sx={{ pb: 1.5, pt: 2, display: 'flex', alignItems: 'center', gap: 1.5, borderBottom: '1px solid', borderColor: 'divider', flexShrink: 0 }}>
+      <DialogTitle sx={{ pb: 1.5, pt: 2, px: { xs: 2, md: 3 }, display: 'flex', alignItems: 'center', gap: 1.5, borderBottom: '1px solid', borderColor: 'divider', flexShrink: 0 }}>
         <Box sx={{
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           width: 40, height: 40, borderRadius: 2, flexShrink: 0,
@@ -369,26 +384,26 @@ export const ModalAsignacionMasivaNeumatico = ({ open, onClose, onSuccess }: Mod
           <Sheet size={20} className="text-blue-600 dark:text-blue-300" />
         </Box>
         <Box sx={{ flex: 1, minWidth: 0 }}>
-          <Typography variant="h6" fontWeight={700} lineHeight={1.2}>
-            Asignación Masiva de Neumáticos
+          <Typography variant="h6" fontWeight={700} lineHeight={1.2} sx={{ fontSize: { xs: '1.05rem', md: '1.25rem' } }}>
+            Asignación masiva de neumáticos
           </Typography>
           <Typography variant="body2" color="text.secondary">
             {subtitulo}
           </Typography>
         </Box>
-        <IconButton size="small" onClick={handleIntentarCerrar}>
+        <IconButton size="small" onClick={handleIntentarCerrar} aria-label="Cerrar">
           <X size={18} />
         </IconButton>
       </DialogTitle>
 
-      <DialogContent sx={{ p: 3, bgcolor: 'var(--superficie-1)', flex: 1, overflowY: 'auto', position: 'relative' }}>
+      <DialogContent sx={{ p: { xs: 2, md: 3 }, bgcolor: 'var(--superficie-1)', flex: 1, minHeight: 0, overflowY: 'auto', position: 'relative' }}>
 
         {confirmandoCierre && (
           <Box sx={{
             position: 'absolute', inset: 0, zIndex: 10, bgcolor: 'rgba(15, 23, 42, 0.45)',
             display: 'flex', alignItems: 'center', justifyContent: 'center', p: 3,
           }}>
-            <Box sx={{ bgcolor: 'white', borderRadius: 3, p: 3, maxWidth: 380, textAlign: 'center', boxShadow: 6 }}>
+            <Box sx={{ bgcolor: 'background.paper', borderRadius: 3, p: 3, width: '100%', maxWidth: 380, textAlign: 'center', boxShadow: 6 }}>
               <Box sx={{
                 width: 56, height: 56, borderRadius: '50%', mx: 'auto', mb: 2,
                 background: 'linear-gradient(135deg, #fef9c3 0%, #fef08a 100%)',
@@ -402,7 +417,7 @@ export const ModalAsignacionMasivaNeumatico = ({ open, onClose, onSuccess }: Mod
               <Typography variant="body2" color="text.secondary" sx={{ mb: 2.5 }}>
                 El archivo se está procesando. Si cierras ahora, se perderá el progreso.
               </Typography>
-              <Box sx={{ display: 'flex', gap: 1.5, justifyContent: 'center' }}>
+              <Box sx={{ display: 'flex', flexDirection: { xs: 'column-reverse', sm: 'row' }, gap: 1.5, justifyContent: 'center', '& > button': { width: { xs: '100%', sm: 'auto' } } }}>
                 <ButtonCustom variant="outline" onClick={() => setConfirmandoCierre(false)}>
                   Continuar procesando
                 </ButtonCustom>
@@ -426,7 +441,7 @@ export const ModalAsignacionMasivaNeumatico = ({ open, onClose, onSuccess }: Mod
               }}
               onClick={() => inputRef.current?.click()}
               className={cn(
-                "flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed py-10 px-6 cursor-pointer transition-colors mt-4",
+                "flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed py-8 px-4 text-center cursor-pointer transition-colors mt-2 md:mt-4 md:py-10 md:px-6",
                 dragActive ? "border-blue-500 bg-blue-50 dark:bg-blue-500/10" : "border-slate-300 dark:border-slate-600 bg-white dark:bg-card hover:bg-slate-50 dark:hover:bg-superficie-1"
               )}
             >
@@ -445,14 +460,14 @@ export const ModalAsignacionMasivaNeumatico = ({ open, onClose, onSuccess }: Mod
                   }}>
                     <FileSpreadsheet size={22} className="text-green-600 dark:text-green-300" />
                   </Box>
-                  <Typography variant="body2" fontWeight={600}>{archivo.name}</Typography>
-                  <Typography variant="caption" color="text.secondary">Haz clic para elegir otro archivo</Typography>
+                  <Typography variant="body2" fontWeight={600} sx={{ wordBreak: 'break-all' }}>{archivo.name}</Typography>
+                  <Typography variant="caption" color="text.secondary">{esMovil ? 'Toca para elegir otro archivo' : 'Haz clic para elegir otro archivo'}</Typography>
                 </>
               ) : (
                 <>
                   <UploadCloud size={30} className="text-slate-400" />
                   <Typography variant="body2" fontWeight={600} color="text.secondary">
-                    Arrastra el archivo Excel aquí o haz clic para seleccionarlo
+                    {esMovil ? 'Toca aquí para elegir el archivo Excel' : 'Arrastra el archivo Excel aquí o haz clic para seleccionarlo'}
                   </Typography>
                   <Typography variant="caption" color="text.disabled">Formatos admitidos: .xlsx, .xls</Typography>
                 </>
@@ -505,7 +520,7 @@ export const ModalAsignacionMasivaNeumatico = ({ open, onClose, onSuccess }: Mod
                   : { grad: 'from-red-500 to-red-600', text: 'text-red-600 dark:text-red-300', bg: 'bg-red-50 dark:bg-red-500/10', border: 'border-red-200 dark:border-red-500/30' };
 
               return (
-                <div className="grid grid-cols-4 gap-3 mb-4 mt-4">
+                <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-4 mb-4 mt-2 md:mt-4">
                   <div className="rounded-xl bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/30 px-3 py-3 flex items-center gap-2.5">
                     <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-linear-to-br from-indigo-500 to-blue-600 shrink-0">
                       <ListChecks size={18} className="text-white" />
@@ -554,7 +569,7 @@ export const ModalAsignacionMasivaNeumatico = ({ open, onClose, onSuccess }: Mod
                 type="button"
                 onClick={() => setTabActiva('aprobadas')}
                 className={cn(
-                  "px-3 py-2 text-sm font-medium border-b-2 -mb-px transition-colors",
+                  "flex-1 sm:flex-none px-3 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors",
                   tabActiva === 'aprobadas' ? "border-blue-600 text-blue-600 dark:text-blue-300" : "border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
                 )}
               >
@@ -564,7 +579,7 @@ export const ModalAsignacionMasivaNeumatico = ({ open, onClose, onSuccess }: Mod
                 type="button"
                 onClick={() => setTabActiva('rechazadas')}
                 className={cn(
-                  "px-3 py-2 text-sm font-medium border-b-2 -mb-px transition-colors",
+                  "flex-1 sm:flex-none px-3 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors",
                   tabActiva === 'rechazadas' ? "border-red-600 text-red-600 dark:text-red-300" : "border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
                 )}
               >
@@ -587,13 +602,13 @@ export const ModalAsignacionMasivaNeumatico = ({ open, onClose, onSuccess }: Mod
                         onClick={() => handleTogglePlaca(fila.placa)}
                         className="w-full flex items-center justify-between px-3 py-2.5 text-left hover:bg-slate-50 dark:hover:bg-superficie-1"
                       >
-                        <div className="flex items-center gap-2">
+                        <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
                           <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">{fila.placa}</span>
                           <span className="inline-flex items-center rounded-md bg-slate-100 dark:bg-superficie-2 px-1.5 py-0.5 text-xs font-medium text-slate-600 dark:text-slate-300 ring-1 ring-inset ring-slate-200">
                             {fila.kilometraje.toLocaleString('es-PE')} km
                           </span>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex shrink-0 items-center gap-2">
                           <span className="text-xs text-slate-500 dark:text-slate-400">{fila.neumaticos.length} neumáticos</span>
                           <ChevronDown size={16} className={cn("text-slate-400 transition-transform", expandida && "rotate-180")} />
                         </div>
@@ -626,7 +641,7 @@ export const ModalAsignacionMasivaNeumatico = ({ open, onClose, onSuccess }: Mod
                         onClick={() => handleTogglePlaca(fila.placa)}
                         className="w-full flex items-center justify-between px-3 py-2.5 text-left hover:bg-slate-100 dark:hover:bg-superficie-2/60 dark:hover:bg-superficie-2/60"
                       >
-                        <div className="flex items-center gap-2">
+                        <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
                           <span className={cn("text-sm font-semibold", fila.arrastrada ? "text-slate-600 dark:text-slate-300" : "text-slate-800 dark:text-slate-100")}>
                             {fila.placa}
                           </span>
@@ -634,7 +649,7 @@ export const ModalAsignacionMasivaNeumatico = ({ open, onClose, onSuccess }: Mod
                             {fila.kilometraje.toLocaleString('es-PE')} km
                           </span>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex shrink-0 items-center gap-2">
                           <span className="text-xs text-slate-500 dark:text-slate-400">{fila.neumaticos.length} neumáticos</span>
                           <ChevronDown size={16} className={cn("text-slate-400 transition-transform", expandida && "rotate-180")} />
                         </div>
@@ -658,7 +673,19 @@ export const ModalAsignacionMasivaNeumatico = ({ open, onClose, onSuccess }: Mod
         )}
       </DialogContent>
 
-      <DialogActions sx={{ px: 3, py: 1.5, borderTop: '1px solid', borderColor: 'divider', flexShrink: 0 }}>
+      <DialogActions
+        sx={{
+          px: { xs: 2, md: 3 },
+          py: 1.5,
+          pb: { xs: 'max(12px, env(safe-area-inset-bottom, 0px))', md: 1.5 },
+          borderTop: '1px solid',
+          borderColor: 'divider',
+          flexShrink: 0,
+          flexDirection: { xs: 'column-reverse', sm: 'row' },
+          gap: 1,
+          '& > button': { width: { xs: '100%', sm: 'auto' }, m: '0 !important' },
+        }}
+      >
         {paso === 'carga' && (
           <>
             <ButtonCustom onClick={handleIntentarCerrar}>

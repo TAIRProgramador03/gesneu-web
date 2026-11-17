@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { Spinner } from '@/components/ui/spinner';
 import { Button, ButtonProps } from './button';
+import { cn } from '@/lib/utils';
 
 interface LoadingButtonProps extends Omit<ButtonProps, 'onClick'> {
   onClick?: () => Promise<void> | void;
@@ -27,7 +28,7 @@ export function LoadingButton2({ icon, onClick, disabled, children, ...props }: 
       {...props}
       onClick={handleClick}
       disabled={loading || disabled}
-      className='cursor-pointer'
+      className={cn('cursor-pointer', props.className)}
     >
       {
         loading ? <Spinner /> : icon

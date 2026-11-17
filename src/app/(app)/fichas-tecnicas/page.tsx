@@ -1,7 +1,10 @@
 'use client';
 
 import React, { useMemo, useState } from 'react';
-import { ArrowUpRight, FileText, FileX2, Search } from 'lucide-react';
+import { ArrowUpRight, FileStack, FileText, FileX2, Search } from 'lucide-react';
+
+import { EncabezadoPagina } from '@/components/ui/EncabezadoPagina';
+import { Tarjeta } from '@/components/ui/Tarjeta';
 
 type TipoRodadura = 'A/T' | 'H/T' | 'M/T' | 'MIXTA';
 type Marca = 'Hankook' | 'Marshall' | 'Pirelli';
@@ -74,19 +77,16 @@ export default function Page(): React.JSX.Element {
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Encabezado */}
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-[#002141]">Fichas Técnicas</h1>
-          <p className="text-sm text-gray-500 dark:text-slate-400">Consulta las fichas técnicas de neumáticos en PDF.</p>
-        </div>
-        <span className="rounded-full bg-[#002141]/5 px-3 py-1 text-xs font-semibold text-[#002141]">
-          {fichasFiltradas.length} {fichasFiltradas.length === 1 ? 'ficha' : 'fichas'}
-        </span>
-      </div>
+      <EncabezadoPagina
+        icono={<FileStack className="size-5" />}
+        degradado="from-indigo-500 to-indigo-800"
+        titulo="Fichas técnicas"
+        descripcion="Consulta las fichas técnicas de neumáticos en PDF."
+        contador={`${fichasFiltradas.length} ${fichasFiltradas.length === 1 ? 'ficha' : 'fichas'}`}
+      />
 
       {/* Controles: búsqueda + filtros */}
-      <div className="flex flex-col gap-4 rounded-2xl border border-gray-100 dark:border-slate-800 bg-white dark:bg-card p-4 shadow-sm">
+      <Tarjeta className="flex flex-col gap-4">
         {/* Barra de búsqueda */}
         <div className="relative w-full">
           <Search className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
@@ -127,7 +127,7 @@ export default function Page(): React.JSX.Element {
             );
           })}
         </div>
-      </div>
+      </Tarjeta>
 
       {/* Grid de tarjetas */}
       {fichasFiltradas.length === 0 ? (

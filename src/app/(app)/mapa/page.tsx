@@ -2,8 +2,10 @@
 
 import * as React from 'react';
 import dynamic from 'next/dynamic';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
+import { MapPin } from 'lucide-react';
+
+import { EncabezadoPagina } from '@/components/ui/EncabezadoPagina';
+import { Tarjeta } from '@/components/ui/Tarjeta';
 
 const MapaTalleres = dynamic(
   () => import('@/components/dashboard/mapa/MapaTalleres').then((m) => m.MapaTalleres),
@@ -12,23 +14,17 @@ const MapaTalleres = dynamic(
 
 export default function Page(): React.JSX.Element {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-      {/* Header */}
-      <div>
-        <h2 style={{ fontSize: '1.5rem', fontWeight: 800, margin: 0, marginBottom: 4, color: 'var(--foreground)' }}>
-          Mapa de Talleres
-        </h2>
-        <p style={{ margin: 0, fontSize: '1rem', color: 'var(--texto-apagado)' }}>
-          Distribución geográfica de la flota por taller
-        </p>
-      </div>
+    <div className="flex flex-col gap-6">
+      <EncabezadoPagina
+        icono={<MapPin className="size-5" />}
+        degradado="from-emerald-500 to-emerald-800"
+        titulo="Mapa de talleres"
+        descripcion="Distribución geográfica de la flota por taller."
+      />
 
-      {/* Mapa */}
-      <Card>
-        <CardContent sx={{ p: '20px !important', height: 700 }}>
-          <MapaTalleres />
-        </CardContent>
-      </Card>
+      <Tarjeta className="h-175 max-h-[80dvh] min-h-[420px] p-3 sm:p-5">
+        <MapaTalleres />
+      </Tarjeta>
     </div>
   );
 }

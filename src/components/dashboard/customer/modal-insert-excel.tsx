@@ -19,10 +19,9 @@ interface ModalInsertExcelProps {
 
 const Overlay = styled.div`
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
+  inset: 0;
+  box-sizing: border-box;
+  padding: 12px;
   background: rgba(0,0,0,0.5);
   z-index: 1300;
   display: flex;
@@ -31,11 +30,18 @@ const Overlay = styled.div`
 `;
 
 const ModalBox = styled.div`
-  background: #fff;
+  background: var(--card, #fff);
+  color: var(--foreground, inherit);
   border-radius: 18px;
-  padding: 38px 32px 28px 32px;
-  min-width: 340px;
-  max-width: 95vw;
+  box-sizing: border-box;
+  padding: 26px 18px 20px 18px;
+  width: 100%;
+  max-width: 440px;
+  max-height: 100%;
+  overflow-y: auto;
+  @media (min-width: 600px) {
+    padding: 38px 32px 28px 32px;
+  }
   box-shadow: 0 10px 40px 0 rgba(25, 118, 210, 0.18), 0 1.5px 8px 0 rgba(0,0,0,0.10);
   display: flex;
   flex-direction: column;
@@ -51,7 +57,8 @@ const DropArea = styled.label<{ dragActive: boolean }>`
   border: 2.5px dashed #1976d2;
   background: ${({ dragActive }) => dragActive ? '#e3f2fd' : '#f5faff'};
   border-radius: 12px;
-  width: 340px;
+  box-sizing: border-box;
+  width: 100%;
   min-height: 120px;
   display: flex;
   flex-direction: column;
@@ -95,8 +102,22 @@ const InfoBar = styled.div`
 
 const Actions = styled.div`
   display: flex;
-  gap: 18px;
+  flex-direction: column-reverse;
+  gap: 10px;
   margin-top: 22px;
+  width: 100%;
+  & > button {
+    width: 100%;
+  }
+  @media (min-width: 600px) {
+    flex-direction: row;
+    justify-content: center;
+    gap: 18px;
+    width: auto;
+    & > button {
+      width: auto;
+    }
+  }
 `;
 
 const ImportButton = styled(Button)`
@@ -116,7 +137,7 @@ const CancelButton = styled(Button)`
   font-weight: 600;
   color: #c62828;
   border: 1.5px solid #ffcdd2;
-  background: #fff;
+  background: var(--card, #fff);
   &:hover {
     background: #ffcdd2;
     color: #fff;

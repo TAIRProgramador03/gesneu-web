@@ -25,8 +25,18 @@ const toGroupKey = (mov: NeumaticoDelHistorial) => {
   return `${fecha}_${mov.ID_ACCION_REALIZADA}`
 }
 
+// Grupos del filtro, por ID_ACCION_REALIZADA (2 montaje · 4 rotación · 5 baja · 6 recupero · 7 inspección)
+const FILTROS: { id: string; label: string; acciones: number[] | null }[] = [
+  { id: 'todos', label: 'Todos', acciones: null },
+  { id: 'montajes', label: 'Montajes', acciones: [2] },
+  { id: 'inspecciones', label: 'Inspecciones', acciones: [7] },
+  { id: 'rotaciones', label: 'Rotaciones', acciones: [4] },
+  { id: 'bajas', label: 'Bajas', acciones: [5, 6] },
+]
+
 export const PlacaTimeline = ({ movimientos }: { movimientos: NeumaticoDelHistorial[] }) => {
   const [showAll, setShowAll] = useState(false)
+  const [filtro, setFiltro] = useState('todos')
 
   const agrupados = useMemo(() => {
     const map = new Map<string, MovimientoAgrupado>()
@@ -53,6 +63,11 @@ export const PlacaTimeline = ({ movimientos }: { movimientos: NeumaticoDelHistor
     )
   }, [movimientos])
 
+  const grupo = FILTROS.find((f) => f.id === filtro)?.acciones ?? null
+  const filtrados = grupo ? agrupados.filter((g) => grupo.includes(g.ID_ACCION_REALIZADA)) : agrupados
+  // Sólo se ofrecen los filtros que tienen algo que mostrar
+  const filtrosDisponibles = FILTROS.filter((f) => !f.acciones || agrupados.some((g) => f.acciones!.includes(g.ID_ACCION_REALIZADA)))
+
   if (agrupados.length === 0) {
     return (
       <CollapsibleSection title="Línea de Tiempo" icon={<Clock className="size-4" />}>
@@ -67,7 +82,7 @@ export const PlacaTimeline = ({ movimientos }: { movimientos: NeumaticoDelHistor
     )
   }
 
-  const visible = showAll ? agrupados : agrupados.slice(0, 6)
+  const visible = showAll ? filtrados : filtrados.slice(0, 6)
 
   return (
     <CollapsibleSection
@@ -75,12 +90,32 @@ export const PlacaTimeline = ({ movimientos }: { movimientos: NeumaticoDelHistor
       icon={<Clock className="size-4" />}
       headerRight={
         <span className="text-xs font-medium text-gray-400 bg-gray-100 dark:bg-superficie-2 rounded-full px-2.5 py-0.5">
-          {agrupados.length} eventos
+          {filtrados.length} eventos
         </span>
       }
-      border="border-sky-500"
+      border="border-indigo-500"
     >
       <div>
+        {filtrosDisponibles.length > 2 && (
+          <div className="mb-4 flex flex-wrap gap-1.5" role="group" aria-label="Filtrar movimientos">
+            {filtrosDisponibles.map((f) => (
+              <button
+                key={f.id}
+                type="button"
+                aria-pressed={filtro === f.id}
+                onClick={() => { setFiltro(f.id); setShowAll(false) }}
+                className={cn(
+                  'rounded-full border px-3 py-1 text-xs font-medium transition-colors',
+                  filtro === f.id
+                    ? 'border-transparent bg-sky-50 font-semibold text-sky-700 dark:bg-sky-500/15 dark:text-sky-300'
+                    : 'bg-card text-texto-apagado hover:text-foreground'
+                )}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
+        )}
         {visible.map((mov, idx) => (
           <PlacaTimelineEventCard
             key={mov.groupKey}
@@ -89,14 +124,14 @@ export const PlacaTimeline = ({ movimientos }: { movimientos: NeumaticoDelHistor
           />
         ))}
 
-        {agrupados.length > 6 && (
+        {filtrados.length > 6 && (
           <div className="flex justify-center pt-2">
             <button
               type="button"
               onClick={() => setShowAll(!showAll)}
               className="inline-flex items-center gap-1.5 text-xs font-medium text-sky-700 dark:text-sky-300 hover:text-sky-900 dark:hover:text-sky-200 bg-sky-50 dark:bg-sky-500/10 hover:bg-sky-100 dark:hover:bg-sky-500/15 rounded-full px-5 py-2 transition-colors"
             >
-              {showAll ? 'Mostrar menos' : `Ver los ${agrupados.length} eventos`}
+              {showAll ? 'Mostrar menos' : `Ver los ${filtrados.length} eventos`}
               <ChevronDown className={cn('size-3.5 transition-transform', showAll && 'rotate-180')} />
             </button>
           </div>

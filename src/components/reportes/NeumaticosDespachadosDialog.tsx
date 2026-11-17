@@ -35,6 +35,7 @@ export const NeumaticosDespachadosDialog = ({ data: dataDonnut, talleresSeleccio
   return (
     <div>
       <DataTableNeumaticos
+        tarjetasEnMovil
         columns={columnsRelacionNeumaticoDespachados}
         data={neumaticosDespachados}
         type='pagination'

@@ -16,6 +16,8 @@ import { es } from "date-fns/locale/es";
 import { MultiSearchSelect } from "../ui/multiple-select";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Button } from "../ui/button";
+import { EncabezadoPagina } from "../ui/EncabezadoPagina";
+import { Tarjeta } from "../ui/Tarjeta";
 import { capitalizeCustomString } from "@/lib/utils";
 import { NeumaticosDespachadosDialog } from "./NeumaticosDespachadosDialog";
 
@@ -57,12 +59,8 @@ function StatPill({ label, value, accent, muted }: StatPillProps) {
   const isDark = theme.palette.mode === 'dark';
   return (
     <div
-      className="group flex items-stretch gap-3 rounded-xl border shadow-sm transition-all hover:-translate-y-0.5 hover:shadow"
-      style={{
-        minWidth: 104, paddingLeft: 4, paddingRight: 16, paddingTop: 8, paddingBottom: 8,
-        background: isDark ? '#1e293b' : '#fff',
-        borderColor: isDark ? '#334155' : '#f1f5f9',
-      }}
+      className="group flex items-stretch gap-3 rounded-xl border bg-card shadow-sm transition-all hover:-translate-y-0.5 hover:shadow"
+      style={{ minWidth: 104, paddingLeft: 4, paddingRight: 16, paddingTop: 8, paddingBottom: 8 }}
     >
       <span className="w-1 rounded-full" style={{ background: accent }} />
       <div className="flex flex-col justify-center">
@@ -204,35 +202,19 @@ export default function ReporteConsumos() {
 
   return (
     <div style={{
-      background: theme.palette.background.default, minHeight: "100vh", padding: "28px 32px", color: theme.palette.text.primary,
+      color: theme.palette.text.primary,
     }}>
 
-      <div style={{ marginBottom: 28, display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: 16 }}>
-        <div>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
-            <div style={{
-              width: 36, height: 36, borderRadius: 10,
-              background: "linear-gradient(135deg, #0c87da, #00538a)",
-              display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
-            }}>
-              <PackageSearch size={18} color="#fff" strokeWidth={2.5} />
-            </div>
-            <h1 style={{ fontSize: '1.375rem', fontWeight: 700, color: theme.palette.text.primary, margin: 0, letterSpacing: "-0.4px" }}>
-              Análisis por consumos
-            </h1>
-          </div>
-          <p style={{ fontSize: '0.875rem', color: theme.palette.text.secondary, margin: 0 }}>
-            Análisis por consumos de neumáticos que se generan a través del SIALOG.
-          </p>
-        </div>
-      </div>
+      <EncabezadoPagina
+        className="mb-6"
+        icono={<PackageSearch className="size-5" strokeWidth={2.5} />}
+        degradado="from-sky-500 to-sky-800"
+        titulo="Análisis por consumos"
+        descripcion="Análisis por consumos de neumáticos que se generan a través del SIALOG."
+      />
 
       {/* Filtros */}
-      <div style={{
-        background: isDark ? '#1e293b' : '#fff', borderRadius: 14, border: `1px solid ${isDark ? '#334155' : '#e2e8f0'}`,
-        padding: "20px 24px", marginBottom: 24,
-      }}
-      >
+      <Tarjeta className="mb-6 sm:p-6">
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
           <span style={{ fontSize: '0.875rem', fontWeight: 600, color: theme.palette.text.primary }}>Filtros:</span>
           {hayFiltrosActivos && (
@@ -292,17 +274,11 @@ export default function ReporteConsumos() {
             <DatePicker value={fechaFin} onChange={setFechaFin} placeholder="Todas" />
           </div>
         </div>
-      </div>
+      </Tarjeta>
 
 
       {/* Gráfico para la distribución de consumos de salidas de S60 de neumáticos */}
-      <div
-        className="rounded-2xl border border-t-[5px] shadow-sm transition-shadow hover:shadow-md"
-        style={{
-          background: isDark ? '#1e293b' : '#fff', padding: "20px 24px", marginBottom: 24,
-          borderColor: isDark ? '#334155' : '#e2e8f0', borderTopColor: "#107569",
-        }}
-      >
+      <Tarjeta acento="#107569" franja esquina interactiva className="sm:p-6 mb-6">
         {/* Header + stats */}
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: 16, marginBottom: 18 }}>
           <div>
@@ -385,7 +361,7 @@ export default function ReporteConsumos() {
               </>
             )
         }
-      </div>
+      </Tarjeta>
 
 
       {/* ------------ Modal: Despacho por taller ----------- */}

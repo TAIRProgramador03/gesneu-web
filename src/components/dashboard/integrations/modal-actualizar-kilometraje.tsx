@@ -1,5 +1,6 @@
 
-import { Box, Card, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typography } from '@mui/material';
+import { Box, Card, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typography, useMediaQuery } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { ClipboardList, CloudBackup, CloudCheck, RefreshCw, ShieldCheck, Tally1 } from 'lucide-react';
 import React from 'react'
 import { Button as ButtonCustom } from '@/components/ui/button';
@@ -12,17 +13,20 @@ interface ModalActualizarKilometraje {
 }
 
 export const ModalActualizarKilometraje = ({ open, onClose, placa }: ModalActualizarKilometraje) => {
+  const theme = useTheme();
+  const esPantallaChica = useMediaQuery(theme.breakpoints.down('md'));
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth
+      fullScreen={esPantallaChica}
       PaperProps={{
-        sx: { borderRadius: 3, overflow: 'hidden' }
+        sx: { borderRadius: { xs: 0, md: 3 }, overflow: 'hidden' }
       }}
     >
       {/* Franja de color superior */}
       <Box sx={{ height: 4, background: 'linear-gradient(90deg, #3b82f6 0%, #6366f1 100%)' }} />
 
-      <DialogTitle sx={{ pb: 1.5, pt: 2, display: 'flex', alignItems: 'center', gap: 1.5, borderBottom: '1px solid', borderColor: 'divider' }}>
+      <DialogTitle sx={{ pb: 1.5, pt: 2, px: { xs: 2, md: 3 }, display: 'flex', alignItems: 'center', gap: 1.5, borderBottom: '1px solid', borderColor: 'divider' }}>
         <Box sx={{
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           width: 40, height: 40, borderRadius: 2,
@@ -31,7 +35,7 @@ export const ModalActualizarKilometraje = ({ open, onClose, placa }: ModalActual
         }}>
           <CloudBackup size={20} className="text-blue-600 dark:text-blue-300" />
         </Box>
-        <Box sx={{ flex: 1 }}>
+        <Box sx={{ flex: 1, minWidth: 0 }}>
           <Typography variant="h6" fontWeight={700} lineHeight={1.2}>
             Actualizar Kilometraje
           </Typography>
@@ -52,9 +56,9 @@ export const ModalActualizarKilometraje = ({ open, onClose, placa }: ModalActual
         </Box>
       </DialogTitle>
 
-      <DialogContent sx={{ pt: 2, bgcolor: 'var(--superficie-1)' }}>
+      <DialogContent sx={{ pt: 2, px: { xs: 1.5, md: 3 }, bgcolor: 'var(--superficie-1)' }}>
 
-        <Card sx={{ flex: 1, p: 2.5, borderRadius: 2.5, border: '1px solid var(--border)', marginTop: '10px' }} elevation={0}>
+        <Card sx={{ flex: 1, p: { xs: 1.5, md: 2.5 }, borderRadius: 2.5, border: '1px solid var(--border)', marginTop: '10px' }} elevation={0}>
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
             <h4>Hola a todos!</h4>
           </Box>
@@ -71,7 +75,7 @@ export const ModalActualizarKilometraje = ({ open, onClose, placa }: ModalActual
         </Card>
       </DialogContent>
 
-      <DialogActions sx={{ px: 3, py: 1.5, borderTop: '1px solid', borderColor: 'divider' }}>
+      <DialogActions sx={{ px: { xs: 2, md: 3 }, py: 1.5, pb: { xs: 'max(12px, env(safe-area-inset-bottom, 0px))', md: 1.5 }, borderTop: '1px solid', borderColor: 'divider', flexDirection: { xs: 'column', sm: 'row' }, gap: 1, '& > button': { width: { xs: '100%', sm: 'auto' }, m: '0 !important' } }}>
         <LoadingButton2
           variant="primary"
           icon={<CloudCheck />}

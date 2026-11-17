@@ -1348,3 +1348,110 @@ export const obtenerPendientesColaS60 = async (limite = 900) => {
   });
   return response.data;
 };
+
+/* =====================================================================
+ * Reporte de cambio de neumáticos
+ *
+ * Una S60 ya regularizada es el acta de un cambio: qué salió y qué entró.
+ * El backend devuelve eso agrupado por comprobante y el PDF se arma en el
+ * navegador (`src/utils/reporte-cambio-pdf.ts`).
+ * ===================================================================== */
+
+/** Un neumático dentro de una línea del reporte. */
+export interface NeumaticoReporteCambio {
+  codigo: string;
+  marca: string | null;
+  medida: string | null;
+  diseno: string | null;
+  /** Lo medido en el momento del cambio. Null si la línea quedó sin enlace al movimiento. */
+  remanente: number | null;
+  presion: number | null;
+  posicion: string | null;
+}
+
+export interface LineaReporteCambio {
+  correlativo: number;
+  par: string;
+  posicion: string | null;
+  sale: NeumaticoReporteCambio & {
+    /** Qué se hizo con el que salió: Recuperado, Baja definitiva… */
+    accion: string | null;
+    tipoBaja: string | null;
+    kmEtapa: number | null;
+  };
+  entra: NeumaticoReporteCambio & { torque: number | null };
+}
+
+/** Un neumático montado en el vehículo, reconstruido del historial. */
+export interface NeumaticoMontado {
+  posicion: string;
+  codigo: string;
+  marca: string | null;
+  medida: string | null;
+  diseno: string | null;
+  remanente: number | null;
+  presion: number | null;
+}
+
+export interface ReporteCambioS60 {
+  /** `almacén-comprobante`; identifica la S60 y sirve de key en las listas. */
+  clave: string;
+  almacen: string;
+  comprobante: number;
+  /** Numéricos crudos del ERP (AAAAMMDD y HHMMSS), por si hay que ordenar. */
+  fecha: number;
+  hora: number;
+  fechaTexto: string;
+  horaTexto: string;
+  placa: string;
+  taller: string | null;
+  usuario: string | null;
+  /** N° de orden de trabajo, de la cabecera de la S60 en el ERP (TMOVH.MHREF6). */
+  ot: string | null;
+  /** Tipo de vehículo según `PO_VEHICULO.RECMEN2` (PICK-UP 4x4, SUV, CAMION…). */
+  tipoVehiculo: string | null;
+  /** Mecánico de la O.T. Nombre completo, o su código si no se pudo resolver. */
+  mecanico: string | null;
+  /** Supervisor que calificó la O.T. Nombre completo, o su código (p. ej. `RQUISPE`). */
+  supervisor: string | null;
+  /** Hora de entrada al taller, de la O.T. Ya formateada: `09:00 AM`. */
+  horaIngreso: string | null;
+  /** Hora de salida del taller, de la O.T. Ya formateada: `10:00 AM`. */
+  horaSalida: string | null;
+  /**
+   * Juego completo que quedó montado justo después del cambio: los que
+   * entraron más los que nadie tocó.
+   *
+   * Es una **reconstrucción** del historial de movimientos, no un dato
+   * guardado, y sólo viene al pedir un reporte concreto (`obtenerReporteCambio`).
+   * En el listado llega vacío.
+   */
+  montados?: NeumaticoMontado[];
+  odometro: number | null;
+  observacion: string | null;
+  lineas: LineaReporteCambio[];
+}
+
+export const obtenerReportesCambioPorPlaca = async (placa: string) => {
+  const response = await axios.get<{ total: number; reportes: ReporteCambioS60[] }>(
+    `/api/cola-s60/reportes/${encodeURIComponent(placa.trim())}`,
+    { withCredentials: true }
+  );
+  return response.data;
+};
+
+/**
+ * Un reporte concreto, con `montados` (el juego completo tras el cambio).
+ *
+ * Se pide al imprimir y no al listar: esa reconstrucción cuesta una consulta
+ * por S60 y la lista no la necesita.
+ */
+export const obtenerReporteCambio = async (placa: string, almacen: string, comprobante: number) => {
+  const response = await axios.get<{ reporte: ReporteCambioS60 }>(
+    `/api/cola-s60/reportes/${encodeURIComponent(placa.trim())}/${encodeURIComponent(
+      almacen.trim()
+    )}/${comprobante}`,
+    { withCredentials: true }
+  );
+  return response.data.reporte;
+};

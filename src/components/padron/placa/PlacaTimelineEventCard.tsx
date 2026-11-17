@@ -197,6 +197,26 @@ export const PlacaTimelineEventCard = ({ mov, isLast }: { mov: MovimientoAgrupad
               </div>
             </div>
 
+            {/* Vista previa: qué neumáticos se tocaron, sin tener que abrir el evento */}
+            {!expanded && (
+              <div className="flex flex-wrap gap-1.5 px-3.5 pb-3">
+                {mov.NEUMATICOS.slice(0, 4).map((neu) => {
+                  const pos = neu.POSICION_NUEVA_EN_VEHICULO ?? neu.POSICION_ANTERIOR_EN_VEHICULO
+                  return (
+                    <span key={`${neu.CODIGO_NEUMATICO}-${neu.ID_MOVIMIENTO}`} className={cn('inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs', accent.chip)}>
+                      <b className="font-semibold">{neu.CODIGO_NEUMATICO}</b>
+                      {pos && <span className="opacity-80">· {pos}</span>}
+                    </span>
+                  )
+                })}
+                {mov.NEUMATICOS.length > 4 && (
+                  <span className="inline-flex items-center rounded-md bg-gray-100 px-2 py-0.5 text-xs text-gray-500 dark:bg-superficie-2 dark:text-slate-400">
+                    +{mov.NEUMATICOS.length - 4} más
+                  </span>
+                )}
+              </div>
+            )}
+
             {/* Expanded */}
             {expanded && (
               <div className="px-3.5 pb-3.5 border-t border-gray-50">

@@ -26,7 +26,7 @@ function CustomTooltipContent({ active, payload }: { active?: boolean; payload?:
   )
 }
 
-export const RemanenteChart = ({ historial, neu }: { historial: MovimientoHistorial[]; neu: NeumaticoBuscado }) => {
+export const RemanenteChart = ({ historial, neu, sinTarjeta = false }: { historial: MovimientoHistorial[]; neu: NeumaticoBuscado; /** Devuelve sólo el gráfico, sin la tarjeta: lo usa EvolucionCard. */ sinTarjeta?: boolean }) => {
 
   const chartData = useMemo<ChartDataPoint[]>(() => {
     return [...historial]
@@ -51,8 +51,7 @@ export const RemanenteChart = ({ historial, neu }: { historial: MovimientoHistor
   const strokeColor = pct < 39 ? "#ef4444" : pct < 79 ? "#eab308" : "#14b8a6"
   const fillColor = pct < 39 ? "#ef4444" : pct < 79 ? "#eab308" : "#14b8a6"
 
-  return (
-    <CollapsibleSection title="Evolución del Remanente" icon={<BarChart3 className="size-4" />} border='border-sky-500' >
+  const grafico = (
       <div className="h-70 w-full">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={chartData} margin={{ top: 8, right: 8, bottom: 0, left: -16 }}>
@@ -118,6 +117,13 @@ export const RemanenteChart = ({ historial, neu }: { historial: MovimientoHistor
           </AreaChart>
         </ResponsiveContainer>
       </div>
+  )
+
+  if (sinTarjeta) return grafico
+
+  return (
+    <CollapsibleSection title="Evolución del Remanente" icon={<BarChart3 className="size-4" />} border='border-sky-500' >
+      {grafico}
     </CollapsibleSection>
   )
 }

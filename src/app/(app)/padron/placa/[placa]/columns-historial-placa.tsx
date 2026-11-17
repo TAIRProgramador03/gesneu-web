@@ -34,6 +34,7 @@ export const columnsHistorialPlaca: ColumnDef<NeumaticoDelHistorial>[] = [
   },
   {
     accessorKey: 'ACCION_REALIZADA',
+    meta: { tarjeta: 'insignia' },
     header: 'Movimiento',
     cell: ({ row }) => (
       <AccionBadge tipo={row.original.ID_ACCION_REALIZADA} text={row.original.ACCION_REALIZADA} />

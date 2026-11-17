@@ -76,7 +76,7 @@ export const columnsNeuCriticos: ColumnDef<NeumaticoEnCritico>[] = [
   },
   {
     accessorKey: "PORCENTAJE_VIDA",
-    meta: { exportLabel: "Estado (%)" },
+    meta: { exportLabel: "Estado (%)", tarjeta: "ancho" },
     header: ({ column }) => {
       return (
         <Button

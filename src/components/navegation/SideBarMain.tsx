@@ -3,26 +3,35 @@ import React, { useEffect, useState } from 'react'
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import GlobalStyles from '@mui/material/GlobalStyles';
-import MenuIcon from '@mui/icons-material/Menu';
-import IconButton from '@mui/material/IconButton';
 
 import { AuthGuard } from '@/components/auth/auth-guard';
 import { MainNav } from '@/components/dashboard/layout/main-nav';
 import { SideNav } from '@/components/dashboard/layout/side-nav';
-import { MobileNav } from '@/components/dashboard/layout/mobile-nav';
+import { ANCHO_SIDENAV, ANCHO_SIDENAV_COLAPSADO } from '@/components/dashboard/layout/nav-constantes';
 
 export const SideBarMain = ({ children }: { children: React.ReactNode }) => {
   const [collapsed, setCollapsed] = useState<boolean>(false);
+  // Hasta leer lo guardado no se anima: así el menú no "se encoge" al abrir la app.
+  const [animar, setAnimar] = useState<boolean>(false);
 
   useEffect(() => {
-    setCollapsed(localStorage.getItem('sidebar-collapsed') === 'true');
+    try {
+      setCollapsed(localStorage.getItem('sidebar-collapsed') === 'true');
+    } catch {
+      // localStorage bloqueado: queda desplegado.
+    }
+    const id = requestAnimationFrame(() => setAnimar(true));
+    return () => cancelAnimationFrame(id);
   }, []);
 
   const handleSetCollapsed = (value: boolean) => {
     setCollapsed(value);
-    localStorage.setItem('sidebar-collapsed', String(value));
+    try {
+      localStorage.setItem('sidebar-collapsed', String(value));
+    } catch {
+      // sin persistencia, el cambio igual se aplica en esta sesión.
+    }
   };
-  const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
     <AuthGuard>
@@ -31,10 +40,8 @@ export const SideBarMain = ({ children }: { children: React.ReactNode }) => {
           body: {
             '--MainNav-height': '56px',
             '--MainNav-zIndex': 1000,
-            '--SideNav-width': '280px',
+            '--SideNav-width': `${ANCHO_SIDENAV}px`,
             '--SideNav-zIndex': 1100,
-            '--MobileNav-width': '320px',
-            '--MobileNav-zIndex': 1100,
           },
         }}
       />
@@ -48,48 +55,32 @@ export const SideBarMain = ({ children }: { children: React.ReactNode }) => {
           display: 'flex',
           flexDirection: 'column',
           position: 'relative',
-          height: '100vh',
+          // dvh: en el navegador del teléfono 100vh incluye la barra de direcciones
+          // y deja cortado el borde inferior.
+          height: '100dvh',
           overflow: 'hidden',
         }}
       >
-        {/* SideNav solo visible en escritorio */}
-        <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-          <SideNav collapsed={collapsed} setCollapsed={handleSetCollapsed} />
+        {/* SideNav fijo solo desde lg. Por debajo, el menú es el drawer que abre MainNav
+            (mismo breakpoint que el botón hamburguesa, para que nunca convivan). */}
+        <Box sx={{ display: { xs: 'none', lg: 'flex' } }}>
+          <SideNav collapsed={collapsed} setCollapsed={handleSetCollapsed} animar={animar} />
         </Box>
-
-        {/* Botón hamburguesa solo en móvil */}
-        {/* <IconButton
-          onClick={() => setMobileOpen(true)}
-          sx={{
-            position: 'fixed',
-            top: 16,
-            left: 16,
-            zIndex: 1300,
-            display: { xs: 'inline-flex', md: 'none' },
-            bgcolor: 'var(--card)',
-            boxShadow: 1,
-          }}
-        >
-          <MenuIcon />
-        </IconButton> */}
-
-        {/* Drawer móvil */}
-        <MobileNav open={mobileOpen} onClose={() => setMobileOpen(false)} />
 
         <Box
           sx={{
             display: 'flex',
             flex: '1 1 auto',
             flexDirection: 'column',
-            pl: { md: collapsed ? '72px' : 'var(--SideNav-width)' },
-            transition: 'padding-left 0.2s',
+            pl: { lg: collapsed ? `${ANCHO_SIDENAV_COLAPSADO}px` : 'var(--SideNav-width)' },
+            transition: animar ? 'padding-left 0.2s' : 'none',
             overflow: 'hidden',
             height: '100%',
           }}
         >
           <MainNav />
           <main style={{ flex: 1, overflow: 'auto', height: '100%' }}>
-            <Container maxWidth={false} sx={{ py: '32px', px: { xs: 1, md: 3 }, marginTop: '17px' }}>
+            <Container maxWidth={false} sx={{ py: { xs: 2, md: 3 }, px: { xs: 2, md: 3 } }}>
               {children}
             </Container>
           </main>

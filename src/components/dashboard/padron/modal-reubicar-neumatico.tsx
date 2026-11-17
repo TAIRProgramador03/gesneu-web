@@ -1,7 +1,8 @@
 'use client'
 
 import { Button as ButtonCustom } from '@/components/ui/button';
-import { Card, Dialog, DialogContent, DialogTitle, Typography, Box } from '@mui/material';
+import { Card, Dialog, DialogContent, DialogTitle, Typography, Box, useMediaQuery } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { ChevronsLeft, ChevronsRight, CircleChevronRight, RotateCw, SquareCheck } from 'lucide-react';
 import { EsRecuperadoBadge } from '@/components/ui/EsRecuperadoBadge';
 import { Field } from '@/components/ui/field';
@@ -141,23 +142,33 @@ export const ModalReubicarNeumatico = ({ open, onClose, onSuccess }: ModalReubic
     return neumaticosParaReubicar.filter(neu => !neumaticosTrasladados?.find(n => n.id === neu.ID_NEUMATICO))
   }, [neumaticosParaReubicar, neumaticosTrasladados])
 
+  const theme = useTheme()
+  const esPantallaChica = useMediaQuery(theme.breakpoints.down('lg'))
+  const esMovil = useMediaQuery(theme.breakpoints.down('md'))
+
   const listaOrigenRef = useRef<HTMLDivElement>(null)
 
   const rowVirtualizer = useVirtualizer({
     count: neumaticosDisponibles.length,
     getScrollElement: () => listaOrigenRef.current,
-    estimateSize: () => 56,
+    estimateSize: () => (esMovil ? 122 : 56),
     overscan: 6,
   })
 
+  // La altura de cada fila cambia entre móvil y escritorio: hay que volver a medir.
+  React.useEffect(() => {
+    rowVirtualizer.measure()
+  }, [esMovil, rowVirtualizer])
+
   return (
     <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth
-      PaperProps={{ sx: { borderRadius: 3, overflow: 'hidden' } }}
+      fullScreen={esPantallaChica}
+      PaperProps={{ sx: { borderRadius: { xs: 0, lg: 3 }, overflow: 'hidden' } }}
     >
       {/* Franja superior */}
       <Box sx={{ height: 4, background: 'linear-gradient(90deg, #3b82f6 0%, #6366f1 100%)' }} />
 
-      <DialogTitle sx={{ pb: 1.5, pt: 2, display: 'flex', alignItems: 'center', gap: 1.5, borderBottom: '1px solid', borderColor: 'divider' }}>
+      <DialogTitle sx={{ pb: 1.5, pt: 2, px: { xs: 2, md: 3 }, display: 'flex', alignItems: 'center', gap: 1.5, borderBottom: '1px solid', borderColor: 'divider' }}>
         <Box sx={{
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           width: 40, height: 40, borderRadius: 2, flexShrink: 0,
@@ -165,9 +176,9 @@ export const ModalReubicarNeumatico = ({ open, onClose, onSuccess }: ModalReubic
         }}>
           <CircleChevronRight size={20} className="text-blue-600 dark:text-blue-300" />
         </Box>
-        <Box>
-          <Typography variant="h6" fontWeight={700} lineHeight={1.2}>
-            Reubicar Neumáticos
+        <Box sx={{ minWidth: 0 }}>
+          <Typography variant="h6" fontWeight={700} lineHeight={1.2} sx={{ fontSize: { xs: '1.05rem', md: '1.25rem' } }}>
+            Reubicar neumáticos
           </Typography>
           <Typography variant="body2" color="text.secondary">
             Mueve neumáticos de un taller origen a un taller destino
@@ -181,13 +192,13 @@ export const ModalReubicarNeumatico = ({ open, onClose, onSuccess }: ModalReubic
         </Box>
       </DialogTitle>
 
-      <DialogContent sx={{ pt: 2.5, bgcolor: 'var(--superficie-1)' }}>
+      <DialogContent sx={{ pt: { xs: 1.5, md: 2.5 }, px: { xs: 1.5, md: 3 }, bgcolor: 'var(--superficie-1)' }}>
 
 
-        <Stack direction="row" spacing={3} alignItems="flex-start">
+        <Stack direction={{ xs: 'column', lg: 'row' }} spacing={{ xs: 2, lg: 3 }} alignItems={{ xs: 'stretch', lg: 'flex-start' }}>
 
           {/* Panel izquierdo — lista de neumáticos */}
-          <Card sx={{ flex: 1, p: 2.5, minWidth: 340, borderRadius: 2.5, border: '1px solid var(--border)', marginTop: '10px' }} elevation={0} className='relative'>
+          <Card sx={{ flex: { xs: 'none', lg: 1 }, p: { xs: 1.5, md: 2.5 }, minWidth: { xs: 0, lg: 340 }, borderRadius: 2.5, border: '1px solid var(--border)', marginTop: '10px' }} elevation={0} className='relative'>
             <span className="inline-flex items-center gap-1 mb-3 px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-500/15 text-blue-500 text-sm font-medium">
               Origen
             </span>
@@ -204,7 +215,7 @@ export const ModalReubicarNeumatico = ({ open, onClose, onSuccess }: ModalReubic
               </ButtonCustom>
             }
 
-            <Box sx={{ minWidth: 200, flex: 1, maxWidth: 280 }}>
+            <Box sx={{ minWidth: { xs: 0, md: 200 }, flex: 1, maxWidth: { xs: '100%', md: 280 } }}>
               <SearchSelect
                 options={proyectosEnTotal.map(proyecto => (
                   {
@@ -232,7 +243,7 @@ export const ModalReubicarNeumatico = ({ open, onClose, onSuccess }: ModalReubic
               Haz clic en uno o varios neumáticos para seleccionarlos
             </Typography>
 
-            <Field className='mt-2 mb-2 w-50'>
+            <Field className='mt-2 mb-2 w-full sm:w-50'>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Input ref={codigoNeuRef} className='size-8 text-xs' id="input-codigo-neu" type="text" placeholder="Buscar por código"
@@ -252,7 +263,7 @@ export const ModalReubicarNeumatico = ({ open, onClose, onSuccess }: ModalReubic
             </Field>
 
             {/* Header de columnas */}
-            <div className="grid grid-cols-[1fr_auto_auto_auto_auto] items-center gap-x-4 px-3 mt-3 mb-1">
+            <div className="hidden md:grid md:grid-cols-[1fr_auto_auto_auto_auto] items-center gap-x-4 px-3 mt-3 mb-1">
               <span className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Código</span>
               <span className="text-xs font-semibold text-slate-400 uppercase tracking-wide text-center">Taller</span>
               <span className="text-xs font-semibold text-slate-400 uppercase tracking-wide text-center">Recup.</span>
@@ -286,7 +297,7 @@ export const ModalReubicarNeumatico = ({ open, onClose, onSuccess }: ModalReubic
                             transform: `translateY(${virtualRow.start}px)`,
                           }}
                           className={`
-                        grid grid-cols-[1fr_auto_auto_auto_auto] items-center gap-x-4
+                        grid max-md:grid-cols-[1fr_auto] max-md:gap-y-1.5 md:grid-cols-[1fr_auto_auto_auto_auto] items-center gap-x-4
                         rounded-xl px-3 py-2.5 cursor-pointer border-2 transition-all duration-150
                         ${isSelected
                               ? 'border-blue-500 bg-blue-50 dark:bg-blue-500/10 shadow-sm'
@@ -295,32 +306,32 @@ export const ModalReubicarNeumatico = ({ open, onClose, onSuccess }: ModalReubic
                       `}
                         >
                           {/* Código + badge estado */}
-                          <div className="flex flex-col gap-0.5">
+                          <div className="flex min-w-0 flex-col gap-0.5 max-md:col-start-1 max-md:row-start-1">
                             <span className="font-normal text-sm text-slate-800 dark:text-slate-100 truncate">
                               {neu.CODIGO}
                             </span>
                           </div>
 
                           {/* Taller */}
-                          <div className="flex flex-col items-center">
+                          <div className="flex min-w-0 flex-col items-center max-md:col-start-1 max-md:row-start-2 max-md:items-start">
                             <span className="font-light italic text-xs text-slate-700 dark:text-slate-200  truncate">
                               {neu.PROYECTO_ACTUAL}
                             </span>
                           </div>
 
                           {/* Recuperado */}
-                          <div className="flex items-center justify-center">
+                          <div className="flex items-center justify-center max-md:col-start-2 max-md:row-start-2">
                             <EsRecuperadoBadge esRecuperado={neu.RECUPERADO} />
                           </div>
 
                           {/* Disponibilidad */}
-                          <div className="flex items-center justify-center">
+                          <div className="flex items-center justify-center max-md:col-start-2 max-md:row-start-1">
                             <TipoMovimientoBadge tipoMovimiento={neu.CODIGO_INTERNO} />
                           </div>
 
                           {/* Vida útil */}
-                          <div className="flex items-center justify-center">
-                            <LinearProgressItem estado={neu.PORCENTAJE_VIDA} width='75px' />
+                          <div className="flex items-center justify-center max-md:col-span-2 max-md:row-start-3">
+                            <LinearProgressItem estado={neu.PORCENTAJE_VIDA} width={esMovil ? '100%' : '75px'} />
                           </div>
                         </div>
                       );
@@ -340,18 +351,18 @@ export const ModalReubicarNeumatico = ({ open, onClose, onSuccess }: ModalReubic
           </Card>
 
           {/* Conector entre paneles */}
-          <Box sx={{ display: 'flex', alignItems: 'center', alignSelf: 'center', color: '#94a3b8', flexShrink: 0 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', alignSelf: 'center', color: '#94a3b8', flexShrink: 0, transform: { xs: 'rotate(90deg)', lg: 'none' } }}>
             <ChevronsRight size={28} />
           </Box>
 
           {/* Panel derecho */}
           <Card sx={{
-            flex: 1, p: 2.5,
-            minWidth: 320,
+            flex: { xs: 'none', lg: 1 }, p: { xs: 1.5, md: 2.5 },
+            minWidth: { xs: 0, lg: 320 },
             borderRadius: 2.5,
             border: '2px solid #fef08a',
             marginTop: '10px',
-            background: neumaticosTrasladados.length === 0 ? 'linear-gradient(135deg, #fefce8 0%, #fef9c3 100%)' : '#fff',
+            background: neumaticosTrasladados.length === 0 ? 'linear-gradient(135deg, #fefce8 0%, #fef9c3 100%)' : 'var(--card)',
             transition: 'background 0.3s ease',
           }} elevation={0}
           >
@@ -373,7 +384,7 @@ export const ModalReubicarNeumatico = ({ open, onClose, onSuccess }: ModalReubic
               </span>
             </div>
 
-            <Box sx={{ minWidth: 200, flex: 1, maxWidth: 280 }}>
+            <Box sx={{ minWidth: { xs: 0, md: 200 }, flex: 1, maxWidth: { xs: '100%', md: 280 } }}>
               <p style={{ fontSize: '0.75rem', fontWeight: 600, color: "#64748b", margin: "0 0 5px", textTransform: "uppercase", letterSpacing: ".05em" }}>
                 Taller destino:
               </p>
@@ -392,7 +403,7 @@ export const ModalReubicarNeumatico = ({ open, onClose, onSuccess }: ModalReubic
               />
             </Box>
 
-            <div className="grid grid-cols-[1fr_auto_auto_auto_auto] items-center gap-x-4 px-3 mt-3 mb-1">
+            <div className="hidden md:grid md:grid-cols-[1fr_auto_auto_auto_auto] items-center gap-x-4 px-3 mt-3 mb-1">
               <span className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Código</span>
               <span className="text-xs font-semibold text-slate-400 uppercase tracking-wide text-center">Taller</span>
               <span className="text-xs font-semibold text-slate-400 uppercase tracking-wide text-center">Recup.</span>
@@ -430,7 +441,7 @@ export const ModalReubicarNeumatico = ({ open, onClose, onSuccess }: ModalReubic
                         onClick={() => handleClickOnNeumaticoTrasladado({ neumatico: neu })}
                         onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && handleClickOnNeumaticoTrasladado({ neumatico: neu })}
                         className={`
-                      relative grid grid-cols-[1fr_auto_auto_auto_auto] items-center gap-x-4
+                      relative grid max-md:grid-cols-[1fr_auto] max-md:gap-y-1.5 md:grid-cols-[1fr_auto_auto_auto_auto] items-center gap-x-4
                       rounded-xl px-3 py-2.5 cursor-pointer border-2 transition-all duration-150
                       ${isSelected
                             ? 'border-yellow-500 bg-yellow-50 dark:bg-yellow-500/10 shadow-sm'
@@ -438,26 +449,26 @@ export const ModalReubicarNeumatico = ({ open, onClose, onSuccess }: ModalReubic
                           }
                     `}
                       >
-                        <div className="flex flex-col gap-0.5">
+                        <div className="flex min-w-0 flex-col gap-0.5 max-md:col-start-1 max-md:row-start-1">
                           <span className="font-normal text-sm text-slate-800 dark:text-slate-100 truncate">
                             {neu.codigo}
                           </span>
                         </div>
 
-                        <div className="flex flex-col items-center">
+                        <div className="flex min-w-0 flex-col items-center max-md:col-start-1 max-md:row-start-2 max-md:items-start">
                           <span className="font-light italic text-xs  text-slate-700 dark:text-slate-200  truncate">{neu.proyecto}</span>
                         </div>
 
-                        <div className="flex items-center justify-center">
+                        <div className="flex items-center justify-center max-md:col-start-2 max-md:row-start-2">
                           <EsRecuperadoBadge esRecuperado={neu.esRecuperado} />
                         </div>
 
-                        <div className="flex items-center justify-center">
+                        <div className="flex items-center justify-center max-md:col-start-2 max-md:row-start-1">
                           <TipoMovimientoBadge tipoMovimiento={neu.tipoMovimiento} />
                         </div>
 
-                        <div className="flex items-center justify-center">
-                          <LinearProgressItem estado={neu.vida} width='75px' />
+                        <div className="flex items-center justify-center max-md:col-span-2 max-md:row-start-3">
+                          <LinearProgressItem estado={neu.vida} width={esMovil ? '100%' : '75px'} />
                         </div>
                       </div>
                     );
@@ -475,7 +486,16 @@ export const ModalReubicarNeumatico = ({ open, onClose, onSuccess }: ModalReubic
           </Card>
         </Stack>
       </DialogContent>
-      <DialogActions sx={{ px: 3, py: 1.5, borderTop: '1px solid', borderColor: 'divider' }}>
+      <DialogActions
+        sx={{
+          px: { xs: 2, md: 3 }, py: 1.5,
+          pb: { xs: 'max(12px, env(safe-area-inset-bottom, 0px))', md: 1.5 },
+          borderTop: '1px solid', borderColor: 'divider',
+          flexDirection: { xs: 'column-reverse', sm: 'row' },
+          gap: 1,
+          '& > button': { width: { xs: '100%', sm: 'auto' }, m: '0 !important' },
+        }}
+      >
         <ButtonCustom onClick={onClose}>
           Cerrar
         </ButtonCustom>

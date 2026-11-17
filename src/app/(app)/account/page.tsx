@@ -1,25 +1,19 @@
 import * as React from 'react';
-import Stack from '@mui/material/Stack';
-import Typography from '@mui/material/Typography';
-import Grid from '@mui/material/Unstable_Grid2';
 
-import { AccountDetailsForm } from '@/components/dashboard/account/account-details-form';
-import { AccountInfo } from '@/components/dashboard/account/account-info';
+import { AccountDatos } from '@/components/dashboard/account/account-datos';
+import { AccountHero } from '@/components/dashboard/account/account-hero';
+import { AccountTalleres } from '@/components/dashboard/account/account-talleres';
 
 export default function Page(): React.JSX.Element {
   return (
-    <Stack spacing={3}>
-      <div>
-        <Typography variant="h4">Cuenta</Typography>
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
+      <AccountHero />
+      <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-3">
+        <AccountDatos />
+        <div className="min-w-0 lg:col-span-2">
+          <AccountTalleres />
+        </div>
       </div>
-      <Grid container spacing={3}>
-        <Grid lg={4} md={6} xs={12}>
-          <AccountInfo />
-        </Grid>
-        <Grid lg={8} md={6} xs={12}>
-          <AccountDetailsForm />
-        </Grid>
-      </Grid>
-    </Stack>
+    </div>
   );
 }

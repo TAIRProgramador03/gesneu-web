@@ -1,13 +1,11 @@
 'use client';
 
 import * as React from 'react';
-import RouterLink from 'next/link';
 import { usePathname } from 'next/navigation';
 import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
-import Stack from '@mui/material/Stack';
 import Chip from '@mui/material/Chip';
 import Badge from '@mui/material/Badge';
 import Typography from '@mui/material/Typography';
@@ -15,39 +13,41 @@ import { CaretLeft, CaretRight, Buildings, CaretUpDown } from '@phosphor-icons/r
 
 import Tooltip from '@mui/material/Tooltip';
 import type { User } from '@/types/user';
-import type { NavItemConfig } from '@/types/nav';
-import { isNavItemActive } from '@/lib/is-nav-item-active';
 
 
 import { useUser } from '@/hooks/use-user';
 import { usePopover } from '@/hooks/use-popover';
 import { Decoracion } from '@/temporadas/temporada-provider';
-import { navItems } from './config';
-import { navIcons } from './nav-icons';
+import { filtrarNavSecciones, navSecciones } from './config';
+import { ANCHO_SIDENAV, ANCHO_SIDENAV_COLAPSADO, NAV_FONDO, NAV_FOCO } from './nav-constantes';
+import { NavMenu } from './nav-menu';
 import { UserPopover } from './user-popover';
 
 interface SideNavProps {
   collapsed: boolean;
   setCollapsed: (value: boolean) => void;
+  /** false hasta que se leyó el estado guardado: evita animar el salto inicial. */
+  animar?: boolean;
 }
 
-export function SideNav({ collapsed, setCollapsed }: SideNavProps): React.JSX.Element {
+export function SideNav({ collapsed, setCollapsed, animar = true }: SideNavProps): React.JSX.Element {
   const pathname = usePathname();
   const { user } = useUser();
-  const username = user?.usuario?.toUpperCase() ?? '';
-  const visibleNavItems = navItems.filter((item) =>
-    !item.allowedUsers || item.allowedUsers.includes(username.trim())
+  const secciones = React.useMemo(
+    () => filtrarNavSecciones(navSecciones, user?.usuario ?? ''),
+    [user?.usuario]
   );
 
   return (
     <Box
       sx={{
-        width: collapsed ? 72 : 280,
-        minWidth: collapsed ? 72 : 280,
-        transition: 'width 0.2s',
-        bgcolor: '#002141',
+        width: collapsed ? ANCHO_SIDENAV_COLAPSADO : ANCHO_SIDENAV,
+        minWidth: collapsed ? ANCHO_SIDENAV_COLAPSADO : ANCHO_SIDENAV,
+        transition: animar ? 'width 0.2s' : 'none',
+        overflow: 'hidden',
+        bgcolor: NAV_FONDO,
         color: 'var(--SideNav-color)',
-        height: '100vh',
+        height: '100dvh',
         position: 'fixed',
         left: 0,
         top: 0,
@@ -63,26 +63,29 @@ export function SideNav({ collapsed, setCollapsed }: SideNavProps): React.JSX.El
           display: 'flex',
           alignItems: 'center',
           justifyContent: collapsed ? 'center' : 'space-between',
-          height: 64,
+          gap: 1,
+          minHeight: 72,
           px: 2,
-          py: 1,
+          flex: '0 0 auto',
         }}
       >
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '20px' }}>
-          {/* <img src="/logo-tair.png" alt="Logo" style={{ width: 40, height: 40 }} /> */}
-          {!collapsed && (
-            <Typography variant="h6" sx={{ ml: 1, color: '#fff', fontSize: '1.6em' }}>
-              Gestor de Neumáticos
-            </Typography>
-          )}
-        </Box>
+        {!collapsed && (
+          <Typography
+            variant="h6"
+            noWrap
+            sx={{ color: '#fff', fontSize: '1.15rem', lineHeight: 1.2, minWidth: 0, flex: '1 1 auto' }}
+          >
+            Gestor de Neumáticos
+          </Typography>
+        )}
         <Button
           onClick={() => setCollapsed(!collapsed)}
+          aria-label={collapsed ? 'Expandir menú' : 'Plegar menú'}
           sx={{
             minWidth: 0,
             width: 32,
             height: 32,
-            ml: collapsed ? 0 : 1,
+            flex: '0 0 auto',
             borderRadius: '50%',
             p: 0,
             color: "#fff",
@@ -96,10 +99,8 @@ export function SideNav({ collapsed, setCollapsed }: SideNavProps): React.JSX.El
       </Box>
       {/* <Divider /> */}
       {/* Menú */}
-      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', pt: 2, marginTop: '25px' }}>
-        <Box component="nav" sx={{ width: '100%', padding: '10px' }}>
-          {renderNavItems({ pathname, items: visibleNavItems, collapsed })}
-        </Box>
+      <Box sx={{ flex: 1, minHeight: 0, overflowY: 'auto', overflowX: 'hidden', p: '10px', mt: '8px', scrollbarWidth: 'thin' }}>
+        <NavMenu secciones={secciones} pathname={pathname} colapsado={collapsed} />
       </Box>
       <Divider sx={{ borderColor: 'rgba(255,255,255,0.12)' }} />
       {/* User description */}
@@ -175,7 +176,7 @@ function UserCard({ user, collapsed }: { user: User | null; collapsed: boolean }
           justifyContent: collapsed ? 'center' : 'flex-start',
           transition: 'background-color 0.15s ease',
           '&:hover': { bgcolor: 'rgba(255,255,255,0.06)' },
-          '&:focus-visible': { outline: '2px solid #67b0f5', outlineOffset: '-2px' },
+          '&:focus-visible': { outline: `2px solid ${NAV_FOCO}`, outlineOffset: '-2px' },
         }}
       >
         <Tooltip
@@ -280,129 +281,5 @@ function UserCard({ user, collapsed }: { user: User | null; collapsed: boolean }
         onClose={popover.handleClose}
       />
     </>
-  );
-}
-
-function renderNavItems({
-  items = [],
-  pathname,
-  collapsed = false,
-}: {
-  items?: NavItemConfig[];
-  pathname: string;
-  collapsed?: boolean;
-}): React.JSX.Element {
-  const children = items.reduce((acc: React.ReactNode[], curr: NavItemConfig): React.ReactNode[] => {
-    const { key, divider, ...item } = curr;
-
-    if (divider) {
-      acc.push(
-        <Divider key={`divider-${key}`} sx={{ my: 1, borderColor: 'rgba(255,255,255,0.30)' }} />
-      );
-    }
-
-    acc.push(<NavItem key={key} pathname={pathname} collapsed={collapsed} {...item} />);
-
-    return acc;
-  }, []);
-
-  return (
-    <Stack component="ul" spacing={1} sx={{ listStyle: 'none', m: 0, p: 0 }}>
-      {children}
-    </Stack>
-  );
-}
-
-interface NavItemProps extends Omit<NavItemConfig, 'items'> {
-  pathname: string;
-  collapsed?: boolean;
-}
-
-function NavItem({
-  disabled,
-  external,
-  href,
-  icon,
-  matcher,
-  pathname,
-  title,
-  collapsed,
-}: NavItemProps): React.JSX.Element {
-  const active = isNavItemActive({ disabled, external, href, matcher, pathname });
-  const Icon = icon ? navIcons[icon] : null;
-
-  return (
-    <Tooltip title={collapsed ? title : ''} placement="right" arrow>
-      <li>
-        <Box
-          // Ganchos de estilo para temporadas (hover caramelo, activo con nieve).
-          className={[
-            'nav-item-temporada',
-            active ? 'nav-item-activo' : '',
-            collapsed ? 'nav-item-colapsado' : '',
-          ]
-            .filter(Boolean)
-            .join(' ')}
-          {...(href
-            ? {
-              component: external ? 'a' : RouterLink,
-              href,
-              target: external ? '_blank' : undefined,
-              rel: external ? 'noreferrer' : undefined,
-            }
-            : { role: 'button', tabIndex: disabled ? -1 : 0 })}
-          sx={{
-            alignItems: 'center',
-            borderRadius: 1,
-            color: '#fff',
-            cursor: 'pointer',
-            display: 'flex',
-            flex: '0 0 auto',
-            gap: 1,
-            p: collapsed ? '6px' : '6px 16px',
-            position: 'relative',
-            textDecoration: 'none',
-            whiteSpace: 'nowrap',
-            justifyContent: collapsed ? 'center' : 'flex-start',
-            transition: 'background-color 0.15s ease',
-            '&:focus-visible': { outline: '2px solid #67b0f5', outlineOffset: '2px' },
-            ...(!active &&
-              !disabled && {
-              '&:hover': { bgcolor: 'rgba(255,255,255,0.08)' },
-            }),
-            ...(disabled && {
-              bgcolor: 'var(--NavItem-disabled-background)',
-              color: 'var(--NavItem-disabled-color)',
-              cursor: 'not-allowed',
-            }),
-            ...(active && { bgcolor: '#167bd9', color: '#fff' }),
-          }}
-        >
-          <Box sx={{ alignItems: 'center', display: 'flex', justifyContent: 'center', flex: '0 0 auto' }}>
-            {Icon ? (
-              <Icon
-                strokeWidth={2.5}
-                fill={active ? '#fff' : 'rgba(255,255,255,0.75)'}
-                fontSize="var(--icon-fontSize-lg)"
-                weight={'bold'}
-              />
-            ) : null}
-          </Box>
-          {/* Solo muestra el nombre si NO está colapsado */}
-          {!collapsed && (
-            <Box sx={{ flex: '1 1 auto' }}>
-              <Typography
-                component="span"
-                sx={{
-                  color: 'inherit', fontSize: '1rem', fontWeight: 500, lineHeight: '28px'
-                }}
-              >
-                {title}
-              </Typography>
-            </Box>
-          )}
-        </Box>
-      </li>
-    </Tooltip>
   );
 }

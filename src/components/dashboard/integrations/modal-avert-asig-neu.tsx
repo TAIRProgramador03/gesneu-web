@@ -61,12 +61,12 @@ const ModalAvertAsigNeu: React.FC<ModalAvertAsigNeuProps> = ({ open, onClose, on
             <DialogContent>
                 <DialogContentText
                     id="alert-dialog-description"
-                    sx={{ textAlign: 'center', color: 'black', fontSize: '1rem' }}
+                    sx={{ textAlign: 'center', color: 'text.primary', fontSize: '1rem' }}
                 >
                     {message}
                 </DialogContentText>
             </DialogContent>
-            <DialogActions sx={{ justifyContent: 'center' }}>
+            <DialogActions sx={{ justifyContent: 'center', flexWrap: 'wrap', gap: 1, px: 3, pb: 2 }}>
 
                 <ButtonCustom
                     variant="ghost"

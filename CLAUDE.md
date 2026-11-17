@@ -115,9 +115,9 @@ Route constants are centralized in `src/paths.ts`.
 
 Top-level (siblings of `AxiosInterceptorLoader.tsx`, not under `dashboard/`): `ChatWidget.tsx`, `SessionErrorSnackbar.tsx`
 
-**`padron/neumatico/`** — tire detail sub-components: `FichaTecnica.tsx`, `FichaItem.tsx`, `MiniKpi.tsx`, `ComparisonBar.tsx`, `RemanenteChart.tsx`, `SemiGauge.tsx`, `Sparkline.tsx`, `HeroHeader.tsx`, `KilometrajeChart.tsx`, `StatCard.tsx`, `Timeline.tsx`, `TimelineEventCard.tsx`, `VidaUtilCard.tsx`
+**`padron/neumatico/`** — tire detail sub-components: `HeroHeader.tsx` (neumático ilustrado con anillo de vida + aviso según situación), `VidaUtilCard.tsx` (regla de profundidad de banda, proyección o balance final), `UbicacionCard.tsx` (usa `DiagramaVehiculo`; sin montar muestra el último vehículo), `EvolucionCard.tsx` (pestañas sobre `RemanenteChart` / `KilometrajeChart`, que aceptan `sinTarjeta`), `FichaTecnica.tsx`, `MiniKpi.tsx`, `StatCard.tsx`, `Timeline.tsx` (con filtros), `TimelineEventCard.tsx`. Los cálculos de desgaste/proyección viven en `utils/estadisticas-neumatico.ts`, no en los componentes
 
-**`padron/placa/`** — vehicle detail sub-components (backs `/padron/placa/[placa]`): `PlacaHeroHeader.tsx`, `PlacaFichaTecnica.tsx`, `NeumaticosActualesCard.tsx`, `PlacaTimeline.tsx`, `PlacaTimelineEventCard.tsx`
+**`padron/placa/`** — vehicle detail sub-components (backs `/padron/placa/[placa]`): `PlacaHeroHeader.tsx` (placa ilustrada, avisos de salud e inspección, anillo de vida promedio), `NeumaticosActualesCard.tsx` (`DiagramaVehiculo` + lista enlazados por posición), `EstadoInspeccionCard.tsx` (regla de 4 días), `PlacaFichaTecnica.tsx`, `PlacaTimeline.tsx` (con filtros), `PlacaTimelineEventCard.tsx`. Las cifras de la placa salen de `utils/estadisticas-placa.ts`
 
 **`reportes/`** — report dialogs/pages used by `/analisis-rendimiento` and `/analisis-consumos`: `Reporteneumaticobaja.tsx`, `NeumaticosBajaDialog.tsx`, `NeumaticosDespachadosDialog.tsx`, `NeumaticosTerrenoDialog.tsx`, `ReporteConsumos.tsx`
 

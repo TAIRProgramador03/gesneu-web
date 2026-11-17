@@ -30,8 +30,9 @@ import ModalInspeccionObligatoria from '@/components/core/theme-provider/modal-r
 import ModalReubicar from '@/components/dashboard/integrations/modal-reubicar';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import { ArrowLeftRightIcon, BookMarked, EyeIcon, ListRestart, MapPinCheckInside, Replace } from 'lucide-react';
+import { ArrowLeftRightIcon, BookMarked, EyeIcon, FileText, ListRestart, MapPinCheckInside, Replace } from 'lucide-react';
 import { ModalVerInspecciones } from '@/components/dashboard/integrations/modal-ver-inspecciones';
+import { ModalReporteCambio } from '@/components/dashboard/integrations/modal-reporte-cambio';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Button as ButtonCustom } from '@/components/ui/button';
 import { LoadingButton2 } from '@/components/ui/loading-button2';
@@ -571,6 +572,7 @@ export default function Page(): React.JSX.Element {
 
   const [openModalInspeccionAnterior, setOpenModalInspeccionAnterior] = useState(false);
   const [openVerInspecciones, setOpenVerInspecciones] = useState(false);
+  const [openReporteCambio, setOpenReporteCambio] = useState(false);
 
   // todo: ABRIR MODAL ANTES DE REUBICAR
   // Función para REUBICAR - Ejecuta TODAS las validaciones ANTES de abrir modal
@@ -822,6 +824,16 @@ export default function Page(): React.JSX.Element {
                       >
                         <Replace />
                         Desasignar
+                      </DropdownMenuItem>
+                      {/* Sólo lee lo ya registrado: no cambia nada y el
+                          backend no le aplica la cola de S60. Ojo: hereda el
+                          `disabled` del botón Mantenimiento, así que con la
+                          placa bloqueada por una S60 vieja no se llega. */}
+                      <DropdownMenuItem
+                        onClick={() => setOpenReporteCambio(true)}
+                      >
+                        <FileText />
+                        Reporte de cambio
                       </DropdownMenuItem>
                     </DropdownMenuGroup>
                   </DropdownMenuContent>
@@ -1125,6 +1137,18 @@ export default function Page(): React.JSX.Element {
             open={openVerInspecciones}
             onClose={() => setOpenVerInspecciones(false)}
             placa={vehiculo?.PLACA ?? ''}
+          />
+        )
+      }
+
+      {/* Reporte de cambio de neumáticos: un PDF por cada S60 regularizada */}
+      {
+        openReporteCambio && vehiculo && (
+          <ModalReporteCambio
+            open={openReporteCambio}
+            onClose={() => setOpenReporteCambio(false)}
+            placa={vehiculo.PLACA ?? ''}
+            vehiculo={vehiculo}
           />
         )
       }

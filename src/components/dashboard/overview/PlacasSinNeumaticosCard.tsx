@@ -165,6 +165,7 @@ export function PlacasSinNeumaticosCard({ sx }: PlacasSinNeumaticosCardProps) {
         <DialogContent>
 
           <DataTableNeumaticos
+            tarjetasEnMovil
             columns={columnsPlacasNeumaticos}
             type='pagination'
             data={placasConCantidadNeumaticos}

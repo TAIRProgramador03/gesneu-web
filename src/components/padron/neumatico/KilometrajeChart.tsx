@@ -45,7 +45,7 @@ function CustomTooltipContent({ active, payload }: { active?: boolean; payload?:
   )
 }
 
-export const KilometrajeChart = ({ historial, neu }: { historial: MovimientoHistorial[]; neu: NeumaticoBuscado }) => {
+export const KilometrajeChart = ({ historial, neu, sinTarjeta = false }: { historial: MovimientoHistorial[]; neu: NeumaticoBuscado; /** Devuelve sólo el gráfico, sin la tarjeta: lo usa EvolucionCard. */ sinTarjeta?: boolean }) => {
 
   const chartData = useMemo<ChartDataPoint[]>(() => {
     return [...historial]
@@ -73,8 +73,7 @@ export const KilometrajeChart = ({ historial, neu }: { historial: MovimientoHist
   const strokeColorD = "#3b82f6"
   const fillColorD = "#3b82f6"
 
-  return (
-    <CollapsibleSection title="Kilómetros recorridos entre inspecciones" icon={<BarChart3 className="size-4" />} border='border-sky-500' >
+  const grafico = (
       <div className="h-70 w-full">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={chartData} margin={{ top: 8, right: 8, bottom: 0, left: -16 }}>
@@ -112,6 +111,13 @@ export const KilometrajeChart = ({ historial, neu }: { historial: MovimientoHist
           </AreaChart>
         </ResponsiveContainer>
       </div>
+  )
+
+  if (sinTarjeta) return grafico
+
+  return (
+    <CollapsibleSection title="Kilómetros recorridos entre inspecciones" icon={<BarChart3 className="size-4" />} border='border-sky-500' >
+      {grafico}
     </CollapsibleSection>
   )
 }
