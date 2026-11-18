@@ -15,7 +15,8 @@ import LinearProgress from '@mui/material/LinearProgress';
 import { Car, ChevronRight, ClipboardList } from 'lucide-react';
 import CountUp from 'react-countup';
 import { useQuery } from '@tanstack/react-query';
-import { obtenerPlacasConNeumaticos } from '@/api/Neumaticos';
+import { obtenerLosTalleresDelUsuario, obtenerPlacasConNeumaticos } from '@/api/Neumaticos';
+import { Combobox } from '@/components/ui/combobox';
 import { DataTableNeumaticos } from '@/components/ui/data-table/data-table';
 import { columnsPlacasNeumaticos } from '@/app/(app)/dashboard/columns-placas-neumaticos';
 import { Box } from '@mui/system';
@@ -30,9 +31,21 @@ export function PlacasSinNeumaticosCard({ sx }: PlacasSinNeumaticosCardProps) {
   const [open, setOpen] = React.useState(false);
   const { user } = useUser();
 
+  const [taller, setTaller] = React.useState<string>('todos');
+
+  const { data: talleres = [] } = useQuery({
+    queryKey: ['talleres-del-usuario'],
+    queryFn: obtenerLosTalleresDelUsuario,
+  });
+
+  // Un solo taller: queda seleccionado; dos o más: arranca en "todos".
+  React.useEffect(() => {
+    if (talleres.length === 1) setTaller(talleres[0].value);
+  }, [talleres]);
+
   const { data: placasConCantidadNeumaticos = [], isLoading } = useQuery({
-    queryKey: ['placas-con-cantidad-neumaticos'],
-    queryFn: obtenerPlacasConNeumaticos
+    queryKey: ['placas-con-cantidad-neumaticos', { taller }],
+    queryFn: () => obtenerPlacasConNeumaticos(taller),
   })
 
   const sinNeu = placasConCantidadNeumaticos.reduce((a, v) => v.CANTIDAD_NEUMATICOS_INSTALADOS === 0 ? a + 1 : a + 0, 0);
@@ -71,6 +84,26 @@ export function PlacasSinNeumaticosCard({ sx }: PlacasSinNeumaticosCardProps) {
               >
                 Placas sin neumáticos
               </Typography>
+
+              {talleres.length > 0 && (
+                <div className="mb-2">
+                  <Combobox
+                    options={talleres}
+                    value={taller === 'todos' ? '' : taller}
+                    onChange={(v) => {
+                      // cmdk puede devolver el valor en minúsculas: se recupera el original.
+                      const opcion = talleres.find((t) => t.value.toLowerCase() === v.toLowerCase());
+                      if (opcion) setTaller(opcion.value);
+                      else if (talleres.length > 1) setTaller('todos');
+                    }}
+                    placeholder={talleres.length > 1 ? 'Todos los talleres' : 'Taller'}
+                    searchPlaceholder="Buscar taller..."
+                    clearable={talleres.length > 1}
+                    clearText="Todos los talleres"
+                    className="w-full max-w-52 h-7 text-xs"
+                  />
+                </div>
+              )}
 
               <Typography variant="h4" sx={{ fontWeight: 800, color: 'text.primary', lineHeight: 1.1 }}>
                 {isLoading

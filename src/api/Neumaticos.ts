@@ -735,10 +735,11 @@ export interface PlacasConNeumaticos {
   CANTIDAD_NEUMATICOS_INSTALADOS: number
 }
 
-export const obtenerPlacasConNeumaticos = async () => {
+export const obtenerPlacasConNeumaticos = async (taller: string = 'todos') => {
   try {
     const response = await axios.get<PlacasConNeumaticos[]>(`/api/po-neumaticos/neumaticos-por-vehiculo`, {
       withCredentials: true,
+      params: { taller },
     });
     return response.data;
   } catch (error) {
